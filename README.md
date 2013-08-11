@@ -1,5 +1,6 @@
-SOAUnit: Orchestrated Testing of SOA Resources
+SOAUnit
 ==================================================
+### Orchestrated Testing of SOA Resources
 
 SOAUnit provides a fluent Java Builder/DSL that allows developers and testers to construct test specifications that specify an endpoint where a message should be sent to kick off a process that requires testing, from which a series of endpoint expectations are specified to ensure messages arrive in a particular order and form. Given such a specification, the framework will automatically send messages to the target endpoint and set up endpoints on all of the expectations to receive messages, and if necessary provide a pre-formed response. The requests/responses are compared semantically to the expectation based on the format required; for example, XML is compared using XMLUnit to allow for variations in XML request/response generation.
 
@@ -43,7 +44,7 @@ syncTest("cxf:http://localhost:8090/pingServiceProxy", "WS PING test with mock s
                     .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                     .responseBody(xml(classpath("/data/pingResponse1.xml"))))
 ```
-The framework (Camel) will set up a CXF/SOAP endpoint on localhost:8090 which expects the message in pingRequest1.xml and will respond with the contents of pingResponse1.xml. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.
+The framework (Camel) will set up a CXF/SOAP endpoint on localhost:8090 which expects the message in `pingRequest1.xml` and will respond with the contents of `pingResponse1.xml`. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.
 
 The PING service may also test more than one service before providing a response; in this case we need only provide an additional expectation:
 ```java
