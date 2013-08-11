@@ -78,7 +78,6 @@ asyncTest("jms:test.input", "Simple Canonicalizer Comparison")
                 .messageBody(xml(text("<SystemField>foo</SystemField>")))
                 .addExpectation(asyncExpectation("jms:test.output")
                     .expectedBody(xml(text("<CanonicalField>foo</CanonicalField>"))))
-
 ```
 
 All of these examples can be found under the example directory of this project; execute the test run with the standard mvn test goal. There is currently some bootstrap code associated with JUnit and Camel - I am hoping to minimize this further by re-shuffling some code or introducing Groovy into the mix.
