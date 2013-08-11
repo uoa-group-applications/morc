@@ -42,7 +42,6 @@ syncTest("cxf:http://localhost:8090/pingServiceProxy", "WS PING test with mock s
                 .addExpectation(syncExpectation("cxf:http://localhost:8090/targetWS")
                     .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                     .responseBody(xml(classpath("/data/pingResponse1.xml"))))
-
 ```
 The framework (Camel) will set up a CXF/SOAP endpoint on localhost:8090 which expects the message in pingRequest1.xml and will respond with the contents of pingResponse1.xml. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.
 
