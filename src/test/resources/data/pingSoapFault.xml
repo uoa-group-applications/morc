@@ -1,0 +1,7 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+        >
+    <Fault xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <faultcode>soap:Server</faultcode>
+        <faultstring>Too much ping</faultstring>
+    </Fault>
+</soapenv:Envelope>

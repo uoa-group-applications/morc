@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<v1:isOfInterest xmlns:v1="http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1">
+    <v1:entity>HREmployee</v1:entity>
+    <v1:identifier name="uoaid">2512472</v1:identifier>
+</v1:isOfInterest>

@@ -1,0 +1,18 @@
+{
+    "firstName": "foo",
+    "lastName": "baz",
+    "address": {
+        "street": "foostreet",
+        "city": "baz"
+    },
+    "phone": [
+        {
+            "type": "home",
+            "number": 1234
+        },
+        {
+            "type": "work",
+            "number": 4321
+        }
+    ]
+}

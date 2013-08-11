@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:v1="http://www.auckland.ac.nz/domain/application/wsdl/ping/v1">
+    <soapenv:Body>
+        <v1:pingRequest>
+            <v1:request>ping</v1:request>
+        </v1:pingRequest>
+    </soapenv:Body>
+</soapenv:Envelope>

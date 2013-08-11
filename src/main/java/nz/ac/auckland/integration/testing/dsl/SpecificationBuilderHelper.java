@@ -1,0 +1,281 @@
+package nz.ac.auckland.integration.testing.dsl;
+
+import nz.ac.auckland.integration.testing.expectation.*;
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
+import nz.ac.auckland.integration.testing.resource.JsonTestResource;
+import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
+import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.validators.HttpExceptionResponseValidator;
+
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * A list of static methods that can be imported into a test implementation for quickly adding
+ * test specifications
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
+public class SpecificationBuilderHelper {
+
+    /**
+     * @param endpointUri The endpoint URI that an asynchronous message should be sent to
+     * @param description A description for the test specification that clearly identifies it
+     * @return An asynchronous test specification builder with the endpoint uri and description configured
+     */
+    public static AsyncOrchestratedTestSpecification.Builder asyncTest(String endpointUri, String description) {
+        return new AsyncOrchestratedTestSpecification.Builder(endpointUri, description);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that a synchronous message should be sent to
+     * @param description A description for the test specification that clearly identifies it
+     * @return An synchronous test specification builder with the endpoint uri and description configured
+     */
+    public static SyncOrchestratedTestSpecification.Builder syncTest(String endpointUri, String description) {
+        return new SyncOrchestratedTestSpecification.Builder(endpointUri, description);
+    }
+
+    /**
+     * @param data An XML string which will be used for seeding a message, or comparing a value
+     */
+    public static XmlTestResource xml(String data) {
+        return new XmlTestResource(data);
+    }
+
+    /**
+     * @param file A file containing an XML document
+     */
+    public static XmlTestResource xml(File file) {
+        return new XmlTestResource(file);
+    }
+
+    /**
+     * @param url A url pointing to an XML document
+     */
+    public static XmlTestResource xml(URL url) {
+        return new XmlTestResource(url);
+    }
+
+    /**
+     * @param data          An XML string which will be used for seeding a message, or comparing a value
+     * @param xpathSelector An xpath selector for returning certain xml nodes from a response
+     */
+    public static XmlTestResource xml(String data, XmlTestResource.XPathSelector xpathSelector) {
+        return new XmlTestResource(data, xpathSelector);
+    }
+
+    /**
+     * @param file          A file containing an XML document
+     * @param xpathSelector An xpath selector for returning certain xml nodes from a response
+     */
+    public static XmlTestResource xml(File file, XmlTestResource.XPathSelector xpathSelector) {
+        return new XmlTestResource(file, xpathSelector);
+    }
+
+    /**
+     * @param url           A url pointing to an XML document
+     * @param xpathSelector An xpath selector for returning certain xml nodes from a response
+     */
+    public static XmlTestResource xml(URL url, XmlTestResource.XPathSelector xpathSelector) {
+        return new XmlTestResource(url, xpathSelector);
+    }
+
+    /**
+     * @param data A JSON string which will be used for seeding a message, or comparing a value
+     */
+    public static JsonTestResource json(String data) {
+        return new JsonTestResource(data);
+    }
+
+    /**
+     * @param file A file containing a JSON document
+     */
+    public static JsonTestResource json(File file) {
+        return new JsonTestResource(file);
+    }
+
+    /**
+     * @param url A url pointing to a JSON document
+     */
+    public static JsonTestResource json(URL url) {
+        return new JsonTestResource(url);
+    }
+
+    /**
+     * @param data A standard Java string which will be used for seeding a message, or comparing a value
+     */
+    public static PlainTextTestResource text(String data) {
+        return new PlainTextTestResource(data);
+    }
+
+    /**
+     * @param file A file containing plain text
+     */
+    public static PlainTextTestResource text(File file) {
+        return new PlainTextTestResource(file);
+    }
+
+
+    /**
+     * @param url A url pointing to a plain text document
+     */
+    public static PlainTextTestResource text(URL url) {
+        return new PlainTextTestResource(url);
+    }
+
+    /**
+     * @param data A map of headers and corresponding data that will be used for seeding a message, or comparing an expected value
+     */
+    public static HeadersTestResource headers(Map<String, Object> data) {
+        return new HeadersTestResource(data);
+    }
+
+    /**
+     * @param file A Java Properties file containing header=value values
+     */
+    public static HeadersTestResource headers(File file) {
+        return new HeadersTestResource(file);
+    }
+
+    /**
+     * @param url A pointer to a Java Properties resource containing header=value values
+     */
+    public static HeadersTestResource headers(URL url) {
+        return new HeadersTestResource(url);
+    }
+
+    /**
+     * Named as such as header interferes with the CamelTestSupport class
+     *
+     * @param header A header to add to an outgoing or expected message
+     * @param value  The value that should be assigned to this header
+     */
+    public static HeaderValue headervalue(String header, Object value) {
+        return header(header, value);
+    }
+
+    /**
+     * @param header A header to add to an outgoing or expected message
+     * @param value  The value that should be assigned to this header
+     */
+    public static HeaderValue header(String header, Object value) {
+        return new HeaderValue(header, value);
+    }
+
+    /**
+     * @param headers A vararg list of headers which can be added to with the header(string,value) function
+     */
+    public static HeadersTestResource headers(HeaderValue... headers) {
+        Map<String, Object> headersMap = new HashMap<String, Object>();
+        for (HeaderValue header : headers) {
+            headersMap.put(header.header, header.value);
+        }
+
+        return headers(headersMap);
+    }
+
+    /**
+     * @param path A path to a resource on the current classpath
+     */
+    public static URL classpath(String path) {
+        URL resource = SpecificationBuilderHelper.class.getResource(path);
+        if (resource == null) throw new RuntimeException("The classpath resource could not be found: " + path);
+
+        return resource;
+    }
+
+    /**
+     * @param path A path to a file
+     */
+    public static File file(String path) {
+        return new File(path);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     */
+    public static AsyncMockExpectation.Builder asyncExpectation(String endpointUri) {
+        return new AsyncMockExpectation.Builder(endpointUri);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     */
+    public static WsFaultMockExpectation.Builder wsFaultExpectation(String endpointUri) {
+        return new WsFaultMockExpectation.Builder(endpointUri);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     */
+    public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri) {
+        return new ExceptionMockExpectation.Builder(endpointUri);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     */
+    public static SyncMockExpectation.Builder syncExpectation(String endpointUri) {
+        return new SyncMockExpectation.Builder(endpointUri);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     */
+    public static UnreceivedMockExpectation.Builder unreceivedExpectation(String endpointUri) {
+        return new UnreceivedMockExpectation.Builder(endpointUri);
+    }
+
+    public static class HeaderValue {
+        private String header;
+        private Object value;
+
+        public HeaderValue(String header, Object value) {
+            this.header = header;
+            this.value = value;
+        }
+    }
+
+    /**
+     * @return A validator that ensures that the HTTP response (likely a SOAP fault) meets the expected response body
+     */
+    public static HttpExceptionResponseValidator httpExceptionResponseValidator() {
+        return new HttpExceptionResponseValidator();
+    }
+
+    public static class NS {
+        private String prefix;
+        private String uri;
+
+        public NS(String prefix, String uri) {
+            this.prefix = prefix;
+            this.uri = uri;
+        }
+    }
+
+    /**
+     * @return A namespace designation for xpath evaluation of xml results
+     */
+    public static NS namespace(String prefix, String uri) {
+        return new NS(prefix, uri);
+    }
+
+    /**
+     * @param xpath      An xpath you want to evaluate to return a node for comparison
+     * @param namespaces a collection of namespace pairs used for evaluating the xpath
+     * @return an xpath selector to be used for the xml test resource
+     */
+    public static XmlTestResource.XPathSelector xpathSelector(String xpath, NS... namespaces) {
+        Map<String, String> namespaceMap = new HashMap<>();
+        for (NS namespace : namespaces) {
+            namespaceMap.put(namespace.prefix, namespace.uri);
+        }
+
+        return new XmlTestResource.XPathSelector(xpath, namespaceMap);
+    }
+}

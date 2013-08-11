@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<v1:isOfInterestResponse xmlns:v1="http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1">
+    <v1:Decision>true</v1:Decision>
+</v1:isOfInterestResponse>
