@@ -1,9 +1,14 @@
 package nz.ac.auckland.integration.testing;
 
+import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
+import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.cxf.CxfComponent;
+import org.apache.camel.component.cxf.CxfEndpoint;
+import org.apache.camel.component.cxf.DataFormat;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
@@ -30,6 +35,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     private final OrchestratedTestSpecification specification;
     private Logger logger = LoggerFactory.getLogger(OrchestratedTest.class);
     private PropertiesComponent properties = null;
+    private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
     /**
      * @param specification A test specification that this test runs
@@ -55,6 +61,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     public OrchestratedTest(String[] springContextPaths, OrchestratedTestSpecification specification) {
         this.springContextPaths = springContextPaths;
         this.specification = specification;
+
+        //we want CXF to be in PAYLOAD mode rather than POJO
+        endpointOverrides.add(new CxfEndpointOverride());
     }
 
     protected AbstractXmlApplicationContext createApplicationContext() {
@@ -67,6 +76,32 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         if (properties != null) context.addComponent("properties", properties);
 
         return context;
+    }
+
+    /**
+     * Override (and super call it) to modify the Camel endpoint for sending
+     * and receiving messages
+     * @param endpoint the current endpoint we are able to create a route for, or send a message to
+     */
+    protected void overrideEndpoint(Endpoint endpoint) {
+        for (EndpointOverride override : endpointOverrides) {
+            override.overrideEndpoint(endpoint);
+        }
+    }
+
+    /**
+     * @return The list of classes that modify the Camel endpoints when *sending* a message
+     */
+    public Collection<EndpointOverride> getEndpointOverrides() {
+        return endpointOverrides;
+    }
+
+    /**
+     * @param endpointOverrides a list of endpoint overrides that will modify the default endpoint string when
+     *                          *sending* a message
+     */
+    public void setEndpointOverrides(Collection<EndpointOverride> endpointOverrides) {
+        this.endpointOverrides = endpointOverrides;
     }
 
     @Test
@@ -93,7 +128,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         //put all of the expectations for each endpoint in an ordered queue
         for (MockExpectation expectation : specification.getMockExpectations()) {
             Endpoint fromEndpoint = context.getEndpoint(expectation.getEndpointUri());
-
+            overrideEndpoint(fromEndpoint);
             logger.trace("Preparing mock expectation: {}", expectation.getName());
 
             if (!mockEndpointExpectations.containsKey(fromEndpoint)) {

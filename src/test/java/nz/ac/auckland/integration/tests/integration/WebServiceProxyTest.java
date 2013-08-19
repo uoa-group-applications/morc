@@ -51,6 +51,14 @@ public class WebServiceProxyTest extends OrchestratedTest {
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingSoapFault.xml"))))
                 .build());
+
+        specifications.add(syncTest("cxf:http://localhost:8091/targetWS", "Simple WS test using CXF")
+                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
+                .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
+                        .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))))
+                .build());
     }
 
     //this is used by JUnit to initialize each instance of this specification

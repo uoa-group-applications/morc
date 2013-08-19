@@ -4,6 +4,7 @@ import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.validators.ExceptionValidator;
 import org.apache.camel.CamelExecutionException;
+import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +55,16 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         try {
             String response;
 
+            Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
+            overrideEndpoint(endpoint);
+
             if (inputRequestBody != null && inputRequestHeaders != null)
-                response = template.requestBodyAndHeaders(getTargetServiceUri(), inputRequestBody.getValue(), inputRequestHeaders.getValue(), String.class);
+                response = template.requestBodyAndHeaders(endpoint, inputRequestBody.getValue(), inputRequestHeaders.getValue(), String.class);
             else if (inputRequestHeaders != null)
-                response = template.requestBodyAndHeaders(getTargetServiceUri(), "", inputRequestHeaders.getValue(), String.class);
+                response = template.requestBodyAndHeaders(endpoint, "", inputRequestHeaders.getValue(), String.class);
             else if (inputRequestBody != null)
-                response = template.requestBody(getTargetServiceUri(), inputRequestBody.getValue(), String.class);
-            else response = template.requestBody(getTargetServiceUri(), "", String.class);
+                response = template.requestBody(endpoint, inputRequestBody.getValue(), String.class);
+            else response = template.requestBody(endpoint, "", String.class);
 
             return expectedResponseBody == null || expectedResponseBody.validateInput(response);
 

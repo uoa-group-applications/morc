@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
+import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +40,17 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
      */
     public boolean sendInput(ProducerTemplate template) {
         try {
+            Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
+            overrideEndpoint(endpoint);
+
             if (inputMessageBody != null && inputMessageHeaders != null)
-                template.sendBodyAndHeaders(getTargetServiceUri(), inputMessageBody.getValue(), inputMessageHeaders.getValue());
+                template.sendBodyAndHeaders(endpoint, inputMessageBody.getValue(), inputMessageHeaders.getValue());
             else if (inputMessageHeaders != null)
-                template.sendBodyAndHeaders(getTargetServiceUri(), "", inputMessageHeaders.getValue());
+                template.sendBodyAndHeaders(endpoint, "", inputMessageHeaders.getValue());
             else if (inputMessageBody != null)
-                template.sendBody(getTargetServiceUri(), inputMessageBody.getValue());
+                template.sendBody(endpoint, inputMessageBody.getValue());
             else
-                template.sendBody(getTargetServiceUri(), "");
+                template.sendBody(endpoint, "");
 
         } catch (IOException e) {
             throw new RuntimeException(e);

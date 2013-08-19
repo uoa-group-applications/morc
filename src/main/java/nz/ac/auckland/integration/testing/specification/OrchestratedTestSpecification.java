@@ -1,6 +1,9 @@
 package nz.ac.auckland.integration.testing.specification;
 
+import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
+import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
 
 import java.util.*;
@@ -17,6 +20,8 @@ public abstract class OrchestratedTestSpecification {
     private String targetServiceUri;
     private List<MockExpectation> mockExpectations;
     private long sleepForTestCompletion;
+    private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
+
 
     /**
      * @return A description that explains what this tests is doing
@@ -48,6 +53,19 @@ public abstract class OrchestratedTestSpecification {
     }
 
     /**
+     * @return The endpoint overrides that modify the receiving endpoint
+     */
+    public Collection<EndpointOverride> getEndpointOverrides() {
+        return this.endpointOverrides;
+    }
+
+    protected void overrideEndpoint(Endpoint endpoint) {
+        for (EndpointOverride override : endpointOverrides) {
+            override.overrideEndpoint(endpoint);
+        }
+    }
+
+    /**
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
      * @return Returns true if the message was successfully sent and, if there's a response, that it is valid
      */
@@ -61,6 +79,7 @@ public abstract class OrchestratedTestSpecification {
         private List<MockExpectation> mockExpectations;
         private int currentExpectationReceivedAtIndex = 0;
         private long sleepForTestCompletion = 15000;
+        private Collection<EndpointOverride> endpointOverrides;
 
         private Map<String, MockExpectation> mockExpectationByEndpoint = new HashMap<>();
 
@@ -72,6 +91,9 @@ public abstract class OrchestratedTestSpecification {
             this.targetServiceUri = targetServiceUri;
             this.description = description;
             mockExpectations = new ArrayList<>();
+            endpointOverrides = new ArrayList<>();
+            //we don't want to use POJO to receive messages
+            endpointOverrides.add(new CxfEndpointOverride());
         }
 
         /**
@@ -103,6 +125,15 @@ public abstract class OrchestratedTestSpecification {
         }
 
         /**
+         * @param override An override used for modifying an endpoint for *receiving* a message
+         * @return
+         */
+        public Builder addEndpointOverride(EndpointOverride override) {
+            endpointOverrides.add(override);
+            return self();
+        }
+
+        /**
          * @param sleepForTestCompletion The amount of time in milliseconds that the test should wait before
          *                               validating all expectations. Only applies with asynchronous/partially
          *                               ordered/unreceived expectations
@@ -119,6 +150,7 @@ public abstract class OrchestratedTestSpecification {
         this.targetServiceUri = builder.targetServiceUri;
         this.mockExpectations = builder.mockExpectations;
         this.sleepForTestCompletion = builder.sleepForTestCompletion;
+        this.endpointOverrides = builder.endpointOverrides;
     }
 
 }
