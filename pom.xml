@@ -11,8 +11,10 @@
     <groupId>nz.ac.auckland.integration.testing</groupId>
     <artifactId>soaunit</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>soaunit</name>
+    <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
+    <url>http://uoa-group-applications.github.io/soaunit/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <camel-version>2.11.1</camel-version>
@@ -114,6 +116,12 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxf-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Web Service and Servlet Dependencies-->
         <dependency>
@@ -150,6 +158,6 @@
             scm:git:git@github.com:uoa-group-applications/soaunit.git
         </developerConnection>
         <url>git@github.com:uoa-group-applications/soaunit.git</url>
-        <tag>HEAD</tag>
+        <tag>soaunit-1.0.0</tag>
     </scm>
 </project>
