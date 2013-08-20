@@ -16,6 +16,8 @@ public class CxfEndpointOverride implements EndpointOverride {
     public void overrideEndpoint(Endpoint endpoint) {
         if (endpoint instanceof CxfEndpoint) {
             ((CxfEndpoint) endpoint).setDataFormat(DataFormat.PAYLOAD);
+            //Works around issue: https://issues.apache.org/jira/browse/CXF-2775
+            System.setProperty("org.apache.cxf.transports.http_jetty.DontClosePort","true");
         }
     }
 }
