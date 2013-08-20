@@ -72,14 +72,14 @@
             <version>${commons-lang-version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-version}</version>
+            <groupId>nz.ac.auckland.composite</groupId>
+            <artifactId>composite-logging-deploy</artifactId>
+            <version>3.3</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j-version}</version>
+        	<groupId>nz.ac.auckland.composite</groupId>
+        	<artifactId>composite-logging-jcl</artifactId>
+        	<version>3.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -105,6 +105,12 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jetty</artifactId>
             <version>${camel-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
