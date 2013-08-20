@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="PingService"
+                  targetNamespace="urn:com:acme:integration:wsdl:pingservice"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="urn:com:acme:integration:wsdl:pingservice"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <wsp:Policy xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                wsu:Id="UsernameToken">
+        <sp:SupportingTokens xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+            <wsp:Policy>
+                <sp:UsernameToken>
+                    <wsp:Policy/>
+                </sp:UsernameToken>
+            </wsp:Policy>
+        </sp:SupportingTokens>
+    </wsp:Policy>
+
+    <wsdl:types>
+        <xsd:schema xmlns:tns="urn:com:acme:integration:wsdl:pingservice"
+                    targetNamespace="urn:com:acme:integration:wsdl:pingservice">
+            <xsd:element name="pingRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="request" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="pingResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="response" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="pingResponse">
+        <wsdl:part element="tns:pingResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="pingRequest">
+        <wsdl:part element="tns:pingRequest" name="parameters"/>
+    </wsdl:message>
+
+    <wsdl:portType name="PingServicePortType">
+        <wsdl:operation name="pingRequest">
+            <wsdl:input message="tns:pingRequest" name="pingRequest"/>
+            <wsdl:output message="tns:pingResponse" name="pingResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="PingServiceSoap11Binding"
+                  type="tns:PingServicePortType">
+        <soap:binding style="document"
+                      transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="pingRequest">
+            <soap:operation soapAction="pingRequest"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <wsp:PolicyReference URI="#UsernameToken"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="PingService">
+        <wsdl:port binding="tns:PingServiceSoap11Binding"
+                   name="PingServicePort">
+            <soap:address location="http://changeme"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

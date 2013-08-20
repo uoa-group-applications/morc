@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+
+    <!--
+        This file just sets up all of the CXF endpoints that the Camel 'ESB' will use
+    -->
+    <bean id="simpleSecurityValidator" class="com.acme.integration.tests.fakeesb.SecurityValidator">
+        <property name="username" value="user"/>
+        <property name="password" value="pass"/>
+    </bean>
+
+    <cxf:cxfEndpoint id="pingService"
+                         xmlns:ping_wsdl="urn:com:acme:integration:wsdl:pingservice"
+                         endpointName="ping_wsdl:PingServicePort"
+                         serviceName="ping_wsdl:PingService"
+                         wsdlURL="PingService.wsdl"
+                         address="http://localhost:8090/services/pingService">
+        <cxf:properties>
+            <entry key="dataFormat" value="PAYLOAD"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+    <cxf:cxfEndpoint id="securePingService"
+                         xmlns:ping_wsdl="urn:com:acme:integration:wsdl:pingservice"
+                         endpointName="ping_wsdl:PingServicePort"
+                         serviceName="ping_wsdl:PingService"
+                         wsdlURL="SecurePingService.wsdl"
+                         address="http://localhost:8090/services/securePingService">
+        <cxf:properties>
+            <entry key="ws-security.ut.validator" value-ref="simpleSecurityValidator"/>
+            <entry key="dataFormat" value="PAYLOAD"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+    <cxf:cxfEndpoint id="pingServiceProxy"
+                         xmlns:ping_wsdl="urn:com:acme:integration:wsdl:pingservice"
+                         endpointName="ping_wsdl:PingServicePort"
+                         serviceName="ping_wsdl:PingService"
+                         wsdlURL="PingService.wsdl"
+                         address="http://localhost:8090/services/pingServiceProxy">
+        <cxf:properties>
+            <entry key="dataFormat" value="PAYLOAD"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+    <cxf:cxfEndpoint id="pingServiceMultiProxy"
+                         xmlns:ping_wsdl="urn:com:acme:integration:wsdl:pingservice"
+                         endpointName="ping_wsdl:PingServicePort"
+                         serviceName="ping_wsdl:PingService"
+                         wsdlURL="PingService.wsdl"
+                         address="http://localhost:8090/services/pingServiceMultiProxy">
+        <cxf:properties>
+            <entry key="dataFormat" value="PAYLOAD"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+    <cxf:cxfEndpoint id="pingServiceMultiProxyUnordered"
+                         xmlns:ping_wsdl="urn:com:acme:integration:wsdl:pingservice"
+                         endpointName="ping_wsdl:PingServicePort"
+                         serviceName="ping_wsdl:PingService"
+                         wsdlURL="PingService.wsdl"
+                         address="http://localhost:8090/services/pingServiceMultiProxyUnordered">
+        <cxf:properties>
+            <entry key="dataFormat" value="PAYLOAD"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+</beans>
