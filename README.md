@@ -10,77 +10,104 @@ This framework was borne out of frustration with setting up automated testing of
 
 As a simple example, we can assume that a PING SOAP-style web-service is running on a mega-vendor's software stack (ESB) that responds with PONG for every PING request. We can create a test specification that sends a request to the service and gets the expected response back:
 ```java
-syncTest("cxf://http://localhost:8090/pingService", "Simple WS PING test")
-                .requestBody(xml(text("<PingService><Request>PING</Request></PingService>")))
-                .expectedResponseBody(xml(text("<PingService><Response>PONG</Response></PingService>")))
+syncTest("cxf:http://localhost:8090/services/pingService","Simple WS PING test")
+                .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                                    "<request>PING</request>" +
+                                 "</ns:pingRequest>"))
+                .expectedResponseBody(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                        "<response>PONG</response>" +
+                        "</ns:pingResponse>"))
 ```
 
-We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and password properties:
+We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and
+password properties:
 ```java
-syncTest("cxf://http://localhost:8090/pingService?properties.ws-security.username=user&properties.ws-security.password=pass", "Simple WS PING test with WS-Security")
-                .requestBody(xml(text("<PingService><Request>PING</Request></PingService>")))
-                .expectedResponseBody(xml(text("<PingService><Response>PONG</Response></PingService>")))
+syncTest("cxf://http://localhost:8090/services/securePingService?wsdlURL=SecurePingService.wsdl&" +
+                "properties.ws-security.username=user" +
+                "&properties.ws-security.password=pass",
+                "Simple WS PING test with WS-Security")
+                .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                                    "<request>PING</request>" +
+                                 "</ns:pingRequest>"))
+                .expectedResponseBody(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                        "<response>PONG</response>" +
+                        "</ns:pingResponse>"))
 ```
+Note that in this case we need to provide a reference to the WSDL because CXF needs to understand the required policy.
 
 Once the requests and responses become larger we will want to put the values into a file, which we can reference from the classpath by changing the xml function parameter:
 ```java
-syncTest("cxf:http://localhost:8090/pingService", "Simple WS PING test with local resources")
+syncTest("cxf:http://localhost:8090/services/pingService","Simple WS PING test with local resources")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
 ```
 
 If there's a JSON service we can also ensure this is acting appropriately:
 ```java
-syncTest("http://localhost:8090/jsonPingService", "Simple JSON PING")
-                .requestBody(json(text("{request:\"PING\"}")))
-                .expectedResponseBody(json(text("{response:\"PONG\"")))
+syncTest("http://localhost:8091/jsonPingService", "Simple JSON PING")
+                .requestBody(json("{\"request\":\"PING\"}"))
+                .expectedResponseBody(json("{\"response\":\"PONG\"}"))
 ```
 JSON comparisons are made using the Jackson library to unmarshal and compare each value.
 
 If we change the PING service on the integration stack to pass the request onto another service then we can automatically mock up this service by adding an expectation:
 ```java
-syncTest("cxf:http://localhost:8090/pingServiceProxy", "WS PING test with mock service expectation")
-                .requestBody(xml(text("<PingService><Request>PING</Request></PingService>")))
-                .expectedResponseBody(xml(text("<PingService><Response>PONG</Response></PingService>")))
-                .addExpectation(syncExpectation("cxf:http://localhost:8090/targetWS")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml"))))
+syncTest("cxf:http://localhost:8090/services/pingServiceProxy","WS PING test with mock service expectation")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService" +
+                        ".wsdl&properties.HonorKeepAlive=false")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponse1.xml"))))
 ```
 The framework (Camel) will set up a CXF/SOAP endpoint on localhost:8090 which expects the message in `pingRequest1.xml` and will respond with the contents of `pingResponse1.xml`. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.
 
 The PING service may also test more than one service before providing a response; in this case we need only provide an additional expectation:
 ```java
-syncTest("cxf:http://localhost:8090/pingServiceProxy", "WS PING test with multiple mock service expectations")
-                .requestBody(xml(text("<PingService><Request>PING</Request></PingService>")))
-                .expectedResponseBody(xml(text("<PingService><Response>PONG</Response></PingService>")))
-                .addExpectation(syncExpectation("cxf:http://localhost:8090/targetWS")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml"))))
-                .addExpectation(syncExpectation("cxf:http://localhost:8090/targetWS")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml"))))
+syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxy","WS PING test with multiple mock service expectations")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService" +
+                        ".wsdl")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponse1.xml"))))
+                .addExpectation(syncExpectation
+                        ("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponse1.xml"))))
 ```
 Note that expectations should occur in the order specified; if each request happens concurrently (e.g. the scatter-gather EIP) then you can relax the ordering requirements:
 ```java
-syncTest("cxf:http://localhost:8090/pingServiceProxy", "WS PING test with mock service expectation")
-             .requestBody(xml(text("<PingService><Request>PING</Request></PingService>")))
-             .expectedResponseBody(xml(text("<PingService><Response>PONG</Response></PingService>")))
-             .addExpectation(syncExpectation("cxf:http://localhost:8090/targetWS")
-                 .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                 .responseBody(xml(classpath("/data/pingResponse1.xml")))
-                 .ordering(MockExpectation.OrderingType.PARTIAL))
-             .addExpectation(syncExpectation("cxf:http://localhost:8090/anotherTargetWS")
-                 .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                 .responseBody(xml(classpath("/data/pingResponse1.xml")))
-                 .ordering(MockExpectation.OrderingType.PARTIAL))
+syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered","WS PING test with multiple unordered mock service expectations")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                        .ordering(MockExpectation.OrderingType.PARTIAL))
+                .addExpectation(syncExpectation("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                        .ordering(MockExpectation.OrderingType.PARTIAL))
 ```
 
 We can also test asynchronous services (no response expected) by configuring expectations; for example if we have a message canonicalizer that takes a target-system message off a JMS destination and transforms it to a canonical format for broadcast onto another JMS destination then we can test it by sending a message to the destination and adding an expected message for the output destination:
+
 ```java
-asyncTest("jms:test.input", "Simple Canonicalizer Comparison")
-                .messageBody(xml(text("<SystemField>foo</SystemField>")))
-                .addExpectation(asyncExpectation("jms:test.output")
-                    .expectedBody(xml(text("<CanonicalField>foo</CanonicalField>"))))
+asyncTest("vm:test.input", "Simple Asynchronous Canonicalizer Comparison")
+                .inputMessage(xml("<SystemField>foo</SystemField>"))
+                .addExpectation(asyncExpectation("vm:test.output")
+                        .expectedBody(xml("<CanonicalField>foo</CanonicalField>")))
 ```
 
-All of these examples can be found under the example directory of this project; execute the test run with the standard mvn test goal. There is currently some bootstrap code associated with JUnit and Camel - I am hoping to minimize this further by re-shuffling some code or introducing Groovy into the mix.
+Finally, we can also send requests that invoke an exception/fault and then ensure we get an exception response:
+```java
+syncTest("cxf:http://localhost:8090/services/pingServiceProxy","Test invalid message doesn't arrive at the endpoint and returns exception")
+                .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                                                    "<request>PONG</request>" +
+                                                 "</ns:pingRequest>"))
+                .expectsExceptionResponse()
+                .addExpectation(unreceivedExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"))
+```
+
+All of these examples can be found under the example directory of this project; execute the test run with the standard mvn test goal. There is currently some bootstrap code associated with JUnit and Camel - I am hoping to minimize this further by re-shuffling some code or introducing Groovy into the mix. The tests themselves are found under com.acme.integration.tests.AcmeTest

@@ -68,8 +68,6 @@ public class AcmeTest extends OrchestratedTest {
                 .expectedResponseBody(json("{\"response\":\"PONG\"}"))
                 .build());
 
-
-        //https://issues.apache.org/jira/browse/CXF-2775
         //Showing how expectations can create mock endpoints to validate the incoming request and provide a canned response
         specifications.add(syncTest("cxf:http://localhost:8090/services/pingServiceProxy",
                 "WS PING test with mock service expectation")
