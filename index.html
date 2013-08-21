@@ -4,11 +4,11 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Soaunit : Orchestrated Testing of SOA Artifacts" />
+    <meta name="description" content="SOAUnit : Orchestrated Testing of SOA Artifacts" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Soaunit</title>
+    <title>SOAUnit</title>
   </head>
 
   <body>
@@ -37,96 +37,125 @@
 <h3>
 <a name="orchestrated-testing-of-soa-artifacts" class="anchor" href="#orchestrated-testing-of-soa-artifacts"><span class="octicon octicon-link"></span></a>Orchestrated Testing of SOA Artifacts</h3>
 
+<p><strong><a href="http://uoa-group-applications.github.io/soaunit/apidocs/">Javadoc</a></strong></p>
+
 <p>SOAUnit provides a fluent Java Builder/DSL that allows developers and testers to construct  specifications that dicate how an integration process/artifact under testing is expected to invoke a variety of different endpoints for a given input, where each endpoint has different ordering and message requirements. Given such a specification, the framework will first set up 'mock' endpoints as specified by the endpoint expectations that provide the canned responses before invoking the integration process/artifact to ensure all requirements are met. The requests/responses are compared semantically to the expectation based on the format required; for example, XML is compared using XMLUnit to allow for variations in XML request/response generation.</p>
 
 <p>This framework was borne out of frustration with setting up automated testing of integration artifacts produced by the mega vendors' integration stacks where we were unable to automatically set up (mock) endpoints to receive messages, ensure they are valid and provide a canned response to let the process continue on its way. This was especially problematic once we started introducing multi-step processes that were invoking other integration artifiacts using a variety of different transports. By using <a href="http://camel.apache.org/">Apache Camel</a> under the hood we were effectively able to to support a <a href="http://camel.apache.org/components.html">huge variety of technologies</a> for receiving and sending messages, although our major focus has been on JMS and (SOAP|REST|XML|JSON over HTTP)-style web-services. Our typical work-flow for testing (on a CI box) is to configure our integration stack to point to local host addresses/ports that SOAUnit (and Camel) will use to spin up a subscriber to receive a message, validate and return a canned response. The end result is that we are able to <strong>automatically and repeatedly test Oracle Service Bus (OSB) Artifacts using standard and well-understood tooling.</strong></p>
 
 <p>As a simple example, we can assume that a PING SOAP-style web-service is running on a mega-vendor's software stack (ESB) that responds with PONG for every PING request. We can create a test specification that sends a request to the service and gets the expected response back:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf://http://localhost:8090/pingService"</span><span class="o">,</span> <span class="s">"Simple WS PING test"</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Request&gt;PING&lt;/Request&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Response&gt;PONG&lt;/Response&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingService"</span><span class="o">,</span><span class="s">"Simple WS PING test"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
+                                    <span class="s">"&lt;request&gt;PING&lt;/request&gt;"</span> <span class="o">+</span>
+                                 <span class="s">"&lt;/ns:pingRequest&gt;"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
+                        <span class="s">"&lt;response&gt;PONG&lt;/response&gt;"</span> <span class="o">+</span>
+                        <span class="s">"&lt;/ns:pingResponse&gt;"</span><span class="o">))</span>
 </pre></div>
 
-<p>We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and password properties:</p>
+<p>We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and
+password properties:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf://http://localhost:8090/pingService?properties.ws-security.username=user&amp;properties.ws-security.password=pass"</span><span class="o">,</span> <span class="s">"Simple WS PING test with WS-Security"</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Request&gt;PING&lt;/Request&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Response&gt;PONG&lt;/Response&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf://http://localhost:8090/services/securePingService?wsdlURL=SecurePingService.wsdl&amp;"</span> <span class="o">+</span>
+                <span class="s">"properties.ws-security.username=user"</span> <span class="o">+</span>
+                <span class="s">"&amp;properties.ws-security.password=pass"</span><span class="o">,</span>
+                <span class="s">"Simple WS PING test with WS-Security"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
+                                    <span class="s">"&lt;request&gt;PING&lt;/request&gt;"</span> <span class="o">+</span>
+                                 <span class="s">"&lt;/ns:pingRequest&gt;"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
+                        <span class="s">"&lt;response&gt;PONG&lt;/response&gt;"</span> <span class="o">+</span>
+                        <span class="s">"&lt;/ns:pingResponse&gt;"</span><span class="o">))</span>
 </pre></div>
+
+<p>Note that in this case we need to provide a reference to the WSDL because CXF needs to understand the required policy.</p>
 
 <p>Once the requests and responses become larger we will want to put the values into a file, which we can reference from the classpath by changing the xml function parameter:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/pingService"</span><span class="o">,</span> <span class="s">"Simple WS PING test with local resources"</span><span class="o">)</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingService"</span><span class="o">,</span><span class="s">"Simple WS PING test with local resources"</span><span class="o">)</span>
                 <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
                 <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
 </pre></div>
 
 <p>If there's a JSON service we can also ensure this is acting appropriately:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"http://localhost:8090/jsonPingService"</span><span class="o">,</span> <span class="s">"Simple JSON PING"</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">json</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"{request:\"PING\"}"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">json</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"{response:\"PONG\""</span><span class="o">)))</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"http://localhost:8091/jsonPingService"</span><span class="o">,</span> <span class="s">"Simple JSON PING"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">json</span><span class="o">(</span><span class="s">"{\"request\":\"PING\"}"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">json</span><span class="o">(</span><span class="s">"{\"response\":\"PONG\"}"</span><span class="o">))</span>
 </pre></div>
 
 <p>JSON comparisons are made using the Jackson library to unmarshal and compare each value.</p>
 
 <p>If we change the PING service on the integration stack to pass the request onto another service then we can automatically mock up this service by adding an expectation:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/pingServiceProxy"</span><span class="o">,</span> <span class="s">"WS PING test with mock service expectation"</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Request&gt;PING&lt;/Request&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Response&gt;PONG&lt;/Response&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/targetWS"</span><span class="o">)</span>
-                    <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
-                    <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceProxy"</span><span class="o">,</span><span class="s">"WS PING test with mock service expectation"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
 </pre></div>
 
 <p>The framework (Camel) will set up a CXF/SOAP endpoint on localhost:8090 which expects the message in <code>pingRequest1.xml</code> and will respond with the contents of <code>pingResponse1.xml</code>. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.</p>
 
 <p>The PING service may also test more than one service before providing a response; in this case we need only provide an additional expectation:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/pingServiceProxy"</span><span class="o">,</span> <span class="s">"WS PING test with multiple mock service expectations"</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Request&gt;PING&lt;/Request&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Response&gt;PONG&lt;/Response&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/targetWS"</span><span class="o">)</span>
-                    <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
-                    <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
-                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/targetWS"</span><span class="o">)</span>
-                    <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
-                    <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceMultiProxy"</span><span class="o">,</span><span class="s">"WS PING test with multiple mock service expectations"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span>
+                        <span class="o">(</span><span class="s">"cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
 </pre></div>
 
 <p>Note that expectations should occur in the order specified; if each request happens concurrently (e.g. the scatter-gather EIP) then you can relax the ordering requirements:</p>
 
-<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/pingServiceProxy"</span><span class="o">,</span> <span class="s">"WS PING test with mock service expectation"</span><span class="o">)</span>
-             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Request&gt;PING&lt;/Request&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-             <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;PingService&gt;&lt;Response&gt;PONG&lt;/Response&gt;&lt;/PingService&gt;"</span><span class="o">)))</span>
-             <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/targetWS"</span><span class="o">)</span>
-                 <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
-                 <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
-                 <span class="o">.</span><span class="na">ordering</span><span class="o">(</span><span class="n">MockExpectation</span><span class="o">.</span><span class="na">OrderingType</span><span class="o">.</span><span class="na">PARTIAL</span><span class="o">))</span>
-             <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/anotherTargetWS"</span><span class="o">)</span>
-                 <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
-                 <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
-                 <span class="o">.</span><span class="na">ordering</span><span class="o">(</span><span class="n">MockExpectation</span><span class="o">.</span><span class="na">OrderingType</span><span class="o">.</span><span class="na">PARTIAL</span><span class="o">))</span>
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered"</span><span class="o">,</span><span class="s">"WS PING test with multiple unordered mock service expectations"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">ordering</span><span class="o">(</span><span class="n">MockExpectation</span><span class="o">.</span><span class="na">OrderingType</span><span class="o">.</span><span class="na">PARTIAL</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">syncExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
+                        <span class="o">.</span><span class="na">ordering</span><span class="o">(</span><span class="n">MockExpectation</span><span class="o">.</span><span class="na">OrderingType</span><span class="o">.</span><span class="na">PARTIAL</span><span class="o">))</span>
 </pre></div>
 
 <p>We can also test asynchronous services (no response expected) by configuring expectations; for example if we have a message canonicalizer that takes a target-system message off a JMS destination and transforms it to a canonical format for broadcast onto another JMS destination then we can test it by sending a message to the destination and adding an expected message for the output destination:</p>
 
-<div class="highlight"><pre><span class="n">asyncTest</span><span class="o">(</span><span class="s">"jms:test.input"</span><span class="o">,</span> <span class="s">"Simple Canonicalizer Comparison"</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">messageBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;SystemField&gt;foo&lt;/SystemField&gt;"</span><span class="o">)))</span>
-                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">asyncExpectation</span><span class="o">(</span><span class="s">"jms:test.output"</span><span class="o">)</span>
-                    <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">text</span><span class="o">(</span><span class="s">"&lt;CanonicalField&gt;foo&lt;/CanonicalField&gt;"</span><span class="o">))))</span>
+<div class="highlight"><pre><span class="n">asyncTest</span><span class="o">(</span><span class="s">"vm:test.input"</span><span class="o">,</span> <span class="s">"Simple Asynchronous Canonicalizer Comparison"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">inputMessage</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;SystemField&gt;foo&lt;/SystemField&gt;"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">asyncExpectation</span><span class="o">(</span><span class="s">"vm:test.output"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">expectedBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;CanonicalField&gt;foo&lt;/CanonicalField&gt;"</span><span class="o">)))</span>
 </pre></div>
 
-<p>All of these examples can be found under the example directory of this project; execute the test run with the standard mvn test goal. There is currently some bootstrap code associated with JUnit and Camel - I am hoping to minimize this further by re-shuffling some code or introducing Groovy into the mix.</p>
+<p>Note that 'vm' is an in-memory destination queue that is effectively the same as a JMS queue.</p>
+
+<p>Finally, we can also send requests that invoke an exception/fault ensuring that we not only do we receive an exception response but also that the target system never receives the invalid message:</p>
+
+<div class="highlight"><pre><span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceProxy"</span><span class="o">,</span><span class="s">"Test invalid message doesn't arrive at the endpoint and returns exception"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
+                                                    <span class="s">"&lt;request&gt;PONG&lt;/request&gt;"</span> <span class="o">+</span>
+                                                 <span class="s">"&lt;/ns:pingRequest&gt;"</span><span class="o">))</span>
+                <span class="o">.</span><span class="na">expectsExceptionResponse</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">unreceivedExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"</span><span class="o">))</span>
+</pre></div>
+
+<p>All of these examples can be found under the example directory of this project; execute the test run with the standard mvn test goal. There is currently some bootstrap code associated with JUnit and Camel - I am hoping to minimize this further by re-shuffling some code or introducing Groovy into the mix. The tests themselves are found under com.acme.integration.tests.AcmeTest</p>
       </section>
     </div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">Soaunit maintained by <a href="https://github.com/uoa-group-applications">uoa-group-applications</a></p>
+        <p class="copyright">SOAUnit maintained by <a href="https://github.com/uoa-group-applications">uoa-group-applications</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
