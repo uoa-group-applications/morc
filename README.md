@@ -55,8 +55,7 @@ If we change the PING service on the integration stack to pass the request onto 
 syncTest("cxf:http://localhost:8090/services/pingServiceProxy","WS PING test with mock service expectation")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
-                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService" +
-                        ".wsdl&properties.HonorKeepAlive=false")
+                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingResponse1.xml"))))
 ```
@@ -67,8 +66,7 @@ The PING service may also test more than one service before providing a response
 syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxy","WS PING test with multiple mock service expectations")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
-                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService" +
-                        ".wsdl")
+                .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingResponse1.xml"))))
                 .addExpectation(syncExpectation
@@ -92,15 +90,15 @@ syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered","WS
 ```
 
 We can also test asynchronous services (no response expected) by configuring expectations; for example if we have a message canonicalizer that takes a target-system message off a JMS destination and transforms it to a canonical format for broadcast onto another JMS destination then we can test it by sending a message to the destination and adding an expected message for the output destination:
-
 ```java
 asyncTest("vm:test.input", "Simple Asynchronous Canonicalizer Comparison")
                 .inputMessage(xml("<SystemField>foo</SystemField>"))
                 .addExpectation(asyncExpectation("vm:test.output")
                         .expectedBody(xml("<CanonicalField>foo</CanonicalField>")))
 ```
+Note that 'vm' is an in-memory destination queue that is effectively the same as a JMS queue.
 
-Finally, we can also send requests that invoke an exception/fault and then ensure we get an exception response:
+Finally, we can also send requests that invoke an exception/fault ensuring that we not only do we response an exception response but also that the target system never receives the invalid message:
 ```java
 syncTest("cxf:http://localhost:8090/services/pingServiceProxy","Test invalid message doesn't arrive at the endpoint and returns exception")
                 .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
