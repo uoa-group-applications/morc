@@ -98,7 +98,7 @@ asyncTest("vm:test.input", "Simple Asynchronous Canonicalizer Comparison")
 ```
 Note that 'vm' is an in-memory destination queue that is effectively the same as a JMS queue.
 
-Finally, we can also send requests that invoke an exception/fault ensuring that we not only do we response an exception response but also that the target system never receives the invalid message:
+Finally, we can also send requests that invoke an exception/fault ensuring that we not only do we receive an exception response but also that the target system never receives the invalid message:
 ```java
 syncTest("cxf:http://localhost:8090/services/pingServiceProxy","Test invalid message doesn't arrive at the endpoint and returns exception")
                 .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
