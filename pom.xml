@@ -1,11 +1,20 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>nz.ac.auckland.groupapps.parent</groupId>
+        <artifactId>parent-java-groupapps-central</artifactId>
+        <version>1.1</version>
+    </parent>
+
     <groupId>nz.ac.auckland.integration.testing</groupId>
     <artifactId>soaunit</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>soaunit</name>
+    <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
+    <url>http://uoa-group-applications.github.io/soaunit/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <camel-version>2.11.1</camel-version>
@@ -63,14 +72,14 @@
             <version>${commons-lang-version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j-version}</version>
+            <groupId>nz.ac.auckland.composite</groupId>
+            <artifactId>composite-logging-deploy</artifactId>
+            <version>3.3</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j-version}</version>
+        	<groupId>nz.ac.auckland.composite</groupId>
+        	<artifactId>composite-logging-jcl</artifactId>
+        	<version>3.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -96,17 +105,35 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jetty</artifactId>
             <version>${camel-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-cxf</artifactId>
             <version>${camel-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- WS-Security related CXF classes -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxf-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Web Service and Servlet Dependencies-->
         <dependency>
@@ -125,25 +152,6 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco-version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
