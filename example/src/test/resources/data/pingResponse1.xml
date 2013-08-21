@@ -1,0 +1,3 @@
+<ns:pingResponse xmlns:ns="urn:com:acme:integration:wsdl:pingservice">
+    <response>PONG</response>
+</ns:pingResponse>
