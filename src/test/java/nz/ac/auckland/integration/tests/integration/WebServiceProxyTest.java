@@ -4,6 +4,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -29,6 +30,11 @@ public class WebServiceProxyTest extends OrchestratedTest {
                 //a straight through proxy
                 from("jetty:http://localhost:8090/testWS")
                         .to("jetty:http://localhost:8090/targetWS?bridgeEndpoint=true&throwExceptionOnFailure=false");
+
+                SoapFault fault = new SoapFault("Pretend SOAP Fault", SoapFault.FAULT_CODE_CLIENT);
+
+                from("cxf:http://localhost:8092/testWSFault?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
+                        .setFaultBody(constant(fault));
 
             }
         };
@@ -67,6 +73,11 @@ public class WebServiceProxyTest extends OrchestratedTest {
                         .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
                                 .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
                                 .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))))
+                        .build());
+
+        specifications.add(syncTest("cxf:http://localhost:8092/testWSFault","CXF WS Fault Test")
+                        .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                        .expectsExceptionResponse()
                         .build());
     }
 
