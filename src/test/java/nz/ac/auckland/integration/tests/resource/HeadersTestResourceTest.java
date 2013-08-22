@@ -55,6 +55,16 @@ public class HeadersTestResourceTest extends Assert {
     }
 
     @Test
+    public void testCompareWrongInput() throws Exception {
+        Map<String, Object> differentProperties = new HashMap<>();
+        differentProperties.put("foo", "foo");
+        differentProperties.put("abc", "123");
+
+        HeadersTestResource resource = new HeadersTestResource(inputUrl);
+        assertFalse(resource.validateInput(differentProperties));
+    }
+
+    @Test
     public void testCompareMoreInputHeaders() throws Exception {
         Map<String, Object> differentProperties = new HashMap<>();
         differentProperties.put("foo", "baz");

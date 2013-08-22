@@ -77,6 +77,7 @@ public class HeadersTestResource extends TestResource<Map<String, Object>> {
 
             if (!input.get(expectedKey).equals(expectedHeaders.get(expectedKey))) {
                 logger.warn("The key: {} has an unexpected value", expectedKey);
+                return false;
             }
         }
 
