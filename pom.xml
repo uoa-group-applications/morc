@@ -11,7 +11,7 @@
     <groupId>nz.ac.auckland.integration.testing</groupId>
     <artifactId>soaunit</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>soaunit</name>
     <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
     <url>http://uoa-group-applications.github.io/soaunit/</url>
@@ -170,6 +170,6 @@
             scm:git:git@github.com:uoa-group-applications/soaunit.git
         </developerConnection>
         <url>git@github.com:uoa-group-applications/soaunit.git</url>
-        <tag>soaunit-1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
