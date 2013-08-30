@@ -12,7 +12,7 @@
         <camel-version>2.11.1</camel-version>
         <junit-version>4.11</junit-version>
         <cxf-version>2.7.4</cxf-version>
-        <soaunit-version>1.0.0</soaunit-version>
+        <soaunit-version>1.0.1</soaunit-version>
     </properties>
     <dependencies>
         <dependency>
