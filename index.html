@@ -97,7 +97,7 @@ password properties:</p>
                         <span class="o">.</span><span class="na">responseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">))))</span>
 </pre></div>
 
-<p>The framework (Camel) will set up a CXF/SOAP endpoint on localhost:8090 which expects the message in <code>pingRequest1.xml</code> and will respond with the contents of <code>pingResponse1.xml</code>. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.</p>
+<p>The framework (Camel) will set up a CXF/SOAP endpoint on localhost:9090 which expects the message in <code>pingRequest1.xml</code> and will respond with the contents of <code>pingResponse1.xml</code>. Note that the advantage with using a Java Builder/Fluent DSL is that code-completion in IDEs can provide hints on what can be added to the specification, in addition to compile-time sanity checks. Furthermore nearly all of the method calls on the builder are optional, meaning it's perfectly acceptable to not set an expectedBody for an expectation if you care only that a request arrives but are not interested in it's content.</p>
 
 <p>The PING service may also test more than one service before providing a response; in this case we need only provide an additional expectation:</p>
 
