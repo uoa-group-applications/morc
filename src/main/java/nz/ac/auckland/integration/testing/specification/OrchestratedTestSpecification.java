@@ -126,7 +126,6 @@ public abstract class OrchestratedTestSpecification {
 
         /**
          * @param override An override used for modifying an endpoint for *receiving* a message
-         * @return
          */
         public Builder addEndpointOverride(EndpointOverride override) {
             endpointOverrides.add(override);
