@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.tests.expectation;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.component.seda.SedaComponent;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -19,7 +20,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertTrue(expectation.checkValid(exchange, 1));
         assertFalse(expectation.checkValid(exchange, 0));
@@ -36,7 +37,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -55,7 +56,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -72,7 +73,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -91,7 +92,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -108,7 +109,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -128,7 +129,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -146,7 +147,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertFalse(expectation.checkValid(exchange, 0));
         assertTrue(expectation.checkValid(exchange, 1));
@@ -166,7 +167,7 @@ public class MessageOrderingMockTest extends Assert {
 
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertTrue(expectation.checkValid(exchange, -1));
         assertTrue(expectation.checkValid(exchange, 0));

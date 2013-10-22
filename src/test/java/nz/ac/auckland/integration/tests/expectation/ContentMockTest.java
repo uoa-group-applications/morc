@@ -4,6 +4,7 @@ import nz.ac.auckland.integration.testing.expectation.ContentMockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import org.apache.camel.Exchange;
+import org.apache.camel.component.seda.SedaComponent;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -23,7 +24,7 @@ public class ContentMockTest extends Assert {
     public void testNoBodyNoHeaders() throws Exception {
         TestContentMockExpectation expectation = new TestContentMockExpectation.Builder("seda:test").build();
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         assertTrue(expectation.checkValid(exchange, 0));
     }
 
@@ -34,7 +35,7 @@ public class ContentMockTest extends Assert {
                 .expectedBody(resource).build();
 
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody(resource.getValue());
 
         assertTrue(expectation.checkValid(exchange, 0));
@@ -50,7 +51,7 @@ public class ContentMockTest extends Assert {
                 .build();
 
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody(resource.getValue());
         exchange.getIn().setHeaders(headers.getValue());
 
@@ -64,7 +65,7 @@ public class ContentMockTest extends Assert {
                 .expectedBody(resource).build();
 
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody("<somebody/>");
 
         assertFalse(expectation.checkValid(exchange, 0));
@@ -81,7 +82,7 @@ public class ContentMockTest extends Assert {
                 .build();
 
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody(resource.getValue());
 
         Map<String, Object> wrongHeaders = new HashMap<>();

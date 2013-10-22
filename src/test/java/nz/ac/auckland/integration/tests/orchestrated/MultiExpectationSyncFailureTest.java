@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper.*;
+import static nz.ac.auckland.integration.testing.OrchestratedTestBuilder.*;
 
 public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
@@ -96,7 +96,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
     private void runTest(OrchestratedTestSpecification spec) throws Exception {
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(new String[]{}, spec);
+            OrchestratedTest test = new OrchestratedTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -108,7 +108,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationToTwoEndpointsSendTwoToOneFails() throws Exception {
-        AsyncOrchestratedTestSpecification spec = asyncTest("vm:z", "Test no exchange available fails")
+        AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification.Builder("vm:z", "Test no exchange available fails")
                 .addExpectation(asyncExpectation("vm:b"))
                 .addExpectation(asyncExpectation("vm:c"))
                 .build();
@@ -118,7 +118,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testDelayedDeliveryFails() throws Exception {
-        SyncOrchestratedTestSpecification spec = syncTest("vm:syncInputAsyncOutputDelayed", "Test delayed delivery fails")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutputDelayed", "Test delayed delivery fails")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
@@ -130,7 +130,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testOutOfOrderDeliveryTotallyOrderedFails() throws Exception {
-        AsyncOrchestratedTestSpecification spec = asyncTest("vm:outOfOrder", "Test out of order expectations to different endpoints fails")
+        AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification.Builder("vm:outOfOrder", "Test out of order expectations to different endpoints fails")
                 .addExpectation(syncExpectation("vm:c"))
                 .addExpectation(syncExpectation("vm:b"))
                 .build();
@@ -140,7 +140,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testOutOfOrderDeliveryNotTotallyOrderedEndpointOrderedFails() throws Exception {
-        AsyncOrchestratedTestSpecification spec = asyncTest("vm:endpointOutOfOrder", "Test out of order expectations to different endpoints fails")
+        AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification.Builder("vm:endpointOutOfOrder", "Test out of order expectations to different endpoints fails")
                 .addExpectation(syncExpectation("vm:a").expectedBody(xml("<foo/>")))
                 .addExpectation(asyncExpectation("vm:b").expectedBody(xml("<baz/>")))
                 .addExpectation(asyncExpectation("vm:b").expectedBody(xml("<foo/>")))
@@ -151,7 +151,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testMultiAsyncEndpointFails() throws Exception {
-        AsyncOrchestratedTestSpecification spec = asyncTest("vm:asyncOutOfOrder", "Test out of order async expectations fail")
+        AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification.Builder("vm:asyncOutOfOrder", "Test out of order async expectations fail")
                 .addExpectation(asyncExpectation("vm:a").expectedBody(text("1")))
                 .addExpectation(asyncExpectation("vm:b"))
                 .addExpectation(asyncExpectation("vm:a").expectedBody(text("2")))
@@ -163,7 +163,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testMultiAsyncEndpointEndOfQueueFails() throws Exception {
-        AsyncOrchestratedTestSpecification spec = asyncTest("vm:asyncOutOfOrder", "Test out of order async expectations fail")
+        AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification.Builder("vm:asyncOutOfOrder", "Test out of order async expectations fail")
                 .addExpectation(asyncExpectation("vm:a").expectedBody(text("1")))
                 .addExpectation(asyncExpectation("vm:a").expectedBody(text("2")))
                 .addExpectation(asyncExpectation("vm:b"))
@@ -175,7 +175,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testEndpointUnorderedIncorrectBodies() throws Exception {
-        AsyncOrchestratedTestSpecification spec = asyncTest("vm:asyncIncorrectBodies", "Test out of order async expectations fail with unordered endpoint")
+        AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification.Builder("vm:asyncIncorrectBodies", "Test out of order async expectations fail with unordered endpoint")
                 .addExpectation(asyncExpectation("vm:a").expectedBody(text("1")).endpointNotOrdered())
                 .addExpectation(asyncExpectation("vm:a").expectedBody(text("2")).endpointNotOrdered())
                 .addExpectation(asyncExpectation("vm:s"))

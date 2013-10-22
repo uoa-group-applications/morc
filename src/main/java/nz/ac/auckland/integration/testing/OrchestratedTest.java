@@ -2,13 +2,10 @@ package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.cxf.CxfComponent;
-import org.apache.camel.component.cxf.CxfEndpoint;
-import org.apache.camel.component.cxf.DataFormat;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
@@ -29,51 +26,78 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
+
 public class OrchestratedTest extends CamelSpringTestSupport {
 
-    private String[] springContextPaths;
-    private final OrchestratedTestSpecification specification;
+    private String[] springContextPaths = new String[]{};
+    private String propertiesLocationPath;
+    private OrchestratedTestSpecification specification;
     private Logger logger = LoggerFactory.getLogger(OrchestratedTest.class);
-    private PropertiesComponent properties = null;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
+
+    protected OrchestratedTest() {
+        //we want CXF to be in PAYLOAD mode rather than POJO
+        endpointOverrides.add(new CxfEndpointOverride());
+    }
 
     /**
      * @param specification A test specification that this test runs
      */
     public OrchestratedTest(OrchestratedTestSpecification specification) {
-        this(new String[]{}, specification);
-    }
-
-    /**
-     * @param propertiesPath a classpath path for a properties file
-     * @param specification  A test specification that this test runs
-     */
-    public OrchestratedTest(String propertiesPath, OrchestratedTestSpecification specification) {
-        this(specification);
-        properties = new PropertiesComponent();
-        properties.setLocation(propertiesPath);
-    }
-
-    /**
-     * @param springContextPaths An array of file paths to Spring Contexts used to set up Camel and any dependencies
-     * @param specification      A test specification that this test runs
-     */
-    public OrchestratedTest(String[] springContextPaths, OrchestratedTestSpecification specification) {
-        this.springContextPaths = springContextPaths;
+        this();
         this.specification = specification;
+    }
 
-        //we want CXF to be in PAYLOAD mode rather than POJO
-        endpointOverrides.add(new CxfEndpointOverride());
+    public OrchestratedTest(OrchestratedTestSpecification specification, String[] springContextPaths) {
+        this(specification);
+        this.springContextPaths = springContextPaths;
+    }
+
+    public OrchestratedTest(OrchestratedTestSpecification specification, String propertiesLocationPath) {
+        this(specification);
+        this.propertiesLocationPath = propertiesLocationPath;
+    }
+
+    public OrchestratedTest(OrchestratedTestSpecification specification, String[] springContextPaths, String propertiesLocationPath) {
+        this(specification,springContextPaths);
+        this.propertiesLocationPath = propertiesLocationPath;
+    }
+
+    //I would've prefered to use a constructor-only approach but sub-classing makes this infeasible
+    protected void setSpecification(OrchestratedTestSpecification specification) {
+        this.specification = specification;
+    }
+
+    /**
+     * Override this to return a list of Spring context paths on the classpath
+     * @return An array of classpath Spring XML file references
+     */
+    protected String[] getSpringContextPaths() {
+        return springContextPaths;
+    }
+
+    /**
+     * Override this to return a path to a properties file for managing Camel endpoint URIs
+     * @return A string path to a properties file
+     */
+    protected String getPropertiesLocation() {
+        return propertiesLocationPath;
     }
 
     protected AbstractXmlApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext(springContextPaths);
+        return new ClassPathXmlApplicationContext(getSpringContextPaths());
     }
 
     @Override
     protected CamelContext createCamelContext() throws Exception {
         CamelContext context = super.createCamelContext();
-        if (properties != null) context.addComponent("properties", properties);
+
+        String propertiesLocation = getPropertiesLocation();
+        if (propertiesLocation != null) {
+            PropertiesComponent properties = new PropertiesComponent();
+            properties.setLocation(propertiesLocation);
+            context.addComponent("properties", properties);
+        }
 
         return context;
     }
@@ -81,6 +105,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     /**
      * Override (and super call it) to modify the Camel endpoint for sending
      * and receiving messages
+     *
      * @param endpoint the current endpoint we are able to create a route for, or send a message to
      */
     protected void overrideEndpoint(Endpoint endpoint) {
@@ -106,6 +131,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
     @Test
     public void runOrchestratedTest() throws Exception {
+
+        if (specification == null)
+            throw new RuntimeException("A specification must be set in order to run an orchestrated test");
 
         logger.info("Starting the test for specification: {}", specification.getDescription());
 
@@ -385,6 +413,8 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
         return false;
     }
+
+
 }
 
 

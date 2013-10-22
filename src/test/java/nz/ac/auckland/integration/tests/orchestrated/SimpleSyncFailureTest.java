@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper.*;
+import static nz.ac.auckland.integration.testing.OrchestratedTestBuilder.*;
 
 public class SimpleSyncFailureTest extends CamelTestSupport {
 
@@ -54,7 +54,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testDelayedDeliveryFails() throws Exception {
-        SyncOrchestratedTestSpecification spec = syncTest("vm:syncInputAsyncOutputDelayed", "Test delayed delivery fails")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutputDelayed", "Test delayed delivery fails")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
@@ -63,7 +63,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(new String[]{}, spec);
+            OrchestratedTest test = new OrchestratedTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -75,13 +75,13 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testInvalidResponseFails() throws Exception {
-        SyncOrchestratedTestSpecification spec = syncTest("vm:syncInputNoCallouts", "Test fails on invalid response")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputNoCallouts", "Test fails on invalid response")
                 .expectedResponseBody(xml("<foo/>"))
                 .build();
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(new String[]{}, spec);
+            OrchestratedTest test = new OrchestratedTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -93,14 +93,14 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationBodyInvalid() throws Exception {
-        SyncOrchestratedTestSpecification spec = syncTest("vm:syncInputAsyncOutput", "Test fails on invalid expectation body")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation body")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
                 .build();
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(new String[]{}, spec);
+            OrchestratedTest test = new OrchestratedTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -113,7 +113,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationHeadersInvalid() throws Exception {
-        SyncOrchestratedTestSpecification spec = syncTest("vm:syncInputAsyncOutput", "Test fails on invalid expectation headers")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation headers")
                 .requestHeaders(headers(headervalue("foo", "baz")))
                 .addExpectation(asyncExpectation("vm:asyncTarget2")
                         .expectedHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def"))))
@@ -121,7 +121,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(new String[]{}, spec);
+            OrchestratedTest test = new OrchestratedTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -134,7 +134,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testSendMoreExchangesThanExpectations() throws Exception {
-        SyncOrchestratedTestSpecification spec = syncTest("vm:syncMultiTestPublisher", "Test fails on invalid expectation headers")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher", "Test fails on invalid expectation headers")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget")
                         .expectedBody(xml("<foo/>")))
@@ -142,7 +142,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(new String[]{}, spec);
+            OrchestratedTest test = new OrchestratedTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {

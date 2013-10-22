@@ -1,27 +1,13 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
-import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.builder.RouteBuilder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper.*;
+import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 
 /**
  * Simple 1 expectation tests for sending and receiving messages using the Camel infrastructure
  */
-@RunWith(value = Parameterized.class)
-public class SimpleAsyncTest extends OrchestratedTest {
-
-    private static List<OrchestratedTestSpecification> specifications = new ArrayList<>();
-
-    public SimpleAsyncTest(String[] springContextPaths, OrchestratedTestSpecification specification, String testName) {
-        super(springContextPaths, specification);
-    }
+public class SimpleAsyncTest extends OrchestratedTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -41,33 +27,18 @@ public class SimpleAsyncTest extends OrchestratedTest {
     }
 
     //declare the actual tests here...
-    static {
-        specifications.add(asyncTest("seda:asyncTestInput", "test async send body")
+    public static void configure() {
+        asyncTest("seda:asyncTestInput", "test async send body")
                 .inputMessage(xml("<test/>"))
-                .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")))
-                .build());
+                .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")));
 
-        specifications.add(asyncTest("seda:asyncTestInput", "test async send headers")
+        asyncTest("seda:asyncTestInput", "test async send headers")
                 .inputHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
-                        .expectedHeaders(headers(headervalue("abc", "def"), headervalue("foo", "baz"))))
-                .build());
+                        .expectedHeaders(headers(headervalue("abc", "def"), headervalue("foo", "baz"))));
 
-        specifications.add(asyncTest("seda:asyncTestInputDelayed", "test async delayed")
-                .addExpectation(asyncExpectation("seda:asyncTestOutput"))
-                .build());
+        asyncTest("seda:asyncTestInputDelayed", "test async delayed")
+                .addExpectation(asyncExpectation("seda:asyncTestOutput"));
     }
 
-    //this is used by JUnit to initialize each instance of this specification
-    @Parameterized.Parameters(name = "{index}: {2}")
-    public static java.util.Collection<Object[]> data() {
-        List<Object[]> constructorInputs = new ArrayList<>();
-
-        for (OrchestratedTestSpecification spec : specifications) {
-            Object[] constructorInput = new Object[]{new String[]{}, spec, spec.getDescription()};
-            constructorInputs.add(constructorInput);
-        }
-
-        return constructorInputs;
-    }
 }

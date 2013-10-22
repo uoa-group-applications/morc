@@ -1,30 +1,16 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
+import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
-import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper.*;
 
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
  */
-@RunWith(value = Parameterized.class)
-public class MultiExpectationSyncTest extends OrchestratedTest {
-
-    private static List<OrchestratedTestSpecification> specifications = new ArrayList<>();
-
-    public MultiExpectationSyncTest(String[] springContextPaths, OrchestratedTestSpecification specification, String testName) {
-        super(springContextPaths, specification);
-    }
+public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -151,24 +137,22 @@ public class MultiExpectationSyncTest extends OrchestratedTest {
         };
     }
 
-    static {
-        specifications.add(syncTest("direct:syncInput", "Simple send body to two destinations and get correct response")
+    public static void configure() {
+        syncTest("direct:syncInput", "Simple send body to two destinations and get correct response")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
-                        responseBody(xml("<foo/>")))
-                .build());
+                        responseBody(xml("<foo/>")));
 
-        specifications.add(syncTest("direct:syncInput", "Simple send body to two destinations with swapped order")
+        syncTest("direct:syncInput", "Simple send body to two destinations with swapped order")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
                         responseBody(xml("<foo/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
-                .build());
+                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
 
-        specifications.add(syncTest("direct:syncInputMultiAsync", "Sync and multiple Async - ensuring total order")
+        syncTest("direct:syncInputMultiAsync", "Sync and multiple Async - ensuring total order")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                         //this expectation will come in last
@@ -177,29 +161,26 @@ public class MultiExpectationSyncTest extends OrchestratedTest {
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
                         responseBody(xml("<foo/>")))
                         //this expectation will come in second to last
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
-                .build());
+                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
 
-        specifications.add(syncTest("direct:syncInputMultiAsyncToSameDest", "Sync and multiple Async to same dest - ensuring total order")
+        syncTest("direct:syncInputMultiAsyncToSameDest", "Sync and multiple Async to same dest - ensuring total order")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget1").expectedBody(xml("<async/>")))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
                         responseBody(xml("<foo/>")))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget1"))
-                .build());
+                .addExpectation(asyncExpectation("seda:asyncTarget1"));
 
-        specifications.add(syncTest("direct:multiSend", "Send to two sync destinations without total ordering")
+        syncTest("direct:multiSend", "Send to two sync destinations without total ordering")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                         //this will receive the message last
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").ordering(MockExpectation.OrderingType.PARTIAL))
                         //this will receive the message first
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").ordering(MockExpectation.OrderingType.PARTIAL))
-                .build());
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").ordering(MockExpectation.OrderingType.PARTIAL));
 
-        specifications.add(syncTest("direct:multiSend1", "Send unordered messages to same sync endpoint without endpoint ordering")
+        syncTest("direct:multiSend1", "Send unordered messages to same sync endpoint without endpoint ordering")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                         //we will receive this last
@@ -207,11 +188,9 @@ public class MultiExpectationSyncTest extends OrchestratedTest {
                         .expectedBody(xml("<second/>")))
                         //we will receive this first
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered()
-                        .expectedBody(xml("<first/>")))
-                .build());
+                        .expectedBody(xml("<first/>")));
 
-        //out of order and total order for sync
-        specifications.add(syncTest("direct:multiSend2", "Send unordered messages to two different sync destinations without total ordering or endpoint ordering")
+        syncTest("direct:multiSend2", "Send unordered messages to two different sync destinations without total ordering or endpoint ordering")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
@@ -221,33 +200,17 @@ public class MultiExpectationSyncTest extends OrchestratedTest {
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
                         .expectedBody(xml("<second/>")))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
-                        .expectedBody(xml("<first/>")))
-                .build());
+                        .expectedBody(xml("<first/>")));
 
-        specifications.add(syncTest("direct:syncAtEnd", "Send async messages out of order such that sync arrives first")
+        syncTest("direct:syncAtEnd", "Send async messages out of order such that sync arrives first")
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")).endpointNotOrdered())
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")).endpointNotOrdered())
-                .addExpectation(syncExpectation(("seda:b")))
-                .build());
+                .addExpectation(syncExpectation(("seda:b")));
 
-        specifications.add(asyncTest("direct:endpointWithSyncOrdering", "send mis-ordered")
+        asyncTest("direct:endpointWithSyncOrdering", "send mis-ordered")
                 .addExpectation(asyncExpectation("seda:a"))
                 .addExpectation(asyncExpectation("seda:b"))
-                .addExpectation(syncExpectation("seda:s"))
-                .build());
-
+                .addExpectation(syncExpectation("seda:s"));
     }
 
-    //this is used by JUnit to initialize each instance of this specification
-    @Parameterized.Parameters(name = "{index}: {2}")
-    public static java.util.Collection<Object[]> data() {
-        List<Object[]> constructorInputs = new ArrayList<>();
-
-        for (OrchestratedTestSpecification spec : specifications) {
-            Object[] constructorInput = new Object[]{new String[]{}, spec, spec.getDescription()};
-            constructorInputs.add(constructorInput);
-        }
-
-        return constructorInputs;
-    }
 }

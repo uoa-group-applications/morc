@@ -1,26 +1,11 @@
 package nz.ac.auckland.integration.tests.integration;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
+import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
-import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.cxf.binding.soap.SoapFault;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper.*;
-
-@RunWith(value = Parameterized.class)
-public class WebServiceProxyTest extends OrchestratedTest {
-
-    protected static List<OrchestratedTestSpecification> specifications = new ArrayList<>();
-
-    public WebServiceProxyTest(String[] springContextPaths, OrchestratedTestSpecification specification, String testName) {
-        super(springContextPaths, specification);
-    }
+public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -40,57 +25,40 @@ public class WebServiceProxyTest extends OrchestratedTest {
         };
     }
 
-    static {
-        specifications.add(syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy test")
+    public static void configure() {
+        syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy test")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponse1.xml"))).ordering(MockExpectation.OrderingType.PARTIAL))
-                .build());
+                        .responseBody(xml(classpath("/data/pingResponse1.xml"))).ordering(MockExpectation.OrderingType.PARTIAL));
 
-        specifications.add(syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test")
+        syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingSoapFault.xml")))
                 .expectsExceptionResponse().exceptionValidator(httpExceptionResponseValidator())
                 .addExpectation(wsFaultExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingSoapFault.xml"))))
-                .build());
+                        .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
 
-        specifications.add(syncTest("cxf:http://localhost:8091/targetWS", "Simple WS test using CXF")
+        syncTest("cxf:http://localhost:8091/targetWS", "Simple WS test using CXF")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
                 .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
                         .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))))
-                .build());
+                        .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))));
 
         //Testing work around for https://issues.apache.org/jira/browse/CXF-2775
-        specifications.add(syncTest("cxf:http://localhost:8091/targetWS", "Duplicated WS test using CXF for CXF-2775 Work around")
+        syncTest("cxf:http://localhost:8091/targetWS", "Duplicated WS test using CXF for CXF-2775 Work around")
                         .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
                         .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
                         .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
                                 .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                                .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))))
-                        .build());
+                                .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))));
 
-        specifications.add(syncTest("cxf:http://localhost:8092/testWSFault","CXF WS Fault Test")
+        syncTest("cxf:http://localhost:8092/testWSFault","CXF WS Fault Test")
                         .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                        .expectsExceptionResponse()
-                        .build());
+                        .expectsExceptionResponse();
     }
 
-    //this is used by JUnit to initialize each instance of this specification
-    @Parameterized.Parameters(name = "{index}: {2}")
-    public static java.util.Collection<Object[]> data() {
-        List<Object[]> constructorInputs = new ArrayList<>();
-
-        for (OrchestratedTestSpecification spec : specifications) {
-            Object[] constructorInput = new Object[]{new String[]{}, spec, spec.getDescription()};
-            constructorInputs.add(constructorInput);
-        }
-
-        return constructorInputs;
-    }
 }

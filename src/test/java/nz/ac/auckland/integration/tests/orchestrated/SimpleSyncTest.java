@@ -1,30 +1,15 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
+import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
-import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper.*;
 
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
  */
-@RunWith(value = Parameterized.class)
-public class SimpleSyncTest extends OrchestratedTest {
-
-    protected static List<OrchestratedTestSpecification> specifications = new ArrayList<>();
-
-    public SimpleSyncTest(String[] springContextPaths, OrchestratedTestSpecification specification, String testName) {
-        super(springContextPaths, specification);
-    }
+public class SimpleSyncTest extends OrchestratedTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -56,79 +41,55 @@ public class SimpleSyncTest extends OrchestratedTest {
         };
     }
 
-    static {
-        specifications.add(syncTest("direct:syncInputAsyncOutput", "Simple send body to async output with valid response")
+    public static void configure() {
+        syncTest("direct:syncInputAsyncOutput", "Simple send body to async output with valid response")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<baz/>")))
-                .expectedResponseBody(xml("<foo/>"))
-                .build());
+                .expectedResponseBody(xml("<foo/>"));
 
-        specifications.add(syncTest("direct:syncInputAsyncOutput", "Ensure unresolved message count is zero and still valid")
+        syncTest("direct:syncInputAsyncOutput", "Ensure unresolved message count is zero and still valid")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
-                .addExpectation(unreceivedExpectation("seda:nothingToSeeHere"))
-                .build());
+                .addExpectation(unreceivedExpectation("seda:nothingToSeeHere"));
 
-        specifications.add(syncTest("direct:syncMultiTestPublisher", "Multiple messages received by expectation")
+        syncTest("direct:syncMultiTestPublisher", "Multiple messages received by expectation")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
                         .expectedMessageCount(3)
-                        .expectedBody(xml("<moo/>")))
-                .build());
+                        .expectedBody(xml("<moo/>")));
 
-        specifications.add(syncTest("direct:syncInputNoCallouts", "Message with no expectations")
+        syncTest("direct:syncInputNoCallouts", "Message with no expectations")
                 .expectedResponseBody(xml("<abc/>"))
-                .requestBody(xml("<foo/>"))
-                .build());
+                .requestBody(xml("<foo/>"));
 
-        specifications.add(syncTest("direct:syncMultiTestPublisher", "Test total ordering response the same")
+        syncTest("direct:syncMultiTestPublisher", "Test total ordering response the same")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
-                        .expectedMessageCount(3).ordering(MockExpectation.OrderingType.PARTIAL))
-                .build());
+                        .expectedMessageCount(3).ordering(MockExpectation.OrderingType.PARTIAL));
 
-        specifications.add(syncTest("direct:syncMultiTestPublisher", "Test endpoint ordering response the same")
+        syncTest("direct:syncMultiTestPublisher", "Test endpoint ordering response the same")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
-                        .expectedMessageCount(3).ordering(MockExpectation.OrderingType.PARTIAL))
-                .build());
+                        .expectedMessageCount(3).ordering(MockExpectation.OrderingType.PARTIAL));
 
-        specifications.add(syncTest("direct:syncMultiTestPublisher", "Test no ordering response the same")
+        syncTest("direct:syncMultiTestPublisher", "Test no ordering response the same")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
-                        .expectedMessageCount(3).ordering(MockExpectation.OrderingType.PARTIAL).endpointNotOrdered())
-                .build());
+                        .expectedMessageCount(3).ordering(MockExpectation.OrderingType.PARTIAL).endpointNotOrdered());
 
-        specifications.add(syncTest("direct:syncInputAsyncOutput", "Test headers are handled appropriately")
+        syncTest("direct:syncInputAsyncOutput", "Test headers are handled appropriately")
                 .requestBody(xml("<baz/>"))
                 .requestHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
-                        .expectedHeaders(headers(headervalue("abc", "def"), headervalue("foo", "baz"))))
-                .build());
+                        .expectedHeaders(headers(headervalue("abc", "def"), headervalue("foo", "baz"))));
 
-        specifications.add(syncTest("direct:syncInputSyncOutput", "Test sync response")
+        syncTest("direct:syncInputSyncOutput", "Test sync response")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget")
                         .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
-                .expectedResponseBody(xml("<foo/>")).build());
+                .expectedResponseBody(xml("<foo/>"));
 
-
-        //Expected: s1.total,s2.partial,s3.partial
-        //Actual s1,s3,s2
-    }
-
-    //this is used by JUnit to initialize each instance of this specification
-    @Parameterized.Parameters(name = "{index}: {2}")
-    public static java.util.Collection<Object[]> data() {
-        List<Object[]> constructorInputs = new ArrayList<>();
-
-        for (OrchestratedTestSpecification spec : specifications) {
-            Object[] constructorInput = new Object[]{new String[]{}, spec, spec.getDescription()};
-            constructorInputs.add(constructorInput);
-        }
-
-        return constructorInputs;
     }
 
 }

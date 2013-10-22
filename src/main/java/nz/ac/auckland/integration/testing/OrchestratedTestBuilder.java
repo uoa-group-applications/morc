@@ -1,4 +1,4 @@
-package nz.ac.auckland.integration.testing.dsl;
+package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
@@ -6,29 +6,39 @@ import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validators.HttpExceptionResponseValidator;
+import org.junit.AfterClass;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- * A list of static methods that can be imported into a test implementation for quickly adding
- * test specifications
- *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
- */
-public class SpecificationBuilderHelper {
+@RunWith(value = OrchestratedParameterized.class)
+public class OrchestratedTestBuilder extends OrchestratedTest {
+
+    private static List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
+
+    @AfterClass
+    public static void clearBuilders() {
+        //since this class might be used in more than one place and we're using a static list
+        specificationBuilders.clear();
+    }
 
     /**
      * @param endpointUri The endpoint URI that an asynchronous message should be sent to
      * @param description A description for the test specification that clearly identifies it
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
-    public static AsyncOrchestratedTestSpecification.Builder asyncTest(String endpointUri, String description) {
-        return new AsyncOrchestratedTestSpecification.Builder(endpointUri, description);
+    protected static AsyncOrchestratedTestSpecification.Builder asyncTest(String endpointUri, String description) {
+        AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification.Builder(endpointUri, description);
+        specificationBuilders.add(builder);
+        return builder;
     }
 
     /**
@@ -36,8 +46,10 @@ public class SpecificationBuilderHelper {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    public static SyncOrchestratedTestSpecification.Builder syncTest(String endpointUri, String description) {
-        return new SyncOrchestratedTestSpecification.Builder(endpointUri, description);
+    protected static SyncOrchestratedTestSpecification.Builder syncTest(String endpointUri, String description) {
+        SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification.Builder(endpointUri, description);
+        specificationBuilders.add(builder);
+        return builder;
     }
 
     /**
@@ -183,7 +195,7 @@ public class SpecificationBuilderHelper {
      * @param path A path to a resource on the current classpath
      */
     public static URL classpath(String path) {
-        URL resource = SpecificationBuilderHelper.class.getResource(path);
+        URL resource = OrchestratedTest.class.getResource(path);
         if (resource == null) throw new RuntimeException("The classpath resource could not be found: " + path);
 
         return resource;
@@ -277,5 +289,18 @@ public class SpecificationBuilderHelper {
         }
 
         return new XmlTestResource.XPathSelector(xpath, namespaceMap);
+    }
+
+    //this is used by JUnit to initialize each instance of this specification
+    public static List<OrchestratedTestSpecification> getSpecifications() {
+
+        List<OrchestratedTestSpecification> specifications = new ArrayList<>();
+
+        for (OrchestratedTestSpecification.AbstractBuilder builder : specificationBuilders) {
+            OrchestratedTestSpecification spec = builder.build();
+            specifications.add(spec);
+        }
+
+        return specifications;
     }
 }

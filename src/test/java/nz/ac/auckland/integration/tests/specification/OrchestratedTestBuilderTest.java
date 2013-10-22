@@ -1,6 +1,6 @@
-package nz.ac.auckland.integration.tests.dsl;
+package nz.ac.auckland.integration.tests.specification;
 
-import nz.ac.auckland.integration.testing.dsl.SpecificationBuilderHelper;
+import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
@@ -16,7 +16,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpecificationBuilderHelperTest extends Assert {
+public class OrchestratedTestBuilderTest extends Assert {
 
     private static final String EXPECTED_XML_VALUE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">\n" +
@@ -46,9 +46,8 @@ public class SpecificationBuilderHelperTest extends Assert {
 
     @Test
     public void testAsyncTest() {
-        AsyncOrchestratedTestSpecification.Builder builder = SpecificationBuilderHelper
-                .asyncTest("endpointUri", "description")
-                .addExpectation(SpecificationBuilderHelper.exceptionExpectation("foo"));
+        AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification.Builder("endpointUri", "description")
+                .addExpectation(OrchestratedTestBuilder.exceptionExpectation("foo"));
         AsyncOrchestratedTestSpecification spec = builder.build();
 
         assertEquals(spec.getDescription(), "description");
@@ -57,7 +56,7 @@ public class SpecificationBuilderHelperTest extends Assert {
 
     @Test
     public void testSyncTest() {
-        SyncOrchestratedTestSpecification.Builder builder = SpecificationBuilderHelper.syncTest("endpointUri", "description");
+        SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification.Builder("endpointUri", "description");
         SyncOrchestratedTestSpecification spec = builder.build();
 
         assertEquals(spec.getDescription(), "description");
@@ -66,58 +65,58 @@ public class SpecificationBuilderHelperTest extends Assert {
 
     @Test
     public void testXmlString() throws Exception {
-        XmlTestResource xml = SpecificationBuilderHelper.xml("<foo/>");
+        XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
         assertEquals("<foo/>", xml.getValue());
     }
 
     @Test
     public void testXmlFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/xml-test1.xml").toURI());
-        XmlTestResource xml = SpecificationBuilderHelper.xml(f);
+        XmlTestResource xml = OrchestratedTestBuilder.xml(f);
         assertTrue(xml.validateInput(EXPECTED_XML_VALUE));
     }
 
     @Test
     public void testXmlURL() throws Exception {
-        XmlTestResource xml = SpecificationBuilderHelper.xml(this.getClass().getResource("/data/xml-test1.xml"));
+        XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"));
         assertTrue(xml.validateInput(EXPECTED_XML_VALUE));
     }
 
     @Test
     public void testJsonString() throws Exception {
-        JsonTestResource json = SpecificationBuilderHelper.json("{foo:\"foo\"}");
+        JsonTestResource json = OrchestratedTestBuilder.json("{foo:\"foo\"}");
         assertEquals("{foo:\"foo\"}", json.getValue());
     }
 
     @Test
     public void testJsonFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/json-test1.json").toURI());
-        JsonTestResource json = SpecificationBuilderHelper.json(f);
+        JsonTestResource json = OrchestratedTestBuilder.json(f);
         assertTrue(json.validateInput(EXPECTED_JSON_VALUE));
     }
 
     @Test
     public void testJsonURL() throws Exception {
-        JsonTestResource json = SpecificationBuilderHelper.json(this.getClass().getResource("/data/json-test1.json"));
+        JsonTestResource json = OrchestratedTestBuilder.json(this.getClass().getResource("/data/json-test1.json"));
         assertTrue(json.validateInput(EXPECTED_JSON_VALUE));
     }
 
     @Test
     public void testPlainTextString() throws Exception {
-        PlainTextTestResource text = SpecificationBuilderHelper.text("foo");
+        PlainTextTestResource text = OrchestratedTestBuilder.text("foo");
         assertEquals("foo", text.getValue());
     }
 
     @Test
     public void testPlainTextFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/plaintext-test1.txt").toURI());
-        PlainTextTestResource text = SpecificationBuilderHelper.text(f);
+        PlainTextTestResource text = OrchestratedTestBuilder.text(f);
         assertTrue(text.validateInput("test"));
     }
 
     @Test
     public void testPlainTextURL() throws Exception {
-        PlainTextTestResource text = SpecificationBuilderHelper.text(this.getClass().getResource("/data/plaintext-test1.txt"));
+        PlainTextTestResource text = OrchestratedTestBuilder.text(this.getClass().getResource("/data/plaintext-test1.txt"));
         assertTrue(text.validateInput("test"));
     }
 
@@ -126,7 +125,7 @@ public class SpecificationBuilderHelperTest extends Assert {
         Map<String, Object> headers = new HashMap<>();
         headers.put("foo", "baz");
 
-        HeadersTestResource headersTest = SpecificationBuilderHelper.headers(headers);
+        HeadersTestResource headersTest = OrchestratedTestBuilder.headers(headers);
 
         assertEquals(1, headersTest.getValue().size());
         assertEquals("baz", headersTest.getValue().get("foo"));
@@ -135,7 +134,7 @@ public class SpecificationBuilderHelperTest extends Assert {
     @Test
     public void testHeadersFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/header-test1.properties").toURI());
-        HeadersTestResource headers = SpecificationBuilderHelper.headers(f);
+        HeadersTestResource headers = OrchestratedTestBuilder.headers(f);
 
         assertEquals(2, headers.getValue().size());
         assertEquals("baz", headers.getValue().get("foo"));
@@ -144,7 +143,7 @@ public class SpecificationBuilderHelperTest extends Assert {
 
     @Test
     public void testHeadersURL() throws Exception {
-        HeadersTestResource headers = SpecificationBuilderHelper.headers(this.getClass().getResource("/data/header-test1.properties"));
+        HeadersTestResource headers = OrchestratedTestBuilder.headers(this.getClass().getResource("/data/header-test1.properties"));
 
         assertEquals(2, headers.getValue().size());
         assertEquals("baz", headers.getValue().get("foo"));
@@ -153,8 +152,8 @@ public class SpecificationBuilderHelperTest extends Assert {
 
     @Test
     public void testHeadersHeaderValue() throws Exception {
-        HeadersTestResource headers = SpecificationBuilderHelper.headers(
-                SpecificationBuilderHelper.headervalue("foo", "baz"), SpecificationBuilderHelper.headervalue("abc", "123"));
+        HeadersTestResource headers = OrchestratedTestBuilder.headers(
+                OrchestratedTestBuilder.headervalue("foo", "baz"), OrchestratedTestBuilder.headervalue("abc", "123"));
 
         assertEquals(2, headers.getValue().size());
         assertEquals("baz", headers.getValue().get("foo"));
@@ -163,44 +162,44 @@ public class SpecificationBuilderHelperTest extends Assert {
 
     @Test
     public void testClasspath() throws Exception {
-        URL classpath = SpecificationBuilderHelper.classpath("/data/header-test1.properties");
+        URL classpath = OrchestratedTestBuilder.classpath("/data/header-test1.properties");
         assertTrue(classpath.getPath().contains("/data/header-test1.properties"));
     }
 
     @Test
     public void testFile() throws Exception {
-        File file = SpecificationBuilderHelper.file("/data/header-test1.properties");
+        File file = OrchestratedTestBuilder.file("/data/header-test1.properties");
         assertEquals(file.getPath(), "/data/header-test1.properties");
     }
 
     @Test
     public void testAsyncExpectation() throws Exception {
-        AsyncMockExpectation.Builder builder = SpecificationBuilderHelper.asyncExpectation("foo");
+        AsyncMockExpectation.Builder builder = OrchestratedTestBuilder.asyncExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
     @Test
     public void testSyncExpectation() throws Exception {
-        SyncMockExpectation.Builder builder = SpecificationBuilderHelper.syncExpectation("foo");
+        SyncMockExpectation.Builder builder = OrchestratedTestBuilder.syncExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
 
     @Test
     public void testCxfFaultExpectation() throws Exception {
-        WsFaultMockExpectation.Builder builder = SpecificationBuilderHelper.wsFaultExpectation("foo");
+        WsFaultMockExpectation.Builder builder = OrchestratedTestBuilder.wsFaultExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
     @Test
     public void testExceptionExpectation() throws Exception {
-        ExceptionMockExpectation.Builder builder = SpecificationBuilderHelper.exceptionExpectation("foo");
+        ExceptionMockExpectation.Builder builder = OrchestratedTestBuilder.exceptionExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
     @Test
     public void testUnreceivedExpectation() throws Exception {
-        UnreceivedMockExpectation.Builder builder = SpecificationBuilderHelper.unreceivedExpectation("foo");
+        UnreceivedMockExpectation.Builder builder = OrchestratedTestBuilder.unreceivedExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
@@ -208,7 +207,7 @@ public class SpecificationBuilderHelperTest extends Assert {
     public void testNonExistentResource() throws Exception {
         Exception e = null;
         try {
-            SpecificationBuilderHelper.classpath("/nosuchfile.xml");
+            OrchestratedTestBuilder.classpath("/nosuchfile.xml");
         } catch (RuntimeException ex) {
             e = ex;
         }

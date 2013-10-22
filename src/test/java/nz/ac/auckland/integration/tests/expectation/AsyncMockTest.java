@@ -6,6 +6,7 @@ import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.component.seda.SedaComponent;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -54,7 +55,7 @@ public class AsyncMockTest extends Assert {
         CamelContext ctx = new DefaultCamelContext();
 
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody(new XmlTestResource(bodyUrl).getValue());
         exchange.getIn().setHeaders(new HeadersTestResource(headersUrl).getValue());
 
@@ -66,7 +67,7 @@ public class AsyncMockTest extends Assert {
         CamelContext ctx = new DefaultCamelContext();
 
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody("");
 
         assertFalse(generateExpectationBuilder().build().checkValid(exchange, 0));
@@ -77,7 +78,7 @@ public class AsyncMockTest extends Assert {
         //for cases where we are just interested in receiving a message, and not the contents of it
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         assertTrue(generateExpectationBuilder().expectedHeaders(null).expectedBody(null).build().checkValid(exchange, 0));
     }
@@ -88,7 +89,7 @@ public class AsyncMockTest extends Assert {
 
         Exchange exchange = new DefaultExchange(ctx);
         exchange.getIn().setBody(new XmlTestResource(bodyUrl).getValue());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
         AsyncMockExpectation expectation = new AsyncMockExpectation.Builder("seda:test")
                 .name("firstExpectation")
@@ -103,7 +104,7 @@ public class AsyncMockTest extends Assert {
         CamelContext ctx = new DefaultCamelContext();
 
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setBody("<test/>");
 
         assertFalse(generateExpectationBuilder().build().checkValid(exchange, 0));
@@ -113,7 +114,7 @@ public class AsyncMockTest extends Assert {
     public void testEmptyExchange() throws Exception {
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         assertFalse(generateExpectationBuilder().build().checkValid(exchange, 0));
     }
 
@@ -122,7 +123,7 @@ public class AsyncMockTest extends Assert {
         CamelContext ctx = new DefaultCamelContext();
 
         Exchange exchange = new DefaultExchange(ctx);
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setHeader("nothing", "here");
 
         assertFalse(generateExpectationBuilder().build().checkValid(exchange, 0));
@@ -134,7 +135,7 @@ public class AsyncMockTest extends Assert {
 
         Exchange exchange = new DefaultExchange(ctx);
         exchange.getIn().setBody(new XmlTestResource(bodyUrl).getValue());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setHeaders(new HeadersTestResource(headersUrl).getValue());
 
         MockExpectation expectation = generateExpectationBuilder().receivedAt(0).build();
@@ -148,7 +149,7 @@ public class AsyncMockTest extends Assert {
 
         Exchange exchange = new DefaultExchange(ctx);
         exchange.getIn().setBody(new XmlTestResource(bodyUrl).getValue());
-        exchange.setFromEndpoint(new SedaEndpoint("seda://test", null, null));
+        exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setHeaders(new HeadersTestResource(headersUrl).getValue());
 
         MockExpectation expectation = generateExpectationBuilder().receivedAt(1).build();
