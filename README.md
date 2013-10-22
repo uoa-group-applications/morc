@@ -147,4 +147,4 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 }
 ```
 
-All of these examples can be found under the example directory of this project; execute the test run with the standard mvn test goal. There is currently some bootstrap code associated with JUnit and Camel - I am hoping to minimize this further by re-shuffling some code or introducing Groovy into the mix. The tests themselves are found under com.acme.integration.tests.AcmeTest
+All of these examples can be found under at (https://github.com/dmacdonald2013/soaunit-example); execute the test run with the standard mvn test goal. The tests themselves are found under com.acme.integration.tests.AcmeTest
