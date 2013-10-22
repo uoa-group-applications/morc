@@ -66,13 +66,13 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                 response = template.requestBody(endpoint, inputRequestBody.getValue(), String.class);
             else response = template.requestBody(endpoint, "", String.class);
 
-            return expectedResponseBody == null || expectedResponseBody.validateInput(response);
+            return expectedResponseBody == null || expectedResponseBody.validate(response);
 
         } catch (CamelExecutionException e) {
             logger.info("An execution exception was encountered", e);
             if (expectsExceptionResponse && exceptionValidator == null) return true;
             if (expectsExceptionResponse) {
-                return exceptionValidator.validateInput(e, expectedResponseBody);
+                return exceptionValidator.validate(e, expectedResponseBody);
             }
 
             throw e;

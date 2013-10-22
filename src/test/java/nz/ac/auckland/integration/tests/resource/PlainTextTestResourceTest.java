@@ -25,31 +25,31 @@ public class PlainTextTestResourceTest extends Assert {
     @Test
     public void testCompareInput() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-        assertTrue(resource.validateInput(EXPECTED_VALUE));
+        assertTrue(resource.validate(EXPECTED_VALUE));
     }
 
     @Test
     public void testCompareDifferentInput() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-        assertFalse(resource.validateInput("sample"));
+        assertFalse(resource.validate("sample"));
     }
 
     @Test
     public void testNullInput() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-        assertFalse(resource.validateInput(null));
+        assertFalse(resource.validate(null));
     }
 
     @Test
     public void testEmptyFile() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource(inputUrl2);
-        assertTrue(resource.validateInput(""));
+        assertTrue(resource.validate(""));
     }
 
     @Test
     public void testPassValueToConstructor() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource("foo");
-        assertTrue(resource.validateInput("foo"));
+        assertTrue(resource.validate("foo"));
     }
 
 }

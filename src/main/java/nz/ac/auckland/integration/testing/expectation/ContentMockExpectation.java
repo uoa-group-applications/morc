@@ -39,8 +39,8 @@ public abstract class ContentMockExpectation extends MockExpectation {
         if (!super.checkValid(incomingExchange, index)) return false;
 
         //now check the expected bodies and headers are valid
-        boolean validateBody = expectedBody == null || expectedBody.validateInput(incomingExchange.getIn().getBody(String.class));
-        boolean validateHeaders = expectedHeaders == null || expectedHeaders.validateInput(incomingExchange.getIn().getHeaders());
+        boolean validateBody = expectedBody == null || expectedBody.validate(incomingExchange.getIn().getBody(String.class));
+        boolean validateHeaders = expectedHeaders == null || expectedHeaders.validate(incomingExchange.getIn().getHeaders());
 
         return validateBody && validateHeaders;
     }

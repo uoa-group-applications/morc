@@ -39,10 +39,11 @@ public abstract class TestResource<T> {
     }
 
     /**
-     * @param input A given message of type T used for comparison against the test resource itself
+     *
+     * @param value A given message of type T used for comparison against the test resource itself
      * @return true if the input matches this test input
      */
-    public abstract boolean validateInput(T input);
+    public abstract boolean validate(T value);
 
     /**
      * @param file a reference to the actual test resource

@@ -11,10 +11,10 @@ import org.apache.camel.component.http.HttpOperationFailedException;
  */
 public class HttpExceptionResponseValidator implements ExceptionValidator {
     @Override
-    public boolean validateInput(CamelExecutionException e, TestResource<String> expectedResponseBody) {
+    public boolean validate(CamelExecutionException e, TestResource<String> expectedResponseBody) {
         Throwable t = e.getCause();
         if (!(t instanceof HttpOperationFailedException)) return false;
         String responseBody = ((HttpOperationFailedException) t).getResponseBody();
-        return expectedResponseBody == null || expectedResponseBody.validateInput(responseBody);
+        return expectedResponseBody == null || expectedResponseBody.validate(responseBody);
     }
 }

@@ -29,20 +29,21 @@ public class JsonTestResource extends TestResource<String> {
     }
 
     /**
-     * @param input A JSON string
+     *
+     * @param value A JSON string
      * @return true if the Json trees match (uses the Jackson ObjectMapper to unmarshal the string and compare using Java equality)
      */
-    public boolean validateInput(String input) {
-        if (input == null) return false;
+    public boolean validate(String value) {
+        if (value == null) return false;
         try {
 
             String expectedInput = getValue();
 
-            if (input.isEmpty() || expectedInput.isEmpty()) return input.isEmpty() && expectedInput.isEmpty();
+            if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode expectedJson = mapper.readTree(getValue());
-            JsonNode inputJson = mapper.readTree(input);
+            JsonNode inputJson = mapper.readTree(value);
             return expectedJson.equals(inputJson);
         } catch (IOException e) {
             throw new RuntimeException(e);

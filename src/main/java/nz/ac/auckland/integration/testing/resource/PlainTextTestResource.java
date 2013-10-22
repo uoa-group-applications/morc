@@ -31,17 +31,18 @@ public class PlainTextTestResource extends TestResource<String> {
     private Logger logger = LoggerFactory.getLogger(PlainTextTestResource.class);
 
     /**
-     * @param input A Java String
+     *
+     * @param value A Java String
      * @return true if the input String is the same as the test resource using Java String equality
      */
-    public boolean validateInput(String input) {
+    public boolean validate(String value) {
 
-        if (input == null) return false;
+        if (value == null) return false;
 
         try {
             String expectedInput = getValue();
-            if (input.isEmpty() || expectedInput.isEmpty()) return input.isEmpty() && expectedInput.isEmpty();
-            return input.equals(expectedInput);
+            if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
+            return value.equals(expectedInput);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

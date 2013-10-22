@@ -48,30 +48,30 @@ public class JsonTestResourceTest extends Assert {
     @Test
     public void testCompareInput() throws Exception {
         JsonTestResource resource = new JsonTestResource(inputUrl);
-        assertTrue(resource.validateInput(EXPECTED_VALUE));
+        assertTrue(resource.validate(EXPECTED_VALUE));
     }
 
     @Test
     public void testCompareDifferentInput() throws Exception {
         JsonTestResource resource = new JsonTestResource(inputUrl);
-        assertFalse(resource.validateInput("{\"name\":\"foo\"}"));
+        assertFalse(resource.validate("{\"name\":\"foo\"}"));
     }
 
     @Test
     public void testNullInput() throws Exception {
         JsonTestResource resource = new JsonTestResource(inputUrl);
-        assertFalse(resource.validateInput(null));
+        assertFalse(resource.validate(null));
     }
 
     @Test
     public void testEmptyFile() throws Exception {
         JsonTestResource resource = new JsonTestResource(inputUrl2);
-        assertTrue(resource.validateInput(""));
+        assertTrue(resource.validate(""));
     }
 
     @Test
     public void testPassValueToConstructor() throws Exception {
         JsonTestResource resource = new JsonTestResource("{\"foo\":\"baz\"}");
-        assertTrue(resource.validateInput("{\"foo\":\"baz\"}"));
+        assertTrue(resource.validate("{\"foo\":\"baz\"}"));
     }
 }

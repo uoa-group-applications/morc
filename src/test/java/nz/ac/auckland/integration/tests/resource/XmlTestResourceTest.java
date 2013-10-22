@@ -44,31 +44,31 @@ public class XmlTestResourceTest extends Assert {
     @Test
     public void testCompareInput() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
-        assertTrue(resource.validateInput(EXPECTED_VALUE));
+        assertTrue(resource.validate(EXPECTED_VALUE));
     }
 
     @Test
     public void testCompareDifferentInput() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
-        assertFalse(resource.validateInput("<sample/>"));
+        assertFalse(resource.validate("<sample/>"));
     }
 
     @Test
     public void testNullInput() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
-        assertFalse(resource.validateInput(null));
+        assertFalse(resource.validate(null));
     }
 
     @Test
     public void testEmptyFile() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl2);
-        assertTrue(resource.validateInput(""));
+        assertTrue(resource.validate(""));
     }
 
     @Test
     public void testPassValueToConstructor() throws Exception {
         XmlTestResource resource = new XmlTestResource("<foo/>");
-        assertTrue(resource.validateInput("<foo/>"));
+        assertTrue(resource.validate("<foo/>"));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class XmlTestResourceTest extends Assert {
     public void testSimpleXPath() throws Exception {
         XmlTestResource.XPathSelector selector = new XmlTestResource.XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
         XmlTestResource resource = new XmlTestResource("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>", selector);
-        assertTrue(resource.validateInput(EXPECTED_VALUE));
+        assertTrue(resource.validate(EXPECTED_VALUE));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class XmlTestResourceTest extends Assert {
 
         XmlTestResource resource = new XmlTestResource("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>", selector);
 
-        assertFalse(resource.validateInput(EXPECTED_VALUE));
+        assertFalse(resource.validate(EXPECTED_VALUE));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class XmlTestResourceTest extends Assert {
 
         Exception e = null;
         try {
-            resource.validateInput(nodeListTest);
+            resource.validate(nodeListTest);
         } catch (RuntimeException ex) {
             e = ex;
         }
@@ -133,7 +133,7 @@ public class XmlTestResourceTest extends Assert {
         Exception e = null;
 
         try {
-            resource.validateInput(EXPECTED_VALUE);
+            resource.validate(EXPECTED_VALUE);
         } catch (RuntimeException ex) {
             e = ex;
         }
@@ -147,7 +147,7 @@ public class XmlTestResourceTest extends Assert {
 
         XmlTestResource resource = new XmlTestResource("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>", selector);
 
-        assertFalse(resource.validateInput(EXPECTED_VALUE));
+        assertFalse(resource.validate(EXPECTED_VALUE));
     }
 
     @Test
@@ -156,7 +156,7 @@ public class XmlTestResourceTest extends Assert {
 
         XmlTestResource resource = new XmlTestResource("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">nosuchvalue</v1:entity>", selector);
 
-        assertFalse(resource.validateInput(EXPECTED_VALUE));
+        assertFalse(resource.validate(EXPECTED_VALUE));
     }
 }
 

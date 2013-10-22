@@ -73,13 +73,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testXmlFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/xml-test1.xml").toURI());
         XmlTestResource xml = OrchestratedTestBuilder.xml(f);
-        assertTrue(xml.validateInput(EXPECTED_XML_VALUE));
+        assertTrue(xml.validate(EXPECTED_XML_VALUE));
     }
 
     @Test
     public void testXmlURL() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"));
-        assertTrue(xml.validateInput(EXPECTED_XML_VALUE));
+        assertTrue(xml.validate(EXPECTED_XML_VALUE));
     }
 
     @Test
@@ -92,13 +92,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testJsonFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/json-test1.json").toURI());
         JsonTestResource json = OrchestratedTestBuilder.json(f);
-        assertTrue(json.validateInput(EXPECTED_JSON_VALUE));
+        assertTrue(json.validate(EXPECTED_JSON_VALUE));
     }
 
     @Test
     public void testJsonURL() throws Exception {
         JsonTestResource json = OrchestratedTestBuilder.json(this.getClass().getResource("/data/json-test1.json"));
-        assertTrue(json.validateInput(EXPECTED_JSON_VALUE));
+        assertTrue(json.validate(EXPECTED_JSON_VALUE));
     }
 
     @Test
@@ -111,13 +111,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testPlainTextFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/plaintext-test1.txt").toURI());
         PlainTextTestResource text = OrchestratedTestBuilder.text(f);
-        assertTrue(text.validateInput("test"));
+        assertTrue(text.validate("test"));
     }
 
     @Test
     public void testPlainTextURL() throws Exception {
         PlainTextTestResource text = OrchestratedTestBuilder.text(this.getClass().getResource("/data/plaintext-test1.txt"));
-        assertTrue(text.validateInput("test"));
+        assertTrue(text.validate("test"));
     }
 
     @Test

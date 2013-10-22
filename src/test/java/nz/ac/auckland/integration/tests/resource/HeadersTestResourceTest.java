@@ -41,7 +41,7 @@ public class HeadersTestResourceTest extends Assert {
 
         Map<String, Object> actualValues = resource.getValue();
 
-        assertTrue(resource.validateInput(actualValues));
+        assertTrue(resource.validate(actualValues));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("123", "abc");
 
         HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertFalse(resource.validateInput(differentProperties));
+        assertFalse(resource.validate(differentProperties));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("abc", "123");
 
         HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertFalse(resource.validateInput(differentProperties));
+        assertFalse(resource.validate(differentProperties));
     }
 
     @Test
@@ -72,19 +72,19 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("moo", "cow");
 
         HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertTrue(resource.validateInput(differentProperties));
+        assertTrue(resource.validate(differentProperties));
     }
 
     @Test
     public void testNullProperties() throws Exception {
         HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertFalse(resource.validateInput(null));
+        assertFalse(resource.validate(null));
     }
 
     @Test
     public void testEmptyPropertiesFile() throws Exception {
         HeadersTestResource resource = new HeadersTestResource(inputUrl2);
-        assertTrue(resource.validateInput(new HashMap<String, Object>()));
+        assertTrue(resource.validate(new HashMap<String, Object>()));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class HeadersTestResourceTest extends Assert {
         values2.put("abc", "123");
 
         HeadersTestResource resource = new HeadersTestResource(values1);
-        assertTrue(resource.validateInput(values2));
+        assertTrue(resource.validate(values2));
     }
 
 }

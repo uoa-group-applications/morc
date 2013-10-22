@@ -33,7 +33,7 @@ public class SyncMockExpectationTest extends Assert {
         mockTest.handleReceivedExchange(exchange);
 
         assertEquals(output.getValue(), exchange.getOut().getBody());
-        assertTrue(headers.validateInput(exchange.getOut().getHeaders()));
+        assertTrue(headers.validate(exchange.getOut().getHeaders()));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class SyncMockExpectationTest extends Assert {
         mockTest.handleReceivedExchange(exchange);
 
         assertEquals("", exchange.getOut().getBody());
-        assertTrue(headers.validateInput(exchange.getOut().getHeaders()));
+        assertTrue(headers.validate(exchange.getOut().getHeaders()));
     }
 
     @Test

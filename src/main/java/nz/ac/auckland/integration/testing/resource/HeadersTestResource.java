@@ -54,11 +54,12 @@ public class HeadersTestResource extends TestResource<Map<String, Object>> {
     }
 
     /**
-     * @param input The headers we want to validate against the test resource
+     *
+     * @param value The headers we want to validate against the test resource
      * @return true if each header in the test resource is in input; additional headers in the input will be ignored
      */
-    public boolean validateInput(Map<String, Object> input) {
-        if (input == null) return false;
+    public boolean validate(Map<String, Object> value) {
+        if (value == null) return false;
 
         Map<String, Object> expectedHeaders;
 
@@ -70,12 +71,12 @@ public class HeadersTestResource extends TestResource<Map<String, Object>> {
 
         //I'm not interested if the input has any additional headers
         for (String expectedKey : expectedHeaders.keySet()) {
-            if (!input.containsKey(expectedKey)) {
+            if (!value.containsKey(expectedKey)) {
                 logger.warn("The key: {} was not found", expectedKey);
                 return false;
             }
 
-            if (!input.get(expectedKey).equals(expectedHeaders.get(expectedKey))) {
+            if (!value.get(expectedKey).equals(expectedHeaders.get(expectedKey))) {
                 logger.warn("The key: {} has an unexpected value", expectedKey);
                 return false;
             }

@@ -50,8 +50,8 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validateInput(exchange.getIn().getBody(String.class)));
-        assertTrue(headers.validateInput(exchange.getIn().getHeaders()));
+        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
+        assertTrue(headers.validate(exchange.getIn().getHeaders()));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validateInput(exchange.getIn().getBody(String.class)));
+        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
     }
 
     @Test

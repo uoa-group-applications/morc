@@ -10,9 +10,10 @@ import org.apache.camel.CamelExecutionException;
  */
 public abstract interface ExceptionValidator {
     /**
+     *
      * @param e                    The exception containing the error response message
      * @param expectedResponseBody The body of the expected (error) response
      * @return true if the error response message in the exception matches the expected response body
      */
-    public boolean validateInput(CamelExecutionException e, TestResource<String> expectedResponseBody);
+    public boolean validate(CamelExecutionException e, TestResource<String> expectedResponseBody);
 }

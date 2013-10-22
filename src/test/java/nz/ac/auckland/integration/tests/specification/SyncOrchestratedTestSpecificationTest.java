@@ -57,8 +57,8 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validateInput(exchange.getIn().getBody(String.class)));
-        assertTrue(headers.validateInput(exchange.getIn().getHeaders()));
+        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
+        assertTrue(headers.validate(exchange.getIn().getHeaders()));
 
     }
 
@@ -115,7 +115,7 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validateInput(exchange.getIn().getBody(String.class)));
+        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
     }
 
     @Test
@@ -145,7 +145,7 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         Exchange exchange = endpoint.getExchanges().get(0);
 
         assertEquals("", exchange.getIn().getBody(String.class));
-        assertTrue(headers.validateInput(exchange.getIn().getHeaders()));
+        assertTrue(headers.validate(exchange.getIn().getHeaders()));
     }
 
     @Test
@@ -246,8 +246,8 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validateInput(exchange.getIn().getBody(String.class)));
-        assertTrue(headers.validateInput(exchange.getIn().getHeaders()));
+        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
+        assertTrue(headers.validate(exchange.getIn().getHeaders()));
 
     }
 

@@ -96,17 +96,18 @@ public class XmlTestResource extends TestResource<String> {
     private XPathSelector xpathSelector = null;
 
     /**
-     * @param input A value to compare to this XML resource
+     *
+     * @param value A value to compare to this XML resource
      * @return true if the input and test resource are similar using XMLUnit's Diff.similar()
      */
-    public boolean validateInput(String input) {
+    public boolean validate(String value) {
 
-        if (input == null) return false;
+        if (value == null) return false;
 
 
         try {
             String expectedInput = getValue();
-            if (input.isEmpty() || expectedInput.isEmpty()) return input.isEmpty() && expectedInput.isEmpty();
+            if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
 
             //get the sub document matching the xpath
             if (xpathSelector != null) {
@@ -115,7 +116,7 @@ public class XmlTestResource extends TestResource<String> {
                 dbf.setNamespaceAware(true);
                 DocumentBuilder db = dbf.newDocumentBuilder();
 
-                Document inputDoc = db.parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
+                Document inputDoc = db.parse(new ByteArrayInputStream(value.getBytes("UTF-8")));
                 XPathFactory xpathFactory = XPathFactory.newInstance();
                 XPath xpath = xpathFactory.newXPath();
                 if (xpathSelector.namespaces != null) {
@@ -135,14 +136,14 @@ public class XmlTestResource extends TestResource<String> {
                 StringWriter sw = new StringWriter();
                 transformer.transform(new DOMSource(result.item(0)), new StreamResult(sw));
 
-                input = sw.toString();
+                value = sw.toString();
             }
 
-            DetailedDiff difference = new DetailedDiff(new Diff(expectedInput, input));
+            DetailedDiff difference = new DetailedDiff(new Diff(expectedInput, value));
             if (!difference.similar()) {
                 logger.warn("Differences exist between two documents: {}", difference.getAllDifferences());
             }
-            logger.trace("No differences exist for input {}", input);
+            logger.trace("No differences exist for input {}", value);
             return difference.similar();
         } catch (IOException | SAXException | ParserConfigurationException |
                 XPathExpressionException | TransformerException e) {
