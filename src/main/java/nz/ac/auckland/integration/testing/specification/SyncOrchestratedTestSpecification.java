@@ -71,7 +71,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         } catch (CamelExecutionException e) {
             logger.info("An execution exception was encountered", e);
             if (expectsExceptionResponse && exceptionValidator == null) return true;
-            if (expectsExceptionResponse) {
+            if (expectsExceptionResponse || exceptionValidator != null) {
                 return exceptionValidator.validate(e, expectedResponseBody);
             }
 
