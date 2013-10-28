@@ -9,9 +9,8 @@ import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpe
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
-import nz.ac.auckland.integration.testing.validator.HttpExceptionValidator;
+import nz.ac.auckland.integration.testing.validator.*;
 
-import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 
@@ -257,10 +256,22 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * @return A validator that ensures that the HTTP responsemeets the expected response body
-     */
-    public static HttpExceptionValidator http(XmlValidator validator) {
-        return new HttpExceptionValidator();
+    * @return A validator that ensures that the HTTP responsemeets the expected response body
+    */
+    public static HttpExceptionValidator http(Validator validator) {
+       return new HttpExceptionValidator(validator);
+    }
+
+    public static HttpExceptionValidator http(XmlTestResource resource) {
+        return http(new XmlValidator(resource));
+    }
+
+    public static HttpExceptionValidator http(JsonTestResource resource) {
+        return http(new JsonValidator(resource));
+    }
+
+    public static HttpExceptionValidator http(PlainTextTestResource resource) {
+        return http(new PlainTextValidator(resource));
     }
 
     public static class NS {
@@ -277,6 +288,8 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @return A namespace designation for xpath evaluation of xml results
      */
     public static NS namespace(String prefix, String uri) {
+
+
         return new NS(prefix, uri);
     }
 
