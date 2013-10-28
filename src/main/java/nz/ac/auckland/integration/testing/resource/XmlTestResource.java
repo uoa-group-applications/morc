@@ -82,7 +82,7 @@ public class XmlTestResource extends StaticTestResource<Document> {
      */
     protected Document getResource(File file) throws Exception {
         if (xpathSelector != null)
-            return xpathSelector.evalute(getXmlAsDocument(file));
+            return xpathSelector.evaluate(getXmlAsDocument(file));
         else
             return getXmlAsDocument(file);
     }
