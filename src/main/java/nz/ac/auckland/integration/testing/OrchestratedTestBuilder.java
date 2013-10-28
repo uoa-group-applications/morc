@@ -8,7 +8,10 @@ import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.validators.HttpExceptionResponseValidator;
+import nz.ac.auckland.integration.testing.utility.XPathSelector;
+import nz.ac.auckland.integration.testing.validator.HttpExceptionValidator;
+
+import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 
@@ -77,7 +80,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param data          An XML string which will be used for seeding a message, or comparing a value
      * @param xpathSelector An xpath selector for returning certain xml nodes from a response
      */
-    public static XmlTestResource xml(String data, XmlTestResource.XPathSelector xpathSelector) {
+    public static XmlTestResource xml(String data, XPathSelector xpathSelector) {
         return new XmlTestResource(data, xpathSelector);
     }
 
@@ -85,7 +88,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param file          A file containing an XML document
      * @param xpathSelector An xpath selector for returning certain xml nodes from a response
      */
-    public static XmlTestResource xml(File file, XmlTestResource.XPathSelector xpathSelector) {
+    public static XmlTestResource xml(File file, XPathSelector xpathSelector) {
         return new XmlTestResource(file, xpathSelector);
     }
 
@@ -93,7 +96,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param url           A url pointing to an XML document
      * @param xpathSelector An xpath selector for returning certain xml nodes from a response
      */
-    public static XmlTestResource xml(URL url, XmlTestResource.XPathSelector xpathSelector) {
+    public static XmlTestResource xml(URL url, XPathSelector xpathSelector) {
         return new XmlTestResource(url, xpathSelector);
     }
 
@@ -183,7 +186,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param headers A vararg list of headers which can be added to with the header(string,value) function
      */
     public static HeadersTestResource headers(HeaderValue... headers) {
-        Map<String, Object> headersMap = new HashMap<String, Object>();
+        Map<String, Object> headersMap = new HashMap<>();
         for (HeaderValue header : headers) {
             headersMap.put(header.header, header.value);
         }
@@ -218,8 +221,8 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static WsFaultMockExpectation.Builder wsFaultExpectation(String endpointUri) {
-        return new WsFaultMockExpectation.Builder(endpointUri);
+    public static HttpErrorMockExpectation.Builder wsFaultExpectation(String endpointUri) {
+        return new HttpErrorMockExpectation.Builder(endpointUri);
     }
 
     /**
@@ -254,10 +257,10 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * @return A validator that ensures that the HTTP response (likely a SOAP fault) meets the expected response body
+     * @return A validator that ensures that the HTTP responsemeets the expected response body
      */
-    public static HttpExceptionResponseValidator httpExceptionResponseValidator() {
-        return new HttpExceptionResponseValidator();
+    public static HttpExceptionValidator http(XmlValidator validator) {
+        return new HttpExceptionValidator();
     }
 
     public static class NS {
@@ -282,13 +285,13 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param namespaces a collection of namespace pairs used for evaluating the xpath
      * @return an xpath selector to be used for the xml test resource
      */
-    public static XmlTestResource.XPathSelector xpathSelector(String xpath, NS... namespaces) {
+    public static XPathSelector xpathSelector(String xpath, NS... namespaces) {
         Map<String, String> namespaceMap = new HashMap<>();
         for (NS namespace : namespaces) {
             namespaceMap.put(namespace.prefix, namespace.uri);
         }
 
-        return new XmlTestResource.XPathSelector(xpath, namespaceMap);
+        return new XPathSelector(xpath, namespaceMap);
     }
 
     //this is used by JUnit to initialize each instance of this specification

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<detail>
+    <ns0:UOASOAException exceptionType="recoverable" identifier="d281a097-5421-451a-86bc-fef49e4caeb9" xmlns:ns0="http://www.auckland.ac.nz/domain/soa/xsd/exception/v1">
+        <ns0:errorCode>connection</ns0:errorCode>
+        <ns0:userMessage>Connection Error</ns0:userMessage>
+    </ns0:UOASOAException>
+</detail>

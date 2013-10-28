@@ -11,7 +11,7 @@ import org.apache.camel.Exchange;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class SyncMockExpectation extends ContentMockExpectation {
-    private TestResource<String> providedResponseBody;
+    private TestResource providedResponseBody;
     private HeadersTestResource providedResponseHeaders;
 
     /**
@@ -24,7 +24,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
     /**
      * @return The response body that the expectation will return to the endpoint
      */
-    public TestResource<String> getProvidedResponseBody() {
+    public TestResource getProvidedResponseBody() {
         return providedResponseBody;
     }
 
@@ -57,7 +57,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
 
     protected abstract static class Init<Product, Builder extends Init<Product, Builder>> extends ContentMockExpectation.AbstractContentBuilder<SyncMockExpectation, Builder> {
 
-        protected TestResource<String> providedResponseBody;
+        protected TestResource providedResponseBody;
         protected HeadersTestResource providedResponseHeaders;
 
         public Init(String endpointUri) {
@@ -67,7 +67,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         /**
          * @param providedResponseBody The body that should be returned back to the client
          */
-        public Builder responseBody(TestResource<String> providedResponseBody) {
+        public Builder responseBody(TestResource providedResponseBody) {
             this.providedResponseBody = providedResponseBody;
             return self();
         }

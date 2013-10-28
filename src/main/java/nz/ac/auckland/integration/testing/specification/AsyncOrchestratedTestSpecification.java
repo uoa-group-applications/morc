@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
+import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
@@ -23,7 +24,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
     /**
      * @return The message headers that will be sent to the target endpoint
      */
-    public TestResource getInputMessageHeaders() {
+    public StaticTestResource getInputMessageHeaders() {
         return inputMessageHeaders;
     }
 
@@ -52,7 +53,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
             else
                 template.sendBody(endpoint, "");
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -75,7 +76,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
         /**
          * @param inputMessageBody The message body to send to the target endpoint
          */
-        public Builder inputMessage(TestResource<String> inputMessageBody) {
+        public Builder inputMessage(TestResource inputMessageBody) {
             this.inputMessageBody = inputMessageBody;
             return self();
         }

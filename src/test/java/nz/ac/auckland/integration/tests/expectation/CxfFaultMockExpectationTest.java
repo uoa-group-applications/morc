@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.tests.expectation;
 
-import nz.ac.auckland.integration.testing.expectation.WsFaultMockExpectation;
+import nz.ac.auckland.integration.testing.expectation.HttpErrorMockExpectation;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -17,7 +17,7 @@ public class CxfFaultMockExpectationTest extends Assert {
         Exchange exchange = new DefaultExchange(ctx);
 
         XmlTestResource output = new XmlTestResource(this.getClass().getResource("/data/cxf-error-response1.xml"));
-        WsFaultMockExpectation mockTest = new WsFaultMockExpectation.Builder("vm:test")
+        HttpErrorMockExpectation mockTest = new HttpErrorMockExpectation.Builder("vm:test")
                 .responseBody(output).build();
 
         mockTest.handleReceivedExchange(exchange);

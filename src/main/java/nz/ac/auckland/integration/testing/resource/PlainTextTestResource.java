@@ -14,7 +14,7 @@ import java.net.URL;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class PlainTextTestResource extends TestResource<String> {
+public class PlainTextTestResource extends StaticTestResource<String> {
 
     public PlainTextTestResource(String value) {
         super(value);
@@ -24,36 +24,15 @@ public class PlainTextTestResource extends TestResource<String> {
         super(file);
     }
 
-    public PlainTextTestResource(URL file) {
-        super(file);
-    }
-
-    private Logger logger = LoggerFactory.getLogger(PlainTextTestResource.class);
-
-    /**
-     *
-     * @param value A Java String
-     * @return true if the input String is the same as the test resource using Java String equality
-     */
-    public boolean validate(String value) {
-
-        if (value == null) return false;
-
-        try {
-            String expectedInput = getValue();
-            if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
-            return value.equals(expectedInput);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+    public PlainTextTestResource(URL url) {
+        super(url);
     }
 
     /**
      * @return The plain text from an external resource as a standard Java String
-     * @throws IOException
+     * @throws Exception
      */
-    public String getResource(File file) throws IOException {
+    protected String getResource(File file) throws Exception {
         return FileUtils.readFileToString(file);
     }
 }

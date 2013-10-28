@@ -19,9 +19,7 @@ import java.util.Properties;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class HeadersTestResource extends TestResource<Map<String, Object>> {
-
-    private Logger logger = LoggerFactory.getLogger(XmlTestResource.class);
+public class HeadersTestResource extends StaticTestResource<Map<String, Object>> {
 
     public HeadersTestResource(Map<String, Object> values) {
         super(values);
@@ -31,16 +29,16 @@ public class HeadersTestResource extends TestResource<Map<String, Object>> {
         super(file);
     }
 
-    public HeadersTestResource(URL file) {
-        super(file);
+    public HeadersTestResource(URL url) {
+        super(url);
     }
 
     /**
      * @param file a reference to a properties file
      * @return A Map containing header/value key pairs
-     * @throws IOException
+     * @throws Exception
      */
-    protected Map<String, Object> getResource(File file) throws IOException {
+    protected Map<String, Object> getResource(File file) throws Exception {
         Properties properties = new Properties();
         properties.load(new FileInputStream(file));
 
@@ -51,38 +49,6 @@ public class HeadersTestResource extends TestResource<Map<String, Object>> {
         }
 
         return Collections.unmodifiableMap(headers);
-    }
-
-    /**
-     *
-     * @param value The headers we want to validate against the test resource
-     * @return true if each header in the test resource is in input; additional headers in the input will be ignored
-     */
-    public boolean validate(Map<String, Object> value) {
-        if (value == null) return false;
-
-        Map<String, Object> expectedHeaders;
-
-        try {
-            expectedHeaders = getValue();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        //I'm not interested if the input has any additional headers
-        for (String expectedKey : expectedHeaders.keySet()) {
-            if (!value.containsKey(expectedKey)) {
-                logger.warn("The key: {} was not found", expectedKey);
-                return false;
-            }
-
-            if (!value.get(expectedKey).equals(expectedHeaders.get(expectedKey))) {
-                logger.warn("The key: {} has an unexpected value", expectedKey);
-                return false;
-            }
-        }
-
-        return true;
     }
 
 }

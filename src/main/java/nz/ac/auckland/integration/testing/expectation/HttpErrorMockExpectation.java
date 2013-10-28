@@ -3,12 +3,12 @@ package nz.ac.auckland.integration.testing.expectation;
 import org.apache.camel.Exchange;
 
 /**
- * This will cause a CXF endpoint (message consumer) to throw an HTTP 500
- * error with the specified body - this should be a SOAP fault message
+ * This will cause a CXF or Jetty endpoint (message consumer) to throw an HTTP 500
+ * error with the specified body - this should be a SOAP fault message in the case of a web-service
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class WsFaultMockExpectation extends SyncMockExpectation {
+public class HttpErrorMockExpectation extends SyncMockExpectation {
 
     /**
      * Sets the outgoing exchange header for org.apache.cxf.message.Message.RESPONSE_CODE to 500.
@@ -25,18 +25,18 @@ public class WsFaultMockExpectation extends SyncMockExpectation {
         return "ws";
     }
 
-    public static class Builder extends SyncMockExpectation.Init<WsFaultMockExpectation, Builder> {
+    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder> {
 
         public Builder(String endpointUri) {
             super(endpointUri);
         }
 
-        public WsFaultMockExpectation build() {
-            return new WsFaultMockExpectation(this);
+        public HttpErrorMockExpectation build() {
+            return new HttpErrorMockExpectation(this);
         }
     }
 
-    protected WsFaultMockExpectation(Builder builder) {
+    protected HttpErrorMockExpectation(Builder builder) {
         super(builder);
     }
 }

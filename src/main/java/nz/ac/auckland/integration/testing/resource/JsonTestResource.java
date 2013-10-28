@@ -14,7 +14,7 @@ import java.net.URL;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class JsonTestResource extends TestResource<String> {
+public class JsonTestResource extends StaticTestResource<String> {
 
     public JsonTestResource(String value) {
         super(value);
@@ -24,38 +24,16 @@ public class JsonTestResource extends TestResource<String> {
         super(file);
     }
 
-    public JsonTestResource(URL file) {
-        super(file);
-    }
-
-    /**
-     *
-     * @param value A JSON string
-     * @return true if the Json trees match (uses the Jackson ObjectMapper to unmarshal the string and compare using Java equality)
-     */
-    public boolean validate(String value) {
-        if (value == null) return false;
-        try {
-
-            String expectedInput = getValue();
-
-            if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode expectedJson = mapper.readTree(getValue());
-            JsonNode inputJson = mapper.readTree(value);
-            return expectedJson.equals(inputJson);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public JsonTestResource(URL url) {
+        super(url);
     }
 
     /**
      * @param file a reference to the JSON test resource
      * @return A JSON string
-     * @throws IOException
+     * @throws Exception
      */
-    protected String getResource(File file) throws IOException {
+    protected String getResource(File file) throws Exception {
         return FileUtils.readFileToString(file);
     }
 }

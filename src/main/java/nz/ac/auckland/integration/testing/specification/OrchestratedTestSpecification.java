@@ -22,7 +22,6 @@ public abstract class OrchestratedTestSpecification {
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
-
     /**
      * @return A description that explains what this tests is doing
      */
