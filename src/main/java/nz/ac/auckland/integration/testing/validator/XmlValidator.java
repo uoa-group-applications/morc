@@ -67,7 +67,7 @@ public class XmlValidator implements Validator {
             Document expectedValue;
             try {
                 if (xpathSelector != null)
-                    value = xpathSelector.evalute(value);
+                    value = xpathSelector.evaluate(value);
                 expectedValue = resource.getValue();
             } catch (XPathSelector.XPathEvaluationException e) {
                 logger.warn("The XPath evaluation failed on the value for validation",e);
