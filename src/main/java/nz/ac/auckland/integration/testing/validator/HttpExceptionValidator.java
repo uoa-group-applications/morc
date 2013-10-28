@@ -4,6 +4,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultExchange;
 
+/**
+ * For validating the response exception is as expected
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class HttpExceptionValidator implements Validator {
 
     private Validator responseBodyValidator;
