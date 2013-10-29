@@ -46,7 +46,6 @@ public class SOAPFaultValidator implements Validator {
             throw new RuntimeException(ex);
         }
 
-
         return false;
     }
 }

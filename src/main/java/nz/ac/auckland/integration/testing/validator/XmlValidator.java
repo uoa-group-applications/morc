@@ -61,8 +61,14 @@ public class XmlValidator implements Validator {
      */
     public boolean validate(Exchange exchange) {
         Document value = exchange.getIn().getBody(Document.class);
-        if (value == null) return false;
+        return value != null && validate(value);
+    }
 
+    public boolean validate(String value) {
+        return validate(XmlTestResource.getXmlAsDocument(value));
+    }
+
+    public boolean validate(Document value) {
         try {
             Document expectedValue;
             try {

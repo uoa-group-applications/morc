@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.tests.expectation;
 import nz.ac.auckland.integration.testing.expectation.SyncMockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.validator.HeadersValidator;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.direct.DirectEndpoint;
@@ -33,7 +34,7 @@ public class SyncMockExpectationTest extends Assert {
         mockTest.handleReceivedExchange(exchange);
 
         assertEquals(output.getValue(), exchange.getOut().getBody());
-        assertTrue(headers.validate(exchange.getOut().getHeaders()));
+        assertTrue(new HeadersValidator(headers).validate(exchange));
     }
 
     @Test
@@ -65,7 +66,7 @@ public class SyncMockExpectationTest extends Assert {
         mockTest.handleReceivedExchange(exchange);
 
         assertEquals("", exchange.getOut().getBody());
-        assertTrue(headers.validate(exchange.getOut().getHeaders()));
+        assertTrue(new HeadersValidator(headers).validate(exchange));
     }
 
     @Test

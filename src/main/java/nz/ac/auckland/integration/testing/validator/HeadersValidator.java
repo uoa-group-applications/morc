@@ -36,8 +36,10 @@ public class HeadersValidator implements Validator {
      */
     public boolean validate(Exchange exchange) {
         Map<String, Object> value = exchange.getIn().getHeaders();
-        if (value == null) return false;
+        return value != null && validate(value);
+    }
 
+    public boolean validate(Map<String,Object> value) {
         Map<String, Object> expectedHeaders;
 
         try {

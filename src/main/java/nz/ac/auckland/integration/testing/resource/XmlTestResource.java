@@ -56,7 +56,7 @@ public class XmlTestResource extends StaticTestResource<Document> {
         this.xpathSelector = xpathSelector;
     }
 
-    protected static synchronized Document getXmlAsDocument(String xml) {
+    public static synchronized Document getXmlAsDocument(String xml) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);

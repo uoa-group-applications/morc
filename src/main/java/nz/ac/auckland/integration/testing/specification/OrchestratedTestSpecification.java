@@ -22,6 +22,8 @@ public abstract class OrchestratedTestSpecification {
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
+    //todo: add number of times to send message
+
     /**
      * @return A description that explains what this tests is doing
      */

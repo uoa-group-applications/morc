@@ -176,7 +176,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param resource An XML resource which will be used to seed a validator
          */
-        public Builder expectedResponseBuilder(XmlTestResource resource) {
+        public Builder expectedResponseBody(XmlTestResource resource) {
             this.responseBodyValidator = new XmlValidator(resource);
             return self();
         }
@@ -184,7 +184,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param resource A JSON resource which will be used to seed a validator
          */
-        public Builder expectedResponseBuilder(JsonTestResource resource) {
+        public Builder expectedResponseBody(JsonTestResource resource) {
             this.responseBodyValidator = new JsonValidator(resource);
             return self();
         }
@@ -192,7 +192,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param resource A plain text resource which will be used to seed a validator
          */
-        public Builder expectedResponseBuilder(PlainTextTestResource resource) {
+        public Builder expectedResponseBody(PlainTextTestResource resource) {
             this.responseBodyValidator = new PlainTextValidator(resource);
             return self();
         }

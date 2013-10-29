@@ -17,9 +17,18 @@ public class HttpExceptionValidator implements Validator {
         this.responseBodyValidator = responseBodyValidator;
     }
 
+    public HttpExceptionValidator() {
+
+    }
+
+    //todo check various HttpOperationFailedException
+
     public boolean validate(Exchange e) {
         Throwable t = e.getException();
         if (!(t instanceof HttpOperationFailedException)) return false;
+
+        if (responseBodyValidator == null) return true;
+
         String responseBody = ((HttpOperationFailedException) t).getResponseBody();
 
         //this is a bit of a hack to use other validators

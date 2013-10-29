@@ -8,6 +8,9 @@ import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.validator.JsonValidator;
+import nz.ac.auckland.integration.testing.validator.PlainTextValidator;
+import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -73,13 +76,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testXmlFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/xml-test1.xml").toURI());
         XmlTestResource xml = OrchestratedTestBuilder.xml(f);
-        assertTrue(xml.validate(EXPECTED_XML_VALUE));
+        assertTrue(new XmlValidator(xml).validate(EXPECTED_XML_VALUE));
     }
 
     @Test
     public void testXmlURL() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"));
-        assertTrue(xml.validate(EXPECTED_XML_VALUE));
+        assertTrue(new XmlValidator(xml).validate(EXPECTED_XML_VALUE));
     }
 
     @Test
@@ -92,13 +95,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testJsonFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/json-test1.json").toURI());
         JsonTestResource json = OrchestratedTestBuilder.json(f);
-        assertTrue(json.validate(EXPECTED_JSON_VALUE));
+        assertTrue(new JsonValidator(json).validate(EXPECTED_JSON_VALUE));
     }
 
     @Test
     public void testJsonURL() throws Exception {
         JsonTestResource json = OrchestratedTestBuilder.json(this.getClass().getResource("/data/json-test1.json"));
-        assertTrue(json.validate(EXPECTED_JSON_VALUE));
+        assertTrue(new JsonValidator(json).validate(EXPECTED_JSON_VALUE));
     }
 
     @Test
@@ -111,13 +114,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testPlainTextFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/plaintext-test1.txt").toURI());
         PlainTextTestResource text = OrchestratedTestBuilder.text(f);
-        assertTrue(text.validate("test"));
+        assertTrue(new PlainTextValidator(text).validate("test"));
     }
 
     @Test
     public void testPlainTextURL() throws Exception {
         PlainTextTestResource text = OrchestratedTestBuilder.text(this.getClass().getResource("/data/plaintext-test1.txt"));
-        assertTrue(text.validate("test"));
+        assertTrue(new PlainTextValidator(text).validate("test"));
     }
 
     @Test

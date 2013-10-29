@@ -1,10 +1,7 @@
 package nz.ac.auckland.integration.testing.expectation;
 
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
-import nz.ac.auckland.integration.testing.resource.StaticTestResource;
-import nz.ac.auckland.integration.testing.resource.TestResource;
-import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.resource.*;
+import nz.ac.auckland.integration.testing.validator.*;
 import org.apache.camel.Exchange;
 
 /**
@@ -66,10 +63,42 @@ public abstract class ContentMockExpectation extends MockExpectation {
         }
 
         /**
-         * @param expectedHeadersValidator The headers that we expect to receive from the endpoint
+         * @param resource An XML resource expected to be received
+         */
+        public Builder expectedBody(XmlTestResource resource) {
+            this.expectedBodyValidator = new XmlValidator(resource);
+            return self();
+        }
+
+        /**
+         * @param resource A JSON resource expected to be received
+         */
+        public Builder expectedBody(JsonTestResource resource) {
+            this.expectedBodyValidator = new JsonValidator(resource);
+            return self();
+        }
+
+        /**
+         * @param resource A plain text resource expected to be received
+         */
+        public Builder expectedBody(PlainTextTestResource resource) {
+            this.expectedHeadersValidator = new PlainTextValidator(resource);
+            return self();
+        }
+
+        /**
+         * @param expectedHeadersValidator A validator for the headers we expected to receive
          */
         public Builder expectedHeaders(Validator expectedHeadersValidator) {
             this.expectedHeadersValidator = expectedHeadersValidator;
+            return self();
+        }
+
+        /**
+         * @param resource A set of headers we expect to receive
+         */
+        public Builder expectedHeaders(HeadersTestResource resource) {
+            this.expectedHeadersValidator = new HeadersValidator(resource);
             return self();
         }
     }

@@ -143,6 +143,7 @@ public abstract class MockExpectation {
 
         protected abstract Builder self();
 
+        //todo: consider making this a list for expectedMessageCount > 1
         public abstract Product build();
 
         public AbstractBuilder(String endpointUri) {

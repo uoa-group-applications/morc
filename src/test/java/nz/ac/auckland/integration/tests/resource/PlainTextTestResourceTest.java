@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
+import nz.ac.auckland.integration.testing.validator.PlainTextValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,40 +17,43 @@ public class PlainTextTestResourceTest extends Assert {
     @Test
     public void testReadFileFromClasspath() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-
         String actualValue = resource.getValue();
-
         assertEquals(actualValue, EXPECTED_VALUE);
     }
 
     @Test
     public void testCompareInput() throws Exception {
-        PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-        assertTrue(resource.validate(EXPECTED_VALUE));
+        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl));
+        assertTrue(validator.validate(EXPECTED_VALUE));
     }
 
     @Test
     public void testCompareDifferentInput() throws Exception {
-        PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-        assertFalse(resource.validate("sample"));
+        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl));
+        assertFalse(validator.validate("sample"));
     }
 
     @Test
     public void testNullInput() throws Exception {
-        PlainTextTestResource resource = new PlainTextTestResource(inputUrl);
-        assertFalse(resource.validate(null));
+        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl));
+        String nullStr = null;
+        assertFalse(validator.validate(nullStr));
     }
 
     @Test
     public void testEmptyFile() throws Exception {
-        PlainTextTestResource resource = new PlainTextTestResource(inputUrl2);
-        assertTrue(resource.validate(""));
+        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl2));
+        assertTrue(validator.validate(""));
     }
 
     @Test
     public void testPassValueToConstructor() throws Exception {
-        PlainTextTestResource resource = new PlainTextTestResource("foo");
-        assertTrue(resource.validate("foo"));
+        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource("foo"));
+        assertTrue(validator.validate("foo"));
     }
 
+    @Test
+    public void testExchangeTextBody() throws Exception {
+        throw new Exception("todo");
+    }
 }

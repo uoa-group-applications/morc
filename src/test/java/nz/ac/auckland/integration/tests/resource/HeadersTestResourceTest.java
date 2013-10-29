@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
+import nz.ac.auckland.integration.testing.validator.HeadersValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,11 +38,8 @@ public class HeadersTestResourceTest extends Assert {
 
     @Test
     public void testCompareInput() throws Exception {
-        HeadersTestResource resource = new HeadersTestResource(inputUrl);
-
-        Map<String, Object> actualValues = resource.getValue();
-
-        assertTrue(resource.validate(actualValues));
+        HeadersValidator validator = new HeadersValidator( new HeadersTestResource(inputUrl));
+        assertTrue(validator.validate(EXPECTED_PROPERTIES));
     }
 
     @Test
@@ -50,8 +48,8 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("baz", "foo");
         differentProperties.put("123", "abc");
 
-        HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertFalse(resource.validate(differentProperties));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(inputUrl));
+        assertFalse(validator.validate(differentProperties));
     }
 
     @Test
@@ -60,8 +58,8 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("foo", "foo");
         differentProperties.put("abc", "123");
 
-        HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertFalse(resource.validate(differentProperties));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(inputUrl));
+        assertFalse(validator.validate(differentProperties));
     }
 
     @Test
@@ -71,20 +69,21 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("abc", "123");
         differentProperties.put("moo", "cow");
 
-        HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertTrue(resource.validate(differentProperties));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(inputUrl));
+        assertFalse(validator.validate(differentProperties));
     }
 
     @Test
     public void testNullProperties() throws Exception {
-        HeadersTestResource resource = new HeadersTestResource(inputUrl);
-        assertFalse(resource.validate(null));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(EXPECTED_PROPERTIES));
+        Map<String,Object> nullMap = null;
+        assertFalse(validator.validate(nullMap));
     }
 
     @Test
     public void testEmptyPropertiesFile() throws Exception {
-        HeadersTestResource resource = new HeadersTestResource(inputUrl2);
-        assertTrue(resource.validate(new HashMap<String, Object>()));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(inputUrl2));
+        assertTrue(validator.validate(new HashMap<String, Object>()));
     }
 
     @Test
@@ -97,8 +96,14 @@ public class HeadersTestResourceTest extends Assert {
         values2.put("foo", "baz");
         values2.put("abc", "123");
 
-        HeadersTestResource resource = new HeadersTestResource(values1);
-        assertTrue(resource.validate(values2));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(values1));
+        assertTrue(validator.validate(values2));
+    }
+
+
+    @Test
+    public void testExchangeHeaders() throws Exception {
+        throw new Exception("todo");
     }
 
 }

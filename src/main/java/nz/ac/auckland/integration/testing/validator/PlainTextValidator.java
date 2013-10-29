@@ -34,8 +34,10 @@ public class PlainTextValidator implements Validator {
      */
     public boolean validate(Exchange exchange) {
         String value = exchange.getIn().getBody(String.class);
-        if (value == null) return false;
+        return value != null && validate(value);
+    }
 
+    public boolean validate(String value) {
         try {
             String expectedInput = resource.getValue();
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();

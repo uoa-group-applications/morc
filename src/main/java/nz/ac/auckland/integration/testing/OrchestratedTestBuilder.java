@@ -256,22 +256,38 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-    * @return A validator that ensures that the HTTP responsemeets the expected response body
+    * @return A validator that ensures that the HTTP response meets the expected response
     */
-    public static HttpExceptionValidator http(Validator validator) {
+    public static HttpExceptionValidator httpException(Validator validator) {
        return new HttpExceptionValidator(validator);
     }
 
-    public static HttpExceptionValidator http(XmlTestResource resource) {
-        return http(new XmlValidator(resource));
+    /**
+    * @return A validator that ensures that some kind of http exception occurs
+    */
+    public static HttpExceptionValidator httpException() {
+        return new HttpExceptionValidator();
     }
 
-    public static HttpExceptionValidator http(JsonTestResource resource) {
-        return http(new JsonValidator(resource));
+    /**
+    * @return A validator that ensures that the HTTP response meets the expected XML response body
+    */
+    public static HttpExceptionValidator httpException(XmlTestResource resource) {
+        return httpException(new XmlValidator(resource));
     }
 
-    public static HttpExceptionValidator http(PlainTextTestResource resource) {
-        return http(new PlainTextValidator(resource));
+    /**
+    * @return A validator that ensures that the HTTP response meets the expected json response body
+    */
+    public static HttpExceptionValidator httpException(JsonTestResource resource) {
+        return httpException(new JsonValidator(resource));
+    }
+
+    /**
+    * @return A validator that ensures that the HTTP response meets the expected plain-text response body
+    */
+    public static HttpExceptionValidator httpException(PlainTextTestResource resource) {
+        return httpException(new PlainTextValidator(resource));
     }
 
     public static class NS {
