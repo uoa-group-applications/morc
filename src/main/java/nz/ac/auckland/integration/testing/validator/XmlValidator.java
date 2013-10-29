@@ -4,6 +4,7 @@ import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import org.apache.camel.Exchange;
+import org.apache.camel.TypeConversionException;
 import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -60,7 +61,13 @@ public class XmlValidator implements Validator {
      * @return true if the input and test resource are similar using XMLUnit's Diff.similar()
      */
     public boolean validate(Exchange exchange) {
-        Document value = exchange.getIn().getBody(Document.class);
+        Document value;
+        try {
+            value = exchange.getIn().getBody(Document.class);
+        } catch (TypeConversionException e) {
+            logger.warn("Error attempting to convert JSON to a Document",e);
+            return false;
+        }
         return value != null && validate(value);
     }
 

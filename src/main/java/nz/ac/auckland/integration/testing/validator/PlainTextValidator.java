@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.testing.validator;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import org.apache.camel.Exchange;
+import org.apache.camel.TypeConversionException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.net.URL;
  */
 public class PlainTextValidator implements Validator {
 
+    private Logger logger = LoggerFactory.getLogger(PlainTextValidator.class);
     PlainTextTestResource resource;
 
     /**
@@ -33,7 +35,13 @@ public class PlainTextValidator implements Validator {
      * @return true if the input String is the same as the test resource using Java String equality
      */
     public boolean validate(Exchange exchange) {
-        String value = exchange.getIn().getBody(String.class);
+        String value;
+        try {
+            value = exchange.getIn().getBody(String.class);
+        } catch (TypeConversionException e) {
+            logger.warn("Error attempting to convert JSON to a String",e);
+            return false;
+        }
         return value != null && validate(value);
     }
 
