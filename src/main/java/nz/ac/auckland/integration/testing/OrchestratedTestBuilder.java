@@ -305,8 +305,6 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @return A namespace designation for xpath evaluation of xml results
      */
     public static NS namespace(String prefix, String uri) {
-
-
         return new NS(prefix, uri);
     }
 
