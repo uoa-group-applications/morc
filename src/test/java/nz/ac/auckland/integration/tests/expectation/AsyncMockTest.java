@@ -4,6 +4,8 @@ import nz.ac.auckland.integration.testing.expectation.AsyncMockExpectation;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.validator.HeadersValidator;
+import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.seda.SedaComponent;
@@ -79,8 +81,11 @@ public class AsyncMockTest extends Assert {
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
         exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
+        HeadersValidator nullHeadersValidator = null;
+        XmlValidator nullValidator = null;
 
-        assertTrue(generateExpectationBuilder().expectedHeaders(null).expectedBody(null).build().checkValid(exchange, 0));
+        assertTrue(generateExpectationBuilder().expectedHeaders(nullHeadersValidator)
+                .expectedBody(nullValidator).build().checkValid(exchange, 0));
     }
 
     @Test

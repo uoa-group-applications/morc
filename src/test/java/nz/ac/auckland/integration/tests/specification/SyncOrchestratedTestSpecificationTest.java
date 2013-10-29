@@ -3,6 +3,8 @@ package nz.ac.auckland.integration.tests.specification;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.validator.HeadersValidator;
+import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -57,8 +59,8 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
-        assertTrue(headers.validate(exchange.getIn().getHeaders()));
+        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(new HeadersValidator(headers).validate(exchange));
 
     }
 
@@ -115,7 +117,7 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
+        assertTrue(new XmlValidator(input).validate(exchange));
     }
 
     @Test
@@ -145,7 +147,7 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         Exchange exchange = endpoint.getExchanges().get(0);
 
         assertEquals("", exchange.getIn().getBody(String.class));
-        assertTrue(headers.validate(exchange.getIn().getHeaders()));
+        assertTrue(new HeadersValidator(headers).validate(exchange));
     }
 
     @Test
@@ -246,9 +248,8 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(input.validate(exchange.getIn().getBody(String.class)));
-        assertTrue(headers.validate(exchange.getIn().getHeaders()));
+        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(new HeadersValidator(headers).validate(exchange));
 
     }
-
 }

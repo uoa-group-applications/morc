@@ -1,8 +1,7 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import org.apache.camel.builder.RouteBuilder;
-
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
+import org.apache.camel.builder.RouteBuilder;
 
 /**
  * Simple 1 expectation tests for sending and receiving messages using the Camel infrastructure

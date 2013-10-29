@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.tests.specification;
 
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import org.apache.camel.builder.RouteBuilder;
 
 //A test to show what happens with 'inheritance' of configure()
