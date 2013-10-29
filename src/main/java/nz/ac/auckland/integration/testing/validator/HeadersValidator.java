@@ -22,7 +22,7 @@ import java.util.Properties;
  */
 public class HeadersValidator implements Validator {
 
-    private Logger logger = LoggerFactory.getLogger(XmlValidator.class);
+    private Logger logger = LoggerFactory.getLogger(HeadersValidator.class);
 
     private HeadersTestResource resource;
 
