@@ -17,6 +17,12 @@ import javax.xml.xpath.XPathFactory;
 import java.io.StringWriter;
 import java.util.Map;
 
+/**
+ * A class for taking documents and apply an xpath to retrieve a single
+ * element.
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class XPathSelector {
     String xpathStatement;
     Map<String, String> namespaces;

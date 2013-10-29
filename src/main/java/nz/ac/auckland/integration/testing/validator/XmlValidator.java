@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
@@ -44,6 +45,7 @@ public class XmlValidator implements Validator {
     private Logger logger = LoggerFactory.getLogger(XmlValidator.class);
     private XmlTestResource resource;
     private XPathSelector xpathSelector;
+    private XMLUtilities xmlUtilities = new XMLUtilities();
 
     public XmlValidator(XmlTestResource resource) {
         this.resource = resource;
@@ -54,6 +56,17 @@ public class XmlValidator implements Validator {
     public XmlValidator(XmlTestResource resource,XPathSelector xpathSelector) {
         this(resource);
         this.xpathSelector = xpathSelector;
+    }
+
+    public XMLUtilities getXmlUtilities() {
+        return xmlUtilities;
+    }
+
+    /**
+     * If you have some special requirements for XML parsing
+     */
+    public void setXmlUtilities(XMLUtilities xmlUtilities) {
+        this.xmlUtilities = xmlUtilities;
     }
 
     /**
@@ -72,7 +85,7 @@ public class XmlValidator implements Validator {
     }
 
     public boolean validate(String value) {
-        return validate(XmlTestResource.getXmlAsDocument(value));
+        return validate(xmlUtilities.getXmlAsDocument(value));
     }
 
     public boolean validate(Document value) {
@@ -90,8 +103,8 @@ public class XmlValidator implements Validator {
             DetailedDiff difference = new DetailedDiff(new Diff(expectedValue, value));
             if (!difference.similar()) {
                 logger.warn("Differences exist between two documents: {}", difference.getAllDifferences());
-            }
-            logger.trace("No differences exist for input {}", value);
+            } else
+                logger.trace("No differences exist for input {}", value);
             return difference.similar();
         } catch (Exception e) {
             throw new RuntimeException(e);

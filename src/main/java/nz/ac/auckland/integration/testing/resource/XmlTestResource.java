@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.resource;
 
+import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import org.w3c.dom.Document;
 
@@ -20,10 +21,7 @@ import java.net.URL;
 public class XmlTestResource extends StaticTestResource<Document> {
 
     private XPathSelector xpathSelector;
-
-    public XmlTestResource(String value) {
-        this(getXmlAsDocument(value));
-    }
+    private XMLUtilities xmlUtilities = new XMLUtilities();
 
     public XmlTestResource(Document value) {
         super(value);
@@ -35,10 +33,6 @@ public class XmlTestResource extends StaticTestResource<Document> {
 
     public XmlTestResource(URL url) {
         super(url);
-    }
-
-    public XmlTestResource(String value, XPathSelector xpathSelector) {
-        this(getXmlAsDocument(value),xpathSelector);
     }
 
     public XmlTestResource(Document value, XPathSelector xpathSelector) {
@@ -56,24 +50,15 @@ public class XmlTestResource extends StaticTestResource<Document> {
         this.xpathSelector = xpathSelector;
     }
 
-    public static synchronized Document getXmlAsDocument(String xml) {
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setValidating(false);
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            return db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public XMLUtilities getXmlUtilities() {
+        return xmlUtilities;
     }
 
-    protected synchronized Document getXmlAsDocument(File xmlFile) throws Exception {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setValidating(false);
-        dbf.setNamespaceAware(true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        return db.parse(xmlFile);
+    /**
+     * In case you have any special XML requirements
+     */
+    public void setXmlUtilities(XMLUtilities xmlUtilities) {
+        this.xmlUtilities = xmlUtilities;
     }
 
     /**
@@ -82,10 +67,8 @@ public class XmlTestResource extends StaticTestResource<Document> {
      */
     protected Document getResource(File file) throws Exception {
         if (xpathSelector != null)
-            return xpathSelector.evaluate(getXmlAsDocument(file));
+            return xpathSelector.evaluate(xmlUtilities.getXmlAsDocument(file));
         else
-            return getXmlAsDocument(file);
+            return xmlUtilities.getXmlAsDocument(file);
     }
-
-
 }

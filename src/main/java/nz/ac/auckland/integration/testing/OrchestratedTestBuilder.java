@@ -8,6 +8,7 @@ import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.*;
 
@@ -25,6 +26,7 @@ import java.util.Map;
 public class OrchestratedTestBuilder extends OrchestratedTest {
 
     private static List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
+    private static XMLUtilities xmlUtilities = new XMLUtilities();
 
     @AfterClass
     public static void clearBuilders() {
@@ -58,7 +60,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param data An XML string which will be used for seeding a message, or comparing a value
      */
     public static XmlTestResource xml(String data) {
-        return new XmlTestResource(data);
+        return new XmlTestResource(xmlUtilities.getXmlAsDocument(data));
     }
 
     /**
@@ -80,7 +82,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param xpathSelector An xpath selector for returning certain xml nodes from a response
      */
     public static XmlTestResource xml(String data, XPathSelector xpathSelector) {
-        return new XmlTestResource(data, xpathSelector);
+        return new XmlTestResource(xmlUtilities.getXmlAsDocument(data), xpathSelector);
     }
 
     /**
