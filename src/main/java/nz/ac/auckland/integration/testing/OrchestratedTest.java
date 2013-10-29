@@ -2,7 +2,7 @@ package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.expectation.*;
+import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;

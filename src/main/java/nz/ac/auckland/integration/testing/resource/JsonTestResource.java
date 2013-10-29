@@ -1,11 +1,8 @@
 package nz.ac.auckland.integration.testing.resource;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 /**

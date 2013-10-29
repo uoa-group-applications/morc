@@ -1,18 +1,12 @@
 package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
-import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Provides a mechanism for retrieving JSON values from a file/URL/String and also

@@ -11,7 +11,6 @@ import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpec
 import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.*;
-
 import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 

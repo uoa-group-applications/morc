@@ -5,7 +5,10 @@ import nz.ac.auckland.integration.testing.validator.JsonValidator;
 import nz.ac.auckland.integration.testing.validator.PlainTextValidator;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
-import org.apache.camel.*;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

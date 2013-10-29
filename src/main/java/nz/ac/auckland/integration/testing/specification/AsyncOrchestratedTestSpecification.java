@@ -8,8 +8,6 @@ import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 /**
  * A complete test specification including all expectations for asynchronously sending a message
  * to a target destination.

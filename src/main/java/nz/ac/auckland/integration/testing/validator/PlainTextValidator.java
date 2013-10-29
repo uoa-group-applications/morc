@@ -1,16 +1,10 @@
 package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
-import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * A simple mechanism for sending and comparing plain text values
