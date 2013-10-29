@@ -26,7 +26,7 @@ import java.util.Map;
 public class OrchestratedTestBuilder extends OrchestratedTest {
 
     private static List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
-    private static XMLUtilities xmlUtilities = new XMLUtilities();
+    protected static XMLUtilities xmlUtilities = new XMLUtilities();
 
     @AfterClass
     public static void clearBuilders() {
