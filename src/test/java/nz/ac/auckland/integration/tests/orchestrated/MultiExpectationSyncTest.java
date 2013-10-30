@@ -47,6 +47,7 @@ public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
                             @Override
                             public void process(Exchange exchange) throws Exception {
                                 template.sendBody("seda:syncMultiSendEndpoint0", exchange.getIn().getBody());
+                                Thread.sleep(100);
                                 template.sendBody("seda:syncMultiSendEndpoint2?waitForTaskToComplete=Never", exchange.getIn().getBody());
                                 Thread.sleep(5000);
                                 template.sendBody("seda:syncMultiSendEndpoint1?waitForTaskToComplete=Never", exchange.getIn().getBody());
@@ -58,6 +59,7 @@ public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
                             @Override
                             public void process(Exchange exchange) throws Exception {
                                 template.sendBody("seda:syncMultiSendEndpoint0", exchange.getIn().getBody());
+                                Thread.sleep(100);
                                 template.sendBody("seda:syncMultiSendEndpoint1", "<first/>");
                                 Thread.sleep(5000);
                                 template.sendBody("seda:syncMultiSendEndpoint1", "<second/>");
@@ -69,6 +71,7 @@ public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
                             @Override
                             public void process(Exchange exchange) throws Exception {
                                 template.sendBody("seda:syncMultiSendEndpoint0", exchange.getIn().getBody());
+                                Thread.sleep(100);
                                 template.sendBody("seda:syncMultiSendEndpoint2", "<first/>");
                                 Thread.sleep(2000);
                                 template.sendBody("seda:syncMultiSendEndpoint1", "<second/>");
