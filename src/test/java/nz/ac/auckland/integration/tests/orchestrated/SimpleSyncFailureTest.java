@@ -61,6 +61,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                 .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
                 .build();
 
+        throw new RuntimeException("this is broken");
+
         AssertionError e = null;
         try {
             OrchestratedTest test = new OrchestratedTest(spec);
@@ -95,7 +97,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     public void testExpectationBodyInvalid() throws Exception {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation body")
                 .requestBody(xml("<foo/>"))
-                .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
+                .addExpectation(asyncExpectation("vm:asyncTarget").expectedBody(xml("<baz/>")))
                 .build();
 
         AssertionError e = null;
@@ -115,11 +117,9 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     public void testExpectationHeadersInvalid() throws Exception {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation headers")
                 .requestHeaders(headers(headervalue("foo", "baz")))
-                .addExpectation(asyncExpectation("vm:asyncTarget2")
+                .addExpectation(asyncExpectation("vm:asyncTarget")
                         .expectedHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def"))))
                 .build();
-
-        if (true) throw new Exception("this is actually broken");
 
         AssertionError e = null;
         try {
@@ -136,7 +136,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testSendMoreExchangesThanExpectations() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher", "Test fails on invalid expectation headers")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher", "Test fails on more exchanges than expectations")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget")
                         .expectedBody(xml("<foo/>")))
@@ -152,5 +152,10 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
             logger.info("Exception ({}): ", spec.getDescription(), e);
         }
         assertNotNull(e);
+    }
+
+    @Test
+    public void testResponseHeadersInvalid() throws Exception {
+        throw new Exception("todo");
     }
 }

@@ -90,6 +90,8 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                         .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
+        throw new RuntimeException("todo test for response headers");
+
     }
 
 }
