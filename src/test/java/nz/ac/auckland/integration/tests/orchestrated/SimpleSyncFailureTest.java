@@ -119,6 +119,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                         .expectedHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def"))))
                 .build();
 
+        if (true) throw new Exception("this is actually broken");
+
         AssertionError e = null;
         try {
             OrchestratedTest test = new OrchestratedTest(spec);
