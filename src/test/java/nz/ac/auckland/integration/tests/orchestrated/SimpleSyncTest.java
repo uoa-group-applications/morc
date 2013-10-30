@@ -2,9 +2,13 @@ package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.validator.HeadersValidator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
@@ -37,6 +41,11 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
 
                 from("direct:syncInputNoCallouts")
                         .setBody(constant("<abc/>"));
+
+                from("direct:setHeaders")
+                        .setHeader("foo",constant("baz"))
+                        .setHeader("abc",constant("123"));
+
             }
         };
     }
@@ -80,9 +89,9 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
 
         syncTest("direct:syncInputAsyncOutput", "Test headers are handled appropriately")
                 .requestBody(xml("<baz/>"))
-                .requestHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def")))
+                .requestHeaders(headers(header("foo", "baz"), header("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
-                        .expectedHeaders(headers(headervalue("abc", "def"), headervalue("foo", "baz"))));
+                        .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
         syncTest("direct:syncInputSyncOutput", "Test sync response")
                 .requestBody(xml("<baz/>"))
@@ -90,8 +99,7 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                         .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
-        throw new RuntimeException("todo test for response headers");
-
+        syncTest("direct:setHeaders","Test Response Headers Validated")
+                .expectedResponseHeaders(headers(header("abc","123"),header("foo","baz")));
     }
-
 }

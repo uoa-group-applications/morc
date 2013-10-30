@@ -1,10 +1,7 @@
 package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.resource.*;
-import nz.ac.auckland.integration.testing.validator.JsonValidator;
-import nz.ac.auckland.integration.testing.validator.PlainTextValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
-import nz.ac.auckland.integration.testing.validator.XmlValidator;
+import nz.ac.auckland.integration.testing.validator.*;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -206,6 +203,14 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
          */
         public Builder expectedResponseBody(PlainTextTestResource resource) {
             this.responseBodyValidator = new PlainTextValidator(resource);
+            return self();
+        }
+
+        /**
+         * @param resource A header test resource which will be used to seed a validator
+         */
+        public Builder expectedResponseHeaders(HeadersTestResource resource) {
+            this.responseHeadersValidator = new HeadersValidator(resource);
             return self();
         }
 

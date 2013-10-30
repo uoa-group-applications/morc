@@ -54,14 +54,15 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testDelayedDeliveryFails() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutputDelayed", "Test delayed delivery fails")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutputDelayed",
+                "Test delayed delivery fails")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
                 .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
                 .build();
 
-        throw new RuntimeException("this is broken");
+        //throw new RuntimeException("this is broken");
 
         AssertionError e = null;
         try {
@@ -116,9 +117,9 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     @Test
     public void testExpectationHeadersInvalid() throws Exception {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation headers")
-                .requestHeaders(headers(headervalue("foo", "baz")))
+                .requestHeaders(headers(new HeaderValue("foo", "baz")))
                 .addExpectation(asyncExpectation("vm:asyncTarget")
-                        .expectedHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def"))))
+                        .expectedHeaders(headers(new HeaderValue("foo", "baz"), new HeaderValue("abc", "def"))))
                 .build();
 
         AssertionError e = null;
@@ -136,10 +137,11 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testSendMoreExchangesThanExpectations() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher", "Test fails on more exchanges than expectations")
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher",
+                "Test fails on more exchanges than expectations")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget")
-                        .expectedBody(xml("<foo/>")))
+                        .expectedBody(xml("<moo/>")))
                 .build();
 
         AssertionError e = null;

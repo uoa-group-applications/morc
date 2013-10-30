@@ -32,9 +32,9 @@ public class SimpleAsyncTest extends OrchestratedTestBuilder {
                 .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")));
 
         asyncTest("seda:asyncTestInput", "test async send headers")
-                .inputHeaders(headers(headervalue("foo", "baz"), headervalue("abc", "def")))
+                .inputHeaders(headers(header("foo", "baz"), header("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
-                        .expectedHeaders(headers(headervalue("abc", "def"), headervalue("foo", "baz"))));
+                        .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
         asyncTest("seda:asyncTestInputDelayed", "test async delayed")
                 .addExpectation(asyncExpectation("seda:asyncTestOutput"));

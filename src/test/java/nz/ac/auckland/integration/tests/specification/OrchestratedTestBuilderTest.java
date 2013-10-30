@@ -161,7 +161,7 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testHeadersHeaderValue() throws Exception {
         HeadersTestResource headers = OrchestratedTestBuilder.headers(
-                OrchestratedTestBuilder.headervalue("foo", "baz"), OrchestratedTestBuilder.headervalue("abc", "123"));
+                OrchestratedTestBuilder.header("foo", "baz"), OrchestratedTestBuilder.header("abc", "123"));
 
         assertEquals(2, headers.getValue().size());
         assertEquals("baz", headers.getValue().get("foo"));

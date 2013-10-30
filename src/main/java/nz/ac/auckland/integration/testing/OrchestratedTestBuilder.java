@@ -165,16 +165,6 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * Named as such as header interferes with the CamelTestSupport class
-     *
-     * @param header A header to add to an outgoing or expected message
-     * @param value  The value that should be assigned to this header
-     */
-    public static HeaderValue headervalue(String header, Object value) {
-        return header(header, value);
-    }
-
-    /**
      * @param header A header to add to an outgoing or expected message
      * @param value  The value that should be assigned to this header
      */
