@@ -9,6 +9,7 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.util.ExchangeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +105,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                         exchange.getIn().setBody("");
                     }
                 });
+
+            //Put the out message into in for consistency during validation
+            ExchangeHelper.prepareOutToIn(response);
 
             Exception e = response.getException();
 
