@@ -8,11 +8,15 @@ import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.validator.JsonValidator;
 import nz.ac.auckland.integration.testing.validator.PlainTextValidator;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.File;
 import java.net.URL;
@@ -69,7 +73,8 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testXmlString() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
-        assertEquals("<foo/>", xml.getValue());
+        DetailedDiff difference = new DetailedDiff(new Diff("<foo/>", new XMLUtilities().getDocumentAsString(xml.getValue())));
+        assertTrue(difference.similar());
     }
 
     @Test
