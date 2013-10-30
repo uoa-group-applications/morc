@@ -316,9 +316,10 @@ public class OrchestratedTest extends CamelSpringTestSupport {
                         }
 
                         String messageBody = currentExchange.getIn().getBody(String.class);
-                        AssertionError orderError = new AssertionError("The expectation: " + expected.getName() + " has not been encountered" +
+                        AssertionError orderError = new AssertionError("The expectation: " + expected.getName() +
+                                " has not been satisfied, or it has not been encountered" +
                                 " in the correct order; the message: " + (messageBody.length() >= 20 ? messageBody.substring(0, 20) + "..." : messageBody) +
-                                " was received first");
+                                " was received");
 
                         //check if the exchange matches any of the unordered endpoints
                         if (!expected.isEndpointOrdered() &&
