@@ -82,7 +82,7 @@ public class XmlValidator implements Validator {
             if (!difference.similar()) {
                 logger.warn("Differences exist between two documents: {}", difference.getAllDifferences());
             } else
-                logger.trace("No differences exist for input {}", xmlUtilities.getDocumentAsString(value));
+                logger.debug("No differences exist for input {}", xmlUtilities.getDocumentAsString(value));
             return difference.similar();
         } catch (Exception e) {
             throw new RuntimeException(e);
