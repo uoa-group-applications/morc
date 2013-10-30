@@ -3,14 +3,18 @@ package nz.ac.auckland.integration.tests.expectation;
 import nz.ac.auckland.integration.testing.expectation.SyncMockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.direct.DirectEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
+import org.custommonkey.xmlunit.DetailedDiff;
+import org.custommonkey.xmlunit.Diff;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.net.URL;
 
@@ -33,8 +37,9 @@ public class SyncMockExpectationTest extends Assert {
 
         mockTest.handleReceivedExchange(exchange);
 
-        assertEquals(output.getValue(), exchange.getOut().getBody());
-        assertTrue(new HeadersValidator(headers).validate(exchange));
+        DetailedDiff difference = new DetailedDiff(new Diff(output.getValue(), exchange.getOut().getBody(Document.class)));
+        assertTrue(difference.similar());
+        assertTrue(new HeadersValidator(headers).validate(exchange.getOut().getHeaders()));
     }
 
     @Test
@@ -49,7 +54,8 @@ public class SyncMockExpectationTest extends Assert {
 
         mockTest.handleReceivedExchange(exchange);
 
-        assertEquals(output.getValue(), exchange.getOut().getBody());
+        DetailedDiff difference = new DetailedDiff(new Diff(output.getValue(), exchange.getOut().getBody(Document.class)));
+        assertTrue(difference.similar());
         assertEquals(0, exchange.getOut().getHeaders().size());
     }
 
@@ -66,7 +72,7 @@ public class SyncMockExpectationTest extends Assert {
         mockTest.handleReceivedExchange(exchange);
 
         assertEquals("", exchange.getOut().getBody());
-        assertTrue(new HeadersValidator(headers).validate(exchange));
+        assertTrue(new HeadersValidator(headers).validate(exchange.getOut().getHeaders()));
     }
 
     @Test
