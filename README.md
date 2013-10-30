@@ -147,4 +147,4 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 }
 ```
 
-All of these examples can be found under at (https://github.com/dmacdonald2013/soaunit-example); execute the test run with the standard mvn test goal. The tests themselves are found under com.acme.integration.tests.AcmeTest
+All of these examples can be found under at https://github.com/dmacdonald2013/soaunit-example; execute the test run with the standard mvn test goal. The tests themselves are found under com.acme.integration.tests.AcmeTest
