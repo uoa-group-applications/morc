@@ -49,7 +49,7 @@ public class JsonValidator implements Validator {
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
 
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode expectedJson = mapper.readTree(value);
+            JsonNode expectedJson = mapper.readTree(expectedInput);
             JsonNode inputJson = mapper.readTree(value);
             return expectedJson.equals(inputJson);
         } catch (Exception e) {
