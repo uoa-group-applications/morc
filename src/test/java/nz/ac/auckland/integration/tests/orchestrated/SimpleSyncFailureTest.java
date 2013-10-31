@@ -185,4 +185,30 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
         }
         assertNotNull(e);
     }
+
+    @Test
+    public void testExceptionRequiredButMissing() {
+
+    }
+
+    @Test
+    public void testExceptionRequiredWithResponseValidatorButMissing() {
+
+    }
+
+    @Test
+    public void testExceptionRequiredBothKinds() {
+
+    }
+
+    @Test
+    public void testExceptionFoundButUnexpectedWithNoValidator() {
+
+    }
+
+    @Test
+    public void testExceptionFoundButValidatorReturnsFalse() {
+
+    }
+
 }
