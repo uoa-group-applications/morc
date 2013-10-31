@@ -14,11 +14,7 @@ public abstract class StaticTestResource<T> implements TestResource {
     private File file;
     private T value;
 
-    public StaticTestResource() {
-
-    }
-
-    /**
+     /**
      * @param value set the value directly for this test resource
      */
     public StaticTestResource(T value) {
