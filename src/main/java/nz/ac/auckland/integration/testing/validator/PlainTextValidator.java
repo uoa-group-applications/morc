@@ -40,6 +40,7 @@ public class PlainTextValidator implements Validator {
     }
 
     public boolean validate(String value) {
+        if (value == null) return false;
         try {
             String expectedInput = resource.getValue();
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();

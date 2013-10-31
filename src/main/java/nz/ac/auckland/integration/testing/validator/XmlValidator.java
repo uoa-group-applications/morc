@@ -67,6 +67,7 @@ public class XmlValidator implements Validator {
     }
 
     public boolean validate(Document value) {
+        if (value == null) return false;
         try {
             Document expectedValue;
             try {

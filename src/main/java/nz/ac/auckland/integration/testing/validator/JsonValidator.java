@@ -42,6 +42,7 @@ public class JsonValidator implements Validator {
     }
 
     public boolean validate(String value) {
+        if (value == null) return false;
         try {
             String expectedInput = resource.getValue();
 
