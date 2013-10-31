@@ -29,9 +29,12 @@ public class XmlValidator implements Validator {
     public XmlValidator(XmlTestResource resource) {
         this.resource = resource;
         XMLUnit.setIgnoreWhitespace(true);
-
     }
 
+    /**
+     * @param resource The XML resource you wish to validate against
+     * @param xpathSelector An xpath for cutting down the incoming document
+     */
     public XmlValidator(XmlTestResource resource,XPathSelector xpathSelector) {
         this(resource);
         this.xpathSelector = xpathSelector;
