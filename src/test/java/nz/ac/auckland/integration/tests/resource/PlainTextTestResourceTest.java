@@ -52,8 +52,4 @@ public class PlainTextTestResourceTest extends Assert {
         assertTrue(validator.validate("foo"));
     }
 
-    @Test
-    public void testExchangeTextBody() throws Exception {
-        throw new Exception("todo");
-    }
 }

@@ -77,8 +77,4 @@ public class JsonTestResourceTest extends Assert {
         assertTrue(validator.validate("{\"foo\":\"baz\"}"));
     }
 
-    @Test
-    public void testExchangeJsonBody() throws Exception {
-        throw new Exception("todo");
-    }
 }

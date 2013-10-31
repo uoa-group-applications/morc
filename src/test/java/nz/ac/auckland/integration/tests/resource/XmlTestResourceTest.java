@@ -165,14 +165,5 @@ public class XmlTestResourceTest extends Assert {
         assertFalse(new XmlValidator(resource).validate(EXPECTED_VALUE));
     }
 
-    @Test
-    public void testValidatorInputException() throws Exception {
-        throw new Exception("todo");
-    }
-
-    @Test
-    public void testExchangeInput() throws Exception {
-        throw new Exception("todo");
-    }
 }
 

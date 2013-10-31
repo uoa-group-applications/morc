@@ -100,10 +100,4 @@ public class HeadersTestResourceTest extends Assert {
         assertTrue(validator.validate(values2));
     }
 
-
-    @Test
-    public void testExchangeHeaders() throws Exception {
-        throw new Exception("todo");
-    }
-
 }
