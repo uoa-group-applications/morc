@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTest;
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -9,6 +10,9 @@ import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static nz.ac.auckland.integration.testing.OrchestratedTestBuilder.*;
 
@@ -42,11 +46,15 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                             @Override
                             public void process(Exchange exchange) throws Exception {
                                 for (int i = 0; i < 3; i++) {
-                                    template.sendBody("vm:asyncTarget?waitForTaskToComplete=Never", "<moo/>");
+                                    template.sendBody("vm:asyncTarget3?waitForTaskToComplete=Never", "<moo/>");
                                 }
                             }
                         })
                         .setBody(constant("<foo/>"));
+
+                from("vm:syncHeaderResponse")
+                        .setHeader("baz",constant("foo"))
+                        .setHeader("123",constant("abc"));
 
             }
         };
@@ -61,8 +69,6 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                 .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
                 .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
                 .build();
-
-        //throw new RuntimeException("this is broken");
 
         AssertionError e = null;
         try {
@@ -140,7 +146,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher",
                 "Test fails on more exchanges than expectations")
                 .requestBody(xml("<foo/>"))
-                .addExpectation(asyncExpectation("vm:asyncTarget")
+                .addExpectation(asyncExpectation("vm:asyncTarget3")
                         .expectedBody(xml("<moo/>")))
                 .build();
 
@@ -158,6 +164,25 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testResponseHeadersInvalid() throws Exception {
-        throw new Exception("todo");
+
+        Map<String,Object> headers = new HashMap<>();
+        headers.put("abc","123");
+        headers.put("foo","baz");
+
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
+                "Test unexpected response headers")
+                .expectedResponseHeaders(new HeadersTestResource(headers))
+                .build();
+
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
     }
 }
