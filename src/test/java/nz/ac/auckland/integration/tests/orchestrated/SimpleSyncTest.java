@@ -51,6 +51,12 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                 from("direct:throwsException")
                         .throwException(new IOException());
 
+                from("direct:asyncHandOff")
+                        .to("seda:asyncExceptionThrower?waitForTaskToComplete=Never")
+                        .setBody(constant("working"));
+                from("seda:asyncExceptionThrower")
+                        .throwException(new IOException());
+
             }
         };
     }
@@ -119,6 +125,10 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                     }
                 });
 
+
+        //we don't expect this to throw an exception back due to the async nature
+        syncTest("direct:asyncHandOff","exception thrown after async call")
+                .expectedResponseBody(text("working"));
 
 
 
