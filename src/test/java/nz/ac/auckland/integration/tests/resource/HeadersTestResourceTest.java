@@ -64,13 +64,15 @@ public class HeadersTestResourceTest extends Assert {
 
     @Test
     public void testCompareMoreInputHeaders() throws Exception {
-        Map<String, Object> differentProperties = new HashMap<>();
-        differentProperties.put("foo", "baz");
-        differentProperties.put("abc", "123");
-        differentProperties.put("moo", "cow");
+        Map<String, Object> expectedHeaders = new HashMap<>();
+        expectedHeaders.put("foo", "baz");
+        expectedHeaders.put("abc", "123");
+        expectedHeaders.put("moo", "cow");
 
-        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(inputUrl));
-        assertFalse(validator.validate(differentProperties));
+        HeadersTestResource receivedHeaders = new HeadersTestResource(inputUrl);
+
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(expectedHeaders));
+        assertFalse(validator.validate(receivedHeaders.getValue()));
     }
 
     @Test
