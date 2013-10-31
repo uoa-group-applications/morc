@@ -94,8 +94,6 @@ public class XmlValidator implements Validator {
                 return false;
             }
 
-
-
             DetailedDiff difference = new DetailedDiff(new Diff(expectedValue, value));
             if (!difference.similar()) {
                 logger.warn("Differences exist between two documents: {}", difference.getAllDifferences());
