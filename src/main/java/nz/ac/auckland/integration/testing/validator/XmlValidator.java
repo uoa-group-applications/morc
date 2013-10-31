@@ -11,6 +11,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXParseException;
 
 /**
  * Provides a mechanism for retrieving XML values from a file/URL/String and also
@@ -63,7 +64,17 @@ public class XmlValidator implements Validator {
     }
 
     public boolean validate(String value) {
-        return validate(xmlUtilities.getXmlAsDocument(value));
+        Document doc;
+        try {
+            doc = xmlUtilities.getXmlAsDocument(value);
+        } catch(RuntimeException e) {
+            if (e.getCause() instanceof SAXParseException) {
+                logger.warn("Unable to parse the input value for validation",e);
+                return false;
+            }
+            throw e;
+        }
+        return validate(doc);
     }
 
     public boolean validate(Document value) {
