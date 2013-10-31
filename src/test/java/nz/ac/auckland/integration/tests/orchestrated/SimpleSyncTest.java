@@ -3,10 +3,12 @@ package nz.ac.auckland.integration.tests.orchestrated;
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,9 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                 from("direct:setHeaders")
                         .setHeader("foo",constant("baz"))
                         .setHeader("abc",constant("123"));
+
+                from("direct:throwsException")
+                        .throwException(new IOException());
 
             }
         };
@@ -101,5 +106,21 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
 
         syncTest("direct:setHeaders","Test Response Headers Validated")
                 .expectedResponseHeaders(headers(header("abc","123"),header("foo","baz")));
+
+        syncTest("direct:throwsException","exception found, expectsExceptionResponse and no validator")
+                .expectsExceptionResponse();
+
+        syncTest("direct:throwsException","exception found and exception validator = true")
+                .expectsExceptionResponse()
+                .exceptionResponseValidator(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return exchange.getException() instanceof IOException;
+                    }
+                });
+
+
+
+
     }
 }
