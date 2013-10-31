@@ -33,7 +33,7 @@ public class XmlValidator implements Validator {
 
     /**
      * @param resource The XML resource you wish to validate against
-     * @param xpathSelector An xpath for cutting down the incoming document
+     * @param xpathSelector An xpath for cutting down the incoming document to an element you care about
      */
     public XmlValidator(XmlTestResource resource,XPathSelector xpathSelector) {
         this(resource);
@@ -87,11 +87,14 @@ public class XmlValidator implements Validator {
             try {
                 if (xpathSelector != null)
                     value = xpathSelector.evaluate(value);
+
                 expectedValue = resource.getValue();
             } catch (XPathSelector.XPathEvaluationException e) {
                 logger.warn("The XPath evaluation failed on the value for validation",e);
                 return false;
             }
+
+
 
             DetailedDiff difference = new DetailedDiff(new Diff(expectedValue, value));
             if (!difference.similar()) {
