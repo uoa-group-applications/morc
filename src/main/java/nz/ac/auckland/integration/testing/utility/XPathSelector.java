@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.testing.utility;
 import org.springframework.util.xml.SimpleNamespaceContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,7 +63,8 @@ public class XPathSelector {
         Document output = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                 .newDocument();
 
-        output.adoptNode(result.item(0));
+        Node resultNode = output.importNode(result.item(0),true);
+        output.appendChild(resultNode);
 
         return output;
     }
