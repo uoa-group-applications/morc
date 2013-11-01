@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -165,10 +166,38 @@ public class XmlTestResourceTest extends Assert {
     }
 
     @Test
+    public void testSimpleXPathOnResourceFromFile() throws Exception {
+        XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
+        XmlTestResource resource = new XmlTestResource(new File(inputUrl.getFile()),selector);
+        assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>")));
+    }
+
+    @Test
+    public void testSimpleXPathOnResourceFromUrl() throws Exception {
+        XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
+        XmlTestResource resource = new XmlTestResource(inputUrl,selector);
+        assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>")));
+    }
+
+    @Test
     public void testSimpleXPathNoNamespaces() throws Exception {
         XPathSelector selector = new XPathSelector("/isOfInterest/entity");
         XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE_NO_NS,selector);
         assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<entity>HREmployee</entity>")));
+    }
+
+    @Test
+    public void testXMLUtilities() {
+        XmlTestResource resource = new XmlTestResource(inputUrl);
+        resource.setXmlUtilities(new FakeXMLUtilities());
+        assertEquals("test",resource.getXmlUtilities().getDocumentAsString(null));
+    }
+
+    static class FakeXMLUtilities extends XMLUtilities {
+        @Override
+        public String getDocumentAsString(Document doc) {
+            return "test";
+        }
     }
 
 }
