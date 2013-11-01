@@ -61,9 +61,19 @@ public class XmlTestResource extends StaticTestResource<Document> {
      * @throws Exception XPathEvaluationException thrown if the xpath could not be evaluated correctly
      */
     protected Document getResource(File file) throws Exception {
+        return xmlUtilities.getXmlAsDocument(file);
+    }
+
+    /**
+     * @return The test resource in the appropriate format
+     * @throws java.io.IOException
+     */
+    @Override
+    public Document getValue() throws Exception {
+        Document value = super.getValue();
         if (xpathSelector != null)
-            return xpathSelector.evaluate(xmlUtilities.getXmlAsDocument(file));
+            return xpathSelector.evaluate(value);
         else
-            return xmlUtilities.getXmlAsDocument(file);
+            return value;
     }
 }
