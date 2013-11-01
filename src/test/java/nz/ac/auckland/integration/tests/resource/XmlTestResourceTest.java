@@ -187,7 +187,7 @@ public class XmlTestResourceTest extends Assert {
     }
 
     @Test
-    public void testXMLUtilities() {
+    public void testXMLUtilities() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
         resource.setXmlUtilities(new FakeXMLUtilities());
         assertEquals("test",resource.getXmlUtilities().getDocumentAsString(null));
@@ -198,6 +198,20 @@ public class XmlTestResourceTest extends Assert {
         public String getDocumentAsString(Document doc) {
             return "test";
         }
+    }
+
+    @Test
+    public void testMissingFile() throws Exception {
+
+        Throwable e = null;
+        try {
+            XmlTestResource resource = new XmlTestResource(new URL("http://nosuchfile.com"));
+        } catch (RuntimeException ex) {
+            assertTrue(ex.getMessage().contains("File Not Found"));
+            e = ex;
+        }
+
+        assertNotNull(e);
     }
 
 }
