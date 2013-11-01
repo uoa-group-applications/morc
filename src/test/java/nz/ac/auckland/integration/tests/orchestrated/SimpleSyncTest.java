@@ -57,6 +57,9 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                 from("seda:asyncExceptionThrower")
                         .throwException(new IOException());
 
+                from("direct:jsonResponse")
+                        .setBody(constant("{\"foo\":\"baz\"}"));
+
             }
         };
     }
@@ -125,12 +128,12 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                     }
                 });
 
-
         //we don't expect this to throw an exception back due to the async nature
         syncTest("direct:asyncHandOff","exception thrown after async call")
                 .expectedResponseBody(text("working"));
 
-
+        syncTest("direct:jsonResponse","test json validation in response")
+                .expectedResponseBody(json("{\"foo\":\"baz\"}"));
 
     }
 }
