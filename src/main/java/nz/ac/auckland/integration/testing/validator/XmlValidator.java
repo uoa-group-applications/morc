@@ -60,7 +60,7 @@ public class XmlValidator implements Validator {
         try {
             value = exchange.getIn().getBody(Document.class);
         } catch (TypeConversionException e) {
-            logger.warn("Error attempting to convert JSON to a Document",e);
+            logger.warn("Error attempting to convert XML to a Document",e);
             return false;
         }
         return value != null && validate(value);
