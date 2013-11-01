@@ -252,4 +252,44 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         assertTrue(new HeadersValidator(headers).validate(exchange));
 
     }
+
+    @Test
+    public void testSetExpectedResponseBodyValidator() throws Exception {
+
+    }
+
+    @Test
+    public void testSetExpectedResponseHeadersValidator() throws Exception {
+
+    }
+
+    @Test
+    public void testSetExpectedResponseBodyJson() throws Exception {
+
+    }
+
+    @Test
+    public void testBuildExpectsExceptionResponseBodySet() throws Exception {
+
+    }
+
+    @Test
+    public void testBuildExceptionValidatorResponseBodySet() throws Exception {
+
+    }
+
+    @Test
+    public void testBuildExpectsExceptionResponseHeadersSet() throws Exception {
+
+    }
+
+    @Test
+    public void testBuildExceptionValidatorResponseHeadersSet() throws Exception {
+
+    }
+
+    @Test
+    public void testBuildExpectsExceptionResponseHeaderAndBodySet() throws Exception {
+
+    }
 }

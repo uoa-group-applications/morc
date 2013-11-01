@@ -98,4 +98,9 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         assertEquals("", exchange.getIn().getBody(String.class));
     }
 
+    @Test
+    public void testBuildNoExpectations() throws Exception {
+
+    }
+
 }

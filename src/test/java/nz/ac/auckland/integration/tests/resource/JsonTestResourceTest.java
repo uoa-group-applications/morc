@@ -77,4 +77,9 @@ public class JsonTestResourceTest extends Assert {
         assertTrue(validator.validate("{\"foo\":\"baz\"}"));
     }
 
+    @Test
+    public void testTypeConversionException() throws Exception {
+
+    }
+
 }

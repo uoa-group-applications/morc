@@ -47,6 +47,16 @@ public class OrchestratedTestSpecificationTest extends Assert {
         assertEquals(2, spec.getMockExpectations().get(1).getReceivedAt());
 
     }
+
+    @Test
+    public void testAddEndpointOverride() throws Exception {
+
+    }
+
+    @Test
+    public void testSleepForTestCompletion() throws Exception {
+
+    }
 }
 
 class TestOrchestratedTestSpecification extends OrchestratedTestSpecification {

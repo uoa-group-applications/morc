@@ -302,4 +302,39 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
         assertNotNull(e);
     }
 
+    @Test
+    public void testNoSpecificationEntered() throws Exception {
+
+    }
+
+    @Test
+    public void testUnorderedExpectationsCopySizeGreater0() throws Exception {
+
+    }
+
+    @Test
+    public void testSetProperties() throws Exception {
+
+    }
+
+    @Test
+    public void testSpringContextPathsConstructor() throws Exception {
+
+    }
+
+    @Test
+    public void testPropertiesConstructor() throws Exception {
+
+    }
+
+    @Test
+    public void testSpringContextPropertiesConstructor() throws Exception {
+
+    }
+
+    @Test
+    public void testSetEndpointOverrides() throws Exception {
+
+    }
+
 }
