@@ -29,6 +29,12 @@ public class XmlTestResourceTest extends Assert {
             "\t<v1:identifier name=\"uoaid\">2512472</v1:identifier>\n" +
             "</v1:isOfInterest>\n");
 
+    private static final Document EXPECTED_VALUE_NO_NS = xmlUtilities.getXmlAsDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<isOfInterest>\n" +
+            "\t<entity>HREmployee</entity>\n" +
+            "\t<identifier name=\"uoaid\">2512472</identifier>\n" +
+            "</isOfInterest>\n");
+
     URL inputUrl = this.getClass().getResource("/data/xml-test1.xml");
     URL inputUrl2 = this.getClass().getResource("/data/xml-test2.xml");
 
@@ -156,6 +162,13 @@ public class XmlTestResourceTest extends Assert {
         XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
         XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE,selector);
         assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>")));
+    }
+
+    @Test
+    public void testSimpleXPathNoNamespaces() throws Exception {
+        XPathSelector selector = new XPathSelector("/isOfInterest/entity");
+        XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE_NO_NS,selector);
+        assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<entity>HREmployee</entity>")));
     }
 
 }
