@@ -223,4 +223,59 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertNotNull(e);
     }
 
+    @Test
+    public void testHttpExceptionNoValidator() throws Exception {
+
+    }
+
+    @Test
+    public void testHttpExceptionValidator() throws Exception {
+
+    }
+
+    @Test
+    public void testHttpExceptionXmlResource() throws Exception {
+
+    }
+
+    @Test
+    public void testHttpExceptionJsonResource() throws Exception {
+
+    }
+
+    @Test
+    public void testHttpExceptionPlainTextResource() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateNSObject() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateNSObjectMethod() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateXPathSelector() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateXMLStringXpath() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateXMLFileXPath() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateXMLURLXPath() throws Exception {
+
+    }
+
 }
