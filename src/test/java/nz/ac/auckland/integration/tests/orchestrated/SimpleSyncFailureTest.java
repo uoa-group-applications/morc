@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,8 +55,11 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                         .setBody(constant("<foo/>"));
 
                 from("vm:syncHeaderResponse")
-                        .setHeader("baz",constant("foo"))
-                        .setHeader("123",constant("abc"));
+                        .setHeader("baz", constant("foo"))
+                        .setHeader("123", constant("abc"));
+
+                from("vm:exceptionThrower")
+                        .throwException(new IOException());
 
             }
         };
@@ -187,28 +192,114 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     }
 
     @Test
-    public void testExceptionRequiredButMissing() {
+    public void testExceptionRequiredButMissing() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
+                "Test Exception Required but not thrown")
+                .expectsExceptionResponse()
+                .build();
 
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
     }
 
     @Test
-    public void testExceptionRequiredWithResponseValidatorButMissing() {
+    public void testExceptionRequiredWithResponseValidatorButMissing() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
+                "Test Exception Required for validator but not thrown")
+                .exceptionResponseValidator(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return true;
+                    }
+                })
+                .build();
 
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
     }
 
     @Test
-    public void testExceptionRequiredBothKinds() {
+    public void testExceptionRequiredBothKinds() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
+                "Test Exception Required for validator and expectsExceptionResponse but not thrown")
+                .expectsExceptionResponse()
+                .exceptionResponseValidator(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return true;
+                    }
+                })
+                .build();
 
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
     }
 
     @Test
-    public void testExceptionFoundButUnexpectedWithNoValidator() {
+    public void testExceptionFoundButUnexpectedWithNoValidator() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
+                "Test Exception Found but not expected")
+                .requestBody(text("foo"))
+                .build();
 
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
     }
 
     @Test
-    public void testExceptionFoundButValidatorReturnsFalse() {
+    public void testExceptionFoundButValidatorReturnsFalse() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
+                "Test Exception Found but not expected")
+                .exceptionResponseValidator(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return false;
+                    }
+                })
+                .build();
 
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
     }
 
 }
