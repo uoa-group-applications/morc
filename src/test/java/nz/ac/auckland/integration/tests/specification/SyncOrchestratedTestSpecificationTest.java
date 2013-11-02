@@ -1,9 +1,11 @@
 package nz.ac.auckland.integration.tests.specification;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
+import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -255,16 +257,56 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
     @Test
     public void testSetExpectedResponseBodyValidator() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:foo",
+                "test set expected body validator")
+                .expectedResponseBody(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return true;
+                    }
+                })
+                .build();
 
+        assertTrue(spec.getResponseBodyValidator().validate(null));
     }
 
     @Test
     public void testSetExpectedResponseHeadersValidator() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:foo",
+                "test set expected headers validator")
+                .expectedResponseHeaders(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return true;
+                    }
+                })
+                .build();
 
+        assertTrue(spec.getResponseHeadersValidator().validate(null));
     }
 
     @Test
     public void testSetExpectedResponseBodyJson() throws Exception {
+        final JsonTestResource input = new JsonTestResource(this.getClass().getResource("/data/json-test1.json"));
+
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                .Builder("direct:syncTestInput", "description")
+                .requestBody(input)
+                .expectedResponseBody(input)
+                .build();
+
+        MockEndpoint endpoint = getMockEndpoint("mock:syncTest");
+        endpoint.expectedMessageCount(1);
+        endpoint.whenAnyExchangeReceived(new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                exchange.getOut().setBody(input.getValue());
+            }
+        });
+
+        assertTrue(spec.sendInput(context.createProducerTemplate()));
+
+        endpoint.assertIsSatisfied();
 
     }
 

@@ -305,6 +305,22 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     @Test
     public void testNoSpecificationEntered() throws Exception {
 
+        IllegalStateException e = null;
+        try {
+            BadOrchestratedTest test = new BadOrchestratedTest();
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (IllegalStateException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
+
+    }
+
+    class BadOrchestratedTest extends OrchestratedTest {
+        public BadOrchestratedTest() {
+            //we never set the spec!
+        }
     }
 
     @Test
