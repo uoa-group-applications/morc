@@ -2,6 +2,10 @@ package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.validator.JsonValidator;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
@@ -76,10 +80,4 @@ public class JsonTestResourceTest extends Assert {
         JsonValidator validator = new JsonValidator(new JsonTestResource("{\"foo\":\"baz\"}"));
         assertTrue(validator.validate("{\"foo\":\"baz\"}"));
     }
-
-    @Test
-    public void testTypeConversionException() throws Exception {
-
-    }
-
 }
