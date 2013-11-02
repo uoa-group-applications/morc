@@ -52,9 +52,4 @@ public class PlainTextTestResourceTest extends Assert {
         assertTrue(validator.validate("foo"));
     }
 
-    @Test
-    public void testTypeConversionException() throws Exception {
-
-    }
-
 }
