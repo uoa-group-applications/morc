@@ -76,4 +76,8 @@ public class XmlTestResource extends StaticTestResource<Document> {
         else
             return value;
     }
+
+    public XPathSelector getXpathSelector() {
+        return this.xpathSelector;
+    }
 }
