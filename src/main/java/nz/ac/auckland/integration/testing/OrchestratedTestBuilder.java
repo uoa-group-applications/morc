@@ -289,6 +289,14 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
             this.prefix = prefix;
             this.uri = uri;
         }
+
+        public String getPrefix() {
+            return this.prefix;
+        }
+
+        public String getUri() {
+            return this.uri;
+        }
     }
 
     /**
