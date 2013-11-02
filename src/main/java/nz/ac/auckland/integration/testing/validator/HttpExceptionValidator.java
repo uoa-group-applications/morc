@@ -24,6 +24,7 @@ public class HttpExceptionValidator implements Validator {
     //todo check various HttpOperationFailedException
 
     public boolean validate(Exchange e) {
+        if (e == null) return false;
         Throwable t = e.getException();
         if (!(t instanceof HttpOperationFailedException)) return false;
 
