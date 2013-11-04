@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class HeadersValidator implements Validator {
 
-    private Logger logger = LoggerFactory.getLogger(HeadersValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(HeadersValidator.class);
 
     private HeadersTestResource resource;
 

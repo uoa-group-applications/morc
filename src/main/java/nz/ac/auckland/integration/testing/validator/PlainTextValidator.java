@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PlainTextValidator implements Validator {
 
-    private Logger logger = LoggerFactory.getLogger(PlainTextValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlainTextValidator.class);
     PlainTextTestResource resource;
 
     /**

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class AsyncMockExpectation extends ContentMockExpectation {
-    private Logger logger = LoggerFactory.getLogger(AsyncMockExpectation.class);
+    private static final Logger logger = LoggerFactory.getLogger(AsyncMockExpectation.class);
 
     /**
      * This is a no-op as an asynchronous expectation doesn't respond with any content

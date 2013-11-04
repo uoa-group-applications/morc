@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JsonValidator implements Validator {
 
-    private Logger logger = LoggerFactory.getLogger(JsonValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(JsonValidator.class);
     JsonTestResource resource;
 
     /**

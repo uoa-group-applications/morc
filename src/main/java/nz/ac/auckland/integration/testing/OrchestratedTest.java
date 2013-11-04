@@ -32,7 +32,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     private String[] springContextPaths = new String[]{};
     private String propertiesLocationPath;
     private OrchestratedTestSpecification specification;
-    private Logger logger = LoggerFactory.getLogger(OrchestratedTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrchestratedTest.class);
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
     protected OrchestratedTest() {

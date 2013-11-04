@@ -21,7 +21,7 @@ import org.xml.sax.SAXParseException;
  */
 public class XmlValidator implements Validator {
 
-    private Logger logger = LoggerFactory.getLogger(XmlValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(XmlValidator.class);
     private XmlTestResource resource;
     private XPathSelector xpathSelector;
     private XMLUtilities xmlUtilities = new XMLUtilities();

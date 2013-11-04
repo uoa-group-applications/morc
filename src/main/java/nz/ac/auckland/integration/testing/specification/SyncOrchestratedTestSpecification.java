@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecification {
-    private Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestSpecification.class);
+    private static final Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestSpecification.class);
     private TestResource inputRequestBody;
     private HeadersTestResource inputRequestHeaders;
     private Validator responseBodyValidator;

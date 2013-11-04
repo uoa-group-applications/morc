@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UnreceivedMockExpectation extends MockExpectation {
 
-    private Logger logger = LoggerFactory.getLogger(UnreceivedMockExpectation.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnreceivedMockExpectation.class);
 
     /**
      * This will always return false as this expectation should never be called

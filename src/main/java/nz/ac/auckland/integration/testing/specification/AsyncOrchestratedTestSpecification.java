@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecification {
-    private Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestSpecification.class);
+    private static final Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestSpecification.class);
     private HeadersTestResource inputMessageHeaders;
     private TestResource inputMessageBody;
 

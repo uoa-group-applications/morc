@@ -16,7 +16,7 @@ import java.lang.reflect.Constructor;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class ExceptionMockExpectation extends MockExpectation {
-    private Logger logger = LoggerFactory.getLogger(ExceptionMockExpectation.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionMockExpectation.class);
 
     private Class<? extends Exception> exceptionClass;
     private String exceptionMessage;

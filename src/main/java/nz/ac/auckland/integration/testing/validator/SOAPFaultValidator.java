@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
 
 public class SOAPFaultValidator implements Validator {
 
-    private Logger logger = LoggerFactory.getLogger(SOAPFaultValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SOAPFaultValidator.class);
 
     private String message;
     private QName code;
