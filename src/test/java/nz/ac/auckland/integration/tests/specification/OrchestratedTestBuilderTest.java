@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.tests.specification;
 
+import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
@@ -356,6 +357,16 @@ public class OrchestratedTestBuilderTest extends Assert {
                 OrchestratedTestBuilder.namespace("v2","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
         XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"),selector);
         assertNotNull(xml.getXpathSelector());
+    }
+
+    @Test
+    public void testSpringContextConstructor() throws Exception {
+
+    }
+
+    @Test
+    public void testPropertiesLocationConstructor() throws Exception {
+
     }
 
 }

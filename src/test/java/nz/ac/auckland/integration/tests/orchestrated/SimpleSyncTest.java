@@ -60,6 +60,12 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                 from("direct:jsonResponse")
                         .setBody(constant("{\"foo\":\"baz\"}"));
 
+                from("direct:propertiesTest")
+                        .setBody(simple("properties:response"));
+
+                from("seda:jsonRequest")
+                        .to("seda:jsonExpectation");
+
             }
         };
     }
@@ -135,5 +141,19 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
         syncTest("direct:jsonResponse","test json validation in response")
                 .expectedResponseBody(json("{\"foo\":\"baz\"}"));
 
+        syncTest("direct:propertiesTest","check properties set correctly")
+                .expectedResponseBody(text("foo"));
+
+        syncTest("seda:jsonRequest","Test JSON Expectation")
+                .requestBody(json("{\"foo\":\"baz\"}"))
+                .addExpectation(syncExpectation("seda:jsonExpectation")
+                .expectedBody(json("{\"foo\":\"baz\"}")));
+
+
+    }
+
+    @Override
+    public String getPropertiesLocation() {
+        return "test.properties";
     }
 }

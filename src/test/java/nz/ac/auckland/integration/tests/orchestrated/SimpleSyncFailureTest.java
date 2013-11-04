@@ -61,6 +61,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                 from("vm:exceptionThrower")
                         .throwException(new IOException());
 
+
+
             }
         };
     }
@@ -325,31 +327,6 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testUnorderedExpectationsCopySizeGreater0() throws Exception {
-
-    }
-
-    @Test
-    public void testSetProperties() throws Exception {
-
-    }
-
-    @Test
-    public void testSpringContextPathsConstructor() throws Exception {
-
-    }
-
-    @Test
-    public void testPropertiesConstructor() throws Exception {
-
-    }
-
-    @Test
-    public void testSpringContextPropertiesConstructor() throws Exception {
-
-    }
-
-    @Test
-    public void testSetEndpointOverrides() throws Exception {
 
     }
 
