@@ -36,7 +36,6 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponseBody(xml(classpath("/data/pingSoapFault.xml")))
                 .exceptionResponseValidator(httpException())
                 .addExpectation(wsFaultExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
