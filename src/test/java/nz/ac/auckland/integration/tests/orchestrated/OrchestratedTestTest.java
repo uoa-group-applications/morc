@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTest;
+import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import org.apache.camel.Endpoint;
 import org.junit.Assert;
@@ -31,6 +32,13 @@ public class OrchestratedTestTest extends Assert {
         OrchestratedTest test = new OrchestratedTest(null,inputs,"foo.properties");
         assertArrayEquals(inputs, test.getSpringContextPaths());
         assertEquals("foo.properties",test.getPropertiesLocation());
+    }
+
+    @Test
+    public void testDefaultEndpointOverrides() throws Exception {
+        OrchestratedTest test = new OrchestratedTest(null);
+        assertEquals(1, test.getEndpointOverrides().size());
+        assertTrue(test.getEndpointOverrides().iterator().next() instanceof CxfEndpointOverride);
     }
 
     @Test
