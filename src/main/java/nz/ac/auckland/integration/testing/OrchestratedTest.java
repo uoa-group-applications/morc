@@ -72,7 +72,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
      * Override this to return a list of Spring context paths on the classpath
      * @return An array of classpath Spring XML file references
      */
-    protected String[] getSpringContextPaths() {
+    public String[] getSpringContextPaths() {
         return springContextPaths;
     }
 
@@ -80,7 +80,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
      * Override this to return a path to a properties file for managing Camel endpoint URIs
      * @return A string path to a properties file
      */
-    protected String getPropertiesLocation() {
+    public String getPropertiesLocation() {
         return propertiesLocationPath;
     }
 
