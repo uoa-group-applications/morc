@@ -101,7 +101,7 @@ public class XmlTestResourceTest extends Assert {
     public void testSimpleXPathOnValidator() throws Exception {
         XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
         XmlTestResource resource = new XmlTestResource(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>"));
-        assertTrue(new XmlValidator(resource,selector).validate(EXPECTED_VALUE));
+        assertTrue(new XmlValidator(resource, selector).validate(EXPECTED_VALUE));
     }
 
     @Test
@@ -212,6 +212,14 @@ public class XmlTestResourceTest extends Assert {
         }
 
         assertNotNull(e);
+    }
+
+    @Test
+    public void testXmlUtilitiesGetterSetter() throws Exception {
+        XmlValidator validator = new XmlValidator(null,null);
+        assertNotNull(validator.getXmlUtilities());
+        validator.setXmlUtilities(null);
+        assertNull(validator.getXmlUtilities());
     }
 
 }
