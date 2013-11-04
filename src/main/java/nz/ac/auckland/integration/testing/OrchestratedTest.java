@@ -214,7 +214,8 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             public void process(Exchange exchange) throws Exception {
                 Queue<MockExpectation> expectations = mockEndpointExpectations.get(exchange.getFromEndpoint());
                 if (expectations == null)
-                    throw new IllegalStateException("The endpoint URI has no expectations: " + exchange.getFromEndpoint());
+                    throw new IllegalStateException("The endpoint URI has no expectations," +
+                            " or you are using a direct-to-direct route: " + exchange.getFromEndpoint());
                 MockExpectation expectation = expectations.poll();
 
                 logger.trace("An exchange has been received from the endpoint: {} {}",
