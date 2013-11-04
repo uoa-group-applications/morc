@@ -330,4 +330,29 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     }
 
+    @Test
+    public void testExceptionValidatorWins() throws Exception {
+        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
+                "Test Exception Found but not expected")
+                .exceptionResponseValidator(new Validator() {
+                    @Override
+                    public boolean validate(Exchange exchange) {
+                        return false;
+                    }
+                })
+                .expectsExceptionResponse()
+                .build();
+
+        AssertionError e = null;
+        try {
+            OrchestratedTest test = new OrchestratedTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            e = ex;
+            logger.info("Exception ({}): ", spec.getDescription(), e);
+        }
+        assertNotNull(e);
+    }
+
 }

@@ -119,10 +119,12 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             }
 
             if (e != null) {
-                logger.trace("An execution exception was encountered", e);
-                if (expectsExceptionResponse && exceptionResponseValidator == null) return true;
-                if (expectsExceptionResponse || exceptionResponseValidator != null)
+                logger.warn("An execution exception was encountered", e);
+                //validator response always wins
+                if (exceptionResponseValidator != null)
                     return exceptionResponseValidator.validate(response);
+                //this will always be true
+                return expectsExceptionResponse;
             }
 
             return ((responseBodyValidator == null || responseBodyValidator.validate(response))
