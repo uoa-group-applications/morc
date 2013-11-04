@@ -238,8 +238,8 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
     protected SyncOrchestratedTestSpecification(Builder builder) {
         super(builder);
 
-        if ((responseBodyValidator != null || responseHeadersValidator != null)
-                && (expectsExceptionResponse || exceptionResponseValidator != null))
+        if ((builder.responseBodyValidator != null || builder.responseHeadersValidator != null)
+                && (builder.expectsExceptionResponse || builder.exceptionResponseValidator != null))
             throw new IllegalArgumentException("You cannot set a response validator if an exception is expected");
 
         this.inputRequestBody = builder.inputRequestBody;
