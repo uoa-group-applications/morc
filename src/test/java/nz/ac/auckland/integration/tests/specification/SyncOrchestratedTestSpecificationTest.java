@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.tests.specification;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
+import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
@@ -312,26 +313,113 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
     @Test
     public void testBuildExpectsExceptionResponseBodySet() throws Exception {
-
+        IllegalArgumentException e = null;
+        try {
+            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                    .Builder("direct:syncTestInput", "description")
+                    .expectsExceptionResponse()
+                    .expectedResponseBody(new PlainTextTestResource("foo"))
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
     }
 
     @Test
     public void testBuildExceptionValidatorResponseBodySet() throws Exception {
-
+        IllegalArgumentException e = null;
+        try {
+            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                    .Builder("direct:syncTestInput", "description")
+                    .exceptionResponseValidator(new Validator() {
+                        @Override
+                        public boolean validate(Exchange exchange) {
+                            return false;
+                        }
+                    })
+                    .expectedResponseBody(new PlainTextTestResource("foo"))
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
     }
 
     @Test
     public void testBuildExpectsExceptionResponseHeadersSet() throws Exception {
-
+        HeadersTestResource headers = new HeadersTestResource(headersUrl);
+        IllegalArgumentException e = null;
+        try {
+            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                    .Builder("direct:syncTestInput", "description")
+                    .expectsExceptionResponse()
+                    .expectedResponseHeaders(headers)
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
     }
 
     @Test
     public void testBuildExceptionValidatorResponseHeadersSet() throws Exception {
-
+        HeadersTestResource headers = new HeadersTestResource(headersUrl);
+        IllegalArgumentException e = null;
+        try {
+            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                    .Builder("direct:syncTestInput", "description")
+                    .exceptionResponseValidator(new Validator() {
+                        @Override
+                        public boolean validate(Exchange exchange) {
+                            return false;
+                        }
+                    })
+                    .expectedResponseHeaders(headers)
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
     }
 
     @Test
     public void testBuildExpectsExceptionResponseHeaderAndBodySet() throws Exception {
+        HeadersTestResource headers = new HeadersTestResource(headersUrl);
+        IllegalArgumentException e = null;
+        try {
+            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                    .Builder("direct:syncTestInput", "description")
+                    .expectedResponseBody(new PlainTextTestResource("foo"))
+                    .expectsExceptionResponse()
+                    .expectedResponseHeaders(headers)
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
+    }
 
+    @Test
+    public void testBuildExpectsExceptionExceptionValidatorResponseHeaderAndBodySet() throws Exception {
+        HeadersTestResource headers = new HeadersTestResource(headersUrl);
+        IllegalArgumentException e = null;
+        try {
+            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
+                    .Builder("direct:syncTestInput", "description")
+                    .expectedResponseBody(new PlainTextTestResource("foo"))
+                    .exceptionResponseValidator(new Validator() {
+                        @Override
+                        public boolean validate(Exchange exchange) {
+                            return false;
+                        }
+                    })
+                    .expectsExceptionResponse()
+                    .expectedResponseHeaders(headers)
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+        assertNotNull(e);
     }
 }
