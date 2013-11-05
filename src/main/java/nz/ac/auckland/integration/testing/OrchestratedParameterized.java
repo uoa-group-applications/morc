@@ -78,24 +78,12 @@ public class OrchestratedParameterized extends Suite {
     private final ArrayList<Runner> runners = new ArrayList<Runner>();
 
     @SuppressWarnings("unchecked")
-    public OrchestratedParameterized(Class<OrchestratedTestBuilder> klass) throws Throwable {
+    public OrchestratedParameterized(Class<? extends OrchestratedTestBuilder> klass) throws Throwable {
         super(klass, Collections.<Runner>emptyList());
 
-        //we want to recursive go up object tree to invoke configure() to 'simulate' inheritance
-        Class currentClass = klass;
-
-        try {
-            while (currentClass != OrchestratedTestBuilder.class) {
-                Method configureMethod = currentClass.getMethod("configure");
-                configureMethod.invoke(null);
-                currentClass = currentClass.getSuperclass();
-            }
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("A public static void configure() method must be defined", e);
-        }
-
-        Method specificationsMethod = klass.getMethod("getSpecifications");
-        List<OrchestratedTestSpecification> specifications = (List) specificationsMethod.invoke(null);
+        Method getSpecifications = OrchestratedTestBuilder.class.getDeclaredMethod("getSpecifications");
+        getSpecifications.setAccessible(true);
+        List<OrchestratedTestSpecification> specifications = (List)getSpecifications.invoke(klass.newInstance());
 
         createRunnersForParameters(specifications);
     }
