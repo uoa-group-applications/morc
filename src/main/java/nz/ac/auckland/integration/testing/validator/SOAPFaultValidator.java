@@ -58,7 +58,7 @@ public class SOAPFaultValidator implements Validator {
             validMessage = faultMessageValidator.validate(faultMessageExchange);
 
             if (!validMessage)
-                logger.warn("The SOAP Fault Message is not as expected; received {}", fault.getMessage());
+                logger.warn("The SOAP Fault message is not as expected; received {}", fault.getCode());
         }
 
         if (codeValidator != null) {
@@ -66,7 +66,7 @@ public class SOAPFaultValidator implements Validator {
             codeExchange.getIn().setBody(fault.getFaultCode());
             validCode = codeValidator.validate(codeExchange);
 
-            if (!validCode) logger.warn("The SOAP Fault Code is not as expected; received {}", fault.getFaultCode());
+            if (!validCode) logger.warn("The SOAP Fault code is not as expected; received {}", fault.getCode());
         }
 
         if (detailValidator != null) {
@@ -74,8 +74,8 @@ public class SOAPFaultValidator implements Validator {
             detailExchange.getIn().setBody(fault.getDetail());
             validDetail = detailValidator.validate(detailExchange);
 
-            if (!validDetail) logger.warn("The SOAP Fault Code is not as expected; received {}", xmlUtilities
-                    .getDocumentAsString(fault.getDetail()));
+            String detail = xmlUtilities.getDocumentAsString(fault.getDetail());
+            if (!validDetail) logger.warn("The SOAP Fault detail is not as expected; received {}", detail);
         }
 
         return validMessage && validCode && validDetail;
