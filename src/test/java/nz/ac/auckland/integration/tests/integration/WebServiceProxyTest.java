@@ -20,7 +20,6 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
                 from("cxf:http://localhost:8092/testWSFault?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
                         .setFaultBody(constant(fault));
-
             }
         };
     }
@@ -38,6 +37,15 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
         syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .exceptionResponseValidator(httpException(500))
+                .addExpectation(wsFaultExpectation("jetty:http://localhost:8090/targetWS")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
+
+        syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test with body")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")))
+                .exceptionResponseValidator(httpException()
+                        .responseBodyValidator(xml(classpath("/data/pingSoapFault.xml")))
+                        .statusCode(500).build())
                 .addExpectation(wsFaultExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
