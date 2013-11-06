@@ -41,7 +41,10 @@ public class HttpExceptionValidator implements Validator {
     public boolean validate(Exchange e) {
         if (e == null) return false;
         Throwable t = e.getException();
-        if (!(t instanceof HttpOperationFailedException)) return false;
+        if (!(t instanceof HttpOperationFailedException)) {
+            logger.error("An unexpected error occurred during exception validation", t);
+            return false;
+        }
 
         HttpOperationFailedException httpException = ((HttpOperationFailedException) t);
 
