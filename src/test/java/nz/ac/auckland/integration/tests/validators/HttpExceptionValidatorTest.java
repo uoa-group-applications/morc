@@ -1,5 +1,8 @@
 package nz.ac.auckland.integration.tests.validators;
 
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
+import nz.ac.auckland.integration.testing.resource.JsonTestResource;
+import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.validator.HttpExceptionValidator;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
@@ -19,6 +22,13 @@ public class HttpExceptionValidatorTest extends Assert {
     public void testNullExchange() throws Exception {
         HttpExceptionValidator validator = new HttpExceptionValidator.Builder().build();
         assertFalse(validator.validate(null));
+    }
+
+    @Test
+    public void testNullException() throws Exception {
+        HttpExceptionValidator validator = new HttpExceptionValidator.Builder().build();
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        assertFalse(validator.validate(e));
     }
 
     @Test
@@ -134,6 +144,57 @@ public class HttpExceptionValidatorTest extends Assert {
         Map<String,String> map = new HashMap<>();
         map.put("foo","baz");
         map.put("baz","moo");
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setException(new HttpOperationFailedException("uri",123,"status","location",map,"foo"));
+        assertFalse(validator.validate(e));
+    }
+
+    @Test
+    public void testPlainTextResource() throws Exception {
+        PlainTextTestResource resource = new PlainTextTestResource("foo");
+
+        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+                .responseBodyValidator(resource).build();
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setException(new HttpOperationFailedException("uri",123,"status","location",null,"foo"));
+
+        assertTrue(validator.validate(e));
+    }
+
+    @Test
+    public void testJsonResource() throws Exception {
+        JsonTestResource resource = new JsonTestResource("{\"foo\":\"baz\"}");
+
+        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+                .responseBodyValidator(resource).build();
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setException(new HttpOperationFailedException("uri",123,"status","location",null,"{\"foo\":\"baz\"}"));
+
+        assertTrue(validator.validate(e));
+    }
+
+    @Test
+    public void testHeadersResource() throws Exception {
+        Validator responseBodyValidator = new Validator() {
+            @Override
+            public boolean validate(Exchange exchange) {
+                return false;
+            }
+        };
+
+        Map<String,String> map = new HashMap<>();
+        map.put("foo","baz");
+        map.put("baz","moo");
+
+        HeadersTestResource resource = new HeadersTestResource((Map)map);
+
+        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+                .responseBodyValidator(responseBodyValidator)
+                .responseHeadersValidator(resource)
+                .build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setException(new HttpOperationFailedException("uri",123,"status","location",map,"foo"));

@@ -363,14 +363,55 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertNotNull(xml.getXpathSelector());
     }
 
-    @Test
-    public void testSpringContextConstructor() throws Exception {
 
+    @Test
+    public void testSoapFaultBuilder() throws Exception {
+        assertTrue(OrchestratedTestBuilder.soapFault() instanceof SOAPFaultValidator.Builder);
     }
 
     @Test
-    public void testPropertiesLocationConstructor() throws Exception {
-
+    public void testSoapFaultMessage() throws Exception {
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault("foo");
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("foo");
+        assertTrue(validator.getFaultMessageValidator().validate(e));
     }
 
+    @Test
+    public void testSoapFaultQName() throws Exception {
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER);
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
+
+        assertTrue(validator.getCodeValidator().validate(e));
+    }
+
+    @Test
+    public void testSoapFaultQNameMessage() throws Exception {
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER,"foo");
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/","Server"));
+
+        Exchange e1 = new DefaultExchange(new DefaultCamelContext());
+        e1.getIn().setBody("foo");
+
+        assertTrue(validator.getCodeValidator().validate(e));
+        assertTrue(validator.getFaultMessageValidator().validate(e1));
+    }
+
+    @Test
+    public void testSoapFaultCodeMessageDetail() throws Exception {
+        XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER,"foo",xml);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/","Server"));
+
+        Exchange e1 = new DefaultExchange(new DefaultCamelContext());
+        e1.getIn().setBody("foo");
+
+        assertTrue(validator.getCodeValidator().validate(e));
+        assertTrue(validator.getFaultMessageValidator().validate(e1));
+        assertTrue(validator.getDetailValidator().validate("<foo/>"));
+    }
 }

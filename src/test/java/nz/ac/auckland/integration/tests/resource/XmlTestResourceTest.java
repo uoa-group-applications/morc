@@ -190,7 +190,8 @@ public class XmlTestResourceTest extends Assert {
     public void testXMLUtilities() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
         resource.setXmlUtilities(new FakeXMLUtilities());
-        assertEquals("test", resource.getXmlUtilities().getDocumentAsString(null));
+        Document d = null;
+        assertEquals("test", resource.getXmlUtilities().getDocumentAsString(d));
     }
 
     static class FakeXMLUtilities extends XMLUtilities {
