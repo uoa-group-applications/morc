@@ -21,6 +21,18 @@ public class HttpExceptionValidator implements Validator {
     private Validator responseHeadersValidator;
     private int statusCode;
 
+    public Validator getResponseBodyValidator() {
+        return responseBodyValidator;
+    }
+
+    public Validator getResponseHeadersValidator() {
+        return responseHeadersValidator;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
     //keep the unwashed masses away
     private HttpExceptionValidator() {
 
