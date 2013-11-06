@@ -33,11 +33,6 @@ public class HttpExceptionValidator implements Validator {
         return statusCode;
     }
 
-    //keep the unwashed masses away
-    private HttpExceptionValidator() {
-
-    }
-
     @SuppressWarnings("unchecked")
     public boolean validate(Exchange e) {
         if (e == null) return false;
