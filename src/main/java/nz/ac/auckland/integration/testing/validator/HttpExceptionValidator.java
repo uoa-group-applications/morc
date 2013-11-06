@@ -1,5 +1,8 @@
 package nz.ac.auckland.integration.testing.validator;
 
+import nz.ac.auckland.integration.testing.resource.JsonTestResource;
+import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultExchange;
@@ -78,6 +81,21 @@ public class HttpExceptionValidator implements Validator {
 
         public Builder responseBodyValidator(Validator responseBodyValidator) {
             this.responseBodyValidator = responseBodyValidator;
+            return this;
+        }
+
+        public Builder responseBodyValidator(XmlTestResource resource) {
+            this.responseBodyValidator = new XmlValidator(resource);
+            return this;
+        }
+
+        public Builder responseBodyValidator(JsonTestResource resource) {
+            this.responseBodyValidator = new JsonValidator(resource);
+            return this;
+        }
+
+        public Builder responseBodyValidator(PlainTextTestResource resource) {
+            this.responseBodyValidator = new PlainTextValidator(resource);
             return this;
         }
 
