@@ -23,7 +23,7 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
                         .setFaultBody(constant(fault));
 
                 SoapFault detailedFault = new SoapFault("Pretend Detailed SOAP Fault", SoapFault.FAULT_CODE_SERVER);
-                        detailedFault.setDetail(new XMLUtilities().getXmlAsDocument("<foo/").getDocumentElement());
+                detailedFault.setDetail(new XMLUtilities().getXmlAsDocument("<detail><foo/></detail>").getDocumentElement());
 
                 from("cxf:http://localhost:8092/testWSFaultDetail?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
                         .setFaultBody(constant(detailedFault));
@@ -78,7 +78,8 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("cxf:http://localhost:8092/testWSFaultDetail", "CXF WS Fault Test")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .exceptionResponseValidator(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault",xml("<foo/>")));
+                .exceptionResponseValidator(soapFault(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
+                        xml("<detail><foo/></detail>")));
     }
 
 }
