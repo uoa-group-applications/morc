@@ -388,9 +388,9 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultQNameMessage() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER,"foo");
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/","Server"));
+        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
 
         Exchange e1 = new DefaultExchange(new DefaultCamelContext());
         e1.getIn().setBody("foo");
@@ -402,10 +402,10 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testSoapFaultCodeMessageDetail() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER,"foo",xml);
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo", xml);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/","Server"));
+        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
 
         Exchange e1 = new DefaultExchange(new DefaultCamelContext());
         e1.getIn().setBody("foo");

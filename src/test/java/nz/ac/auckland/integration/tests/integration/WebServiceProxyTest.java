@@ -67,9 +67,9 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("cxf:http://localhost:8092/testWSFault", "CXF WS Fault Test")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .exceptionResponseValidator(soapFault(SOAPFAULT_CLIENT,"Pretend SOAP Fault"));
+                .exceptionResponseValidator(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
 
-            //todo: add detail
+        //todo: add detail
     }
 
 }

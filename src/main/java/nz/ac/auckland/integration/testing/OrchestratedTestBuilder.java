@@ -11,7 +11,6 @@ import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpec
 import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.*;
-import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.runner.RunWith;
 
 import javax.xml.namespace.QName;
@@ -28,8 +27,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     private List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
     private static XMLUtilities xmlUtilities = new XMLUtilities();
 
-    public static final QName SOAPFAULT_CLIENT = qname("http://schemas.xmlsoap.org/soap/envelope/","Client");
-    public static final QName SOAPFAULT_SERVER = qname("http://schemas.xmlsoap.org/soap/envelope/","Server");
+    public static final QName SOAPFAULT_CLIENT = qname("http://schemas.xmlsoap.org/soap/envelope/", "Client");
+    public static final QName SOAPFAULT_SERVER = qname("http://schemas.xmlsoap.org/soap/envelope/", "Server");
 
     protected abstract void configure();
 
@@ -305,15 +304,15 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * @param code  A code in the SOAP Fault that is expected to be returned
-     * @return  A validator for the expected SOAP Fault Response
+     * @param code A code in the SOAP Fault that is expected to be returned
+     * @return A validator for the expected SOAP Fault Response
      */
     public static SOAPFaultValidator soapFault(QName code) {
         return new SOAPFaultValidator.Builder().codeValidator(code).build();
     }
 
     /**
-     * @param code A code in the SOAP Fault that is expected to be returned
+     * @param code    A code in the SOAP Fault that is expected to be returned
      * @param message The message in the SOAP fault that is expected back
      * @return A validator for the expected SOAP Fault response
      */
@@ -324,9 +323,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * @param code A code in the SOAP Fault that is expected to be returned
+     * @param code    A code in the SOAP Fault that is expected to be returned
      * @param message The message in the SOAP fault that is expected back
-     * @param detail An XML element for the expected detail in the response
+     * @param detail  An XML element for the expected detail in the response
      * @return A validator for the expected SOAP Fault response
      */
     public static SOAPFaultValidator soapFault(QName code, String message, XmlTestResource detail) {
@@ -339,8 +338,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * A simple way for generating a QName for SOAP Faults
      */
-    public static QName qname(String uri,String localName) {
-        return new QName(uri,localName);
+    public static QName qname(String uri, String localName) {
+        return new QName(uri, localName);
     }
 
     public static class NS {

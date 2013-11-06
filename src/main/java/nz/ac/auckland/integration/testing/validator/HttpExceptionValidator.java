@@ -2,8 +2,8 @@ package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
+import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultExchange;
@@ -46,7 +46,7 @@ public class HttpExceptionValidator implements Validator {
             return false;
         }
 
-        HttpOperationFailedException httpException = (HttpOperationFailedException)t;
+        HttpOperationFailedException httpException = (HttpOperationFailedException) t;
 
         String responseBody = httpException.getResponseBody();
         Map responseHeaders = httpException.getResponseHeaders();

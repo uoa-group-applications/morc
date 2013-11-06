@@ -48,7 +48,7 @@ public class SOAPFaultValidator implements Validator {
             return false;
         }
 
-        SoapFault fault = (SoapFault)t;
+        SoapFault fault = (SoapFault) t;
 
         boolean validMessage = true, validCode = true, validDetail = true;
 
@@ -57,7 +57,8 @@ public class SOAPFaultValidator implements Validator {
             faultMessageExchange.getIn().setBody(fault.getMessage());
             validMessage = faultMessageValidator.validate(faultMessageExchange);
 
-            if (!validMessage) logger.warn("The SOAP Fault Message is not as expected; received {}", fault.getMessage());
+            if (!validMessage)
+                logger.warn("The SOAP Fault Message is not as expected; received {}", fault.getMessage());
         }
 
         if (codeValidator != null) {
@@ -73,7 +74,7 @@ public class SOAPFaultValidator implements Validator {
             detailExchange.getIn().setBody(fault.getDetail());
             validDetail = detailValidator.validate(detailExchange);
 
-            if (!validDetail) logger.warn("The SOAP Fault Code is not as expected; received {}",xmlUtilities
+            if (!validDetail) logger.warn("The SOAP Fault Code is not as expected; received {}", xmlUtilities
                     .getDocumentAsString(fault.getDetail()));
         }
 
@@ -119,14 +120,14 @@ public class SOAPFaultValidator implements Validator {
         }
 
         /**
-         * @param expectedCode  A QName that we expect to receive
+         * @param expectedCode A QName that we expect to receive
          */
         public Builder codeValidator(final QName expectedCode) {
             this.codeValidator = new Validator() {
                 @Override
                 public boolean validate(Exchange exchange) {
                     //The receive QName is passed in from the body
-                    return  exchange != null &&
+                    return exchange != null &&
                             exchange.getIn().getBody(QName.class) != null &&
                             exchange.getIn().getBody(QName.class).equals(expectedCode);
                 }
