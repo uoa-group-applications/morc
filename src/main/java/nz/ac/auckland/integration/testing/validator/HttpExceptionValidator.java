@@ -50,8 +50,8 @@ public class HttpExceptionValidator implements Validator {
 
         //this is a bit of a hack to use other validators
         Exchange validationExchange = new DefaultExchange(e);
-        e.getIn().setBody(responseBody);
-        e.getIn().setHeaders(responseHeaders);
+        validationExchange.getIn().setBody(responseBody);
+        validationExchange.getIn().setHeaders(responseHeaders);
 
         boolean validStatus = true, validBody = true, validHeaders = true;
 
@@ -61,12 +61,12 @@ public class HttpExceptionValidator implements Validator {
             validStatus = false;
         }
 
-        if (responseBodyValidator != null && !responseBodyValidator.validate(e)) {
+        if (responseBodyValidator != null && !responseBodyValidator.validate(validationExchange)) {
             logger.warn("The HTTP exception response body is not as expected");
             validBody = false;
         }
 
-        if (responseHeadersValidator != null && !responseHeadersValidator.validate(e)) {
+        if (responseHeadersValidator != null && !responseHeadersValidator.validate(validationExchange)) {
             logger.warn("The HTTP exception response headers are not as expected");
             validHeaders = false;
         }
