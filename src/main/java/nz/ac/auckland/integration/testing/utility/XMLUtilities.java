@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.testing.utility;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,6 +48,22 @@ public class XMLUtilities {
     }
 
     public String getDocumentAsString(Document doc) {
+        try {
+            StringWriter sw = new StringWriter();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
+
+            return sw.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String getDocumentAsString(Element doc) {
         try {
             StringWriter sw = new StringWriter();
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
