@@ -46,7 +46,7 @@ public class HttpExceptionValidator implements Validator {
             return false;
         }
 
-        HttpOperationFailedException httpException = ((HttpOperationFailedException) t);
+        HttpOperationFailedException httpException = (HttpOperationFailedException)t;
 
         String responseBody = httpException.getResponseBody();
         Map responseHeaders = httpException.getResponseHeaders();
