@@ -51,15 +51,15 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         //Testing work around for https://issues.apache.org/jira/browse/CXF-2775
         syncTest("cxf:http://localhost:8091/targetWS", "Duplicated WS test using CXF for CXF-2775 Work around")
-                        .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                        .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
-                        .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
-                                .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                                .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))));
+                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
+                .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
+                        .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                        .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))));
 
-        syncTest("cxf:http://localhost:8092/testWSFault","CXF WS Fault Test")
-                        .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                        .expectsExceptionResponse();
+        syncTest("cxf:http://localhost:8092/testWSFault", "CXF WS Fault Test")
+                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectsExceptionResponse();
     }
 
 }

@@ -41,7 +41,7 @@ public class SOAPFaultValidator implements Validator {
         Exception ex = e.getException();
 
         if (!(e instanceof SoapFault)) {
-            logger.error("An unexpected error occurred during exception validation",ex);
+            logger.error("An unexpected error occurred during exception validation", ex);
             throw new RuntimeException(ex);
         }
 

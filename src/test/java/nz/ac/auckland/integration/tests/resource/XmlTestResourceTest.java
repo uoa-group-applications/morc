@@ -127,7 +127,7 @@ public class XmlTestResourceTest extends Assert {
 
         XmlTestResource resource = new XmlTestResource(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>"));
 
-        assertFalse(new XmlValidator(resource,selector).validate(nodeListTest));
+        assertFalse(new XmlValidator(resource, selector).validate(nodeListTest));
 
     }
 
@@ -137,7 +137,7 @@ public class XmlTestResourceTest extends Assert {
 
         XmlTestResource resource = new XmlTestResource(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>"));
 
-        assertFalse(new XmlValidator(resource,selector).validate(EXPECTED_VALUE));
+        assertFalse(new XmlValidator(resource, selector).validate(EXPECTED_VALUE));
     }
 
     @Test
@@ -161,28 +161,28 @@ public class XmlTestResourceTest extends Assert {
     @Test
     public void testSimpleXPathOnResource() throws Exception {
         XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
-        XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE,selector);
+        XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE, selector);
         assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>")));
     }
 
     @Test
     public void testSimpleXPathOnResourceFromFile() throws Exception {
         XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
-        XmlTestResource resource = new XmlTestResource(new File(inputUrl.getFile()),selector);
+        XmlTestResource resource = new XmlTestResource(new File(inputUrl.getFile()), selector);
         assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>")));
     }
 
     @Test
     public void testSimpleXPathOnResourceFromUrl() throws Exception {
         XPathSelector selector = new XPathSelector("/v1:isOfInterest/v1:entity", namespaceMap);
-        XmlTestResource resource = new XmlTestResource(inputUrl,selector);
+        XmlTestResource resource = new XmlTestResource(inputUrl, selector);
         assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<v1:entity xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\">HREmployee</v1:entity>")));
     }
 
     @Test
     public void testSimpleXPathNoNamespaces() throws Exception {
         XPathSelector selector = new XPathSelector("/isOfInterest/entity");
-        XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE_NO_NS,selector);
+        XmlTestResource resource = new XmlTestResource(EXPECTED_VALUE_NO_NS, selector);
         assertTrue(new XmlValidator(resource).validate(xmlUtilities.getXmlAsDocument("<entity>HREmployee</entity>")));
     }
 
@@ -190,7 +190,7 @@ public class XmlTestResourceTest extends Assert {
     public void testXMLUtilities() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
         resource.setXmlUtilities(new FakeXMLUtilities());
-        assertEquals("test",resource.getXmlUtilities().getDocumentAsString(null));
+        assertEquals("test", resource.getXmlUtilities().getDocumentAsString(null));
     }
 
     static class FakeXMLUtilities extends XMLUtilities {
@@ -216,7 +216,7 @@ public class XmlTestResourceTest extends Assert {
 
     @Test
     public void testXmlUtilitiesGetterSetter() throws Exception {
-        XmlValidator validator = new XmlValidator(null,null);
+        XmlValidator validator = new XmlValidator(null, null);
         assertNotNull(validator.getXmlUtilities());
         validator.setXmlUtilities(null);
         assertNull(validator.getXmlUtilities());

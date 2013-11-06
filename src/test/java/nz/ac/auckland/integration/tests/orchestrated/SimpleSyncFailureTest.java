@@ -62,7 +62,6 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                         .throwException(new IOException());
 
 
-
             }
         };
     }
@@ -172,9 +171,9 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     @Test
     public void testResponseHeadersInvalid() throws Exception {
 
-        Map<String,Object> headers = new HashMap<>();
-        headers.put("abc","123");
-        headers.put("foo","baz");
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("abc", "123");
+        headers.put("foo", "baz");
 
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
                 "Test unexpected response headers")

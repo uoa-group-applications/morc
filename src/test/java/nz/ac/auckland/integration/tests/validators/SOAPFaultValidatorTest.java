@@ -33,7 +33,7 @@ public class SOAPFaultValidatorTest extends CamelTestSupport {
 
         final SoapFault recoverableFault = new SoapFault("Connection Error", SoapFault.FAULT_CODE_SERVER);
         DocumentBuilderFactory dbf = DocumentBuilderFactory
-                                .newInstance();
+                .newInstance();
         dbf.setNamespaceAware(true);
 
         recoverableFault.setDetail(

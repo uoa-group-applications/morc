@@ -50,11 +50,11 @@ public class XMLUtilities {
         try {
             StringWriter sw = new StringWriter();
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"no");
-            transformer.setOutputProperty(OutputKeys.INDENT,"yes");
-            transformer.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
-            transformer.transform(new DOMSource(doc),new StreamResult(sw));
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
 
             return sw.toString();
         } catch (Exception e) {

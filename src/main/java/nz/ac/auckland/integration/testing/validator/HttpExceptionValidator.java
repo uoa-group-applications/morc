@@ -57,7 +57,7 @@ public class HttpExceptionValidator implements Validator {
         boolean validStatus = true, validBody = true, validHeaders = true;
 
         if (statusCode != 0 && statusCode != httpException.getStatusCode()) {
-            logger.warn("HTTP Status Code is not expected, received: %s, expected: %s",httpException.getStatusCode(),
+            logger.warn("HTTP Status Code is not expected, received: %s, expected: %s", httpException.getStatusCode(),
                     this.statusCode);
             validStatus = false;
         }

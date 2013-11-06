@@ -81,7 +81,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     }
                 });
             else if (inputRequestHeaders != null)
-                response = template.request(endpoint,new Processor() {
+                response = template.request(endpoint, new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody("");
@@ -89,7 +89,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     }
                 });
             else if (inputRequestBody != null)
-                response = template.request(endpoint,new Processor() {
+                response = template.request(endpoint, new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody(inputRequestBody.getValue());
@@ -114,7 +114,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             }
 
             if (e != null && (!expectsExceptionResponse && exceptionResponseValidator == null)) {
-                logger.warn("An unexpected exception was encountered",e);
+                logger.warn("An unexpected exception was encountered", e);
                 return false;
             }
 

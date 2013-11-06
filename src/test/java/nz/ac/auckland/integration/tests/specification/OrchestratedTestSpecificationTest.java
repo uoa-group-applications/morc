@@ -55,11 +55,13 @@ public class OrchestratedTestSpecificationTest extends Assert {
     public void testAddEndpointOverride() throws Exception {
         EndpointOverride e1 = new EndpointOverride() {
             @Override
-            public void overrideEndpoint(Endpoint endpoint) { }
+            public void overrideEndpoint(Endpoint endpoint) {
+            }
         };
         EndpointOverride e2 = new EndpointOverride() {
             @Override
-            public void overrideEndpoint(Endpoint endpoint) { }
+            public void overrideEndpoint(Endpoint endpoint) {
+            }
         };
 
         TestOrchestratedTestSpecification spec = new TestOrchestratedTestSpecification
@@ -68,7 +70,7 @@ public class OrchestratedTestSpecificationTest extends Assert {
                 .addEndpointOverride(e2)
                 .build();
 
-        assertEquals(3,spec.getEndpointOverrides().size());
+        assertEquals(3, spec.getEndpointOverrides().size());
 
         assertTrue(spec.getEndpointOverrides().contains(e1));
         assertTrue(spec.getEndpointOverrides().contains(e2));
@@ -84,7 +86,7 @@ public class OrchestratedTestSpecificationTest extends Assert {
                 .sleepForTestCompletion(1234)
                 .build();
 
-        assertEquals(1234,spec.getSleepForTestCompletion());
+        assertEquals(1234, spec.getSleepForTestCompletion());
     }
 }
 

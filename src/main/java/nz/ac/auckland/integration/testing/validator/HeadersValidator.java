@@ -31,7 +31,7 @@ public class HeadersValidator implements Validator {
         return value != null && validate(value);
     }
 
-    public boolean validate(Map<String,Object> value) {
+    public boolean validate(Map<String, Object> value) {
         if (value == null) return false;
         Map<String, Object> expectedHeaders;
 

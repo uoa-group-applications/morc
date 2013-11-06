@@ -38,7 +38,7 @@ public class HeadersTestResourceTest extends Assert {
 
     @Test
     public void testCompareInput() throws Exception {
-        HeadersValidator validator = new HeadersValidator( new HeadersTestResource(inputUrl));
+        HeadersValidator validator = new HeadersValidator(new HeadersTestResource(inputUrl));
         assertTrue(validator.validate(EXPECTED_PROPERTIES));
     }
 
@@ -78,7 +78,7 @@ public class HeadersTestResourceTest extends Assert {
     @Test
     public void testNullProperties() throws Exception {
         HeadersValidator validator = new HeadersValidator(new HeadersTestResource(EXPECTED_PROPERTIES));
-        Map<String,Object> nullMap = null;
+        Map<String, Object> nullMap = null;
         assertFalse(validator.validate(nullMap));
     }
 

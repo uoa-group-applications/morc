@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
@@ -12,7 +11,7 @@ public class DirectToDirectFailureTest extends OrchestratedTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("direct:direct2direct","Test direct to direct expectation where Camel doesn't set fromEndpoint properly")
+        syncTest("direct:direct2direct", "Test direct to direct expectation where Camel doesn't set fromEndpoint properly")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("direct:directExpectation")
                         .expectedBody(xml("<foo/>")));

@@ -33,7 +33,7 @@ public class PlainTextValidator implements Validator {
         try {
             value = exchange.getIn().getBody(String.class);
         } catch (TypeConversionException e) {
-            logger.warn("Error attempting to convert exchange to a String",e);
+            logger.warn("Error attempting to convert exchange to a String", e);
             return false;
         }
         return value != null && validate(value);

@@ -103,14 +103,14 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         Exception e = null;
         try {
             AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification
-                .Builder("seda:asyncTestInput", "description")
-                .build();
+                    .Builder("seda:asyncTestInput", "description")
+                    .build();
         } catch (Exception ex) {
             e = ex;
         }
 
         assertNotNull(e);
-        assertIsInstanceOf(IllegalArgumentException.class,e);
+        assertIsInstanceOf(IllegalArgumentException.class, e);
     }
 
 }

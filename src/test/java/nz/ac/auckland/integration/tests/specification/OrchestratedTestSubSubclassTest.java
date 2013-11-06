@@ -7,11 +7,11 @@ public class OrchestratedTestSubSubclassTest extends OrchestratedTestSubclassTes
 
     @Override
     public void configure() {
-        syncTest("direct:syncInput","Simple Sync Test 1")
+        syncTest("direct:syncInput", "Simple Sync Test 1")
                 .requestBody(text("foo"))
                 .expectedResponseBody(text("baz"));
 
-        syncTest("direct:syncInput","Simple Sync Test 2")
+        syncTest("direct:syncInput", "Simple Sync Test 2")
                 .requestBody(text("foo"))
                 .expectedResponseBody(text("baz"));
     }

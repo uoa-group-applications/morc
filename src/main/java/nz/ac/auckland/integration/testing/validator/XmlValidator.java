@@ -32,10 +32,10 @@ public class XmlValidator implements Validator {
     }
 
     /**
-     * @param resource The XML resource you wish to validate against
+     * @param resource      The XML resource you wish to validate against
      * @param xpathSelector An xpath for cutting down the incoming document to an element you care about
      */
-    public XmlValidator(XmlTestResource resource,XPathSelector xpathSelector) {
+    public XmlValidator(XmlTestResource resource, XPathSelector xpathSelector) {
         this(resource);
         this.xpathSelector = xpathSelector;
     }
@@ -60,7 +60,7 @@ public class XmlValidator implements Validator {
         try {
             value = exchange.getIn().getBody(Document.class);
         } catch (TypeConversionException e) {
-            logger.warn("Error attempting to convert XML to a Document",e);
+            logger.warn("Error attempting to convert XML to a Document", e);
             return false;
         }
         return value != null && validate(value);
@@ -70,9 +70,9 @@ public class XmlValidator implements Validator {
         Document doc;
         try {
             doc = xmlUtilities.getXmlAsDocument(value);
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             if (e.getCause() instanceof SAXParseException) {
-                logger.warn("Unable to parse the input value for validation",e);
+                logger.warn("Unable to parse the input value for validation", e);
                 return false;
             }
             throw e;
@@ -90,7 +90,7 @@ public class XmlValidator implements Validator {
 
                 expectedValue = resource.getValue();
             } catch (XPathSelector.XPathEvaluationException e) {
-                logger.warn("The XPath evaluation failed on the value for validation",e);
+                logger.warn("The XPath evaluation failed on the value for validation", e);
                 return false;
             }
 

@@ -11,7 +11,6 @@ import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpec
 import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.*;
-import org.junit.AfterClass;
 import org.junit.runner.RunWith;
 
 import java.io.File;
@@ -243,44 +242,44 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-    * @return A validator that ensures that the HTTP response body meets the expected response
-    */
+     * @return A validator that ensures that the HTTP response body meets the expected response
+     */
     public static HttpExceptionValidator httpException(Validator validator) {
-       return new HttpExceptionValidator.Builder().responseBodyValidator(validator).build();
+        return new HttpExceptionValidator.Builder().responseBodyValidator(validator).build();
     }
 
     /**
-    * @return A validation builder for setting http exception response values
-    */
+     * @return A validation builder for setting http exception response values
+     */
     public static HttpExceptionValidator.Builder httpException() {
         return new HttpExceptionValidator.Builder();
     }
 
     /**
-     * @param statusCode    The HTTP status code that is expected to be received back
-     * @return              A validator that ensures that the HTTP response meets the expected XML response body
+     * @param statusCode The HTTP status code that is expected to be received back
+     * @return A validator that ensures that the HTTP response meets the expected XML response body
      */
     public static HttpExceptionValidator httpException(int statusCode) {
         return new HttpExceptionValidator.Builder().statusCode(statusCode).build();
     }
 
     /**
-    * @return A validator that ensures that the HTTP response meets the expected XML response body
-    */
+     * @return A validator that ensures that the HTTP response meets the expected XML response body
+     */
     public static HttpExceptionValidator httpException(XmlTestResource resource) {
         return httpException(new XmlValidator(resource));
     }
 
     /**
-    * @return A validator that ensures that the HTTP response meets the expected json response body
-    */
+     * @return A validator that ensures that the HTTP response meets the expected json response body
+     */
     public static HttpExceptionValidator httpException(JsonTestResource resource) {
         return httpException(new JsonValidator(resource));
     }
 
     /**
-    * @return A validator that ensures that the HTTP response meets the expected plain-text response body
-    */
+     * @return A validator that ensures that the HTTP response meets the expected plain-text response body
+     */
     public static HttpExceptionValidator httpException(PlainTextTestResource resource) {
         return httpException(new PlainTextValidator(resource));
     }

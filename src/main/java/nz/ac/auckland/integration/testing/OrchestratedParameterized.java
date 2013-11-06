@@ -43,7 +43,7 @@ public class OrchestratedParameterized extends Suite {
         @Override
         public Object createTest() throws Exception {
             Constructor co = getTestClass().getJavaClass().getConstructor();
-            OrchestratedTest test = (OrchestratedTest)co.newInstance();
+            OrchestratedTest test = (OrchestratedTest) co.newInstance();
             test.setSpecification(specification);
 
             return test;
@@ -83,7 +83,7 @@ public class OrchestratedParameterized extends Suite {
 
         Method getSpecifications = OrchestratedTestBuilder.class.getDeclaredMethod("getSpecifications");
         getSpecifications.setAccessible(true);
-        List<OrchestratedTestSpecification> specifications = (List)getSpecifications.invoke(klass.newInstance());
+        List<OrchestratedTestSpecification> specifications = (List) getSpecifications.invoke(klass.newInstance());
 
         createRunnersForParameters(specifications);
     }

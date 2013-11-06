@@ -7,11 +7,11 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 
     @Override
     public void configure() {
-        asyncTest("seda:asyncInput","Simple Async Test 1")
+        asyncTest("seda:asyncInput", "Simple Async Test 1")
                 .inputMessage(text("foo"))
                 .addExpectation(asyncExpectation("seda:asyncOutput").expectedBody(text("foo")));
 
-        asyncTest("seda:asyncInput","Simple Async Test 2")
+        asyncTest("seda:asyncInput", "Simple Async Test 2")
                 .inputMessage(text("foo"))
                 .addExpectation(asyncExpectation("seda:asyncOutput").expectedBody(text("foo")));
     }

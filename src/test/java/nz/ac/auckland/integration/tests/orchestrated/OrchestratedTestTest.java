@@ -15,23 +15,23 @@ public class OrchestratedTestTest extends Assert {
 
     @Test
     public void testSpringContextPathsConstructor() throws Exception {
-        String[] inputs = new String[] {"foo.xml","baz.xml"};
-        OrchestratedTest test = new OrchestratedTest(null,inputs);
+        String[] inputs = new String[]{"foo.xml", "baz.xml"};
+        OrchestratedTest test = new OrchestratedTest(null, inputs);
         assertArrayEquals(inputs, test.getSpringContextPaths());
     }
 
     @Test
     public void testPropertiesConstructor() throws Exception {
-        OrchestratedTest test = new OrchestratedTest(null,"foo.properties");
-        assertEquals("foo.properties",test.getPropertiesLocation());
+        OrchestratedTest test = new OrchestratedTest(null, "foo.properties");
+        assertEquals("foo.properties", test.getPropertiesLocation());
     }
 
     @Test
     public void testSpringContextPropertiesConstructor() throws Exception {
-        String[] inputs = new String[] {"foo.xml","baz.xml"};
-        OrchestratedTest test = new OrchestratedTest(null,inputs,"foo.properties");
+        String[] inputs = new String[]{"foo.xml", "baz.xml"};
+        OrchestratedTest test = new OrchestratedTest(null, inputs, "foo.properties");
         assertArrayEquals(inputs, test.getSpringContextPaths());
-        assertEquals("foo.properties",test.getPropertiesLocation());
+        assertEquals("foo.properties", test.getPropertiesLocation());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class OrchestratedTestTest extends Assert {
         OrchestratedTest test = new OrchestratedTest(null);
         test.setEndpointOverrides(endpointOverrides);
 
-        assertEquals(1,test.getEndpointOverrides().size());
+        assertEquals(1, test.getEndpointOverrides().size());
 
         Exception ex = null;
         try {

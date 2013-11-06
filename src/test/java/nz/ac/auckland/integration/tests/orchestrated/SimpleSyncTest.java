@@ -2,15 +2,12 @@ package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
-import nz.ac.auckland.integration.testing.validator.HeadersValidator;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
@@ -45,8 +42,8 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                         .setBody(constant("<abc/>"));
 
                 from("direct:setHeaders")
-                        .setHeader("foo",constant("baz"))
-                        .setHeader("abc",constant("123"));
+                        .setHeader("foo", constant("baz"))
+                        .setHeader("abc", constant("123"));
 
                 from("direct:throwsException")
                         .throwException(new IOException());
@@ -120,13 +117,13 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                         .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
-        syncTest("direct:setHeaders","Test Response Headers Validated")
-                .expectedResponseHeaders(headers(header("abc","123"),header("foo","baz")));
+        syncTest("direct:setHeaders", "Test Response Headers Validated")
+                .expectedResponseHeaders(headers(header("abc", "123"), header("foo", "baz")));
 
-        syncTest("direct:throwsException","exception found, expectsExceptionResponse and no validator")
+        syncTest("direct:throwsException", "exception found, expectsExceptionResponse and no validator")
                 .expectsExceptionResponse();
 
-        syncTest("direct:throwsException","exception found and exception validator = true")
+        syncTest("direct:throwsException", "exception found and exception validator = true")
                 .expectsExceptionResponse()
                 .exceptionResponseValidator(new Validator() {
                     @Override
@@ -136,19 +133,19 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                 });
 
         //we don't expect this to throw an exception back due to the async nature
-        syncTest("direct:asyncHandOff","exception thrown after async call")
+        syncTest("direct:asyncHandOff", "exception thrown after async call")
                 .expectedResponseBody(text("working"));
 
-        syncTest("direct:jsonResponse","test json validation in response")
+        syncTest("direct:jsonResponse", "test json validation in response")
                 .expectedResponseBody(json("{\"foo\":\"baz\"}"));
 
-        syncTest("direct:propertiesTest","check properties set correctly")
+        syncTest("direct:propertiesTest", "check properties set correctly")
                 .expectedResponseBody(text("foo"));
 
-        syncTest("seda:jsonRequest","Test JSON Expectation")
+        syncTest("seda:jsonRequest", "Test JSON Expectation")
                 .requestBody(json("{\"foo\":\"baz\"}"))
                 .addExpectation(syncExpectation("seda:jsonExpectation")
-                .expectedBody(json("{\"foo\":\"baz\"}")));
+                        .expectedBody(json("{\"foo\":\"baz\"}")));
 
 
     }

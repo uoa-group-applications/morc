@@ -63,7 +63,7 @@ public class XPathSelector {
         Document output = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                 .newDocument();
 
-        Node resultNode = output.importNode(result.item(0),true);
+        Node resultNode = output.importNode(result.item(0), true);
         output.appendChild(resultNode);
 
         return output;

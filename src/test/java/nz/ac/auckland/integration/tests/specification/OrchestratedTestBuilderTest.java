@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.tests.specification;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
@@ -12,8 +11,8 @@ import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpec
 import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.*;
-import org.apache.camel.Exchange;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -235,7 +234,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testHttpExceptionStatusCode() throws Exception {
-        assertEquals(OrchestratedTestBuilder.httpException(500).getStatusCode(),500);
+        assertEquals(OrchestratedTestBuilder.httpException(500).getStatusCode(), 500);
     }
 
     @Test
@@ -249,7 +248,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
-        e.setException(new HttpOperationFailedException(null,0,null,null,null,null));
+        e.setException(new HttpOperationFailedException(null, 0, null, null, null, null));
 
         assertTrue(validator.validate(e));
     }
@@ -263,7 +262,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
-        e.setException(new HttpOperationFailedException(null,0,null,null,null,"{\"foo\":\"baz\"}"));
+        e.setException(new HttpOperationFailedException(null, 0, null, null, null, "{\"foo\":\"baz\"}"));
 
         validator.validate(e);
     }
@@ -274,7 +273,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
-        e.setException(new HttpOperationFailedException(null,0,null,null,null,"{\"foo\":\"baz\"}"));
+        e.setException(new HttpOperationFailedException(null, 0, null, null, null, "{\"foo\":\"baz\"}"));
 
         validator.validate(e);
     }
@@ -286,23 +285,23 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
-        e.setException(new HttpOperationFailedException(null,0,null,null,null,"foo"));
+        e.setException(new HttpOperationFailedException(null, 0, null, null, null, "foo"));
 
         validator.validate(e);
     }
 
     @Test
     public void testCreateNSObject() throws Exception {
-        OrchestratedTestBuilder.NS ns = new OrchestratedTestBuilder.NS("foo","baz");
+        OrchestratedTestBuilder.NS ns = new OrchestratedTestBuilder.NS("foo", "baz");
         assertEquals("foo", ns.getPrefix());
-        assertEquals("baz",ns.getUri());
+        assertEquals("baz", ns.getUri());
     }
 
     @Test
     public void testCreateNSObjectMethod() throws Exception {
         OrchestratedTestBuilder.NS ns = OrchestratedTestBuilder.namespace("foo", "baz");
-        assertEquals("foo",ns.getPrefix());
-        assertEquals("baz",ns.getUri());
+        assertEquals("foo", ns.getPrefix());
+        assertEquals("baz", ns.getUri());
     }
 
     @Test
@@ -313,34 +312,34 @@ public class OrchestratedTestBuilderTest extends Assert {
                 xmlUtilities.getXmlAsDocument("<v2:entity xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">HREmployee</v2:entity>"));
 
         Document input = xmlUtilities.getXmlAsDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                    "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\"" +
-                        " xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">\n" +
-                    "\t<v2:entity >HREmployee</v2:entity>\n" +
-                    "\t<v2:identifier name=\"uoaid\">2512472</v2:identifier>\n" +
-                    "</v1:isOfInterest>\n");
+                "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\"" +
+                " xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">\n" +
+                "\t<v2:entity >HREmployee</v2:entity>\n" +
+                "\t<v2:identifier name=\"uoaid\">2512472</v2:identifier>\n" +
+                "</v1:isOfInterest>\n");
 
         XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
+                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
+                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
 
-        XmlValidator validator = new XmlValidator(resource,selector);
+        XmlValidator validator = new XmlValidator(resource, selector);
         assertTrue(validator.validate(input));
     }
 
     @Test
     public void testCreateXMLStringXpath() throws Exception {
         XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
+                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
+                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
 
         String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                            "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\"" +
-                                " xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">\n" +
-                            "\t<v2:entity >HREmployee</v2:entity>\n" +
-                            "\t<v2:identifier name=\"uoaid\">2512472</v2:identifier>\n" +
-                            "</v1:isOfInterest>\n";
+                "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\"" +
+                " xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">\n" +
+                "\t<v2:entity >HREmployee</v2:entity>\n" +
+                "\t<v2:identifier name=\"uoaid\">2512472</v2:identifier>\n" +
+                "</v1:isOfInterest>\n";
 
-        XmlTestResource xml = OrchestratedTestBuilder.xml(input,selector);
+        XmlTestResource xml = OrchestratedTestBuilder.xml(input, selector);
         DetailedDiff difference = new DetailedDiff(new Diff("<v2:entity xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">HREmployee</v2:entity>",
                 new XMLUtilities().getDocumentAsString(xml.getValue())));
         assertTrue(difference.similar());
@@ -349,18 +348,18 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testCreateXMLFileXPath() throws Exception {
         XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
-        XmlTestResource xml = OrchestratedTestBuilder.xml(new File("something"),selector);
+                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
+                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
+        XmlTestResource xml = OrchestratedTestBuilder.xml(new File("something"), selector);
         assertNotNull(xml.getXpathSelector());
     }
 
     @Test
     public void testCreateXMLURLXPath() throws Exception {
         XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2","http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
-        XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"),selector);
+                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
+                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
+        XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"), selector);
         assertNotNull(xml.getXpathSelector());
     }
 
