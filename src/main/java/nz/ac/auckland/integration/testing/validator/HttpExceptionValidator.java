@@ -60,12 +60,12 @@ public class HttpExceptionValidator implements Validator {
             validStatus = false;
         }
 
-        if (responseBodyValidator != null && !responseBodyValidator.validate(validationExchange)) {
+        if (responseBodyValidator != null && !responseBodyValidator.validate(e)) {
             logger.warn("The HTTP exception response body is not as expected");
             validBody = false;
         }
 
-        if (responseHeadersValidator != null && !responseHeadersValidator.validate(validationExchange)) {
+        if (responseHeadersValidator != null && !responseHeadersValidator.validate(e)) {
             logger.warn("The HTTP exception response headers are not as expected");
             validHeaders = false;
         }
