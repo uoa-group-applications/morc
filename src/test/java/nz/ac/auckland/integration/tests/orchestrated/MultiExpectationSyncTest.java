@@ -140,7 +140,8 @@ public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
         };
     }
 
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("direct:syncInput", "Simple send body to two destinations and get correct response")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))

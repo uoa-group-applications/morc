@@ -5,7 +5,8 @@ import org.apache.camel.builder.RouteBuilder;
 //A test to show what happens with 'inheritance' of configure()
 public class OrchestratedTestSubSubclassTest extends OrchestratedTestSubclassTest {
 
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("direct:syncInput","Simple Sync Test 1")
                 .requestBody(text("foo"))
                 .expectedResponseBody(text("baz"));

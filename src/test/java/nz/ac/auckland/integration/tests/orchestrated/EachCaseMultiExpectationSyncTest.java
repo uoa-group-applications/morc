@@ -138,7 +138,8 @@ public class EachCaseMultiExpectationSyncTest extends OrchestratedTestBuilder {
         };
     }
 
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("direct:totalOrderOrderedEndpoint", "Total Order Ordered Endpoint")
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("2")))

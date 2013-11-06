@@ -10,7 +10,8 @@ import org.apache.camel.builder.RouteBuilder;
  */
 public class DirectToDirectFailureTest extends OrchestratedTestBuilder {
 
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("direct:direct2direct","Test direct to direct expectation where Camel doesn't set fromEndpoint properly")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("direct:directExpectation")

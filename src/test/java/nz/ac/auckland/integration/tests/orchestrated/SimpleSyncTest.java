@@ -70,7 +70,8 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
         };
     }
 
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("direct:syncInputAsyncOutput", "Simple send body to async output with valid response")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<baz/>")))

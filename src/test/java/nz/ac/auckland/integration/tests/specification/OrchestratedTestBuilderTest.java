@@ -230,7 +230,12 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testHttpExceptionNoValidator() throws Exception {
-        assertTrue(OrchestratedTestBuilder.httpException() instanceof HttpExceptionValidator);
+        assertTrue(OrchestratedTestBuilder.httpException() instanceof HttpExceptionValidator.Builder);
+    }
+
+    @Test
+    public void testHttpExceptionStatusCode() throws Exception {
+        assertEquals(OrchestratedTestBuilder.httpException(500).getStatusCode(),500);
     }
 
     @Test

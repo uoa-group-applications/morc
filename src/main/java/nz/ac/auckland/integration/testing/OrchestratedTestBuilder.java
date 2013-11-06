@@ -22,23 +22,19 @@ import java.util.List;
 import java.util.Map;
 
 @RunWith(value = OrchestratedParameterized.class)
-public class OrchestratedTestBuilder extends OrchestratedTest {
+public abstract class OrchestratedTestBuilder extends OrchestratedTest {
 
-    private static List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
-    protected static XMLUtilities xmlUtilities = new XMLUtilities();
+    private List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
+    private static XMLUtilities xmlUtilities = new XMLUtilities();
 
-    @AfterClass
-    public static void clearBuilders() {
-        //since this class might be used in more than one place and we're using a static list
-        specificationBuilders.clear();
-    }
+    protected abstract void configure();
 
     /**
      * @param endpointUri The endpoint URI that an asynchronous message should be sent to
      * @param description A description for the test specification that clearly identifies it
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
-    protected static AsyncOrchestratedTestSpecification.Builder asyncTest(String endpointUri, String description) {
+    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String endpointUri, String description) {
         AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification.Builder(endpointUri, description);
         specificationBuilders.add(builder);
         return builder;
@@ -49,7 +45,7 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    protected static SyncOrchestratedTestSpecification.Builder syncTest(String endpointUri, String description) {
+    protected SyncOrchestratedTestSpecification.Builder syncTest(String endpointUri, String description) {
         SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification.Builder(endpointUri, description);
         specificationBuilders.add(builder);
         return builder;
@@ -247,17 +243,25 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-    * @return A validator that ensures that the HTTP response meets the expected response
+    * @return A validator that ensures that the HTTP response body meets the expected response
     */
     public static HttpExceptionValidator httpException(Validator validator) {
-       return new HttpExceptionValidator(validator);
+       return new HttpExceptionValidator.Builder().responseBodyValidator(validator).build();
     }
 
     /**
-    * @return A validator that ensures that some kind of http exception occurs
+    * @return A validation builder for setting http exception response values
     */
-    public static HttpExceptionValidator httpException() {
-        return new HttpExceptionValidator();
+    public static HttpExceptionValidator.Builder httpException() {
+        return new HttpExceptionValidator.Builder();
+    }
+
+    /**
+     * @param statusCode    The HTTP status code that is expected to be received back
+     * @return              A validator that ensures that the HTTP response meets the expected XML response body
+     */
+    public static HttpExceptionValidator httpException(int statusCode) {
+        return new HttpExceptionValidator.Builder().statusCode(statusCode).build();
     }
 
     /**
@@ -321,7 +325,8 @@ public class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     //this is used by JUnit to initialize each instance of this specification
-    public static List<OrchestratedTestSpecification> getSpecifications() {
+    private List<OrchestratedTestSpecification> getSpecifications() {
+        configure();
 
         List<OrchestratedTestSpecification> specifications = new ArrayList<>();
 

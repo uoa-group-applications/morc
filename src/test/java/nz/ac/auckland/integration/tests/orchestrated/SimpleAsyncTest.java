@@ -26,7 +26,8 @@ public class SimpleAsyncTest extends OrchestratedTestBuilder {
     }
 
     //declare the actual tests here...
-    public static void configure() {
+    @Override
+    public void configure() {
         asyncTest("seda:asyncTestInput", "test async send body")
                 .inputMessage(xml("<test/>"))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")));

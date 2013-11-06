@@ -5,7 +5,8 @@ import org.apache.camel.builder.RouteBuilder;
 
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 
-    public static void configure() {
+    @Override
+    public void configure() {
         asyncTest("seda:asyncInput","Simple Async Test 1")
                 .inputMessage(text("foo"))
                 .addExpectation(asyncExpectation("seda:asyncOutput").expectedBody(text("foo")));
