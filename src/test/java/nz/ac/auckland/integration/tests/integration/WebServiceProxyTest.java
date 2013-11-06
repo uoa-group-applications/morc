@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.tests.integration;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.cxf.binding.soap.SoapFault;
 
@@ -20,6 +21,12 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
                 from("cxf:http://localhost:8092/testWSFault?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
                         .setFaultBody(constant(fault));
+
+                SoapFault detailedFault = new SoapFault("Pretend Detailed SOAP Fault", SoapFault.FAULT_CODE_SERVER);
+                        detailedFault.setDetail(new XMLUtilities().getXmlAsDocument("<foo/").getDocumentElement());
+
+                from("cxf:http://localhost:8092/testWSFaultDetail?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
+                        .setFaultBody(constant(detailedFault));
             }
         };
     }
@@ -69,7 +76,9 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
                 .exceptionResponseValidator(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
 
-        //todo: add detail
+        syncTest("cxf:http://localhost:8092/testWSFaultDetail", "CXF WS Fault Test")
+                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .exceptionResponseValidator(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault",xml("<foo/>")));
     }
 
 }
