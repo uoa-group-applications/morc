@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.validator;
 
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
@@ -101,6 +102,11 @@ public class HttpExceptionValidator implements Validator {
 
         public Builder responseHeadersValidator(Validator responseHeadersValidator) {
             this.responseHeadersValidator = responseHeadersValidator;
+            return this;
+        }
+
+        public Builder responseHeadersValidator(HeadersTestResource resource) {
+            this.responseHeadersValidator = new HeadersValidator(resource);
             return this;
         }
 
