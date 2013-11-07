@@ -23,6 +23,9 @@ public class SoapFaultMockExpectation extends SyncMockExpectation {
 
     public static class Builder extends SyncMockExpectation.Init<SoapFaultMockExpectation, Builder,SoapFaultTestResource> {
 
+        /**
+         * @param endpointUri This MUST be a CXF endpoint URI
+         */
         public Builder(String endpointUri) {
             super(endpointUri);
         }
