@@ -23,13 +23,21 @@ import java.io.StringWriter;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class XMLUtilities {
-    public Document getXmlAsDocument(String xml) {
+
+    public DocumentBuilder getDocumentBuilder() {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
             dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            return db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+            return dbf.newDocumentBuilder();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Document getXmlAsDocument(String xml) {
+        try {
+            return getDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -37,11 +45,19 @@ public class XMLUtilities {
 
     public Document getXmlAsDocument(File xmlFile) {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setValidating(false);
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            return db.parse(xmlFile);
+            return getDocumentBuilder().parse(xmlFile);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Transformer getTransformer() {
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            return transformer;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -50,13 +66,7 @@ public class XMLUtilities {
     public String getDocumentAsString(Document doc) {
         try {
             StringWriter sw = new StringWriter();
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-            transformer.transform(new DOMSource(doc), new StreamResult(sw));
-
+            getTransformer().transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -66,13 +76,7 @@ public class XMLUtilities {
     public String getDocumentAsString(Element doc) {
         try {
             StringWriter sw = new StringWriter();
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-            transformer.transform(new DOMSource(doc), new StreamResult(sw));
-
+            getTransformer().transform(new DOMSource(doc), new StreamResult(sw));
             return sw.toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
