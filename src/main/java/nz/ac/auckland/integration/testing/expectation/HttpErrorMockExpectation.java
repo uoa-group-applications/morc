@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.expectation;
 
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 
 /**
@@ -25,7 +26,7 @@ public class HttpErrorMockExpectation extends SyncMockExpectation {
         return "ws";
     }
 
-    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder> {
+    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder,TestResource> {
 
         public Builder(String endpointUri) {
             super(endpointUri);

@@ -44,7 +44,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         return "sync";
     }
 
-    public static class Builder extends Init<SyncMockExpectation, Builder> {
+    public static class Builder extends Init<SyncMockExpectation, Builder,TestResource> {
 
         public Builder(String endpointUri) {
             super(endpointUri);
@@ -55,9 +55,10 @@ public class SyncMockExpectation extends ContentMockExpectation {
         }
     }
 
-    protected abstract static class Init<Product, Builder extends Init<Product, Builder>> extends ContentMockExpectation.AbstractContentBuilder<SyncMockExpectation, Builder> {
+    protected abstract static class Init<Product, Builder extends Init<Product, Builder,T>,T extends TestResource>
+            extends ContentMockExpectation.AbstractContentBuilder<SyncMockExpectation, Builder> {
 
-        protected TestResource providedResponseBody;
+        protected T providedResponseBody;
         protected HeadersTestResource providedResponseHeaders;
 
         public Init(String endpointUri) {
@@ -67,7 +68,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         /**
          * @param providedResponseBody The body that should be returned back to the client
          */
-        public Builder responseBody(TestResource providedResponseBody) {
+        public Builder responseBody(T providedResponseBody) {
             this.providedResponseBody = providedResponseBody;
             return self();
         }
@@ -85,6 +86,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
             //this may through an exception if the implementation isn't complete
             return (Builder) this;
         }
+
     }
 
     @SuppressWarnings("unchecked")
