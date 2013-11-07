@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class SoapFaultTestResource implements TestResource {
     private QName faultCode;
     private XmlTestResource xmlDetail;
 
-    private XMLUtilities xmlUtilities = new XMLUtilities();
+    private XmlUtilities xmlUtilities = new XmlUtilities();
 
     public SoapFaultTestResource(QName faultCode, String message) {
         this.faultCode = faultCode;
@@ -36,14 +36,14 @@ public class SoapFaultTestResource implements TestResource {
         this.xmlDetail = xmlDetail;
     }
 
-    public XMLUtilities getXmlUtilities() {
+    public XmlUtilities getXmlUtilities() {
         return xmlUtilities;
     }
 
     /**
      * In case you have any special XML requirements
      */
-    public void setXmlUtilities(XMLUtilities xmlUtilities) {
+    public void setXmlUtilities(XmlUtilities xmlUtilities) {
         this.xmlUtilities = xmlUtilities;
     }
 

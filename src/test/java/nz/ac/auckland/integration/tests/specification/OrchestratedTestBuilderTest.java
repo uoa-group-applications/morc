@@ -2,13 +2,10 @@ package nz.ac.auckland.integration.tests.specification;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.*;
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
-import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
-import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.*;
 import org.apache.camel.CamelContext;
@@ -16,6 +13,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.junit.Assert;
@@ -77,7 +75,7 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testXmlString() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
-        DetailedDiff difference = new DetailedDiff(new Diff("<foo/>", new XMLUtilities().getDocumentAsString(xml.getValue())));
+        DetailedDiff difference = new DetailedDiff(new Diff("<foo/>", new XmlUtilities().getDocumentAsString(xml.getValue())));
         assertTrue(difference.similar());
     }
 
@@ -255,7 +253,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testHttpExceptionXmlResource() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
 
         HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(
                 new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>")));
@@ -306,7 +304,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testCreateXPathSelector() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
 
         XmlTestResource resource = new XmlTestResource(
                 xmlUtilities.getXmlAsDocument("<v2:entity xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">HREmployee</v2:entity>"));
@@ -341,7 +339,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         XmlTestResource xml = OrchestratedTestBuilder.xml(input, selector);
         DetailedDiff difference = new DetailedDiff(new Diff("<v2:entity xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">HREmployee</v2:entity>",
-                new XMLUtilities().getDocumentAsString(xml.getValue())));
+                new XmlUtilities().getDocumentAsString(xml.getValue())));
         assertTrue(difference.similar());
     }
 
@@ -366,12 +364,12 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultBuilder() throws Exception {
-        assertTrue(OrchestratedTestBuilder.soapFaultResponse() instanceof SOAPFaultValidator.Builder);
+        assertTrue(OrchestratedTestBuilder.soapFaultResponse() instanceof SoapFaultValidator.Builder);
     }
 
     @Test
     public void testSoapFaultMessage() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse("foo");
+        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse("foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody("foo");
         assertTrue(validator.getFaultMessageValidator().validate(e));
@@ -379,7 +377,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultQName() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER);
+        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER);
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
 
@@ -388,7 +386,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultQNameMessage() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo");
+        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
 
@@ -402,7 +400,7 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testSoapFaultCodeMessageDetail() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo", xml);
+        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo", xml);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
@@ -413,5 +411,27 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertTrue(validator.getCodeValidator().validate(e));
         assertTrue(validator.getFaultMessageValidator().validate(e1));
         assertTrue(validator.getDetailValidator().validate("<foo/>"));
+    }
+
+    @Test
+    public void testSoapFaultTestResourceQNameMessage() throws Exception {
+        SoapFaultTestResource resource = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_CLIENT,"foo");
+
+        assertEquals("foo", resource.getValue().getMessage());
+        assertEquals(OrchestratedTestBuilder.SOAPFAULT_CLIENT,resource.getValue().getFaultCode());
+    }
+
+    @Test
+    public void testSoapFaultResponseValidator() throws Exception {
+        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT,"foo");
+
+        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(resource);
+
+        SoapFault fault = new SoapFault("foo",OrchestratedTestBuilder.SOAPFAULT_CLIENT);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setException(fault);
+
+        assertTrue(validator.validate(e));
     }
 }

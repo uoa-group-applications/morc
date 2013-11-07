@@ -3,7 +3,7 @@ package nz.ac.auckland.integration.testing.validator;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -18,25 +18,26 @@ import javax.xml.namespace.QName;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SOAPFaultValidator implements Validator {
+public class SoapFaultValidator implements Validator {
 
-    private static final Logger logger = LoggerFactory.getLogger(SOAPFaultValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SoapFaultValidator.class);
 
     private Validator faultMessageValidator;
     private Validator codeValidator;
     private XmlValidator detailValidator;
 
-    private XMLUtilities xmlUtilities = new XMLUtilities();
+    private XmlUtilities xmlUtilities = new XmlUtilities();
 
-    public SOAPFaultValidator() {
+    public SoapFaultValidator() {
         //possible to just expect some kind of SOAP Fault
     }
 
-    public SOAPFaultValidator(SoapFaultTestResource resource) {
+    public SoapFaultValidator(SoapFaultTestResource resource) {
         try {
             faultMessageValidator = new PlainTextValidator(new PlainTextTestResource(resource.getValue().getMessage()));
             codeValidator = new QNameValidator(resource.getValue().getFaultCode());
-            detailValidator = new XmlValidator(new XmlTestResource(resource.getValue().getDetail().getOwnerDocument()));
+            if (resource.getValue().getDetail() != null)
+                detailValidator = new XmlValidator(new XmlTestResource(resource.getValue().getDetail().getOwnerDocument()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -158,8 +159,8 @@ public class SOAPFaultValidator implements Validator {
             return this;
         }
 
-        public SOAPFaultValidator build() {
-            SOAPFaultValidator validator = new SOAPFaultValidator();
+        public SoapFaultValidator build() {
+            SoapFaultValidator validator = new SoapFaultValidator();
             validator.faultMessageValidator = this.faultMessageValidator;
             validator.codeValidator = this.codeValidator;
             validator.detailValidator = this.detailValidator;

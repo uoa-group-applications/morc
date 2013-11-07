@@ -22,7 +22,7 @@ import java.io.StringWriter;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class XMLUtilities {
+public class XmlUtilities {
 
     public DocumentBuilder getDocumentBuilder() {
         try {

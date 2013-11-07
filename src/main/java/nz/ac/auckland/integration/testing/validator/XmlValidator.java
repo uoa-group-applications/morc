@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
@@ -24,7 +24,7 @@ public class XmlValidator implements Validator {
     private static final Logger logger = LoggerFactory.getLogger(XmlValidator.class);
     private XmlTestResource resource;
     private XPathSelector xpathSelector;
-    private XMLUtilities xmlUtilities = new XMLUtilities();
+    private XmlUtilities xmlUtilities = new XmlUtilities();
 
     public XmlValidator(XmlTestResource resource) {
         this.resource = resource;
@@ -40,14 +40,14 @@ public class XmlValidator implements Validator {
         this.xpathSelector = xpathSelector;
     }
 
-    public XMLUtilities getXmlUtilities() {
+    public XmlUtilities getXmlUtilities() {
         return xmlUtilities;
     }
 
     /**
      * If you have some special requirements for XML parsing
      */
-    public void setXmlUtilities(XMLUtilities xmlUtilities) {
+    public void setXmlUtilities(XmlUtilities xmlUtilities) {
         this.xmlUtilities = xmlUtilities;
     }
 

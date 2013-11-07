@@ -2,7 +2,7 @@ package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ public class SoapFaultTestResourceTest extends Assert {
 
     @Test
     public void testDetailWrapped() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
         XmlTestResource detail = new XmlTestResource(xmlUtilities.getXmlAsDocument("<detail><foo/></detail>"));
 
         SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo", "baz"), "foo", detail);
@@ -36,7 +36,7 @@ public class SoapFaultTestResourceTest extends Assert {
 
     @Test
     public void testDetailUnwrapped() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
         XmlTestResource detail = new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>"));
 
         SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo", "baz"), "foo", detail);

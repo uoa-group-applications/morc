@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import org.w3c.dom.Document;
 
@@ -16,7 +16,7 @@ import java.net.URL;
 public class XmlTestResource extends StaticTestResource<Document> {
 
     private XPathSelector xpathSelector;
-    private XMLUtilities xmlUtilities = new XMLUtilities();
+    private XmlUtilities xmlUtilities = new XmlUtilities();
 
     public XmlTestResource(Document value) {
         super(value);
@@ -45,14 +45,14 @@ public class XmlTestResource extends StaticTestResource<Document> {
         this.xpathSelector = xpathSelector;
     }
 
-    public XMLUtilities getXmlUtilities() {
+    public XmlUtilities getXmlUtilities() {
         return xmlUtilities;
     }
 
     /**
      * In case you have any special XML requirements
      */
-    public void setXmlUtilities(XMLUtilities xmlUtilities) {
+    public void setXmlUtilities(XmlUtilities xmlUtilities) {
         this.xmlUtilities = xmlUtilities;
     }
 

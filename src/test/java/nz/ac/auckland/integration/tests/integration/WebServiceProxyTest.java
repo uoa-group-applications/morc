@@ -2,7 +2,7 @@ package nz.ac.auckland.integration.tests.integration;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.cxf.binding.soap.SoapFault;
 
@@ -23,7 +23,7 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
                         .setFaultBody(constant(fault));
 
                 SoapFault detailedFault = new SoapFault("Pretend Detailed SOAP Fault", SoapFault.FAULT_CODE_SERVER);
-                detailedFault.setDetail(new XMLUtilities().getXmlAsDocument("<detail><foo/></detail>").getDocumentElement());
+                detailedFault.setDetail(new XmlUtilities().getXmlAsDocument("<detail><foo/></detail>").getDocumentElement());
 
                 from("cxf:http://localhost:8092/testWSFaultDetail?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
                         .setFaultBody(constant(detailedFault));

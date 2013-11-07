@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.custommonkey.xmlunit.Diff;
@@ -21,7 +21,7 @@ public class XmlTestResourceTest extends Assert {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
-    private static XMLUtilities xmlUtilities = new XMLUtilities();
+    private static XmlUtilities xmlUtilities = new XmlUtilities();
 
     private static Map<String, String> namespaceMap = new HashMap<>();
     private static final Document EXPECTED_VALUE = xmlUtilities.getXmlAsDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -189,12 +189,12 @@ public class XmlTestResourceTest extends Assert {
     @Test
     public void testXMLUtilities() throws Exception {
         XmlTestResource resource = new XmlTestResource(inputUrl);
-        resource.setXmlUtilities(new FakeXMLUtilities());
+        resource.setXmlUtilities(new FakeXmlUtilities());
         Document d = null;
         assertEquals("test", resource.getXmlUtilities().getDocumentAsString(d));
     }
 
-    static class FakeXMLUtilities extends XMLUtilities {
+    static class FakeXmlUtilities extends XmlUtilities {
         @Override
         public String getDocumentAsString(Document doc) {
             return "test";

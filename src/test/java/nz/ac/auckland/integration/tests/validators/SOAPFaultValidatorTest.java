@@ -1,9 +1,11 @@
 package nz.ac.auckland.integration.tests.validators;
 
+import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
+import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XMLUtilities;
-import nz.ac.auckland.integration.testing.validator.SOAPFaultValidator;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
+import nz.ac.auckland.integration.testing.validator.SoapFaultValidator;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.Exchange;
@@ -20,20 +22,20 @@ import java.io.IOException;
 public class SOAPFaultValidatorTest extends Assert {
     @Test
     public void testNullExchange() throws Exception {
-        assertFalse(new SOAPFaultValidator().validate(null));
+        assertFalse(new SoapFaultValidator().validate(null));
     }
 
     @Test
     public void testNullException() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        assertFalse(new SOAPFaultValidator().validate(e));
+        assertFalse(new SoapFaultValidator().validate(e));
     }
 
     @Test
     public void testNonSoapFaultException() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setException(new IOException());
-        assertFalse(new SOAPFaultValidator().validate(e));
+        assertFalse(new SoapFaultValidator().validate(e));
     }
 
     @Test
@@ -42,7 +44,7 @@ public class SOAPFaultValidatorTest extends Assert {
         SoapFault fault = new SoapFault("message", null);
         e.setException(fault);
 
-        Validator validator = new SOAPFaultValidator.Builder().faultMessageValidator("message").build();
+        Validator validator = new SoapFaultValidator.Builder().faultMessageValidator("message").build();
 
         assertTrue(validator.validate(e));
         fault = new SoapFault("message1", null);
@@ -60,14 +62,14 @@ public class SOAPFaultValidatorTest extends Assert {
             }
         };
 
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().faultMessageValidator(v).build();
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().faultMessageValidator(v).build();
 
         assertEquals(validator.getFaultMessageValidator(), v);
     }
 
     @Test
     public void testPlainTextMessageValidator() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().faultMessageValidator(
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().faultMessageValidator(
                 new PlainTextTestResource("foo")).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
@@ -79,7 +81,7 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testFaultCodeValidator() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().codeValidator(new Validator() {
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().codeValidator(new Validator() {
             @Override
             public boolean validate(Exchange exchange) {
                 QName name = exchange.getIn().getBody(QName.class);
@@ -101,7 +103,7 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testQNameFaultCodeValidation() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder()
+        SoapFaultValidator validator = new SoapFaultValidator.Builder()
                 .codeValidator(new QName("www.foo.com", "baz"))
                 .build();
 
@@ -118,9 +120,9 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testFaultDetailValidator() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
 
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().detailValidator(
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().detailValidator(
                 new XmlValidator(new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>"))))
                 .build();
 
@@ -133,9 +135,9 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testFaultDetailXMLResourceValidator() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
 
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().detailValidator(
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().detailValidator(
                 new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>")))
                 .build();
 
@@ -144,7 +146,7 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testInvalidFaultMessage() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().faultMessageValidator(new Validator() {
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().faultMessageValidator(new Validator() {
             @Override
             public boolean validate(Exchange exchange) {
                 return false;
@@ -165,7 +167,7 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testInvalidCode() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().faultMessageValidator(new Validator() {
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().faultMessageValidator(new Validator() {
             @Override
             public boolean validate(Exchange exchange) {
                 return true;
@@ -186,9 +188,9 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testInvalidDetail() throws Exception {
-        XMLUtilities xmlUtilities = new XMLUtilities();
+        XmlUtilities xmlUtilities = new XmlUtilities();
 
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder().detailValidator(
+        SoapFaultValidator validator = new SoapFaultValidator.Builder().detailValidator(
                 new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>")))
                 .build();
 
@@ -203,7 +205,7 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testNullExchangeToCodeValidator() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder()
+        SoapFaultValidator validator = new SoapFaultValidator.Builder()
                 .codeValidator(new QName("foo", "baz")).build();
 
         assertFalse(validator.getCodeValidator().validate(null));
@@ -211,7 +213,7 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testNoCodeInBody() throws Exception {
-        SOAPFaultValidator validator = new SOAPFaultValidator.Builder()
+        SoapFaultValidator validator = new SoapFaultValidator.Builder()
                 .codeValidator(new QName("foo", "baz")).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
@@ -219,4 +221,14 @@ public class SOAPFaultValidatorTest extends Assert {
         assertFalse(validator.getCodeValidator().validate(e));
     }
 
+    @Test
+    public void testSoapFaultTestResourceConstructor() throws Exception {
+        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT,"foo");
+        SoapFaultValidator validator = new SoapFaultValidator(resource);
+
+        SoapFault fault = new SoapFault("foo",OrchestratedTestBuilder.SOAPFAULT_CLIENT);
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setException(fault);
+        assertTrue(validator.validate(e));
+    }
 }
