@@ -58,7 +58,7 @@ public class SoapFaultTestResource implements TestResource {
                 DocumentBuilder builder = xmlUtilities.getDocumentBuilder();
                 Document newDetailDocument = builder.newDocument();
                 Element newDetailElement = newDetailDocument.createElement("detail");
-                newDetailElement.appendChild(newDetailDocument.importNode(document.getDocumentElement(),true));
+                newDetailElement.appendChild(newDetailDocument.importNode(document.getDocumentElement(), true));
 
                 fault.setDetail(newDetailElement);
             } else

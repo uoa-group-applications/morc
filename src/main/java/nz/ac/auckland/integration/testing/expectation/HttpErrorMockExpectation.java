@@ -6,7 +6,7 @@ import org.apache.camel.Exchange;
 /**
  * This will cause a Jetty or CXF endpoint (message consumer) to throw an HTTP 500 (or other)
  * error with the specified body - this could be a SOAP fault message in the case of a web-service
- *
+ * <p/>
  * It is recommended to use SoapFaultMockExpectation if you want to throw correct CXF SOAP Faults
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
@@ -24,7 +24,7 @@ public class HttpErrorMockExpectation extends SyncMockExpectation {
         return "ws";
     }
 
-    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder,TestResource> {
+    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder, TestResource> {
 
         private int statusCode = 500;
 

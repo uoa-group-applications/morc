@@ -82,12 +82,12 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
                 .exceptionResponseValidator(soapFaultResponse(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
                         xml("<detail><foo/></detail>")));
 
-        syncTest("cxf:http://localhost:8092/targetWS","Simple test to show SOAP Fault expectation")
+        syncTest("cxf:http://localhost:8092/targetWS", "Simple test to show SOAP Fault expectation")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .exceptionResponseValidator(soapFaultResponse(SOAPFAULT_SERVER,"Pretend Fault",
+                .exceptionResponseValidator(soapFaultResponse(SOAPFAULT_SERVER, "Pretend Fault",
                         xml("<detail><foo/></detail>")))
                 .addExpectation(soapFaultExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
-                        .responseBody(soapFault(SOAPFAULT_SERVER,"Pretend Fault",xml("<detail><foo/></detail>"))));
+                        .responseBody(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));
 
 
     }

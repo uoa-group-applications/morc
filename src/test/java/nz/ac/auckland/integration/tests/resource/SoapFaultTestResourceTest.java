@@ -14,11 +14,11 @@ public class SoapFaultTestResourceTest extends Assert {
 
     @Test
     public void testFaultCodeMessageValid() throws Exception {
-        SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo","baz"),"foo");
+        SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo", "baz"), "foo");
 
         SoapFault fault = resource.getValue();
-        assertEquals(fault.getMessage(),"foo");
-        assertEquals(fault.getFaultCode(),new QName("foo","baz"));
+        assertEquals(fault.getMessage(), "foo");
+        assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
     }
 
     @Test
@@ -26,10 +26,10 @@ public class SoapFaultTestResourceTest extends Assert {
         XMLUtilities xmlUtilities = new XMLUtilities();
         XmlTestResource detail = new XmlTestResource(xmlUtilities.getXmlAsDocument("<detail><foo/></detail>"));
 
-        SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo","baz"),"foo",detail);
+        SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo", "baz"), "foo", detail);
         SoapFault fault = resource.getValue();
-        assertEquals(fault.getMessage(),"foo");
-        assertEquals(fault.getFaultCode(),new QName("foo","baz"));
+        assertEquals(fault.getMessage(), "foo");
+        assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
         XmlValidator validator = new XmlValidator(detail);
         assertTrue(validator.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
     }
@@ -39,10 +39,10 @@ public class SoapFaultTestResourceTest extends Assert {
         XMLUtilities xmlUtilities = new XMLUtilities();
         XmlTestResource detail = new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>"));
 
-        SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo","baz"),"foo",detail);
+        SoapFaultTestResource resource = new SoapFaultTestResource(new QName("foo", "baz"), "foo", detail);
         SoapFault fault = resource.getValue();
-        assertEquals(fault.getMessage(),"foo");
-        assertEquals(fault.getFaultCode(),new QName("foo","baz"));
+        assertEquals(fault.getMessage(), "foo");
+        assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
         XmlValidator validator = new XmlValidator(new XmlTestResource(xmlUtilities.getXmlAsDocument("<detail><foo/></detail>")));
         assertTrue(validator.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
     }

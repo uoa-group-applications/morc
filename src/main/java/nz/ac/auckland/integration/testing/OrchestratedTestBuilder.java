@@ -185,7 +185,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param message   The message to use in the SOAP Fault
      */
     public static SoapFaultTestResource soapFault(QName faultCode, String message) {
-        return new SoapFaultTestResource(faultCode,message);
+        return new SoapFaultTestResource(faultCode, message);
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param xmlDetail The XML detail to use in the SOAP Fault
      */
     public static SoapFaultTestResource soapFault(QName faultCode, String message, XmlTestResource xmlDetail) {
-        return new SoapFaultTestResource(faultCode,message,xmlDetail);
+        return new SoapFaultTestResource(faultCode, message, xmlDetail);
     }
 
     /**

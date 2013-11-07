@@ -44,7 +44,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         return "sync";
     }
 
-    public static class Builder extends Init<SyncMockExpectation, Builder,TestResource> {
+    public static class Builder extends Init<SyncMockExpectation, Builder, TestResource> {
 
         public Builder(String endpointUri) {
             super(endpointUri);
@@ -55,7 +55,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         }
     }
 
-    protected abstract static class Init<Product, Builder extends Init<Product, Builder,T>,T extends TestResource>
+    protected abstract static class Init<Product, Builder extends Init<Product, Builder, T>, T extends TestResource>
             extends ContentMockExpectation.AbstractContentBuilder<SyncMockExpectation, Builder> {
 
         protected T providedResponseBody;
