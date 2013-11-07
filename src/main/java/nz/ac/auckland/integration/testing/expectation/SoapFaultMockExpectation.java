@@ -3,7 +3,7 @@ package nz.ac.auckland.integration.testing.expectation;
 import org.apache.camel.Exchange;
 
 /**
- * This will cause a CXF endpoint (message consumer) to a specified SOAP fault back to the consumer
+ * This will cause a CXF endpoint (message consumer) to return a specified SOAP fault back to the consumer
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */

@@ -210,7 +210,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static HttpErrorMockExpectation.Builder wsFaultExpectation(String endpointUri) {
+    public static HttpErrorMockExpectation.Builder httpErrorExpectation(String endpointUri) {
         return new HttpErrorMockExpectation.Builder(endpointUri);
     }
 

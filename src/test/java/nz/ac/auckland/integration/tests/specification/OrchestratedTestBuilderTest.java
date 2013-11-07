@@ -199,7 +199,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testCxfFaultExpectation() throws Exception {
-        HttpErrorMockExpectation.Builder builder = OrchestratedTestBuilder.wsFaultExpectation("foo");
+        HttpErrorMockExpectation.Builder builder = OrchestratedTestBuilder.httpErrorExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
