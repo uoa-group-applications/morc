@@ -20,7 +20,6 @@ import java.util.Collection;
 
 import static nz.ac.auckland.integration.testing.OrchestratedTestBuilder.*;
 
-@Ignore
 public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport {
 
     Logger logger = LoggerFactory.getLogger(EachCaseMultiExpectationSyncFailureTest.class);
