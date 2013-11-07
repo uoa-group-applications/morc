@@ -5,8 +5,8 @@ import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.*;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -415,19 +415,19 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultTestResourceQNameMessage() throws Exception {
-        SoapFaultTestResource resource = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_CLIENT,"foo");
+        SoapFaultTestResource resource = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_CLIENT, "foo");
 
         assertEquals("foo", resource.getValue().getMessage());
-        assertEquals(OrchestratedTestBuilder.SOAPFAULT_CLIENT,resource.getValue().getFaultCode());
+        assertEquals(OrchestratedTestBuilder.SOAPFAULT_CLIENT, resource.getValue().getFaultCode());
     }
 
     @Test
     public void testSoapFaultResponseValidator() throws Exception {
-        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT,"foo");
+        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT, "foo");
 
         SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(resource);
 
-        SoapFault fault = new SoapFault("foo",OrchestratedTestBuilder.SOAPFAULT_CLIENT);
+        SoapFault fault = new SoapFault("foo", OrchestratedTestBuilder.SOAPFAULT_CLIENT);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setException(fault);

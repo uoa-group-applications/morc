@@ -223,10 +223,10 @@ public class SOAPFaultValidatorTest extends Assert {
 
     @Test
     public void testSoapFaultTestResourceConstructor() throws Exception {
-        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT,"foo");
+        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT, "foo");
         SoapFaultValidator validator = new SoapFaultValidator(resource);
 
-        SoapFault fault = new SoapFault("foo",OrchestratedTestBuilder.SOAPFAULT_CLIENT);
+        SoapFault fault = new SoapFault("foo", OrchestratedTestBuilder.SOAPFAULT_CLIENT);
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setException(fault);
         assertTrue(validator.validate(e));

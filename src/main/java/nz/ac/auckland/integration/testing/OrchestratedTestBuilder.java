@@ -5,8 +5,8 @@ import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.*;
 import org.junit.runner.RunWith;
 

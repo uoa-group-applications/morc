@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.w3c.dom.Document;
 
 import java.io.File;

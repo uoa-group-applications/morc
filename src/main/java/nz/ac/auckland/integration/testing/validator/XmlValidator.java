@@ -1,8 +1,8 @@
 package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
+import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.custommonkey.xmlunit.DetailedDiff;
