@@ -231,4 +231,18 @@ public class SOAPFaultValidatorTest extends Assert {
         e.setException(fault);
         assertTrue(validator.validate(e));
     }
+
+    @Test
+    public void testSoapFaultTestResourceWithDetailConstructor() throws Exception {
+        XmlTestResource xmlTestResource = new XmlTestResource(new XmlUtilities().getXmlAsDocument("<detail><foo/></detail>"));
+
+        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT, "foo",xmlTestResource);
+        SoapFaultValidator validator = new SoapFaultValidator(resource);
+
+        SoapFault fault = new SoapFault("foo", OrchestratedTestBuilder.SOAPFAULT_CLIENT);
+        fault.setDetail(xmlTestResource.getValue().getDocumentElement());
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setException(fault);
+        assertTrue(validator.validate(e));
+    }
 }
