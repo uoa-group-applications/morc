@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.testing.expectation;
 
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import org.apache.camel.Exchange;
 
@@ -37,15 +36,6 @@ public class SoapFaultMockExpectation extends SyncMockExpectation {
         @Override
         public Builder responseBody(SoapFaultTestResource providedResponseBody) {
             this.providedResponseBody = providedResponseBody;
-            return self();
-        }
-
-        /**
-         * @param providedResponseHeaders The headers that should be returned back to the client
-         */
-        @Override
-        public Builder responseHeaders(HeadersTestResource providedResponseHeaders) {
-            this.providedResponseHeaders = providedResponseHeaders;
             return self();
         }
 
