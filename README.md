@@ -12,7 +12,8 @@ As a simple example, we can assume that a PING SOAP-style web-service is running
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf:http://localhost:8090/services/pingService","Simple WS PING test")
             .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                 "<request>PING</request>" +
@@ -29,7 +30,8 @@ password properties:
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf://http://localhost:8090/services/securePingService?wsdlURL=SecurePingService.wsdl&" +
             "properties.ws-security.username=user" +
             "&properties.ws-security.password=pass",
@@ -49,16 +51,17 @@ Once the requests and responses become larger we will want to put the values int
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf:http://localhost:8090/services/pingService","Simple WS PING test with local resources")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")));
 
-        //If there's a JSON service we can also ensure this is acting appropriately:
+        //If there's a JSON service we can also ensure this is acting appropriately
+        //(JSON comparisons are made using the Jackson library to unmarshal and compare each value)
         syncTest("http://localhost:8091/jsonPingService", "Simple JSON PING")
             .requestBody(json("{\"request\":\"PING\"}"))
             .expectedResponseBody(json("{\"response\":\"PONG\"}"));
-        //JSON comparisons are made using the Jackson library to unmarshal and compare each value.
     }
 }
 ```
@@ -68,7 +71,8 @@ If we change the PING service on the integration stack to pass the request onto 
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf:http://localhost:8090/services/pingServiceProxy","WS PING test with mock service expectation")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
@@ -84,7 +88,8 @@ The PING service may also test more than one service before providing a response
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxy","WS PING test with multiple mock service expectations")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
@@ -102,7 +107,8 @@ Note that expectations should occur in the order specified; if each request happ
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered","WS PING test with multiple unordered mock service expectations")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
@@ -122,7 +128,8 @@ We can also test asynchronous services (no response expected) by configuring exp
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         asyncTest("vm:test.input", "Simple Asynchronous Canonicalizer Comparison")
             .inputMessage(xml("<SystemField>foo</SystemField>"))
             .addExpectation(asyncExpectation("vm:test.output")
@@ -136,7 +143,8 @@ Finally, we can also send requests that invoke an exception/fault ensuring that 
 ```java
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
-    public static void configure() {
+    @Override
+    public void configure() {
         syncTest("cxf:http://localhost:8090/services/pingServiceProxy","Test invalid message doesn't arrive at the endpoint and returns exception")
             .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                                 "<request>PONG</request>" +
