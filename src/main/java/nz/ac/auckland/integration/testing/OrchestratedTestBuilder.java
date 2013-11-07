@@ -1,10 +1,7 @@
 package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.expectation.*;
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
-import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
-import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
@@ -184,6 +181,23 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
+     * @param faultCode The fault code to use for the SOAP Fault
+     * @param message   The message to use in the SOAP Fault
+     */
+    public static SoapFaultTestResource soapFault(QName faultCode, String message) {
+        return new SoapFaultTestResource(faultCode,message);
+    }
+
+    /**
+     * @param faultCode The fault code to use for the SOAP Fault
+     * @param message   The message to use in the SOAP Fault
+     * @param xmlDetail The XML detail to use in the SOAP Fault
+     */
+    public static SoapFaultTestResource soapFault(QName faultCode, String message, XmlTestResource xmlDetail) {
+        return new SoapFaultTestResource(faultCode,message,xmlDetail);
+    }
+
+    /**
      * @param path A path to a resource on the current classpath
      */
     public static URL classpath(String path) {
@@ -212,6 +226,13 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      */
     public static HttpErrorMockExpectation.Builder httpErrorExpectation(String endpointUri) {
         return new HttpErrorMockExpectation.Builder(endpointUri);
+    }
+
+    /**
+     * @param endpointUri The endpoint URI that the mock should listen to; should follow the Apache Camel URI format
+     */
+    public static SoapFaultMockExpectation.Builder soapFaultExpectation(String endpointUri) {
+        return new SoapFaultMockExpectation.Builder(endpointUri);
     }
 
     /**
@@ -248,50 +269,50 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
-    public static HttpExceptionValidator httpException(Validator validator) {
-        return new HttpExceptionValidator.Builder().responseBodyValidator(validator).build();
+    public static HttpErrorValidator httpExceptionResponse(Validator validator) {
+        return new HttpErrorValidator.Builder().responseBodyValidator(validator).build();
     }
 
     /**
      * @return A validation builder for setting http exception response values
      */
-    public static HttpExceptionValidator.Builder httpException() {
-        return new HttpExceptionValidator.Builder();
+    public static HttpErrorValidator.Builder httpExceptionResponse() {
+        return new HttpErrorValidator.Builder();
     }
 
     /**
      * @param statusCode The HTTP status code that is expected to be received back
      * @return A validator that ensures that the HTTP response meets the expected XML response body
      */
-    public static HttpExceptionValidator httpException(int statusCode) {
-        return new HttpExceptionValidator.Builder().statusCode(statusCode).build();
+    public static HttpErrorValidator httpExceptionResponse(int statusCode) {
+        return new HttpErrorValidator.Builder().statusCode(statusCode).build();
     }
 
     /**
      * @return A validator that ensures that the HTTP response meets the expected XML response body
      */
-    public static HttpExceptionValidator httpException(XmlTestResource resource) {
-        return httpException(new XmlValidator(resource));
+    public static HttpErrorValidator httpExceptionResponse(XmlTestResource resource) {
+        return httpExceptionResponse(new XmlValidator(resource));
     }
 
     /**
      * @return A validator that ensures that the HTTP response meets the expected json response body
      */
-    public static HttpExceptionValidator httpException(JsonTestResource resource) {
-        return httpException(new JsonValidator(resource));
+    public static HttpErrorValidator httpExceptionResponse(JsonTestResource resource) {
+        return httpExceptionResponse(new JsonValidator(resource));
     }
 
     /**
      * @return A validator that ensures that the HTTP response meets the expected plain-text response body
      */
-    public static HttpExceptionValidator httpException(PlainTextTestResource resource) {
-        return httpException(new PlainTextValidator(resource));
+    public static HttpErrorValidator httpExceptionResponse(PlainTextTestResource resource) {
+        return httpExceptionResponse(new PlainTextValidator(resource));
     }
 
     /**
      * @return A builder for specifying the expected SOAP fault response
      */
-    public static SOAPFaultValidator.Builder soapFault() {
+    public static SOAPFaultValidator.Builder soapFaultResponse() {
         return new SOAPFaultValidator.Builder();
     }
 
@@ -299,7 +320,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param message The message in the SOAP fault that is expected back
      * @return A validator for the expected SOAP Fault response
      */
-    public static SOAPFaultValidator soapFault(String message) {
+    public static SOAPFaultValidator soapFaultResponse(String message) {
         return new SOAPFaultValidator.Builder().faultMessageValidator(message).build();
     }
 
@@ -307,7 +328,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param code A code in the SOAP Fault that is expected to be returned
      * @return A validator for the expected SOAP Fault Response
      */
-    public static SOAPFaultValidator soapFault(QName code) {
+    public static SOAPFaultValidator soapFaultResponse(QName code) {
         return new SOAPFaultValidator.Builder().codeValidator(code).build();
     }
 
@@ -316,10 +337,17 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param message The message in the SOAP fault that is expected back
      * @return A validator for the expected SOAP Fault response
      */
-    public static SOAPFaultValidator soapFault(QName code, String message) {
+    public static SOAPFaultValidator soapFaultResponse(QName code, String message) {
         return new SOAPFaultValidator.Builder().faultMessageValidator(message)
                 .codeValidator(code)
                 .build();
+    }
+
+    /**
+     * @param resource A SOAP Fault you expect to be validated on response
+     */
+    public static SOAPFaultValidator soapFaultResponse(SoapFaultTestResource resource) {
+        return new SOAPFaultValidator(resource);
     }
 
     /**
@@ -328,7 +356,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param detail  An XML element for the expected detail in the response
      * @return A validator for the expected SOAP Fault response
      */
-    public static SOAPFaultValidator soapFault(QName code, String message, XmlTestResource detail) {
+    public static SOAPFaultValidator soapFaultResponse(QName code, String message, XmlTestResource detail) {
         return new SOAPFaultValidator.Builder().faultMessageValidator(message)
                 .codeValidator(code)
                 .detailValidator(detail)

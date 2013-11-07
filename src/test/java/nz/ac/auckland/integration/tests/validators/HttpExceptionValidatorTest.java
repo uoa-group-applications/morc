@@ -3,7 +3,7 @@ package nz.ac.auckland.integration.tests.validators;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
-import nz.ac.auckland.integration.testing.validator.HttpExceptionValidator;
+import nz.ac.auckland.integration.testing.validator.HttpErrorValidator;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
@@ -20,13 +20,13 @@ public class HttpExceptionValidatorTest extends Assert {
 
     @Test
     public void testNullExchange() throws Exception {
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder().build();
+        HttpErrorValidator validator = new HttpErrorValidator.Builder().build();
         assertFalse(validator.validate(null));
     }
 
     @Test
     public void testNullException() throws Exception {
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder().build();
+        HttpErrorValidator validator = new HttpErrorValidator.Builder().build();
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         assertFalse(validator.validate(e));
     }
@@ -47,7 +47,7 @@ public class HttpExceptionValidatorTest extends Assert {
             }
         };
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(responseBodyValidator)
                 .responseHeadersValidator(responseHeadersValidator)
                 .statusCode(500)
@@ -62,7 +62,7 @@ public class HttpExceptionValidatorTest extends Assert {
     public void testWrongException() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setException(new IOException());
-        assertFalse(new HttpExceptionValidator().validate(e));
+        assertFalse(new HttpErrorValidator().validate(e));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class HttpExceptionValidatorTest extends Assert {
             }
         };
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(responseBodyValidator)
                 .responseHeadersValidator(responseHeadersValidator)
                 .statusCode(500)
@@ -108,7 +108,7 @@ public class HttpExceptionValidatorTest extends Assert {
             }
         };
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(responseBodyValidator)
                 .responseHeadersValidator(responseHeadersValidator)
                 .build();
@@ -136,7 +136,7 @@ public class HttpExceptionValidatorTest extends Assert {
             }
         };
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(responseBodyValidator)
                 .responseHeadersValidator(responseHeadersValidator)
                 .build();
@@ -154,7 +154,7 @@ public class HttpExceptionValidatorTest extends Assert {
     public void testPlainTextResource() throws Exception {
         PlainTextTestResource resource = new PlainTextTestResource("foo");
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(resource).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
@@ -167,7 +167,7 @@ public class HttpExceptionValidatorTest extends Assert {
     public void testJsonResource() throws Exception {
         JsonTestResource resource = new JsonTestResource("{\"foo\":\"baz\"}");
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(resource).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
@@ -191,7 +191,7 @@ public class HttpExceptionValidatorTest extends Assert {
 
         HeadersTestResource resource = new HeadersTestResource((Map) map);
 
-        HttpExceptionValidator validator = new HttpExceptionValidator.Builder()
+        HttpErrorValidator validator = new HttpErrorValidator.Builder()
                 .responseBodyValidator(responseBodyValidator)
                 .responseHeadersValidator(resource)
                 .build();

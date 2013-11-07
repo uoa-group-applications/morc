@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
+import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XMLUtilities;
 import org.apache.camel.Exchange;
@@ -26,6 +27,20 @@ public class SOAPFaultValidator implements Validator {
     private XmlValidator detailValidator;
 
     private XMLUtilities xmlUtilities = new XMLUtilities();
+
+    public SOAPFaultValidator() {
+        //possible to just expect some kind of SOAP Fault
+    }
+
+    public SOAPFaultValidator(SoapFaultTestResource resource) {
+        try {
+            faultMessageValidator = new PlainTextValidator(new PlainTextTestResource(resource.getValue().getMessage()));
+            codeValidator = new QNameValidator(resource.getValue().getFaultCode());
+            detailValidator = new XmlValidator(new XmlTestResource(resource.getValue().getDetail().getOwnerDocument()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public Validator getFaultMessageValidator() {
         return faultMessageValidator;
@@ -123,16 +138,7 @@ public class SOAPFaultValidator implements Validator {
          * @param expectedCode A QName that we expect to receive
          */
         public Builder codeValidator(final QName expectedCode) {
-            this.codeValidator = new Validator() {
-                @Override
-                public boolean validate(Exchange exchange) {
-                    //The receive QName is passed in from the body
-                    return exchange != null &&
-                            exchange.getIn().getBody(QName.class) != null &&
-                            exchange.getIn().getBody(QName.class).equals(expectedCode);
-                }
-            };
-
+            this.codeValidator = new QNameValidator(expectedCode);
             return this;
         }
 
@@ -158,6 +164,23 @@ public class SOAPFaultValidator implements Validator {
             validator.codeValidator = this.codeValidator;
             validator.detailValidator = this.detailValidator;
             return validator;
+        }
+    }
+
+    private static class QNameValidator implements Validator {
+
+        private QName expectedCode;
+
+        public QNameValidator(QName expectedCode) {
+            this.expectedCode = expectedCode;
+        }
+
+        @Override
+        public boolean validate(Exchange exchange) {
+            //The receive QName is passed in from the body
+            return exchange != null &&
+                    exchange.getIn().getBody(QName.class) != null &&
+                    exchange.getIn().getBody(QName.class).equals(expectedCode);
         }
     }
 }

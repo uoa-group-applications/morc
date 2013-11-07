@@ -229,17 +229,17 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testHttpExceptionNoValidator() throws Exception {
-        assertTrue(OrchestratedTestBuilder.httpException() instanceof HttpExceptionValidator.Builder);
+        assertTrue(OrchestratedTestBuilder.httpExceptionResponse() instanceof HttpErrorValidator.Builder);
     }
 
     @Test
     public void testHttpExceptionStatusCode() throws Exception {
-        assertEquals(OrchestratedTestBuilder.httpException(500).getStatusCode(), 500);
+        assertEquals(OrchestratedTestBuilder.httpExceptionResponse(500).getStatusCode(), 500);
     }
 
     @Test
     public void testHttpExceptionValidator() throws Exception {
-        HttpExceptionValidator validator = OrchestratedTestBuilder.httpException(new Validator() {
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(new Validator() {
             @Override
             public boolean validate(Exchange exchange) {
                 return true;
@@ -257,7 +257,7 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testHttpExceptionXmlResource() throws Exception {
         XMLUtilities xmlUtilities = new XMLUtilities();
 
-        HttpExceptionValidator validator = OrchestratedTestBuilder.httpException(
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(
                 new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>")));
 
         CamelContext context = new DefaultCamelContext();
@@ -269,7 +269,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testHttpExceptionJsonResource() throws Exception {
-        HttpExceptionValidator validator = OrchestratedTestBuilder.httpException(new JsonTestResource("{\"foo\":\"baz\"}"));
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(new JsonTestResource("{\"foo\":\"baz\"}"));
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
@@ -281,7 +281,7 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testHttpExceptionPlainTextResource() throws Exception {
 
-        HttpExceptionValidator validator = OrchestratedTestBuilder.httpException(new PlainTextTestResource("foo"));
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(new PlainTextTestResource("foo"));
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
@@ -366,12 +366,12 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultBuilder() throws Exception {
-        assertTrue(OrchestratedTestBuilder.soapFault() instanceof SOAPFaultValidator.Builder);
+        assertTrue(OrchestratedTestBuilder.soapFaultResponse() instanceof SOAPFaultValidator.Builder);
     }
 
     @Test
     public void testSoapFaultMessage() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault("foo");
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse("foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody("foo");
         assertTrue(validator.getFaultMessageValidator().validate(e));
@@ -379,7 +379,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultQName() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER);
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER);
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
 
@@ -388,7 +388,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testSoapFaultQNameMessage() throws Exception {
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo");
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
 
@@ -402,7 +402,7 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testSoapFaultCodeMessageDetail() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
-        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo", xml);
+        SOAPFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo", xml);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));

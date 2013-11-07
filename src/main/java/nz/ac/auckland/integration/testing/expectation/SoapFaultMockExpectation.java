@@ -11,7 +11,6 @@ import org.apache.camel.Exchange;
 public class SoapFaultMockExpectation extends SyncMockExpectation {
 
     public void handleReceivedExchange(Exchange exchange) throws Exception {
-        exchange.getOut().setHeader("org.apache.cxf.message.Message.RESPONSE_CODE", 500);
         exchange.getOut().setFault(true);
         super.handleReceivedExchange(exchange);
     }

@@ -17,9 +17,9 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class HttpExceptionValidator implements Validator {
+public class HttpErrorValidator implements Validator {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpExceptionValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpErrorValidator.class);
 
     private Validator responseBodyValidator;
     private Validator responseHeadersValidator;
@@ -139,8 +139,8 @@ public class HttpExceptionValidator implements Validator {
             return this;
         }
 
-        public HttpExceptionValidator build() {
-            HttpExceptionValidator validator = new HttpExceptionValidator();
+        public HttpErrorValidator build() {
+            HttpErrorValidator validator = new HttpErrorValidator();
             validator.responseBodyValidator = this.responseBodyValidator;
             validator.responseHeadersValidator = this.responseHeadersValidator;
             validator.statusCode = this.statusCode;

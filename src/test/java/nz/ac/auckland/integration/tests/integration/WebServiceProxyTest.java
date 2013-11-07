@@ -43,19 +43,20 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .exceptionResponseValidator(httpException(500))
+                .exceptionResponseValidator(httpExceptionResponse(500))
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
 
         syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test with body")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .exceptionResponseValidator(httpException()
+                .exceptionResponseValidator(httpExceptionResponse()
                         .responseBodyValidator(xml(classpath("/data/pingSoapFault.xml")))
-                        .statusCode(500).build())
+                        .statusCode(501).build())
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
+                        .responseBody(xml(classpath("/data/pingSoapFault.xml")))
+                        .statusCode(501));
 
         syncTest("cxf:http://localhost:8091/targetWS", "Simple WS test using CXF")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
@@ -74,12 +75,21 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("cxf:http://localhost:8092/testWSFault", "CXF WS Fault Test")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .exceptionResponseValidator(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
+                .exceptionResponseValidator(soapFaultResponse(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
 
-        syncTest("cxf:http://localhost:8092/testWSFaultDetail", "CXF WS Fault Test")
+        syncTest("cxf:http://localhost:8092/testWSFaultDetail", "CXF WS Fault Test with detail")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .exceptionResponseValidator(soapFault(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
+                .exceptionResponseValidator(soapFaultResponse(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
                         xml("<detail><foo/></detail>")));
+
+        syncTest("cxf:http://localhost:8092/targetWS","Simple test to show SOAP Fault expectation")
+                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .exceptionResponseValidator(soapFaultResponse(SOAPFAULT_SERVER,"Pretend Fault",
+                        xml("<detail><foo/></detail>")))
+                .addExpectation(soapFaultExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
+                        .responseBody(soapFault(SOAPFAULT_SERVER,"Pretend Fault",xml("<foo/>"))));
+
+
     }
 
 }
