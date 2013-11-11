@@ -47,7 +47,8 @@
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingService"</span><span class="o">,</span><span class="s">"Simple WS PING test"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
                                 <span class="s">"&lt;request&gt;PING&lt;/request&gt;"</span> <span class="o">+</span>
@@ -64,7 +65,8 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf://http://localhost:8090/services/securePingService?wsdlURL=SecurePingService.wsdl&amp;"</span> <span class="o">+</span>
             <span class="s">"properties.ws-security.username=user"</span> <span class="o">+</span>
             <span class="s">"&amp;properties.ws-security.password=pass"</span><span class="o">,</span>
@@ -85,16 +87,17 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingService"</span><span class="o">,</span><span class="s">"Simple WS PING test with local resources"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
             <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)));</span>
 
-        <span class="c1">//If there's a JSON service we can also ensure this is acting appropriately:</span>
+        <span class="c1">//If there's a JSON service we can also ensure this is acting appropriately</span>
+        <span class="c1">//(JSON comparisons are made using the Jackson library to unmarshal and compare each value)</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"http://localhost:8091/jsonPingService"</span><span class="o">,</span> <span class="s">"Simple JSON PING"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">json</span><span class="o">(</span><span class="s">"{\"request\":\"PING\"}"</span><span class="o">))</span>
             <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">json</span><span class="o">(</span><span class="s">"{\"response\":\"PONG\"}"</span><span class="o">));</span>
-        <span class="c1">//JSON comparisons are made using the Jackson library to unmarshal and compare each value.</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
@@ -103,7 +106,8 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceProxy"</span><span class="o">,</span><span class="s">"WS PING test with mock service expectation"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
             <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
@@ -120,7 +124,8 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceMultiProxy"</span><span class="o">,</span><span class="s">"WS PING test with multiple mock service expectations"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
             <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
@@ -139,7 +144,8 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered"</span><span class="o">,</span><span class="s">"WS PING test with multiple unordered mock service expectations"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingRequest1.xml"</span><span class="o">)))</span>
             <span class="o">.</span><span class="na">expectedResponseBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="n">classpath</span><span class="o">(</span><span class="s">"/data/pingResponse1.xml"</span><span class="o">)))</span>
@@ -159,7 +165,8 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">asyncTest</span><span class="o">(</span><span class="s">"vm:test.input"</span><span class="o">,</span> <span class="s">"Simple Asynchronous Canonicalizer Comparison"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">inputMessage</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;SystemField&gt;foo&lt;/SystemField&gt;"</span><span class="o">))</span>
             <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">asyncExpectation</span><span class="o">(</span><span class="s">"vm:test.output"</span><span class="o">)</span>
@@ -174,7 +181,8 @@ password properties:</p>
 
 <div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"cxf:http://localhost:8090/services/pingServiceProxy"</span><span class="o">,</span><span class="s">"Test invalid message doesn't arrive at the endpoint and returns exception"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
                                                 <span class="s">"&lt;request&gt;PONG&lt;/request&gt;"</span> <span class="o">+</span>
@@ -185,7 +193,7 @@ password properties:</p>
 <span class="o">}</span>
 </pre></div>
 
-<p>All of these examples can be found under at (<a href="https://github.com/dmacdonald2013/soaunit-example">https://github.com/dmacdonald2013/soaunit-example</a>); execute the test run with the standard mvn test goal. The tests themselves are found under com.acme.integration.tests.AcmeTest</p>
+<p>All of these examples can be found under at <a href="https://github.com/dmacdonald2013/soaunit-example">https://github.com/dmacdonald2013/soaunit-example</a>; execute the test run with the standard mvn test goal. The tests themselves are found under com.acme.integration.tests.AcmeTest</p>
       </section>
     </div>
 
