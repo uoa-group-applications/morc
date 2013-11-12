@@ -51,6 +51,18 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return builder;
     }
 
+    public static MockExpectation.OrderingType totalOrdering() {
+        return MockExpectation.OrderingType.TOTAL;
+    }
+
+    public static MockExpectation.OrderingType partialOrdering() {
+        return MockExpectation.OrderingType.PARTIAL;
+    }
+
+    public static MockExpectation.OrderingType noOrdering() {
+        return MockExpectation.OrderingType.NONE;
+    }
+
     /**
      * @param data An XML string which will be used for seeding a message, or comparing a value
      */

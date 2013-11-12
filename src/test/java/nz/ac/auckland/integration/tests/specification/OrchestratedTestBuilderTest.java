@@ -473,4 +473,11 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         assertTrue(validator.validate(e));
     }
+
+    @Test
+    public void testOrderingRequirements() throws Exception {
+        assertEquals(MockExpectation.OrderingType.NONE,OrchestratedTestBuilder.noOrdering());
+        assertEquals(MockExpectation.OrderingType.PARTIAL,OrchestratedTestBuilder.partialOrdering());
+        assertEquals(MockExpectation.OrderingType.TOTAL,OrchestratedTestBuilder.totalOrdering());
+    }
 }

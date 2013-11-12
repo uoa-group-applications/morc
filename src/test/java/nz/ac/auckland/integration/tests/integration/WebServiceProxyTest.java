@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.integration;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -39,7 +38,7 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingResponse1.xml")))
-                        .ordering(MockExpectation.OrderingType.PARTIAL));
+                        .ordering(partialOrdering()));
 
         syncTest("jetty:http://localhost:8090/testWS", "Simple WS proxy failure test")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
