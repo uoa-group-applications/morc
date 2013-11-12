@@ -108,8 +108,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody("");
-                        logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
-                                HeadersTestResource.formatHeaders(inputRequestHeaders.getValue()),
+                        logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),
                                 exchange.getIn().getBody(String.class)});
                     }
                 });
