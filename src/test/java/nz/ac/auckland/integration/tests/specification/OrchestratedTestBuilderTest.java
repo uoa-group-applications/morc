@@ -260,9 +260,23 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         CamelContext context = new DefaultCamelContext();
         Exchange e = new DefaultExchange(context);
-        e.setException(new HttpOperationFailedException(null, 0, null, null, null, "{\"foo\":\"baz\"}"));
+        e.setException(new HttpOperationFailedException(null, 0, null, null, null, "<foo/>"));
 
-        validator.validate(e);
+        assertTrue(validator.validate(e));
+    }
+
+    @Test
+    public void testHttpExceptionXmlResourceWithCode() throws Exception {
+        XmlUtilities xmlUtilities = new XmlUtilities();
+
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(501,
+                new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>")));
+
+        CamelContext context = new DefaultCamelContext();
+        Exchange e = new DefaultExchange(context);
+        e.setException(new HttpOperationFailedException(null, 501, null, null, null, "<foo/>"));
+
+        assertTrue(validator.validate(e));
     }
 
     @Test
@@ -273,7 +287,19 @@ public class OrchestratedTestBuilderTest extends Assert {
         Exchange e = new DefaultExchange(context);
         e.setException(new HttpOperationFailedException(null, 0, null, null, null, "{\"foo\":\"baz\"}"));
 
-        validator.validate(e);
+        assertTrue(validator.validate(e));
+    }
+
+    @Test
+    public void testHttpExceptionJsonResourceWithCode() throws Exception {
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(501,
+                new JsonTestResource("{\"foo\":\"baz\"}"));
+
+        CamelContext context = new DefaultCamelContext();
+        Exchange e = new DefaultExchange(context);
+        e.setException(new HttpOperationFailedException(null, 501, null, null, null, "{\"foo\":\"baz\"}"));
+
+        assertTrue(validator.validate(e));
     }
 
     @Test
@@ -285,7 +311,20 @@ public class OrchestratedTestBuilderTest extends Assert {
         Exchange e = new DefaultExchange(context);
         e.setException(new HttpOperationFailedException(null, 0, null, null, null, "foo"));
 
-        validator.validate(e);
+        assertTrue(validator.validate(e));
+    }
+
+    @Test
+    public void testHttpExceptionPlainTextResourceWithCode() throws Exception {
+
+        HttpErrorValidator validator = OrchestratedTestBuilder.httpExceptionResponse(501,
+                new PlainTextTestResource("foo"));
+
+        CamelContext context = new DefaultCamelContext();
+        Exchange e = new DefaultExchange(context);
+        e.setException(new HttpOperationFailedException(null, 501, null, null, null, "foo"));
+
+        assertTrue(validator.validate(e));
     }
 
     @Test

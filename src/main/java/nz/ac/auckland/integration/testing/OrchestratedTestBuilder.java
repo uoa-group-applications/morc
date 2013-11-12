@@ -274,6 +274,13 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
+     * @return A validator that ensures that the HTTP response body meets the expected response
+     */
+    public static HttpErrorValidator httpExceptionResponse(int statusCode, Validator validator) {
+        return new HttpErrorValidator.Builder().responseBodyValidator(validator).statusCode(statusCode).build();
+    }
+
+    /**
      * @return A validation builder for setting http exception response values
      */
     public static HttpErrorValidator.Builder httpExceptionResponse() {
@@ -296,6 +303,13 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
+     * @return A validator that ensures that the HTTP response meets the expected XML response body and status code
+     */
+    public static HttpErrorValidator httpExceptionResponse(int statusCode, XmlTestResource resource) {
+        return httpExceptionResponse(statusCode,new XmlValidator(resource));
+    }
+
+    /**
      * @return A validator that ensures that the HTTP response meets the expected json response body
      */
     public static HttpErrorValidator httpExceptionResponse(JsonTestResource resource) {
@@ -303,10 +317,24 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
+     * @return A validator that ensures that the HTTP response meets the expected json response body and status code
+     */
+    public static HttpErrorValidator httpExceptionResponse(int statusCode, JsonTestResource resource) {
+        return httpExceptionResponse(statusCode,new JsonValidator(resource));
+    }
+
+    /**
      * @return A validator that ensures that the HTTP response meets the expected plain-text response body
      */
     public static HttpErrorValidator httpExceptionResponse(PlainTextTestResource resource) {
         return httpExceptionResponse(new PlainTextValidator(resource));
+    }
+
+    /**
+     * @return A validator that ensures that the HTTP response meets the expected plain-text response body and status code
+     */
+    public static HttpErrorValidator httpExceptionResponse(int statusCode, PlainTextTestResource resource) {
+        return httpExceptionResponse(statusCode,new PlainTextValidator(resource));
     }
 
     /**
