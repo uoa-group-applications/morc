@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.testing;
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
@@ -219,9 +220,10 @@ public class OrchestratedTest extends CamelSpringTestSupport {
                     throw new IllegalStateException("The endpoint URI has no expectations," +
                             " or you are using a direct-to-direct route: " + exchange.getFromEndpoint());
                 MockExpectation expectation = expectations.poll();
-                //todo dump headers too
-                logger.trace("An exchange has been received from the endpoint: {} {}",
-                        exchange.getFromEndpoint().getEndpointUri(), exchange.getIn().getBody(String.class));
+
+                logger.trace("An exchange has been received from the endpoint: {}, headers: {}, body: {}",
+                        new String[] {exchange.getFromEndpoint().getEndpointUri(),
+                                HeadersTestResource.formatHeaders(exchange.getIn().getHeaders()), exchange.getIn().getBody(String.class)});
 
                 if (expectation == null) {
                     //this will be caught by the mock (an additional message will be received)

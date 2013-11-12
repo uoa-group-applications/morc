@@ -43,6 +43,10 @@ public class PlainTextValidator implements Validator {
         if (value == null) return false;
         try {
             String expectedInput = resource.getValue();
+
+            logger.trace("Expected Plain Text Value: {},\nActual Plain Text Value: {}",expectedInput,
+                    value);
+
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
             return value.equals(expectedInput);
         } catch (Exception e) {

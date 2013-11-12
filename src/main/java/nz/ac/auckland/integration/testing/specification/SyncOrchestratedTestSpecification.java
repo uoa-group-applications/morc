@@ -67,7 +67,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
      */
     public boolean sendInput(ProducerTemplate template) {
         try {
-            Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
+            final Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
             overrideEndpoint(endpoint);
 
             Exchange response;
@@ -78,6 +78,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody(inputRequestBody.getValue());
                         exchange.getIn().setHeaders(inputRequestHeaders.getValue());
+                        logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
+                                HeadersTestResource.formatHeaders(inputRequestHeaders.getValue()),
+                                exchange.getIn().getBody(String.class)});
                     }
                 });
             else if (inputRequestHeaders != null)
@@ -86,6 +89,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody("");
                         exchange.getIn().setHeaders(inputRequestHeaders.getValue());
+                        logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
+                                HeadersTestResource.formatHeaders(inputRequestHeaders.getValue()),
+                                exchange.getIn().getBody(String.class)});
                     }
                 });
             else if (inputRequestBody != null)
@@ -93,6 +99,8 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody(inputRequestBody.getValue());
+                        logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),
+                                exchange.getIn().getBody(String.class)});
                     }
                 });
             else
@@ -100,6 +108,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody("");
+                        logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
+                                HeadersTestResource.formatHeaders(inputRequestHeaders.getValue()),
+                                exchange.getIn().getBody(String.class)});
                     }
                 });
 
@@ -119,13 +130,16 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             }
 
             if (e != null) {
-                logger.warn("An execution exception was encountered", e);
+                logger.debug("An execution exception was encountered", e);
                 //validator response always wins
                 if (exceptionResponseValidator != null)
                     return exceptionResponseValidator.validate(response);
                 //this will always be true
                 return expectsExceptionResponse;
             }
+
+            logger.trace("Synchronous response headers: {}, body: {}",
+                    HeadersTestResource.formatHeaders(response.getIn().getHeaders()),response.getIn().getBody(String.class));
 
             return ((responseBodyValidator == null || responseBodyValidator.validate(response))
                     && (responseHeadersValidator == null || responseHeadersValidator.validate(response)));

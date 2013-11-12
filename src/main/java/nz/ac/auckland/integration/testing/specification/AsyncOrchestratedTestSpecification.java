@@ -42,14 +42,25 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
             Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
             overrideEndpoint(endpoint);
 
-            if (inputMessageBody != null && inputMessageHeaders != null)
+            if (inputMessageBody != null && inputMessageHeaders != null) {
+                logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
+                    HeadersTestResource.formatHeaders(inputMessageHeaders.getValue()),
+                    template.getCamelContext().getTypeConverter().convertTo(String.class,inputMessageBody.getValue())});
                 template.sendBodyAndHeaders(endpoint, inputMessageBody.getValue(), inputMessageHeaders.getValue());
-            else if (inputMessageHeaders != null)
+            }
+            else if (inputMessageHeaders != null) {
+                logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
+                    HeadersTestResource.formatHeaders(inputMessageHeaders.getValue()),
+                    template.getCamelContext().getTypeConverter().convertTo(String.class,"")});
                 template.sendBodyAndHeaders(endpoint, "", inputMessageHeaders.getValue());
-            else if (inputMessageBody != null)
+            } else if (inputMessageBody != null) {
+                logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),
+                    template.getCamelContext().getTypeConverter().convertTo(String.class,inputMessageBody.getValue())});
                 template.sendBody(endpoint, inputMessageBody.getValue());
-            else
+            } else {
+                logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),""});
                 template.sendBody(endpoint, "");
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);

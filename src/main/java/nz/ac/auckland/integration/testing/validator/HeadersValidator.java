@@ -41,6 +41,9 @@ public class HeadersValidator implements Validator {
             throw new RuntimeException(e);
         }
 
+        logger.trace("Expected Headers: {}, Actual Headers: {}",HeadersTestResource.formatHeaders(expectedHeaders),
+                HeadersTestResource.formatHeaders(value));
+
         //I'm not interested if the input has any additional headers
         for (String expectedKey : expectedHeaders.keySet()) {
             if (!value.containsKey(expectedKey)) {

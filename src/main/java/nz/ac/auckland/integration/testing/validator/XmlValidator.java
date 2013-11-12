@@ -94,11 +94,14 @@ public class XmlValidator implements Validator {
                 return false;
             }
 
+            logger.trace("Expected XML Value: {},\nActual XML Value: {}",xmlUtilities.getDocumentAsString(expectedValue).trim()
+                    ,xmlUtilities.getDocumentAsString(value).trim());
+
             DetailedDiff difference = new DetailedDiff(new Diff(expectedValue, value));
             if (!difference.similar())
                 logger.warn("Differences exist between two documents: {}", difference.getAllDifferences());
             else
-                logger.debug("No differences exist for input {}", xmlUtilities.getDocumentAsString(value));
+                logger.debug("No differences exist for input");
             return difference.similar();
         } catch (Exception e) {
             throw new RuntimeException(e);

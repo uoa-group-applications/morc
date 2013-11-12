@@ -46,12 +46,17 @@ public class JsonValidator implements Validator {
         try {
             String expectedInput = resource.getValue();
 
+            logger.trace("Expected JSON Input: {},\nActual JSON Input: {}",expectedInput,
+                    value);
+
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode expectedJson = mapper.readTree(expectedInput);
             JsonNode inputJson = mapper.readTree(value);
-            return expectedJson.equals(inputJson);
+            boolean equal = expectedJson.equals(inputJson);
+            if (!equal) logger.warn("Differences exist between the expected JSON value and the encountered value");
+            return equal;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
