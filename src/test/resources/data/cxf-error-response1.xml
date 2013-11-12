@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Fault xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
                 xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance">
     <faultcode xsi:type="xsd:string">SOAP-ENV:Client</faultcode>
