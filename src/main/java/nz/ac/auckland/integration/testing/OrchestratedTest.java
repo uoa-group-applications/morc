@@ -7,9 +7,11 @@ import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jetty.JettyHttpEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
     protected OrchestratedTest() {
+        configureXmlUnit();
         //we want CXF to be in PAYLOAD mode rather than POJO
         endpointOverrides.add(new CxfEndpointOverride());
     }
@@ -130,6 +133,15 @@ public class OrchestratedTest extends CamelSpringTestSupport {
      */
     public void setEndpointOverrides(Collection<EndpointOverride> endpointOverrides) {
         this.endpointOverrides = endpointOverrides;
+    }
+
+    /**
+     * Configure XML Unit parameters for comparing XML - override this to adjust the defaults
+     */
+    protected void configureXmlUnit() {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setNormalizeWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
     }
 
     @Test
@@ -246,10 +258,17 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             @Override
             public void configure() throws Exception {
                 for (Endpoint endpoint : mockEndpointExpectations.keySet()) {
-                    from(endpoint)
-                            .log(LoggingLevel.DEBUG, "An exchange has been received from the endpoint: " + endpoint.getEndpointUri())
-                            .convertBodyTo(String.class)
-                            .to(mockEndpoint);
+                    if (endpoint instanceof JettyHttpEndpoint) {
+                        //Jetty keeps things in a string which is a pain
+                        from(endpoint)
+                                .log(LoggingLevel.DEBUG, "An exchange has been received from the endpoint: " + endpoint.getEndpointUri())
+                                .convertBodyTo(String.class)
+                                .to(mockEndpoint);
+                    } else {
+                        from(endpoint)
+                                .log(LoggingLevel.DEBUG, "An exchange has been received from the endpoint: " + endpoint.getEndpointUri())
+                                .to(mockEndpoint);
+                    }
 
                     logger.debug("Added a new route from: {} to mock: {}", endpoint.getEndpointUri(),
                             mockEndpoint.getEndpointUri());
