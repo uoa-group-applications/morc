@@ -168,7 +168,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param inputRequestBody The input request body to send to the target service
          */
-        public Builder requestBody(StaticTestResource inputRequestBody) {
+        public Builder requestBody(TestResource inputRequestBody) {
             this.inputRequestBody = inputRequestBody;
             return self();
         }
