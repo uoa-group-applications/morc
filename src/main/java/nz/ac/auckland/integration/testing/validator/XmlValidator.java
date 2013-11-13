@@ -28,7 +28,6 @@ public class XmlValidator implements Validator {
 
     public XmlValidator(XmlTestResource resource) {
         this.resource = resource;
-        XMLUnit.setIgnoreWhitespace(true);
     }
 
     /**
