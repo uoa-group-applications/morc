@@ -5,6 +5,8 @@ import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -16,13 +18,14 @@ import java.util.*;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public abstract class OrchestratedTestSpecification {
+    private static final Logger logger = LoggerFactory.getLogger(OrchestratedTestSpecification.class);
     private String description;
     private String targetServiceUri;
     private List<MockExpectation> mockExpectations;
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
-
-    //todo: add number of times to send message
+    private int sendCount;
+    private long sendInterval;
 
     /**
      * @return A description that explains what this tests is doing
@@ -60,6 +63,20 @@ public abstract class OrchestratedTestSpecification {
         return Collections.unmodifiableCollection(this.endpointOverrides);
     }
 
+    /**
+     * @return The number of times the message will be sent to the endpoint
+     */
+    public int getSendCount() {
+        return this.sendCount;
+    }
+
+    /**
+     * @return The interval in milliseconds between sending multiple messages
+     */
+    public long getSendInterval() {
+        return this.sendInterval;
+    }
+
     protected void overrideEndpoint(Endpoint endpoint) {
         for (EndpointOverride override : endpointOverrides) {
             override.overrideEndpoint(endpoint);
@@ -70,7 +87,30 @@ public abstract class OrchestratedTestSpecification {
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
      * @return Returns true if the message was successfully sent and, if there's a response, that it is valid
      */
-    public abstract boolean sendInput(ProducerTemplate template);
+    public boolean sendInput(ProducerTemplate template) {
+        int i = 0;
+
+        do {
+            try {
+                if (i != 0) Thread.sleep(sendInterval);
+            } catch(InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            logger.debug("Sending input message {}", i+1);
+            boolean response = sendInputInternal(template);
+            if (!response) {
+                logger.warn("Failed on sending input message {}",i+1);
+                return false;
+            }
+
+            i++;
+        } while (i < sendCount);
+
+        return true;
+    }
+
+    protected abstract boolean sendInputInternal(ProducerTemplate template);
 
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
     public static abstract class AbstractBuilder<Product extends OrchestratedTestSpecification, Builder extends AbstractBuilder<Product, Builder>> {
@@ -81,6 +121,8 @@ public abstract class OrchestratedTestSpecification {
         private int currentExpectationReceivedAtIndex = 0;
         private long sleepForTestCompletion = 15000;
         private Collection<EndpointOverride> endpointOverrides;
+        private int sendCount = 1;
+        private long sendInterval = 1000l;
 
         private Map<String, MockExpectation> mockExpectationByEndpoint = new HashMap<>();
 
@@ -143,6 +185,26 @@ public abstract class OrchestratedTestSpecification {
             return self();
         }
 
+        /**
+         * @param sendCount The number of times to send the message, defaults to 1
+         */
+        public Builder sendCount(int sendCount) {
+            if (sendCount < 1)
+                throw new IllegalArgumentException("You must be able to send at least one message with sendCount");
+            this.sendCount = sendCount;
+            return self();
+        }
+
+        /**
+         * @param sendInterval The interval in milliseconds between sending multiple messages, defaults to 1000ms
+         */
+        public Builder sendInterval(long sendInterval) {
+            if (sendInterval <= 0)
+                throw new IllegalArgumentException("You must specify an interval > 0 between sending messages");
+            this.sendInterval = sendInterval;
+            return self();
+        }
+
     }
 
     protected OrchestratedTestSpecification(AbstractBuilder builder) {
@@ -151,6 +213,8 @@ public abstract class OrchestratedTestSpecification {
         this.mockExpectations = builder.mockExpectations;
         this.sleepForTestCompletion = builder.sleepForTestCompletion;
         this.endpointOverrides = builder.endpointOverrides;
+        this.sendCount = builder.sendCount;
+        this.sendInterval = builder.sendInterval;
     }
 
 }

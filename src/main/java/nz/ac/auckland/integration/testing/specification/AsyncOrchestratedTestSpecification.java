@@ -37,7 +37,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
      * @return true as there is no response to validate
      */
-    public boolean sendInput(ProducerTemplate template) {
+    protected boolean sendInputInternal(ProducerTemplate template) {
         try {
             Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
             overrideEndpoint(endpoint);
