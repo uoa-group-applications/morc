@@ -144,6 +144,30 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         XMLUnit.setIgnoreComments(true);
     }
 
+    /**
+     * A route for subscribing to the expectation endpoints and sending them through to the MockEndpoint -
+     * override this at your own risk if you have special requirements (e.g. transactions)
+     * @param expectationEndpoint The endpoint that exchanges will be sent to as part of testing
+     * @param mockEndpoint The endpoint that the incoming exchanges will be sent to
+     * @return A Camel RouteBuilder that creates routes for the expectations
+     */
+    protected RouteBuilder generateMockFeedRoute(final Endpoint expectationEndpoint, final Endpoint mockEndpoint) {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                if (expectationEndpoint instanceof JettyHttpEndpoint) {
+                    //Jetty streams things so we need to convert to a string first
+                    from(expectationEndpoint)
+                            .convertBodyTo(String.class)
+                            .to(mockEndpoint);
+                } else {
+                    from(expectationEndpoint)
+                            .to(mockEndpoint);
+                }
+            }
+        };
+    }
+
     @Test
     public void runOrchestratedTest() throws Exception {
 
@@ -254,27 +278,27 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         mockEndpoint.expectedMessageCount(expectedMessageCount);
 
         //set up the endpoints that send everything through to a mock
+
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-                for (Endpoint endpoint : mockEndpointExpectations.keySet()) {
-                    if (endpoint instanceof JettyHttpEndpoint) {
-                        //Jetty keeps things in a string which is a pain
-                        from(endpoint)
-                                .log(LoggingLevel.DEBUG, "An exchange has been received from the endpoint: " + endpoint.getEndpointUri())
-                                .convertBodyTo(String.class)
-                                .to(mockEndpoint);
-                    } else {
-                        from(endpoint)
-                                .log(LoggingLevel.DEBUG, "An exchange has been received from the endpoint: " + endpoint.getEndpointUri())
-                                .to(mockEndpoint);
-                    }
-
-                    logger.debug("Added a new route from: {} to mock: {}", endpoint.getEndpointUri(),
-                            mockEndpoint.getEndpointUri());
-                }
+                from("direct:internalMockFeederRoute")
+                    .process(new Processor() {
+                        @Override
+                        public void process(Exchange exchange) throws Exception {
+                            exchange.setProperty("orchestratedTestFromURI", exchange.getFromEndpoint().getEndpointUri());
+                        }
+                    })
+                    .log(LoggingLevel.DEBUG, OrchestratedTest.class.getName(), "An exchange has been received from the endpoint: ${property.orchestratedTestFromURI}")
+                    .to(mockEndpoint);
             }
         });
+
+        for (Endpoint endpoint : mockEndpointExpectations.keySet()) {
+            context.addRoutes(generateMockFeedRoute(endpoint, context.getEndpoint("direct:internalMockFeederRoute")));
+            logger.debug("Added a new route from: {} to mock: {}", endpoint.getEndpointUri(),
+                    mockEndpoint.getEndpointUri());
+        }
 
         //now set up the expectations of what we expect to receive, and in what order
         mockEndpoint.expects(new Runnable() {
