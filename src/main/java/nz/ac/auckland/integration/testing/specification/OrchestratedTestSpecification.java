@@ -57,7 +57,7 @@ public abstract class OrchestratedTestSpecification {
      * @return The endpoint overrides that modify the receiving endpoint
      */
     public Collection<EndpointOverride> getEndpointOverrides() {
-        return this.endpointOverrides;
+        return Collections.unmodifiableCollection(this.endpointOverrides);
     }
 
     protected void overrideEndpoint(Endpoint endpoint) {
