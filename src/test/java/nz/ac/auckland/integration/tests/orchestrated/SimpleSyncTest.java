@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -147,6 +148,14 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
                 .addExpectation(syncExpectation("seda:jsonExpectation")
                         .expectedBody(json("{\"foo\":\"baz\"}")));
 
+
+        MockExpectation.AbstractBuilder expectation1 = syncExpectation("seda:jsonExpectation")
+                                .expectedBody(json("{\"foo\":\"baz\"}"));
+        MockExpectation.AbstractBuilder expectation2 = unreceivedExpectation("seda:nothingToSeeHere");
+
+        syncTest("seda:jsonRequest","addExpectationsTest")
+                .requestBody(json("{\"foo\":\"baz\"}"))
+                .addExpectations(expectation1,expectation2);
 
     }
 

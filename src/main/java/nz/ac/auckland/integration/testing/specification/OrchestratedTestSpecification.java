@@ -88,6 +88,7 @@ public abstract class OrchestratedTestSpecification {
      * @return Returns true if the message was successfully sent and, if there's a response, that it is valid
      */
     public boolean sendInput(ProducerTemplate template) {
+
         int i = 0;
 
         do {
@@ -163,6 +164,17 @@ public abstract class OrchestratedTestSpecification {
             currentExpectationReceivedAtIndex += expectation.getExpectedMessageCount();
 
             mockExpectations.add(expectation);
+
+            return self();
+        }
+
+        /**
+         * A convenience method for adding multiple expectations at the same time
+         */
+        public Builder addExpectations(MockExpectation.AbstractBuilder... expectationBuilders) {
+            for (MockExpectation.AbstractBuilder expectationBuilder : expectationBuilders) {
+                self().addExpectation(expectationBuilder);
+            }
 
             return self();
         }
