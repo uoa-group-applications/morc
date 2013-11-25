@@ -93,7 +93,7 @@ public class OrchestratedTestSpecificationTest extends Assert {
 class TestOrchestratedTestSpecification extends OrchestratedTestSpecification {
 
     @Override
-    public boolean sendInput(ProducerTemplate template) {
+    protected boolean sendInputInternal(ProducerTemplate template) {
         return true;
     }
 
