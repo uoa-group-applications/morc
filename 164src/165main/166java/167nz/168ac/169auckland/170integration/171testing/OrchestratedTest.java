@@ -263,7 +263,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
                 if (expectation == null) {
                     //this will be caught by the mock (an additional message will be received)
-                    logger.debug("An exchange has been received from the endpoint: {} however no such expectation has been provided"
+                    logger.warn("An exchange has been received from the endpoint: {} however no such expectation has been provided"
                             , exchange.getFromEndpoint());
                     return;
                 }
