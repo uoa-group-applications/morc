@@ -115,7 +115,7 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
                     .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                     .responseBody(xml(classpath("/data/pingResponse1.xml")))
-                    .ordering(MockExpectation.OrderingType.PARTIAL))
+                    .ordering(partialOrdering()))
             .addExpectation(syncExpectation("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
                     .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                     .responseBody(xml(classpath("/data/pingResponse1.xml")))
