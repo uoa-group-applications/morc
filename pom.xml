@@ -17,7 +17,7 @@
     <url>http://uoa-group-applications.github.io/soaunit/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <camel-version>2.12.1</camel-version>
+        <camel-version>[2.12.0,)</camel-version>
         <xmlunit-version>1.5</xmlunit-version>
         <junit-version>4.11</junit-version>
         <commons-io-version>2.4</commons-io-version>
