@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
+import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
@@ -42,6 +43,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         configureXmlUnit();
         //we want CXF to be in PAYLOAD mode rather than POJO
         endpointOverrides.add(new CxfEndpointOverride());
+        endpointOverrides.add(new UrlConnectionOverride());
     }
 
     /**
