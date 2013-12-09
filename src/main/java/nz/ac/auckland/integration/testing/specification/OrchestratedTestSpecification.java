@@ -90,7 +90,7 @@ public abstract class OrchestratedTestSpecification {
     public boolean sendInput(ProducerTemplate template) {
 
         int i = 0;
-
+        //todo: turn this into a runner of some kind (support multi threading)
         do {
             try {
                 if (i != 0) Thread.sleep(sendInterval);

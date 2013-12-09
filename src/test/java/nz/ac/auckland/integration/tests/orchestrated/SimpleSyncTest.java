@@ -115,7 +115,7 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
         syncTest("direct:syncInputSyncOutput", "Test sync response")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
+                        .expectedBody(xml("<baz/>"),xml("<")).responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
         syncTest("direct:setHeaders", "Test Response Headers Validated")

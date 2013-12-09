@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.testing.expectation;
 
-import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import org.apache.camel.Exchange;
+import org.apache.cxf.binding.soap.SoapFault;
 
 /**
  * This will cause a CXF endpoint (message consumer) to return a specified SOAP fault back to the consumer
@@ -19,7 +19,7 @@ public class SoapFaultMockExpectation extends SyncMockExpectation {
         return "ws";
     }
 
-    public static class Builder extends SyncMockExpectation.Init<SoapFaultMockExpectation, Builder, SoapFaultTestResource> {
+    public static class Builder extends SyncMockExpectation.Init<SoapFaultMockExpectation, Builder,SoapFault> {
 
         /**
          * @param endpointUri This MUST be a CXF endpoint URI
@@ -28,17 +28,7 @@ public class SoapFaultMockExpectation extends SyncMockExpectation {
             super(endpointUri);
         }
 
-        /**
-         * @param providedResponseBody The body that should be returned back to the client which must be a
-         *                             SoapFaultTestResource
-         */
-        @Override
-        public Builder responseBody(SoapFaultTestResource providedResponseBody) {
-            this.providedResponseBody = providedResponseBody;
-            return self();
-        }
-
-        public SoapFaultMockExpectation build() {
+        protected SoapFaultMockExpectation buildInternal() {
             return new SoapFaultMockExpectation(this);
         }
     }
@@ -47,3 +37,4 @@ public class SoapFaultMockExpectation extends SyncMockExpectation {
         super(builder);
     }
 }
+

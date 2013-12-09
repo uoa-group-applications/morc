@@ -38,7 +38,7 @@ public class AsyncMockExpectation extends ContentMockExpectation {
             return this;
         }
 
-        public AsyncMockExpectation build() {
+        protected AsyncMockExpectation buildInternal() {
             //setup the default as PARTIAL
             if (orderingType != OrderingType.NONE) ordering(OrderingType.PARTIAL);
             return new AsyncMockExpectation(this);

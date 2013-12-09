@@ -1,5 +1,8 @@
 package nz.ac.auckland.integration.testing.resource;
 
+import nz.ac.auckland.integration.testing.answer.Answer;
+import org.apache.camel.Exchange;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;

@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +17,13 @@ public class HeadersValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(HeadersValidator.class);
 
-    private HeadersTestResource resource;
+    private TestResource<Map<String,Object>> resource;
 
+    public HeadersValidator(TestResource<Map<String,Object>> resource) {
+        this.resource = resource;
+    }
+
+    @SuppressWarnings("unchecked")
     public HeadersValidator(HeadersTestResource resource) {
         this.resource = resource;
     }

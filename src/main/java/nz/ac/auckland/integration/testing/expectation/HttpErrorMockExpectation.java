@@ -24,7 +24,7 @@ public class HttpErrorMockExpectation extends SyncMockExpectation {
         return "ws";
     }
 
-    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder, TestResource> {
+    public static class Builder extends SyncMockExpectation.Init<HttpErrorMockExpectation, Builder, Object> {
 
         private int statusCode = 500;
 
@@ -40,7 +40,7 @@ public class HttpErrorMockExpectation extends SyncMockExpectation {
             return self();
         }
 
-        public HttpErrorMockExpectation build() {
+        protected HttpErrorMockExpectation buildInternal() {
             return new HttpErrorMockExpectation(this);
         }
 

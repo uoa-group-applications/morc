@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.tests.validators;
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.SoapFaultValidator;
@@ -184,6 +185,8 @@ public class SOAPFaultValidatorTest extends Assert {
         SoapFault fault = new SoapFault("message", new QName("www.foo.com", "baz"));
         e.setException(fault);
         assertFalse(validator.validate(e));
+
+        TestResource<SoapFault> foo = new SoapFaultTestResource();
     }
 
     @Test

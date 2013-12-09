@@ -1,6 +1,8 @@
 package nz.ac.auckland.integration.testing.resource;
 
+import nz.ac.auckland.integration.testing.answer.Answer;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
+import org.apache.camel.Exchange;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SoapFaultTestResource implements TestResource {
+public class SoapFaultTestResource implements TestResource<SoapFault> {
 
     private static final Logger logger = LoggerFactory.getLogger(SoapFaultTestResource.class);
 
@@ -67,4 +69,5 @@ public class SoapFaultTestResource implements TestResource {
 
         return fault;
     }
+
 }
