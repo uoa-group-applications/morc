@@ -2,6 +2,8 @@ package nz.ac.auckland.integration.testing.expectation;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.util.URISupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -29,6 +31,9 @@ import java.net.URISyntaxException;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public abstract class MockExpectation {
+
+    private static final Logger logger = LoggerFactory.getLogger(MockExpectation.class);
+
     private String endpointUri;
     private int receivedAt;
     private int expectedMessageCount = 1;
@@ -133,7 +138,8 @@ public abstract class MockExpectation {
     /*
         Using details from: https://weblogs.java.net/node/642849
      */
-    public static abstract class AbstractBuilder<Product extends MockExpectation, Builder extends AbstractBuilder<Product, Builder>> {
+    public static abstract class AbstractBuilder<Product extends MockExpectation,
+            Builder extends AbstractBuilder<Product, Builder>> {
         protected String endpointUri;
         protected int receivedAt;
         protected int expectedMessageCount = 1;
@@ -143,8 +149,19 @@ public abstract class MockExpectation {
 
         protected abstract Builder self();
 
-        //todo: consider making this a list for expectedMessageCount > 1
-        public abstract Product build();
+        public Product build() {
+            Product product = buildInternal();
+            int childExpectedMessageCount = expectedMessageCount();
+            if (childExpectedMessageCount < expectedMessageCount)
+                logger.warn("The endpoint %s has %s expected messages, but only %s validators have been provided",
+                        new Object[] {endpointUri,expectedMessageCount,childExpectedMessageCount});
+
+            expectedMessageCount = childExpectedMessageCount;
+            logger.info("The expected received message count for the endpoint %s is %s", endpointUri,expectedMessageCount);
+            return product;
+        }
+
+        protected abstract Product buildInternal();
 
         public AbstractBuilder(String endpointUri) {
             try {
@@ -178,6 +195,8 @@ public abstract class MockExpectation {
             this.expectedMessageCount = expectedMessageCount;
             return self();
         }
+
+        protected abstract int expectedMessageCount();
 
         /**
          * Specifies the ordering that this expectation requires (TOTAL, PARTIAL or NONE)

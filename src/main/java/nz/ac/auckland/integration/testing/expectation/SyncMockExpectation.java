@@ -1,8 +1,14 @@
 package nz.ac.auckland.integration.testing.expectation;
 
+import nz.ac.auckland.integration.testing.answer.Answer;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * An expectation that provides a message response back to the message
@@ -11,55 +17,42 @@ import org.apache.camel.Exchange;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class SyncMockExpectation extends ContentMockExpectation {
-    private TestResource providedResponseBody;
-    private HeadersTestResource providedResponseHeaders;
-
-    /**
-     * @return The response headers that this expectation will return to the endpoint
-     */
-    public HeadersTestResource getProvidedResponseHeaders() {
-        return providedResponseHeaders;
-    }
-
-    /**
-     * @return The response body that the expectation will return to the endpoint
-     */
-    public TestResource getProvidedResponseBody() {
-        return providedResponseBody;
-    }
+    protected Answer responseBodyAnswer;
+    protected Answer<Map<String, Object>> responseHeadersAnswer;
+    private static final Logger logger = LoggerFactory.getLogger(SyncMockExpectation.class);
 
     /**
      * Sets the exchange out body to the provided response body and headers
+     * Synchronized so that the body response and header response shift in lock-step
      *
      * @param exchange The Camel exchange that needs to be modified, or handled once it has been received
      * @throws Exception
      */
-    public void handleReceivedExchange(Exchange exchange) throws Exception {
-        if (providedResponseBody != null) exchange.getOut().setBody(providedResponseBody.getValue());
+    public synchronized void handleReceivedExchange(Exchange exchange) throws Exception {
+        if (responseBodyAnswer != null) exchange.getOut().setBody(responseBodyAnswer.response(exchange));
         else exchange.getOut().setBody("");
-        if (providedResponseHeaders != null) exchange.getOut().setHeaders(providedResponseHeaders.getValue());
+        if (responseHeadersAnswer != null) exchange.getOut().setHeaders(responseHeadersAnswer.response(exchange));
     }
 
     public String getType() {
         return "sync";
     }
 
-    public static class Builder extends Init<SyncMockExpectation, Builder, TestResource> {
-
+    public static class Builder extends Init<SyncMockExpectation, Builder, Object> {
         public Builder(String endpointUri) {
             super(endpointUri);
         }
 
-        public SyncMockExpectation build() {
+        protected SyncMockExpectation buildInternal() {
             return new SyncMockExpectation(this);
         }
     }
 
-    protected abstract static class Init<Product, Builder extends Init<Product, Builder, T>, T extends TestResource>
+    protected abstract static class Init<Product, Builder extends Init<Product, Builder,T>, T>
             extends ContentMockExpectation.AbstractContentBuilder<SyncMockExpectation, Builder> {
 
-        protected T providedResponseBody;
-        protected HeadersTestResource providedResponseHeaders;
+        protected Answer<T> responseBodyAnswer;
+        protected Answer<Map<String, Object>> responseHeadersAnswer;
 
         public Init(String endpointUri) {
             super(endpointUri);
@@ -68,22 +61,69 @@ public class SyncMockExpectation extends ContentMockExpectation {
         /**
          * @param providedResponseBody The body that should be returned back to the client
          */
-        public Builder responseBody(T providedResponseBody) {
-            this.providedResponseBody = providedResponseBody;
+        public Builder responseBody(Answer<T> providedResponseBody) {
+            this.responseBodyAnswer = providedResponseBody;
             return self();
+        }
+
+        //todo: aggregate over all all calls
+        @SuppressWarnings("unchecked")
+        public final Builder responseBody(TestResource<T>... resources) {
+            if (resources.length == 0)
+                logger.warn("No test resource response bodies were provided for endpoint %s, this is not recommended",endpointUri);
+
+            this.responseBodyAnswer = new AggregatedTestResourceAnswer<>(resources);
+            return self();
+        }
+
+        @SuppressWarnings("unchecked")
+        public Builder responseBody(Enumeration<TestResource<T>> resources) {
+            if (!resources.hasMoreElements())
+                logger.warn("The enumeration provided no response bodies for endpoint %s, this is not recommended",endpointUri);
+
+            List<TestResource<T>> remainingResources = new ArrayList<>();
+
+            while (resources.hasMoreElements()) {
+                remainingResources.add(resources.nextElement());
+            }
+
+            return responseBody((TestResource<T>[])remainingResources.toArray());
         }
 
         /**
          * @param providedResponseHeaders The headers that should be returned back to the client
          */
-        public Builder responseHeaders(HeadersTestResource providedResponseHeaders) {
-            this.providedResponseHeaders = providedResponseHeaders;
+        public Builder responseHeaders(Answer<Map<String, Object>> providedResponseHeaders) {
+            this.responseHeadersAnswer = providedResponseHeaders;
             return self();
         }
 
         @SuppressWarnings("unchecked")
+        public Builder responseHeaders(TestResource<Map<String,Object>>... resources) {
+            if (resources.length == 0)
+                logger.warn("No test resource response headers were provided for endpoint %s, this is not recommended",endpointUri);
+
+            this.responseHeadersAnswer = new AggregatedTestResourceAnswer<>(resources);
+            return self();
+        }
+
+        @SuppressWarnings("unchecked")
+        public Builder responseHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
+            if (!resources.hasMoreElements())
+                logger.warn("The enumeration provided no response headers for endpoint %s, this is not recommended",endpointUri);
+
+            List<TestResource<Map<String,Object>>> remainingResources = new ArrayList<>();
+
+            while (resources.hasMoreElements()) {
+                remainingResources.add(resources.nextElement());
+            }
+
+            return responseBody((TestResource<T>[])remainingResources.toArray());
+        }
+
+        @SuppressWarnings("unchecked")
         protected Builder self() {
-            //this may through an exception if the implementation isn't complete
+            //this may throw an exception if the implementation isn't complete
             return (Builder) this;
         }
 
@@ -93,8 +133,28 @@ public class SyncMockExpectation extends ContentMockExpectation {
     protected SyncMockExpectation(Init builder) {
         super(builder);
 
-        this.providedResponseBody = builder.providedResponseBody;
-        this.providedResponseHeaders = builder.providedResponseHeaders;
+        this.responseBodyAnswer = builder.responseBodyAnswer;
+        this.responseHeadersAnswer = builder.responseHeadersAnswer;
     }
 
+}
+
+class AggregatedTestResourceAnswer<T> implements Answer {
+    private Queue<T> values = new ConcurrentLinkedQueue<>();
+
+    @SafeVarargs
+    public AggregatedTestResourceAnswer(TestResource<T>... remaining) {
+       try {
+           for (TestResource<T> resource: remaining) {
+               values.add(resource.getValue());
+           }
+       } catch (Exception e) {
+           throw new RuntimeException(e);
+       }
+    }
+
+    @Override
+    public T response(Exchange exchange) throws Exception {
+       return values.poll();
+    }
 }

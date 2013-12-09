@@ -45,9 +45,12 @@ public class UnreceivedMockExpectation extends MockExpectation {
             return this;
         }
 
-        public UnreceivedMockExpectation build() {
-            this.expectedMessageCount(0);
+        protected UnreceivedMockExpectation buildInternal() {
             return new UnreceivedMockExpectation(this);
+        }
+
+        protected int expectedMessageCount() {
+            return 0;
         }
 
     }

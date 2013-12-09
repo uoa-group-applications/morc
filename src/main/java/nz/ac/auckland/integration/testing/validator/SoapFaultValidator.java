@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.testing.validator;
 
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.Exchange;
@@ -32,7 +33,7 @@ public class SoapFaultValidator implements Validator {
         //possible to just expect some kind of SOAP Fault
     }
 
-    public SoapFaultValidator(SoapFaultTestResource resource) {
+    public SoapFaultValidator(TestResource<SoapFault> resource) {
         try {
             faultMessageValidator = new PlainTextValidator(new PlainTextTestResource(resource.getValue().getMessage()));
             codeValidator = new QNameValidator(resource.getValue().getFaultCode());

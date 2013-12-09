@@ -1,11 +1,12 @@
 package nz.ac.auckland.integration.testing.expectation;
 
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
-import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
-import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.validator.*;
 import org.apache.camel.Exchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * An abstract class to set expectations for bodies and headers for
@@ -17,100 +18,126 @@ import org.apache.camel.Exchange;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public abstract class ContentMockExpectation extends MockExpectation {
-    private Validator expectedBodyValidator;
-    private Validator expectedHeadersValidator;
+    private List<Validator> expectedBodyValidators;
+    private List<HeadersValidator> expectedHeadersValidators;
+
+    private static final Logger logger = LoggerFactory.getLogger(ContentMockExpectation.class);
 
     /**
      * @return The expected headers that the target endpoint expects to receive at a particular point in test
      */
-    public Validator getExpectedHeadersValidator() {
-        return expectedHeadersValidator;
+    public List<HeadersValidator> getExpectedHeadersValidators() {
+        return Collections.unmodifiableList(expectedHeadersValidators);
     }
 
     /**
      * @return The expected body that the target endpoint expects to receive at a particular point in the test
      */
-    public Validator getExpectedBodyValidator() {
-        return expectedBodyValidator;
+    public List<Validator> getExpectedBodyValidators() {
+        return Collections.unmodifiableList(expectedBodyValidators);
     }
 
     /**
      * Evaluates whether the content coming in from an endpoint meets the content requirements. Ordering checks
      * are delegated to the superclass.
+     *
+     * Synchronized so that the body and headers validator can be retrieved in lock-step
      */
-    public boolean checkValid(Exchange incomingExchange, int index) {
+    public synchronized boolean checkValid(Exchange incomingExchange, int index) {
         if (!super.checkValid(incomingExchange, index)) return false;
 
+        int validatorOffset = index - getReceivedAt();
+
         //now check the expected bodies and headers are valid
-        boolean validateBody = expectedBodyValidator == null || expectedBodyValidator.validate(incomingExchange);
-        boolean validateHeaders = expectedHeadersValidator == null || expectedHeadersValidator.validate(incomingExchange);
+        boolean validateBody = validatorOffset >= expectedBodyValidators.size() ||
+                expectedBodyValidators.get(validatorOffset).validate(incomingExchange);
+        boolean validateHeaders = validatorOffset >= expectedHeadersValidators.size() ||
+                expectedHeadersValidators.get(validatorOffset).validate(incomingExchange);
 
         return validateBody && validateHeaders;
     }
 
-    public static abstract class AbstractContentBuilder<Product extends MockExpectation, Builder extends AbstractBuilder<Product, Builder>> extends AbstractBuilder<Product, Builder> {
+    public static abstract class AbstractContentBuilder<Product extends MockExpectation,
+            Builder extends AbstractBuilder<Product, Builder>> extends AbstractBuilder<Product, Builder> {
 
-        private Validator expectedBodyValidator;
-        private Validator expectedHeadersValidator;
+        private List<Validator> expectedBodyValidators = new ArrayList<>();
+        private List<HeadersValidator> expectedHeadersValidators = new ArrayList<>();
 
         public AbstractContentBuilder(String endpointUri) {
             super(endpointUri);
         }
 
-        /**
-         * @param expectedBodyValidator The body that we expect to receive from the endpoint
-         */
-        public Builder expectedBody(Validator expectedBodyValidator) {
-            this.expectedBodyValidator = expectedBodyValidator;
+        public Builder expectedBody(Validator... validators) {
+            Collections.addAll(expectedBodyValidators, validators);
             return self();
         }
 
-        /**
-         * @param resource An XML resource expected to be received
-         */
-        public Builder expectedBody(XmlTestResource resource) {
-            this.expectedBodyValidator = new XmlValidator(resource);
+        //todo: this as an enumeration too
+        public Builder expectedBody(XmlTestResource... resources) {
+            for (XmlTestResource resource : resources) {
+                expectedBodyValidators.add(new XmlValidator(resource));
+            }
+
             return self();
         }
 
-        /**
-         * @param resource A JSON resource expected to be received
-         */
-        public Builder expectedBody(JsonTestResource resource) {
-            this.expectedBodyValidator = new JsonValidator(resource);
+        public Builder expectedBody(JsonTestResource... resources) {
+            for (JsonTestResource resource : resources) {
+                expectedBodyValidators.add(new JsonValidator(resource));
+            }
             return self();
         }
 
-        /**
-         * @param resource A plain text resource expected to be received
-         */
-        public Builder expectedBody(PlainTextTestResource resource) {
-            this.expectedHeadersValidator = new PlainTextValidator(resource);
+        public Builder expectedBody(PlainTextTestResource... resources) {
+            for (PlainTextTestResource resource : resources) {
+                expectedBodyValidators.add(new PlainTextValidator(resource));
+            }
             return self();
         }
 
-        /**
-         * @param expectedHeadersValidator A validator for the headers we expected to receive
-         */
-        public Builder expectedHeaders(Validator expectedHeadersValidator) {
-            this.expectedHeadersValidator = expectedHeadersValidator;
+        public Builder expectedBody(Enumeration<Validator> validators) {
+            while (validators.hasMoreElements()) {
+                expectedBodyValidators.add(validators.nextElement());
+            }
+
             return self();
         }
 
-        /**
-         * @param resource A set of headers we expect to receive
-         */
-        public Builder expectedHeaders(HeadersTestResource resource) {
-            this.expectedHeadersValidator = new HeadersValidator(resource);
+        public Builder expectedHeaders(HeadersValidator... validators) {
+            Collections.addAll(expectedHeadersValidators, validators);
             return self();
         }
+
+        @SafeVarargs
+        public final Builder expectedHeaders(TestResource<Map<String,Object>>... resources) {
+            for (TestResource<Map<String,Object>> resource : resources) {
+                expectedHeadersValidators.add(new HeadersValidator(resource));
+            }
+            return self();
+        }
+
+        public Builder expectedHeaders(Enumeration<TestResource<Map<String,Object>>> validators) {
+            while (validators.hasMoreElements()) {
+                expectedHeadersValidators.add(new HeadersValidator(validators.nextElement()));
+            }
+
+            return self();
+        }
+
+        protected int expectedMessageCount() {
+            if (expectedBodyValidators.size() != expectedHeadersValidators.size())
+                logger.warn("A different number of body and header validators were provided for the endpoint %s", endpointUri);
+
+            return Math.max(expectedBodyValidators.size(), expectedHeadersValidators.size());
+        }
+
     }
 
     @SuppressWarnings("unchecked")
     protected ContentMockExpectation(AbstractContentBuilder builder) {
         super(builder);
 
-        this.expectedBodyValidator = builder.expectedBodyValidator;
-        this.expectedHeadersValidator = builder.expectedHeadersValidator;
+        this.expectedBodyValidators = builder.expectedBodyValidators;
+        this.expectedHeadersValidators = builder.expectedHeadersValidators;
     }
 }

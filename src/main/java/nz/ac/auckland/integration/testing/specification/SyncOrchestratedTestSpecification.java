@@ -10,6 +10,8 @@ import org.apache.camel.util.ExchangeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
+
 /**
  * A synchronous orchestrated test makes a call to a target endpoint which provides a response. During
  * the request process the target may make a number of call outs to expectations which need to be satisfied.
@@ -19,47 +21,11 @@ import org.slf4j.LoggerFactory;
  */
 public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestSpecification.class);
-    private TestResource inputRequestBody;
-    private HeadersTestResource inputRequestHeaders;
-    private Validator responseBodyValidator;
-    private boolean expectsExceptionResponse;
-    private Validator exceptionResponseValidator;
-    private Validator responseHeadersValidator;
 
-    /**
-     * @return The input request body that will be sent to the target endpoint
-     */
-    public TestResource getInputRequestBody() {
-        return inputRequestBody;
-    }
-
-    /**
-     * @return The input request headers that will be sent to the target endpoint
-     */
-    public HeadersTestResource getInputRequestHeaders() {
-        return inputRequestHeaders;
-    }
-
-    /**
-     * @return The input request body that should be returned in order for the test to pass
-     */
-    public Validator getResponseBodyValidator() {
-        return responseBodyValidator;
-    }
-
-    /**
-     * @return The exception validator
-     */
-    public Validator getExceptionResponseValidator() {
-        return exceptionResponseValidator;
-    }
-
-    /**
-     * @return The response headers validator
-     */
-    public Validator getResponseHeadersValidator() {
-        return responseHeadersValidator;
-    }
+    private Queue<TestResource> inputRequestBodies;
+    private Queue<TestResource<Map<String,Object>>> inputRequestHeaders;
+    private Queue<Validator> responseBodyValidators;
+    private Queue<HeadersValidator> responseHeadersValidators;
 
     /**
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
@@ -67,38 +33,52 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
      */
     protected boolean sendInputInternal(ProducerTemplate template) {
         try {
+
+            final TestResource inputBody;
+            final TestResource<Map<String,Object>> inputHeaders;
+            final Validator responseBodyValidator;
+            final HeadersValidator responseHeadersValidator;
+
+            //ensure we get all required resources in lock-step
+            synchronized (this) {
+                inputBody = inputRequestBodies.poll();
+                inputHeaders = inputRequestHeaders.poll();
+                responseBodyValidator = responseBodyValidators.poll();
+                responseHeadersValidator = responseHeadersValidators.poll();
+            }
+
             final Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
             overrideEndpoint(endpoint);
 
             Exchange response;
 
-            if (inputRequestBody != null && inputRequestHeaders != null)
+            if (inputBody != null && inputHeaders != null)
                 response = template.request(endpoint, new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
-                        exchange.getIn().setBody(inputRequestBody.getValue());
-                        exchange.getIn().setHeaders(inputRequestHeaders.getValue());
+                        exchange.getIn().setBody(inputBody.getValue());
+                        exchange.getIn().setHeaders(inputHeaders.getValue());
                         logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
-                                HeadersTestResource.formatHeaders(inputRequestHeaders.getValue()),
+                                HeadersTestResource.formatHeaders(inputHeaders.getValue()),
                                 exchange.getIn().getBody(String.class)});
                     }
                 });
-            else if (inputRequestHeaders != null)
+            else if (inputHeaders != null)
                 response = template.request(endpoint, new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody("");
-                        exchange.getIn().setHeaders(inputRequestHeaders.getValue());
+                        exchange.getIn().setHeaders(inputHeaders.getValue());
                         logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
-                                HeadersTestResource.formatHeaders(inputRequestHeaders.getValue()),
+                                HeadersTestResource.formatHeaders(inputHeaders.getValue()),
                                 exchange.getIn().getBody(String.class)});
                     }
                 });
-            else if (inputRequestBody != null)
+            else if (inputBody != null)
                 response = template.request(endpoint, new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
-                        exchange.getIn().setBody(inputRequestBody.getValue());
+                        exchange.getIn().setBody(inputBody.getValue());
                         logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),
                                 exchange.getIn().getBody(String.class)});
                     }
@@ -118,30 +98,34 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
             Exception e = response.getException();
 
+            /*
             if (e == null && (expectsExceptionResponse || exceptionResponseValidator != null)) {
                 logger.warn("An exception was expected to be received");
                 return false;
-            }
+            }*/
 
-            if (e != null && (!expectsExceptionResponse && exceptionResponseValidator == null)) {
-                logger.warn("An unexpected exception was encountered", e);
-                return false;
-            }
-
-            if (e != null) {
+            /*if (e != null) {
                 logger.debug("An execution exception was encountered", e);
                 //validator response always wins
                 if (exceptionResponseValidator != null)
                     return exceptionResponseValidator.validate(response);
                 //this will always be true
                 return expectsExceptionResponse;
-            }
+            }*/
 
             logger.trace("Synchronous response headers: {}, body: {}",
                     HeadersTestResource.formatHeaders(response.getIn().getHeaders()),response.getIn().getBody(String.class));
 
-            return ((responseBodyValidator == null || responseBodyValidator.validate(response))
+            boolean validResponse = ((responseBodyValidator == null || responseBodyValidator.validate(response))
                     && (responseHeadersValidator == null || responseHeadersValidator.validate(response)));
+
+            //this ensures exception validation happens correctly
+            if (!validResponse && e != null) {
+                logger.warn("An unexpected exception was encountered", e);
+                return false;
+            }
+
+            return validResponse;
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -150,12 +134,10 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
     public static class Builder extends OrchestratedTestSpecification.AbstractBuilder<SyncOrchestratedTestSpecification, Builder> {
 
-        private TestResource inputRequestBody;
-        private HeadersTestResource inputRequestHeaders;
-        private Validator responseBodyValidator;
-        private boolean expectsExceptionResponse = false;
-        private Validator exceptionResponseValidator;
-        private Validator responseHeadersValidator;
+        private Queue<TestResource> inputRequestBodies = new LinkedList<>();
+        private Queue<TestResource<Map<String,Object>>> inputRequestHeaders = new LinkedList<>();
+        private Queue<Validator> responseBodyValidators = new LinkedList<>();
+        private Queue<HeadersValidator> responseHeadersValidators = new LinkedList<>();
 
         public Builder(String endpointUri, String description) {
             super(endpointUri, description);
@@ -165,83 +147,89 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return this;
         }
 
-        /**
-         * @param inputRequestBody The input request body to send to the target service
-         */
-        public Builder requestBody(TestResource inputRequestBody) {
-            this.inputRequestBody = inputRequestBody;
+        public Builder requestBody(TestResource... resources) {
+            Collections.addAll(inputRequestBodies, resources);
             return self();
         }
 
-        /**
-         * @param inputRequestHeaders The input request headers to send to the target service
-         */
-        public Builder requestHeaders(HeadersTestResource inputRequestHeaders) {
-            this.inputRequestHeaders = inputRequestHeaders;
+        public Builder requestBody(Enumeration<TestResource> resources) {
+            while (resources.hasMoreElements()) {
+                inputRequestBodies.add(resources.nextElement());
+            }
             return self();
         }
 
-        /**
-         * @param responseBodyValidator The body that is expected to received back as a response
-         */
-        public Builder expectedResponseBody(Validator responseBodyValidator) {
-            this.responseBodyValidator = responseBodyValidator;
+        @SafeVarargs
+        public final Builder requestHeaders(TestResource<Map<String,Object>>... resources) {
+            Collections.addAll(inputRequestHeaders, resources);
             return self();
         }
 
-        /**
-         * @param responseHeadersValidator A validator for the headers in the response
-         */
-        public Builder expectedResponseHeaders(Validator responseHeadersValidator) {
-            this.responseHeadersValidator = responseHeadersValidator;
+        public final Builder requestHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
+            while (resources.hasMoreElements()) {
+                inputRequestHeaders.add(resources.nextElement());
+            }
+            return self();
+        }
+
+        public Builder expectedResponseBody(Validator... validators) {
+            Collections.addAll(this.responseBodyValidators,validators);
+            return self();
+        }
+
+        public Builder expectedResponseBody(Enumeration<Validator> validators) {
+            while (validators.hasMoreElements()) {
+                responseBodyValidators.add(validators.nextElement());
+            }
             return self();
         }
 
         /**
          * @param resource An XML resource which will be used to seed a validator
          */
-        public Builder expectedResponseBody(XmlTestResource resource) {
-            this.responseBodyValidator = new XmlValidator(resource);
+        public Builder expectedResponseBody(XmlTestResource... resources) {
+            for (XmlTestResource resource : resources) {
+                this.responseBodyValidators.add(new XmlValidator(resource));
+            }
             return self();
         }
 
         /**
          * @param resource A JSON resource which will be used to seed a validator
          */
-        public Builder expectedResponseBody(JsonTestResource resource) {
-            this.responseBodyValidator = new JsonValidator(resource);
+        public Builder expectedResponseBody(JsonTestResource... resources) {
+            for (JsonTestResource resource : resources) {
+                this.responseBodyValidators.add(new JsonValidator(resource));
+            }
             return self();
         }
 
         /**
          * @param resource A plain text resource which will be used to seed a validator
          */
-        public Builder expectedResponseBody(PlainTextTestResource resource) {
-            this.responseBodyValidator = new PlainTextValidator(resource);
+        public Builder expectedResponseBody(PlainTextTestResource... resources) {
+            for (PlainTextTestResource resource : resources) {
+                this.responseBodyValidators.add(new PlainTextValidator(resource));
+            }
             return self();
         }
 
-        /**
-         * @param resource A header test resource which will be used to seed a validator
-         */
-        public Builder expectedResponseHeaders(HeadersTestResource resource) {
-            this.responseHeadersValidator = new HeadersValidator(resource);
+        public Builder expectedResponseHeaders(HeadersValidator... responseHeadersValidators) {
+            Collections.addAll(this.responseHeadersValidators,responseHeadersValidators);
             return self();
         }
 
-        /**
-         * An exception/fault is expected to be thrown in the response
-         */
-        public Builder expectsExceptionResponse() {
-            this.expectsExceptionResponse = true;
+        public Builder expectedResponseHeaders(HeadersTestResource... resources) {
+            for (HeadersTestResource resource : resources) {
+                this.responseHeadersValidators.add(new HeadersValidator(resource));
+            }
             return self();
         }
 
-        /**
-         * @param exceptionResponseValidator Something capable of validating the expected type of exception
-         */
-        public Builder exceptionResponseValidator(Validator exceptionResponseValidator) {
-            this.exceptionResponseValidator = exceptionResponseValidator;
+        public Builder expectedResponseHeaders(Enumeration<HeadersValidator> resources) {
+            while (resources.hasMoreElements()) {
+                this.responseHeadersValidators.add(resources.nextElement());
+            }
             return self();
         }
 
@@ -253,16 +241,10 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
     protected SyncOrchestratedTestSpecification(Builder builder) {
         super(builder);
 
-        if ((builder.responseBodyValidator != null || builder.responseHeadersValidator != null)
-                && (builder.expectsExceptionResponse || builder.exceptionResponseValidator != null))
-            throw new IllegalArgumentException("You cannot set a response validator if an exception is expected");
-
-        this.inputRequestBody = builder.inputRequestBody;
+        this.inputRequestBodies = builder.inputRequestBodies;
         this.inputRequestHeaders = builder.inputRequestHeaders;
-        this.responseBodyValidator = builder.responseBodyValidator;
-        this.expectsExceptionResponse = builder.expectsExceptionResponse;
-        this.exceptionResponseValidator = builder.exceptionResponseValidator;
-        this.responseHeadersValidator = builder.responseHeadersValidator;
+        this.responseBodyValidators = builder.responseBodyValidators;
+        this.responseHeadersValidators = builder.responseHeadersValidators;
     }
 
 }

@@ -13,10 +13,7 @@ import org.junit.runner.RunWith;
 import javax.xml.namespace.QName;
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(value = OrchestratedParameterized.class)
 public abstract class OrchestratedTestBuilder extends OrchestratedTest {
