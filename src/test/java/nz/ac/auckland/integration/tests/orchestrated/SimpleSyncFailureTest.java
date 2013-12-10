@@ -3,7 +3,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;

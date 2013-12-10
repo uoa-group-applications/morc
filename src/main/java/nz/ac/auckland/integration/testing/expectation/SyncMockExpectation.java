@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.testing.expectation;
 
 import nz.ac.auckland.integration.testing.answer.Answer;
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
@@ -66,7 +65,6 @@ public class SyncMockExpectation extends ContentMockExpectation {
             return self();
         }
 
-        //todo: aggregate over all all calls
         @SuppressWarnings("unchecked")
         public final Builder responseBody(TestResource<T>... resources) {
             if (resources.length == 0)

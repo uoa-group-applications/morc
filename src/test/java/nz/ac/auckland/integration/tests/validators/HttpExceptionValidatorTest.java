@@ -4,7 +4,7 @@ import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.validator.HttpErrorValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultCamelContext;

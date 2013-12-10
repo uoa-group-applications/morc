@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.testing.expectation;
 
-import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 
 /**

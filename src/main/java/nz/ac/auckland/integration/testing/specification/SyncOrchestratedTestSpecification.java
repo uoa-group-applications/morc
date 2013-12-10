@@ -165,7 +165,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
-        public final Builder requestHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
+        public Builder requestHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
             while (resources.hasMoreElements()) {
                 inputRequestHeaders.add(resources.nextElement());
             }
@@ -184,43 +184,14 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
-        /**
-         * @param resource An XML resource which will be used to seed a validator
-         */
-        public Builder expectedResponseBody(XmlTestResource... resources) {
-            for (XmlTestResource resource : resources) {
-                this.responseBodyValidators.add(new XmlValidator(resource));
-            }
-            return self();
-        }
-
-        /**
-         * @param resource A JSON resource which will be used to seed a validator
-         */
-        public Builder expectedResponseBody(JsonTestResource... resources) {
-            for (JsonTestResource resource : resources) {
-                this.responseBodyValidators.add(new JsonValidator(resource));
-            }
-            return self();
-        }
-
-        /**
-         * @param resource A plain text resource which will be used to seed a validator
-         */
-        public Builder expectedResponseBody(PlainTextTestResource... resources) {
-            for (PlainTextTestResource resource : resources) {
-                this.responseBodyValidators.add(new PlainTextValidator(resource));
-            }
-            return self();
-        }
-
         public Builder expectedResponseHeaders(HeadersValidator... responseHeadersValidators) {
             Collections.addAll(this.responseHeadersValidators,responseHeadersValidators);
             return self();
         }
 
-        public Builder expectedResponseHeaders(HeadersTestResource... resources) {
-            for (HeadersTestResource resource : resources) {
+        @SafeVarargs
+        public final Builder expectedResponseHeaders(TestResource<Map<String,Object>>... resources) {
+            for (TestResource<Map<String,Object>> resource : resources) {
                 this.responseHeadersValidators.add(new HeadersValidator(resource));
             }
             return self();

@@ -5,8 +5,6 @@ import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-
 /**
  * This endpoint will throw an exception of the specified type back to the
  * message consumer; this is likely to cause transaction rollback or some kind

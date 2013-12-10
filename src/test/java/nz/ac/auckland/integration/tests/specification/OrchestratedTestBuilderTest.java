@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.tests.specification;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
+import nz.ac.auckland.integration.testing.Validator;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;

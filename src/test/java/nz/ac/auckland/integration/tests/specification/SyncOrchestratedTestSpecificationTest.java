@@ -6,7 +6,7 @@ import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.Validator;
 import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

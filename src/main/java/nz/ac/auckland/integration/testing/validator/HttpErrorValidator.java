@@ -92,33 +92,9 @@ public class HttpErrorValidator implements Validator {
         }
 
         /**
-         * @param resource An XML resource that is expected to be received in the body of the HTTP response
-         */
-        public Builder responseBodyValidator(XmlTestResource resource) {
-            this.responseBodyValidator = new XmlValidator(resource);
-            return this;
-        }
-
-        /**
-         * @param resource A JSON resource that is expected to be received in the body of the HTTP response
-         */
-        public Builder responseBodyValidator(JsonTestResource resource) {
-            this.responseBodyValidator = new JsonValidator(resource);
-            return this;
-        }
-
-        /**
-         * @param resource A plain text resource that is expected to be received in the body of the HTTP response
-         */
-        public Builder responseBodyValidator(PlainTextTestResource resource) {
-            this.responseBodyValidator = new PlainTextValidator(resource);
-            return this;
-        }
-
-        /**
          * @param responseHeadersValidator A validator for the HTTP response headers
          */
-        public Builder responseHeadersValidator(Validator responseHeadersValidator) {
+        public Builder responseHeadersValidator(HeadersValidator responseHeadersValidator) {
             this.responseHeadersValidator = responseHeadersValidator;
             return this;
         }
@@ -126,6 +102,7 @@ public class HttpErrorValidator implements Validator {
         /**
          * @param resource A resource containing the expected response headers
          */
+        @SuppressWarnings("unchecked")
         public Builder responseHeadersValidator(HeadersTestResource resource) {
             this.responseHeadersValidator = new HeadersValidator(resource);
             return this;

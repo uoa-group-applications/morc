@@ -1,10 +1,8 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.answer.Answer;
-import org.apache.camel.Exchange;
-
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -39,6 +37,10 @@ public abstract class StaticTestResource<T> implements TestResource {
         if (fileName.isEmpty()) throw new RuntimeException("File Not Found: " + url.toString());
 
         this.file = new File(url.getFile());
+    }
+
+    public StaticTestResource(InputStream inputStream) {
+
     }
 
     /**

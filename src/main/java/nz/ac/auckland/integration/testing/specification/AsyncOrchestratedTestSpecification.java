@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
-import nz.ac.auckland.integration.testing.resource.StaticTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
@@ -98,7 +97,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
             return self();
         }
 
-        public final Builder inputHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
+        public Builder inputHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
             while (resources.hasMoreElements()) {
                 this.inputMessageHeaders.add(resources.nextElement());
             }

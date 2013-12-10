@@ -23,11 +23,6 @@ public class HeadersValidator implements Validator {
         this.resource = resource;
     }
 
-    @SuppressWarnings("unchecked")
-    public HeadersValidator(HeadersTestResource resource) {
-        this.resource = resource;
-    }
-
     /**
      * @param exchange The exchange containing the headers we need to validate
      * @return true if each header in the test resource is in input; additional headers in the input will be ignored

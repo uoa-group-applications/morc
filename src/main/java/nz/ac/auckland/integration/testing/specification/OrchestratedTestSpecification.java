@@ -219,6 +219,7 @@ public abstract class OrchestratedTestSpecification {
 
     }
 
+    @SuppressWarnings("unchecked")
     protected OrchestratedTestSpecification(AbstractBuilder builder) {
         this.description = builder.description;
         this.targetServiceUri = builder.targetServiceUri;

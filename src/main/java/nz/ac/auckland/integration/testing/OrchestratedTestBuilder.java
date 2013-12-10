@@ -82,30 +82,6 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * @param data          An XML string which will be used for seeding a message, or comparing a value
-     * @param xpathSelector An xpath selector for returning certain xml nodes from a response
-     */
-    public static XmlTestResource xml(String data, XPathSelector xpathSelector) {
-        return new XmlTestResource(xmlUtilities.getXmlAsDocument(data), xpathSelector);
-    }
-
-    /**
-     * @param file          A file containing an XML document
-     * @param xpathSelector An xpath selector for returning certain xml nodes from a response
-     */
-    public static XmlTestResource xml(File file, XPathSelector xpathSelector) {
-        return new XmlTestResource(file, xpathSelector);
-    }
-
-    /**
-     * @param url           A url pointing to an XML document
-     * @param xpathSelector An xpath selector for returning certain xml nodes from a response
-     */
-    public static XmlTestResource xml(URL url, XPathSelector xpathSelector) {
-        return new XmlTestResource(url, xpathSelector);
-    }
-
-    /**
      * @param data A JSON string which will be used for seeding a message, or comparing a value
      */
     public static JsonTestResource json(String data) {
@@ -302,102 +278,6 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      */
     public static HttpErrorValidator httpExceptionResponse(int statusCode) {
         return new HttpErrorValidator.Builder().statusCode(statusCode).build();
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response meets the expected XML response body
-     */
-    public static HttpErrorValidator httpExceptionResponse(XmlTestResource resource) {
-        return httpExceptionResponse(new XmlValidator(resource));
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response meets the expected XML response body and status code
-     */
-    public static HttpErrorValidator httpExceptionResponse(int statusCode, XmlTestResource resource) {
-        return httpExceptionResponse(statusCode,new XmlValidator(resource));
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response meets the expected json response body
-     */
-    public static HttpErrorValidator httpExceptionResponse(JsonTestResource resource) {
-        return httpExceptionResponse(new JsonValidator(resource));
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response meets the expected json response body and status code
-     */
-    public static HttpErrorValidator httpExceptionResponse(int statusCode, JsonTestResource resource) {
-        return httpExceptionResponse(statusCode,new JsonValidator(resource));
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response meets the expected plain-text response body
-     */
-    public static HttpErrorValidator httpExceptionResponse(PlainTextTestResource resource) {
-        return httpExceptionResponse(new PlainTextValidator(resource));
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response meets the expected plain-text response body and status code
-     */
-    public static HttpErrorValidator httpExceptionResponse(int statusCode, PlainTextTestResource resource) {
-        return httpExceptionResponse(statusCode,new PlainTextValidator(resource));
-    }
-
-    /**
-     * @return A builder for specifying the expected SOAP fault response
-     */
-    public static SoapFaultValidator.Builder soapFaultResponse() {
-        return new SoapFaultValidator.Builder();
-    }
-
-    /**
-     * @param message The message in the SOAP fault that is expected back
-     * @return A validator for the expected SOAP Fault response
-     */
-    public static SoapFaultValidator soapFaultResponse(String message) {
-        return new SoapFaultValidator.Builder().faultMessageValidator(message).build();
-    }
-
-    /**
-     * @param code A code in the SOAP Fault that is expected to be returned
-     * @return A validator for the expected SOAP Fault Response
-     */
-    public static SoapFaultValidator soapFaultResponse(QName code) {
-        return new SoapFaultValidator.Builder().codeValidator(code).build();
-    }
-
-    /**
-     * @param code    A code in the SOAP Fault that is expected to be returned
-     * @param message The message in the SOAP fault that is expected back
-     * @return A validator for the expected SOAP Fault response
-     */
-    public static SoapFaultValidator soapFaultResponse(QName code, String message) {
-        return new SoapFaultValidator.Builder().faultMessageValidator(message)
-                .codeValidator(code)
-                .build();
-    }
-
-    /**
-     * @param resource A SOAP Fault you expect to be validated on response
-     */
-    public static SoapFaultValidator soapFaultResponse(SoapFaultTestResource resource) {
-        return new SoapFaultValidator(resource);
-    }
-
-    /**
-     * @param code    A code in the SOAP Fault that is expected to be returned
-     * @param message The message in the SOAP fault that is expected back
-     * @param detail  An XML element for the expected detail in the response
-     * @return A validator for the expected SOAP Fault response
-     */
-    public static SoapFaultValidator soapFaultResponse(QName code, String message, XmlTestResource detail) {
-        return new SoapFaultValidator.Builder().faultMessageValidator(message)
-                .codeValidator(code)
-                .detailValidator(detail)
-                .build();
     }
 
     /**

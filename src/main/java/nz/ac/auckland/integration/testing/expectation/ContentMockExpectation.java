@@ -72,29 +72,6 @@ public abstract class ContentMockExpectation extends MockExpectation {
             return self();
         }
 
-        //todo: this as an enumeration too
-        public Builder expectedBody(XmlTestResource... resources) {
-            for (XmlTestResource resource : resources) {
-                expectedBodyValidators.add(new XmlValidator(resource));
-            }
-
-            return self();
-        }
-
-        public Builder expectedBody(JsonTestResource... resources) {
-            for (JsonTestResource resource : resources) {
-                expectedBodyValidators.add(new JsonValidator(resource));
-            }
-            return self();
-        }
-
-        public Builder expectedBody(PlainTextTestResource... resources) {
-            for (PlainTextTestResource resource : resources) {
-                expectedBodyValidators.add(new PlainTextValidator(resource));
-            }
-            return self();
-        }
-
         public Builder expectedBody(Enumeration<Validator> validators) {
             while (validators.hasMoreElements()) {
                 expectedBodyValidators.add(validators.nextElement());
