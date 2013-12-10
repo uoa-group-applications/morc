@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 
 import javax.xml.namespace.QName;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 
@@ -180,6 +181,18 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      */
     public static SoapFaultTestResource soapFault(QName faultCode, String message, XmlTestResource xmlDetail) {
         return new SoapFaultTestResource(faultCode, message, xmlDetail);
+    }
+
+    public static ExceptionValidator exception() {
+        return new ExceptionValidator();
+    }
+
+    public static ExceptionValidator exception(Class<? extends Exception> exception) {
+        return new ExceptionValidator(exception);
+    }
+
+    public static ExceptionValidator exception(Class<? extends Exception> exception, String message) {
+        return new ExceptionValidator(exception,message);
     }
 
     /**
