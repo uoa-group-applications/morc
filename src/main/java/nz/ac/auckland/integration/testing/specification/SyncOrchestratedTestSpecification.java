@@ -98,21 +98,6 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
             Exception e = response.getException();
 
-            /*
-            if (e == null && (expectsExceptionResponse || exceptionResponseValidator != null)) {
-                logger.warn("An exception was expected to be received");
-                return false;
-            }*/
-
-            /*if (e != null) {
-                logger.debug("An execution exception was encountered", e);
-                //validator response always wins
-                if (exceptionResponseValidator != null)
-                    return exceptionResponseValidator.validate(response);
-                //this will always be true
-                return expectsExceptionResponse;
-            }*/
-
             logger.trace("Synchronous response headers: {}, body: {}",
                     HeadersTestResource.formatHeaders(response.getIn().getHeaders()),response.getIn().getBody(String.class));
 
@@ -205,7 +190,14 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         }
 
         public SyncOrchestratedTestSpecification build() {
-            return new SyncOrchestratedTestSpecification(this);
+            SyncOrchestratedTestSpecification specification = new SyncOrchestratedTestSpecification(this);
+
+            logger.info("The endpoint %s will be sending %s request message bodies, %s request message headers, " +
+                    "%s expected response body validators, and %s expected response headers validators",
+                    new Object[] {specification.getTargetServiceUri(),inputRequestBodies.size(), inputRequestHeaders.size(),
+                    responseBodyValidators.size(),responseHeadersValidators.size()});
+
+            return specification;
         }
     }
 
