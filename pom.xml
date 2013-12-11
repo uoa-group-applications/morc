@@ -25,6 +25,7 @@
         <cxf-version>2.7.7</cxf-version>
         <jackson-version>1.9.13</jackson-version>
         <jacoco-version>0.6.3.201306030806</jacoco-version>
+        <opencsv-version>2.3</opencsv-version>
         <github.global.server>github</github.global.server>
     </properties>
     <developers>
@@ -136,6 +137,11 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${cxf-version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>net.sf.opencsv</groupId>
+        	<artifactId>opencsv</artifactId>
+        	<version>${opencsv-version}</version>
         </dependency>
     </dependencies>
     <build>

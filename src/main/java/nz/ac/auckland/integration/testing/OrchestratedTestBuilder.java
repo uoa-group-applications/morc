@@ -1,5 +1,8 @@
 package nz.ac.auckland.integration.testing;
 
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.bean.HeaderColumnNameMappingStrategy;
+import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
@@ -12,7 +15,9 @@ import org.junit.runner.RunWith;
 
 import javax.xml.namespace.QName;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
 
@@ -80,6 +85,51 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      */
     public static XmlTestResource xml(URL url) {
         return new XmlTestResource(url);
+    }
+
+    public static Enumeration<XmlTestResource> dynamicXml(List<InputStream> inputs) {
+
+    }
+
+    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource) {
+
+    }
+
+    public static List<Map<String,String>> csvdatasource(URL csvUrl) {
+        CSVReader reader;
+
+        List<Map<String,String>> output = new ArrayList<>();
+        String[] headers;
+
+        try {
+            reader = new CSVReader(new InputStreamReader(csvUrl.openStream()));
+
+            headers = reader.readNext();
+
+            //todo: check all headers are unique
+
+            String[] nextLine;
+            int line = 2;
+            while ((nextLine = reader.readNext()) != null) {
+                Map<String,String> variableMap = new HashMap<>();
+
+                if (nextLine.length != headers.length)
+                    throw new IllegalArgumentException("The CSV resource " + csvUrl + " has a different " +
+                            "number of headers and values for line " + line);
+
+                for (int i = 0; i < nextLine.length; i++) {
+                    variableMap.put(headers[i],nextLine[i]);
+                }
+
+                output.add(variableMap);
+                line++;
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return output;
     }
 
     /**
