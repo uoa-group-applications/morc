@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.specification;
 
+import nz.ac.auckland.integration.testing.EndpointUriGenerator;
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
@@ -20,7 +21,7 @@ import java.util.*;
 public abstract class OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratedTestSpecification.class);
     private String description;
-    private String targetServiceUri;
+    private EndpointUriGenerator targetServiceUriGenerator;
     private List<MockExpectation> mockExpectations;
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
@@ -32,13 +33,6 @@ public abstract class OrchestratedTestSpecification {
      */
     public String getDescription() {
         return description;
-    }
-
-    /**
-     * @return An Apache Camel URI that a message/request will be sent to
-     */
-    public String getTargetServiceUri() {
-        return targetServiceUri;
     }
 
     /**
@@ -83,6 +77,10 @@ public abstract class OrchestratedTestSpecification {
         }
     }
 
+    public EndpointUriGenerator getTargetServiceUriGenerator() {
+        return targetServiceUriGenerator;
+    }
+
     /**
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
      * @return Returns true if the message was successfully sent and, if there's a response, that it is valid
@@ -117,7 +115,7 @@ public abstract class OrchestratedTestSpecification {
     public static abstract class AbstractBuilder<Product extends OrchestratedTestSpecification, Builder extends AbstractBuilder<Product, Builder>> {
 
         private String description;
-        private String targetServiceUri;
+        private EndpointUriGenerator targetServiceUriGenerator;
         private List<MockExpectation> mockExpectations;
         private int currentExpectationReceivedAtIndex = 0;
         private long sleepForTestCompletion = 15000;
@@ -131,13 +129,26 @@ public abstract class OrchestratedTestSpecification {
 
         public abstract Product build();
 
-        public AbstractBuilder(String targetServiceUri, String description) {
-            this.targetServiceUri = targetServiceUri;
+        public AbstractBuilder(final String targetServiceUri, String description) {
+            this(new EndpointUriGenerator() {
+                @Override
+                public String getEndpoint() {
+                    return targetServiceUri;
+                }
+
+                public String toString() {
+                    return targetServiceUri;
+                }
+            },description);
+        }
+
+        public AbstractBuilder(EndpointUriGenerator targetServiceUriGenerator, String description) {
             this.description = description;
             mockExpectations = new ArrayList<>();
             endpointOverrides = new ArrayList<>();
             //we don't want to use POJO to receive messages
             endpointOverrides.add(new CxfEndpointOverride());
+            this.targetServiceUriGenerator = targetServiceUriGenerator;
         }
 
         /**
@@ -222,7 +233,7 @@ public abstract class OrchestratedTestSpecification {
     @SuppressWarnings("unchecked")
     protected OrchestratedTestSpecification(AbstractBuilder builder) {
         this.description = builder.description;
-        this.targetServiceUri = builder.targetServiceUri;
+        this.targetServiceUriGenerator = builder.targetServiceUriGenerator;
         this.mockExpectations = builder.mockExpectations;
         this.sleepForTestCompletion = builder.sleepForTestCompletion;
         this.endpointOverrides = builder.endpointOverrides;

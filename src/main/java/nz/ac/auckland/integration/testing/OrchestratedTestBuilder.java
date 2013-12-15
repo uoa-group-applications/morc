@@ -132,6 +132,47 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return output;
     }
 
+    public static EndpointUriGenerator multiUri(final String endpointUri, final String... endpointUris) {
+        return new EndpointUriGenerator() {
+
+            private Queue<String> uriQueue = new LinkedList<>();
+            private String lastResponse;
+            private String humanReadableFormat;
+
+            {
+                uriQueue.add(endpointUri);
+                Collections.addAll(uriQueue, endpointUris);
+
+                StringBuilder builder = new StringBuilder();
+                builder.append("(");
+                builder.append(endpointUri);
+
+                for (String uri : endpointUris) {
+                    uriQueue.add(uri);
+                    builder.append(",");
+                    builder.append(endpointUri);
+                }
+
+                builder.append(")");
+                humanReadableFormat = builder.toString();
+            }
+
+            @Override
+            public String getEndpoint() {
+                String endpointUri = uriQueue.poll();
+                if (endpointUri == null) return lastResponse;
+
+                lastResponse = endpointUri;
+                return endpointUri;
+            }
+
+            @Override
+            public String toString() {
+                return "multiUri(" + humanReadableFormat + ")";
+            }
+        };
+    }
+
     /**
      * @param data A JSON string which will be used for seeding a message, or comparing a value
      */

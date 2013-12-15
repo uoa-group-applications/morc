@@ -38,16 +38,18 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             final TestResource<Map<String,Object>> inputHeaders;
             final Validator responseBodyValidator;
             final HeadersValidator responseHeadersValidator;
+            final String targetServiceUri;
 
             //ensure we get all required resources in lock-step
             synchronized (this) {
+                targetServiceUri = getTargetServiceUriGenerator().getEndpoint();
                 inputBody = inputRequestBodies.poll();
                 inputHeaders = inputRequestHeaders.poll();
                 responseBodyValidator = responseBodyValidators.poll();
                 responseHeadersValidator = responseHeadersValidators.poll();
             }
 
-            final Endpoint endpoint = template.getCamelContext().getEndpoint(getTargetServiceUri());
+            final Endpoint endpoint = template.getCamelContext().getEndpoint(targetServiceUri);
             overrideEndpoint(endpoint);
 
             Exchange response;
@@ -194,7 +196,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
             logger.info("The endpoint %s will be sending %s request message bodies, %s request message headers, " +
                     "%s expected response body validators, and %s expected response headers validators",
-                    new Object[] {specification.getTargetServiceUri(),inputRequestBodies.size(), inputRequestHeaders.size(),
+                    new Object[] {specification.getTargetServiceUriGenerator(),inputRequestBodies.size(), inputRequestHeaders.size(),
                     responseBodyValidators.size(),responseHeadersValidators.size()});
 
             return specification;
