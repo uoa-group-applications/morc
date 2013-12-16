@@ -3,6 +3,9 @@ package nz.ac.auckland.integration.testing;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.bean.HeaderColumnNameMappingStrategy;
 import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
+import groovy.text.GStringTemplateEngine;
+import groovy.text.Template;
+import groovy.text.TemplateEngine;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
@@ -11,13 +14,14 @@ import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpec
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.*;
+import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.cxf.common.i18n.UncheckedException;
 import org.junit.runner.RunWith;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.xml.namespace.QName;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
@@ -87,26 +91,79 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new XmlTestResource(url);
     }
 
-    public static Enumeration<XmlTestResource> dynamicXml(List<InputStream> inputs) {
+    public static XmlTestResource[] dynamicXml(final List<InputStream> inputs) {
+        XmlTestResource[] resources = new XmlTestResource[inputs.size()];
 
+        for (int i = 0; i < inputs.size(); i++) {
+            resources[i] = new XmlTestResource(inputs.get(i));
+        }
+
+        return resources;
     }
 
     public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource) {
-
+        return groovy(template,dataSource,GStringTemplateEngine.class);
     }
 
-    public static List<Map<String,String>> csvdatasource(URL csvUrl) {
-        CSVReader reader;
+    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource,
+                                      Class<? extends TemplateEngine> templateEngine) {
+        List<InputStream> results = new ArrayList<>();
+        try {
+            TemplateEngine engine = templateEngine.newInstance();
+            Template groovyTemplate = engine.createTemplate(template.getValue());
 
+            for (Map<String,String> variables : dataSource) {
+                results.add(new ReaderInputStream(new StringReader(groovyTemplate.make(variables).toString())));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return results;
+    }
+
+    public static List<InputStream> dir(String urlpath) {
+        List<URL> resourceUrls = new ArrayList<>();
+        List<InputStream> resourceStreams = new ArrayList<>();
+
+        try {
+            Resource[] resources;
+            resources = new PathMatchingResourcePatternResolver().getResources(urlpath);
+            for (Resource resource : resources) {
+                resourceUrls.add(resource.getURL());
+            }
+
+            //sort them alphabetically first
+            Collections.sort(resourceUrls, new Comparator<URL>() {
+                @Override
+                public int compare(URL o1, URL o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+
+            for (URL url : resourceUrls) {
+                resourceStreams.add(url.openStream());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resourceStreams;
+    }
+
+
+    public static List<Map<String,String>> csv(TestResource<String> csvResource) {
+        CSVReader reader;
         List<Map<String,String>> output = new ArrayList<>();
         String[] headers;
 
         try {
-            reader = new CSVReader(new InputStreamReader(csvUrl.openStream()));
+            reader = new CSVReader(new StringReader(csvResource.getValue()));
 
             headers = reader.readNext();
 
-            //todo: check all headers are unique
+            if (new LinkedHashSet<>(Arrays.asList(headers)).size() != headers.length)
+                throw new IllegalArgumentException("The headers for the csv " + csvResource + " are not unique");
 
             String[] nextLine;
             int line = 2;
@@ -114,7 +171,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
                 Map<String,String> variableMap = new HashMap<>();
 
                 if (nextLine.length != headers.length)
-                    throw new IllegalArgumentException("The CSV resource " + csvUrl + " has a different " +
+                    throw new IllegalArgumentException("The CSV resource " + csvResource + " has a different " +
                             "number of headers and values for line " + line);
 
                 for (int i = 0; i < nextLine.length; i++) {
@@ -125,7 +182,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
                 line++;
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -197,14 +254,16 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param data A standard Java string which will be used for seeding a message, or comparing a value
      */
-    public static PlainTextTestResource text(String data) {
+    @SuppressWarnings("unchecked")
+    public static TestResource<String> text(String data) {
         return new PlainTextTestResource(data);
     }
 
     /**
      * @param file A file containing plain text
      */
-    public static PlainTextTestResource text(File file) {
+    @SuppressWarnings("unchecked")
+    public static TestResource<String> text(File file) {
         return new PlainTextTestResource(file);
     }
 
@@ -212,7 +271,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param url A url pointing to a plain text document
      */
-    public static PlainTextTestResource text(URL url) {
+    @SuppressWarnings("unchecked")
+    public static TestResource<String> text(URL url) {
         return new PlainTextTestResource(url);
     }
 

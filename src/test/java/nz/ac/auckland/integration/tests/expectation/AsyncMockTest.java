@@ -5,7 +5,6 @@ import nz.ac.auckland.integration.testing.expectation.MockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.seda.SedaComponent;

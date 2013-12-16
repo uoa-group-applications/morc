@@ -2,6 +2,8 @@ package nz.ac.auckland.integration.testing.resource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,9 +36,9 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
      * @return A Map containing header/value key pairs
      * @throws Exception
      */
-    protected Map<String, Object> getResource(File file) throws Exception {
+    protected Map<String, Object> getResource(InputStream stream) throws Exception {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(file));
+        properties.load(stream);
 
         Map<String, Object> headers = new HashMap<>();
 

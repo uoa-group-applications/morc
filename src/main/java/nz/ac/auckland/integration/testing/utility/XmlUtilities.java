@@ -12,6 +12,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.StringWriter;
 
 /**
@@ -46,6 +47,14 @@ public class XmlUtilities {
     public Document getXmlAsDocument(File xmlFile) {
         try {
             return getDocumentBuilder().parse(xmlFile);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Document getXmlAsDocument(InputStream stream) {
+        try {
+            return getDocumentBuilder().parse(stream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

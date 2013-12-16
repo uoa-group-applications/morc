@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -38,6 +39,10 @@ public class XmlTestResource extends StaticTestResource<Document> implements Val
         super(url);
     }
 
+    public XmlTestResource(InputStream stream) {
+        super(stream);
+    }
+
     public XmlUtilities getXmlUtilities() {
         return xmlUtilities;
     }
@@ -53,8 +58,8 @@ public class XmlTestResource extends StaticTestResource<Document> implements Val
      * @return The XML document from the resource as a String
      * @throws Exception XPathEvaluationException thrown if the xpath could not be evaluated correctly
      */
-    protected Document getResource(File file) throws Exception {
-        return xmlUtilities.getXmlAsDocument(file);
+    protected Document getResource(InputStream stream) throws Exception {
+        return xmlUtilities.getXmlAsDocument(stream);
     }
 
     /**

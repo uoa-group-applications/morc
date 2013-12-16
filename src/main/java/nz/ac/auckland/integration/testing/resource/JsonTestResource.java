@@ -4,12 +4,13 @@ import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.apache.commons.io.FileUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.*;
 import java.net.URL;
 
 /**
@@ -34,13 +35,17 @@ public class JsonTestResource extends StaticTestResource<String> implements Vali
         super(url);
     }
 
+    public JsonTestResource(InputStream stream) {
+        super(stream);
+    }
+
     /**
      * @param file a reference to the JSON test resource
      * @return A JSON string
      * @throws Exception
      */
-    protected String getResource(File file) throws Exception {
-        return FileUtils.readFileToString(file);
+    protected String getResource(InputStream stream) throws Exception {
+        return IOUtils.toString(stream, "UTF-8");
     }
 
     /**

@@ -417,8 +417,8 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         //send the request through to the target endpoint, ensure it gets sent and there's a valid response
         boolean testSendState = specification.sendInput(context.createProducerTemplate());
 
-        if (!testSendState) throw new AssertionError("The message could not be sent to the target destination: "
-                + specification.getTargetServiceUri() + ", or the response was invalid");
+        if (!testSendState) throw new AssertionError("The message could not be sent to the target destination(s): "
+                + specification.getTargetServiceUriGenerator() + ", or the response was invalid");
 
         logger.trace("Starting to check if the mock endpoint assert is satisfied");
         mockEndpoint.assertIsSatisfied();

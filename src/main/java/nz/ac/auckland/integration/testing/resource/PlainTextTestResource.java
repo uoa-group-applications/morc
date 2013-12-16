@@ -4,10 +4,14 @@ import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.apache.commons.io.FileUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -32,12 +36,16 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
         super(url);
     }
 
+    public PlainTextTestResource(InputStream stream) {
+        super(stream);
+    }
+
     /**
      * @return The plain text from an external resource as a standard Java String
      * @throws Exception
      */
-    protected String getResource(File file) throws Exception {
-        return FileUtils.readFileToString(file);
+    protected String getResource(InputStream stream) throws Exception {
+        return IOUtils.toString(stream, "UTF-8");
     }
 
     /**
