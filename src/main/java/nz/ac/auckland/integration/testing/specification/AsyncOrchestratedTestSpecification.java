@@ -73,8 +73,8 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
         private Queue<TestResource<Map<String,Object>>> inputMessageHeaders = new LinkedList<>();
         private Queue<TestResource> inputMessageBodies = new LinkedList<>();
 
-        public Builder(String endpointUri, String description) {
-            super(endpointUri, description);
+        public Builder(String description, String endpointUri, String... endpointUris) {
+            super(description, endpointUri, endpointUris);
         }
 
         protected Builder self() {

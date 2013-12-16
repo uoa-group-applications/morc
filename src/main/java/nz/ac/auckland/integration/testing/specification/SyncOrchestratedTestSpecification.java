@@ -126,8 +126,8 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         private Queue<Validator> responseBodyValidators = new LinkedList<>();
         private Queue<HeadersValidator> responseHeadersValidators = new LinkedList<>();
 
-        public Builder(String endpointUri, String description) {
-            super(endpointUri, description);
+        public Builder(String description, String endpointUri, String... endpointUris) {
+            super(description,endpointUri,endpointUris);
         }
 
         protected Builder self() {

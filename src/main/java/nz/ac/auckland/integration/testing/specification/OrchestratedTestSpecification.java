@@ -129,20 +129,11 @@ public abstract class OrchestratedTestSpecification {
 
         public abstract Product build();
 
-        public AbstractBuilder(final String targetServiceUri, String description) {
-            this(new EndpointUriGenerator() {
-                @Override
-                public String getEndpoint() {
-                    return targetServiceUri;
-                }
-
-                public String toString() {
-                    return targetServiceUri;
-                }
-            }, description);
+        public AbstractBuilder(String description, String targetServiceUri, String... targetServiceUris) {
+            this(description, new MultiEndpointGenerator(targetServiceUri,targetServiceUris));
         }
 
-        public AbstractBuilder(EndpointUriGenerator targetServiceUriGenerator, String description) {
+        public AbstractBuilder(String description, EndpointUriGenerator targetServiceUriGenerator) {
             this.description = description;
             mockExpectations = new ArrayList<>();
             endpointOverrides = new ArrayList<>();
@@ -241,4 +232,43 @@ public abstract class OrchestratedTestSpecification {
         this.sendInterval = builder.sendInterval;
     }
 
+}
+
+class MultiEndpointGenerator implements EndpointUriGenerator {
+
+    private Queue<String> uriQueue = new LinkedList<>();
+    private String lastResponse;
+    private String humanReadableFormat;
+
+    public MultiEndpointGenerator(String endpointUri, String... endpointUris) {
+        uriQueue.add(endpointUri);
+        Collections.addAll(uriQueue, endpointUris);
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        builder.append(endpointUri);
+
+        for (String uri : endpointUris) {
+            uriQueue.add(uri);
+            builder.append(",");
+            builder.append(endpointUri);
+        }
+
+        builder.append(")");
+        humanReadableFormat = builder.toString();
+    }
+
+    @Override
+    public String getEndpoint() {
+        String endpointUri = uriQueue.poll();
+        if (endpointUri == null) return lastResponse;
+
+        lastResponse = endpointUri;
+        return endpointUri;
+    }
+
+    @Override
+    public String toString() {
+        return "EndpointGenerator: " + humanReadableFormat;
+    }
 }
