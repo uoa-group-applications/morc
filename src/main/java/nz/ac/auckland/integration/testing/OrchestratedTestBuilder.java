@@ -41,8 +41,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
-    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String endpointUri, String description) {
-        AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification.Builder(endpointUri, description);
+    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String description,String endpointUri,String... endpointUris) {
+        AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification
+                .Builder(description,endpointUri,endpointUris);
         specificationBuilders.add(builder);
         return builder;
     }
@@ -52,8 +53,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    protected SyncOrchestratedTestSpecification.Builder syncTest(String endpointUri, String description) {
-        SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification.Builder(endpointUri, description);
+    protected SyncOrchestratedTestSpecification.Builder syncTest(String description,String endpointUri,String... endpointUris) {
+        SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification
+                .Builder(description,endpointUri,endpointUris);
         specificationBuilders.add(builder);
         return builder;
     }
