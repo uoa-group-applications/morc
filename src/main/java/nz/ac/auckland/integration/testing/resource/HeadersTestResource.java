@@ -31,6 +31,10 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
         super(url);
     }
 
+    public HeadersTestResource(InputStream stream) {
+        super(stream);
+    }
+
     /**
      * @param file a reference to a properties file
      * @return A Map containing header/value key pairs

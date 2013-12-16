@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.specification;
 
+import nz.ac.auckland.integration.testing.EndpointUriGenerator;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Endpoint;
@@ -75,6 +76,10 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
 
         public Builder(String description, String endpointUri, String... endpointUris) {
             super(description, endpointUri, endpointUris);
+        }
+
+        public Builder(String description, EndpointUriGenerator targetServiceUriGenerator) {
+            super(description,targetServiceUriGenerator);
         }
 
         protected Builder self() {

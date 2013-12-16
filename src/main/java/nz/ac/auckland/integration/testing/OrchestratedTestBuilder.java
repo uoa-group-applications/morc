@@ -91,7 +91,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new XmlTestResource(url);
     }
 
-    public static XmlTestResource[] dynamicXml(final List<InputStream> inputs) {
+    public static XmlTestResource[] xml(final List<InputStream> inputs) {
         XmlTestResource[] resources = new XmlTestResource[inputs.size()];
 
         for (int i = 0; i < inputs.size(); i++) {
@@ -210,6 +210,16 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new JsonTestResource(url);
     }
 
+    public static JsonTestResource[] json(final List<InputStream> inputs) {
+        JsonTestResource[] resources = new JsonTestResource[inputs.size()];
+
+        for (int i = 0; i < inputs.size(); i++) {
+            resources[i] = new JsonTestResource(inputs.get(i));
+        }
+
+        return resources;
+    }
+
     /**
      * @param data A standard Java string which will be used for seeding a message, or comparing a value
      */
@@ -234,6 +244,17 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new PlainTextTestResource(url);
     }
 
+    @SuppressWarnings("unchecked")
+    public static TestResource<String>[] text(final List<InputStream> inputs) {
+        PlainTextTestResource[] resources = new PlainTextTestResource[inputs.size()];
+
+        for (int i = 0; i < inputs.size(); i++) {
+            resources[i] = new PlainTextTestResource(inputs.get(i));
+        }
+
+        return resources;
+    }
+
     /**
      * @param data A map of headers and corresponding data that will be used for seeding a message, or comparing an expected value
      */
@@ -253,6 +274,16 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      */
     public static HeadersTestResource headers(URL url) {
         return new HeadersTestResource(url);
+    }
+
+    public static HeadersTestResource[] headers(final List<InputStream> inputs) {
+        HeadersTestResource[] resources = new HeadersTestResource[inputs.size()];
+
+        for (int i = 0; i < inputs.size(); i++) {
+            resources[i] = new HeadersTestResource(inputs.get(i));
+        }
+
+        return resources;
     }
 
     /**
