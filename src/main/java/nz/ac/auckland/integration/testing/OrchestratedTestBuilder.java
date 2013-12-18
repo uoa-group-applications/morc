@@ -6,6 +6,7 @@ import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
+import nz.ac.auckland.integration.testing.answer.MatchedInputResponseAnswer;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
@@ -101,94 +102,6 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         }
 
         return resources;
-    }
-
-    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource) {
-        return groovy(template,dataSource,GStringTemplateEngine.class);
-    }
-
-    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource,
-                                      Class<? extends TemplateEngine> templateEngine) {
-        List<InputStream> results = new ArrayList<>();
-        try {
-            TemplateEngine engine = templateEngine.newInstance();
-            Template groovyTemplate = engine.createTemplate(template.getValue());
-
-            for (Map<String,String> variables : dataSource) {
-                results.add(new ReaderInputStream(new StringReader(groovyTemplate.make(variables).toString())));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return results;
-    }
-
-    public static List<InputStream> dir(String urlpath) {
-        List<URL> resourceUrls = new ArrayList<>();
-        List<InputStream> resourceStreams = new ArrayList<>();
-
-        try {
-            Resource[] resources;
-            resources = new PathMatchingResourcePatternResolver().getResources(urlpath);
-            for (Resource resource : resources) {
-                resourceUrls.add(resource.getURL());
-            }
-
-            //sort them alphabetically first
-            Collections.sort(resourceUrls, new Comparator<URL>() {
-                @Override
-                public int compare(URL o1, URL o2) {
-                    return o1.toString().compareTo(o2.toString());
-                }
-            });
-
-            for (URL url : resourceUrls) {
-                resourceStreams.add(url.openStream());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return resourceStreams;
-    }
-
-
-    public static List<Map<String,String>> csv(TestResource<String> csvResource) {
-        CSVReader reader;
-        List<Map<String,String>> output = new ArrayList<>();
-        String[] headers;
-
-        try {
-            reader = new CSVReader(new StringReader(csvResource.getValue()));
-
-            headers = reader.readNext();
-
-            if (new LinkedHashSet<>(Arrays.asList(headers)).size() != headers.length)
-                throw new IllegalArgumentException("The headers for the csv " + csvResource + " are not unique");
-
-            String[] nextLine;
-            int line = 2;
-            while ((nextLine = reader.readNext()) != null) {
-                Map<String,String> variableMap = new HashMap<>();
-
-                if (nextLine.length != headers.length)
-                    throw new IllegalArgumentException("The CSV resource " + csvResource + " has a different " +
-                            "number of headers and values for line " + line);
-
-                for (int i = 0; i < nextLine.length; i++) {
-                    variableMap.put(headers[i],nextLine[i]);
-                }
-
-                output.add(variableMap);
-                line++;
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return output;
     }
 
     /**
@@ -352,6 +265,135 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      */
     public static File file(String path) {
         return new File(path);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static MatchedInputResponseAnswer matchedResponse(MatchedInputResponseAnswer.MatchedResponse... responses) {
+        return new MatchedInputResponseAnswer(responses);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static MatchedInputResponseAnswer matchedResponse(boolean removeOnMatch,
+                                                             MatchedInputResponseAnswer.MatchedResponse... responses) {
+        return new MatchedInputResponseAnswer(removeOnMatch,responses);
+    }
+
+    @SafeVarargs
+    public static MatchedInputResponseAnswer<Map<String,Object>> matchedHeadersResponse(
+            MatchedInputResponseAnswer.MatchedResponse<Map<String,Object>>... responses) {
+        return new MatchedInputResponseAnswer<>(responses);
+    }
+
+    @SafeVarargs
+    public static MatchedInputResponseAnswer<Map<String,Object>> matchedHeadersResponse(boolean removeOnMatch,
+                MatchedInputResponseAnswer.MatchedResponse<Map<String,Object>>... responses) {
+            return new MatchedInputResponseAnswer<>(removeOnMatch,responses);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static MatchedInputResponseAnswer.MatchedResponse answer(Validator validator, TestResource resource) {
+        try {
+            return new MatchedInputResponseAnswer.MatchedResponse(validator,resource);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static MatchedInputResponseAnswer.MatchedResponse<Map<String,Object>> headerAnswer(Validator validator,
+                                                                                        TestResource<Map<String,Object>> resource) {
+        try {
+            return new MatchedInputResponseAnswer.MatchedResponse<>(validator,resource);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource) {
+        return groovy(template,dataSource,GStringTemplateEngine.class);
+    }
+
+    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource,
+                                      Class<? extends TemplateEngine> templateEngine) {
+        List<InputStream> results = new ArrayList<>();
+        try {
+            TemplateEngine engine = templateEngine.newInstance();
+            Template groovyTemplate = engine.createTemplate(template.getValue());
+
+            for (Map<String,String> variables : dataSource) {
+                results.add(new ReaderInputStream(new StringReader(groovyTemplate.make(variables).toString())));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return results;
+    }
+
+    public static List<InputStream> dir(String urlpath) {
+        List<URL> resourceUrls = new ArrayList<>();
+        List<InputStream> resourceStreams = new ArrayList<>();
+
+        try {
+            Resource[] resources;
+            resources = new PathMatchingResourcePatternResolver().getResources(urlpath);
+            for (Resource resource : resources) {
+                resourceUrls.add(resource.getURL());
+            }
+
+            //sort them alphabetically first
+            Collections.sort(resourceUrls, new Comparator<URL>() {
+                @Override
+                public int compare(URL o1, URL o2) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+
+            for (URL url : resourceUrls) {
+                resourceStreams.add(url.openStream());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resourceStreams;
+    }
+
+
+    public static List<Map<String,String>> csv(TestResource<String> csvResource) {
+        CSVReader reader;
+        List<Map<String,String>> output = new ArrayList<>();
+        String[] headers;
+
+        try {
+            reader = new CSVReader(new StringReader(csvResource.getValue()));
+
+            headers = reader.readNext();
+
+            if (new LinkedHashSet<>(Arrays.asList(headers)).size() != headers.length)
+                throw new IllegalArgumentException("The headers for the csv " + csvResource + " are not unique");
+
+            String[] nextLine;
+            int line = 2;
+            while ((nextLine = reader.readNext()) != null) {
+                Map<String,String> variableMap = new HashMap<>();
+
+                if (nextLine.length != headers.length)
+                    throw new IllegalArgumentException("The CSV resource " + csvResource + " has a different " +
+                            "number of headers and values for line " + line);
+
+                for (int i = 0; i < nextLine.length; i++) {
+                    variableMap.put(headers[i],nextLine[i]);
+                }
+
+                output.add(variableMap);
+                line++;
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return output;
     }
 
     /**
