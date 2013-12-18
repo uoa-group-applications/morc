@@ -92,14 +92,14 @@ public abstract class OrchestratedTestSpecification {
         do {
             try {
                 if (i != 0) Thread.sleep(sendInterval);
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
 
-            logger.debug("Sending input message {}", i+1);
+            logger.debug("Sending input message {}", i + 1);
             boolean response = sendInputInternal(template);
             if (!response) {
-                logger.warn("Failed on sending input message {}",i+1);
+                logger.warn("Failed on sending input message {}", i + 1);
                 return false;
             }
 
@@ -130,7 +130,7 @@ public abstract class OrchestratedTestSpecification {
         public abstract Product build();
 
         public AbstractBuilder(String description, String targetServiceUri, String... targetServiceUris) {
-            this(description, new MultiEndpointGenerator(targetServiceUri,targetServiceUris));
+            this(description, new MultiEndpointGenerator(targetServiceUri, targetServiceUris));
         }
 
         public AbstractBuilder(String description, EndpointUriGenerator targetServiceUriGenerator) {

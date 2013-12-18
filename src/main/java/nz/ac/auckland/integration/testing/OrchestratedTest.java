@@ -149,8 +149,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     /**
      * A route for subscribing to the expectation endpoints and sending them through to the MockEndpoint -
      * override this at your own risk if you have special requirements (e.g. transactions)
+     *
      * @param expectationEndpoint The endpoint that exchanges will be sent to as part of testing
-     * @param mockEndpoint The endpoint that the incoming exchanges will be sent to
+     * @param mockEndpoint        The endpoint that the incoming exchanges will be sent to
      * @return A Camel RouteBuilder that creates routes for the expectations
      */
     protected RouteBuilder generateMockFeedRoute(final Endpoint expectationEndpoint, final Endpoint mockEndpoint) {
@@ -260,7 +261,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
                 MockExpectation expectation = expectations.poll();
 
                 logger.trace("An exchange has been received from the endpoint: {}, headers: {}, body: {}",
-                        new String[] {exchange.getFromEndpoint().getEndpointUri(),
+                        new String[]{exchange.getFromEndpoint().getEndpointUri(),
                                 HeadersTestResource.formatHeaders(exchange.getIn().getHeaders()), exchange.getIn().getBody(String.class)});
 
                 if (expectation == null) {
@@ -285,14 +286,14 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             @Override
             public void configure() throws Exception {
                 from("direct:internalMockFeederRoute")
-                    .process(new Processor() {
-                        @Override
-                        public void process(Exchange exchange) throws Exception {
-                            exchange.setProperty("orchestratedTestFromURI", exchange.getFromEndpoint().getEndpointUri());
-                        }
-                    })
-                    .log(LoggingLevel.DEBUG, OrchestratedTest.class.getName(), "An exchange has been received from the endpoint: ${property.orchestratedTestFromURI}")
-                    .to(mockEndpoint);
+                        .process(new Processor() {
+                            @Override
+                            public void process(Exchange exchange) throws Exception {
+                                exchange.setProperty("orchestratedTestFromURI", exchange.getFromEndpoint().getEndpointUri());
+                            }
+                        })
+                        .log(LoggingLevel.DEBUG, OrchestratedTest.class.getName(), "An exchange has been received from the endpoint: ${property.orchestratedTestFromURI}")
+                        .to(mockEndpoint);
             }
         });
 

@@ -1,8 +1,6 @@
 package nz.ac.auckland.integration.testing;
 
 import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.bean.HeaderColumnNameMappingStrategy;
-import au.com.bytecode.opencsv.bean.HeaderColumnNameTranslateMappingStrategy;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
@@ -14,15 +12,19 @@ import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecific
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.validator.*;
+import nz.ac.auckland.integration.testing.validator.ExceptionValidator;
+import nz.ac.auckland.integration.testing.validator.HttpErrorValidator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.commons.io.input.ReaderInputStream;
-import org.apache.cxf.common.i18n.UncheckedException;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.xml.namespace.QName;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.*;
 
@@ -42,9 +44,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
-    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String description,String endpointUri,String... endpointUris) {
+    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String description, String endpointUri, String... endpointUris) {
         AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification
-                .Builder(description,endpointUri,endpointUris);
+                .Builder(description, endpointUri, endpointUris);
         specificationBuilders.add(builder);
         return builder;
     }
@@ -54,9 +56,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    protected SyncOrchestratedTestSpecification.Builder syncTest(String description,String endpointUri,String... endpointUris) {
+    protected SyncOrchestratedTestSpecification.Builder syncTest(String description, String endpointUri, String... endpointUris) {
         SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification
-                .Builder(description,endpointUri,endpointUris);
+                .Builder(description, endpointUri, endpointUris);
         specificationBuilders.add(builder);
         return builder;
     }
@@ -247,7 +249,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     public static ExceptionValidator exception(Class<? extends Exception> exception, String message) {
-        return new ExceptionValidator(exception,message);
+        return new ExceptionValidator(exception, message);
     }
 
     /**
@@ -275,51 +277,51 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     @SuppressWarnings("unchecked")
     public static MatchedInputResponseAnswer matchedResponse(boolean removeOnMatch,
                                                              MatchedInputResponseAnswer.MatchedResponse... responses) {
-        return new MatchedInputResponseAnswer(removeOnMatch,responses);
+        return new MatchedInputResponseAnswer(removeOnMatch, responses);
     }
 
     @SafeVarargs
-    public static MatchedInputResponseAnswer<Map<String,Object>> matchedHeadersResponse(
-            MatchedInputResponseAnswer.MatchedResponse<Map<String,Object>>... responses) {
+    public static MatchedInputResponseAnswer<Map<String, Object>> matchedHeadersResponse(
+            MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>>... responses) {
         return new MatchedInputResponseAnswer<>(responses);
     }
 
     @SafeVarargs
-    public static MatchedInputResponseAnswer<Map<String,Object>> matchedHeadersResponse(boolean removeOnMatch,
-                MatchedInputResponseAnswer.MatchedResponse<Map<String,Object>>... responses) {
-            return new MatchedInputResponseAnswer<>(removeOnMatch,responses);
+    public static MatchedInputResponseAnswer<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
+                                                                                         MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>>... responses) {
+        return new MatchedInputResponseAnswer<>(removeOnMatch, responses);
     }
 
     @SuppressWarnings("unchecked")
     public static MatchedInputResponseAnswer.MatchedResponse answer(Validator validator, TestResource resource) {
         try {
-            return new MatchedInputResponseAnswer.MatchedResponse(validator,resource);
+            return new MatchedInputResponseAnswer.MatchedResponse(validator, resource);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static MatchedInputResponseAnswer.MatchedResponse<Map<String,Object>> headerAnswer(Validator validator,
-                                                                                        TestResource<Map<String,Object>> resource) {
+    public static MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
+                                                                                               TestResource<Map<String, Object>> resource) {
         try {
-            return new MatchedInputResponseAnswer.MatchedResponse<>(validator,resource);
+            return new MatchedInputResponseAnswer.MatchedResponse<>(validator, resource);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource) {
-        return groovy(template,dataSource,GStringTemplateEngine.class);
+    public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
+        return groovy(template, dataSource, GStringTemplateEngine.class);
     }
 
-    public static List<InputStream> groovy(TestResource<String> template, List<Map<String,String>> dataSource,
-                                      Class<? extends TemplateEngine> templateEngine) {
+    public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource,
+                                           Class<? extends TemplateEngine> templateEngine) {
         List<InputStream> results = new ArrayList<>();
         try {
             TemplateEngine engine = templateEngine.newInstance();
             Template groovyTemplate = engine.createTemplate(template.getValue());
 
-            for (Map<String,String> variables : dataSource) {
+            for (Map<String, String> variables : dataSource) {
                 results.add(new ReaderInputStream(new StringReader(groovyTemplate.make(variables).toString())));
             }
         } catch (Exception e) {
@@ -359,9 +361,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
 
-    public static List<Map<String,String>> csv(TestResource<String> csvResource) {
+    public static List<Map<String, String>> csv(TestResource<String> csvResource) {
         CSVReader reader;
-        List<Map<String,String>> output = new ArrayList<>();
+        List<Map<String, String>> output = new ArrayList<>();
         String[] headers;
 
         try {
@@ -375,14 +377,14 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
             String[] nextLine;
             int line = 2;
             while ((nextLine = reader.readNext()) != null) {
-                Map<String,String> variableMap = new HashMap<>();
+                Map<String, String> variableMap = new HashMap<>();
 
                 if (nextLine.length != headers.length)
                     throw new IllegalArgumentException("The CSV resource " + csvResource + " has a different " +
                             "number of headers and values for line " + line);
 
                 for (int i = 0; i < nextLine.length; i++) {
-                    variableMap.put(headers[i],nextLine[i]);
+                    variableMap.put(headers[i], nextLine[i]);
                 }
 
                 output.add(variableMap);

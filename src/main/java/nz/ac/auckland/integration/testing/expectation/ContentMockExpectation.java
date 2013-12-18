@@ -1,7 +1,8 @@
 package nz.ac.auckland.integration.testing.expectation;
 
-import nz.ac.auckland.integration.testing.resource.*;
-import nz.ac.auckland.integration.testing.validator.*;
+import nz.ac.auckland.integration.testing.resource.TestResource;
+import nz.ac.auckland.integration.testing.validator.HeadersValidator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public abstract class ContentMockExpectation extends MockExpectation {
     /**
      * Evaluates whether the content coming in from an endpoint meets the content requirements. Ordering checks
      * are delegated to the superclass.
-     *
+     * <p/>
      * Synchronized so that the body and headers validator can be retrieved in lock-step
      */
     public synchronized boolean checkValid(Exchange incomingExchange, int index) {
@@ -86,14 +87,14 @@ public abstract class ContentMockExpectation extends MockExpectation {
         }
 
         @SafeVarargs
-        public final Builder expectedHeaders(TestResource<Map<String,Object>>... resources) {
-            for (TestResource<Map<String,Object>> resource : resources) {
+        public final Builder expectedHeaders(TestResource<Map<String, Object>>... resources) {
+            for (TestResource<Map<String, Object>> resource : resources) {
                 expectedHeadersValidators.add(new HeadersValidator(resource));
             }
             return self();
         }
 
-        public Builder expectedHeaders(Enumeration<TestResource<Map<String,Object>>> validators) {
+        public Builder expectedHeaders(Enumeration<TestResource<Map<String, Object>>> validators) {
             while (validators.hasMoreElements()) {
                 expectedHeadersValidators.add(new HeadersValidator(validators.nextElement()));
             }

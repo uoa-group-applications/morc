@@ -1,8 +1,6 @@
 package nz.ac.auckland.integration.testing.resource;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
@@ -53,14 +51,14 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
         return Collections.unmodifiableMap(headers);
     }
 
-    public static String formatHeaders(Map<String,Object> headers) {
+    public static String formatHeaders(Map<String, Object> headers) {
         if (headers == null) return "";
 
         StringBuilder sb = new StringBuilder();
 
-        for (String key: headers.keySet()) {
+        for (String key : headers.keySet()) {
             Object value = headers.get(key);
-            sb.append(String.format("(%s:%s) ",key,value == null ? "null" : value.toString().trim()));
+            sb.append(String.format("(%s:%s) ", key, value == null ? "null" : value.toString().trim()));
         }
 
         return sb.toString().trim();

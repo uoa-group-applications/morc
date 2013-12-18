@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestSpecification.class);
-    private Queue<TestResource<Map<String,Object>>> inputMessageHeaders;
+    private Queue<TestResource<Map<String, Object>>> inputMessageHeaders;
     private Queue<TestResource> inputMessageBodies;
 
     /**
@@ -27,7 +27,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
      */
     protected boolean sendInputInternal(ProducerTemplate template) {
 
-        TestResource<Map<String,Object>> inputHeaders;
+        TestResource<Map<String, Object>> inputHeaders;
         TestResource inputMessageBody;
         final String targetServiceUri;
 
@@ -43,22 +43,21 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
             overrideEndpoint(endpoint);
 
             if (inputMessageBody != null && inputHeaders != null) {
-                logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
-                    HeadersTestResource.formatHeaders(inputHeaders.getValue()),
-                    template.getCamelContext().getTypeConverter().convertTo(String.class,inputMessageBody.getValue())});
+                logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[]{endpoint.toString(),
+                        HeadersTestResource.formatHeaders(inputHeaders.getValue()),
+                        template.getCamelContext().getTypeConverter().convertTo(String.class, inputMessageBody.getValue())});
                 template.sendBodyAndHeaders(endpoint, inputMessageBody.getValue(), inputHeaders.getValue());
-            }
-            else if (inputHeaders != null) {
-                logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[] {endpoint.toString(),
-                    HeadersTestResource.formatHeaders(inputHeaders.getValue()),
-                    template.getCamelContext().getTypeConverter().convertTo(String.class,"")});
+            } else if (inputHeaders != null) {
+                logger.trace("Sending to endpoint: {} headers: {}, body: {}", new String[]{endpoint.toString(),
+                        HeadersTestResource.formatHeaders(inputHeaders.getValue()),
+                        template.getCamelContext().getTypeConverter().convertTo(String.class, "")});
                 template.sendBodyAndHeaders(endpoint, "", inputHeaders.getValue());
             } else if (inputMessageBody != null) {
-                logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),
-                    template.getCamelContext().getTypeConverter().convertTo(String.class,inputMessageBody.getValue())});
+                logger.trace("Sending to endpoint: {} body: {}", new String[]{endpoint.toString(),
+                        template.getCamelContext().getTypeConverter().convertTo(String.class, inputMessageBody.getValue())});
                 template.sendBody(endpoint, inputMessageBody.getValue());
             } else {
-                logger.trace("Sending to endpoint: {} body: {}", new String[] {endpoint.toString(),""});
+                logger.trace("Sending to endpoint: {} body: {}", new String[]{endpoint.toString(), ""});
                 template.sendBody(endpoint, "");
             }
 
@@ -71,7 +70,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
 
     public static class Builder extends AsyncOrchestratedTestSpecification.AbstractBuilder<AsyncOrchestratedTestSpecification, Builder> {
 
-        private Queue<TestResource<Map<String,Object>>> inputMessageHeaders = new LinkedList<>();
+        private Queue<TestResource<Map<String, Object>>> inputMessageHeaders = new LinkedList<>();
         private Queue<TestResource> inputMessageBodies = new LinkedList<>();
 
         public Builder(String description, String endpointUri, String... endpointUris) {
@@ -79,7 +78,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
         }
 
         public Builder(String description, EndpointUriGenerator targetServiceUriGenerator) {
-            super(description,targetServiceUriGenerator);
+            super(description, targetServiceUriGenerator);
         }
 
         protected Builder self() {
@@ -99,12 +98,12 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
         }
 
         @SafeVarargs
-        public final Builder inputHeaders(TestResource<Map<String,Object>>... resources) {
-            Collections.addAll(this.inputMessageHeaders,resources);
+        public final Builder inputHeaders(TestResource<Map<String, Object>>... resources) {
+            Collections.addAll(this.inputMessageHeaders, resources);
             return self();
         }
 
-        public Builder inputHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
+        public Builder inputHeaders(Enumeration<TestResource<Map<String, Object>>> resources) {
             while (resources.hasMoreElements()) {
                 this.inputMessageHeaders.add(resources.nextElement());
             }
@@ -119,7 +118,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
             if (specification.getMockExpectations().size() == 0)
                 throw new IllegalArgumentException("At least 1 mock expectation must be set for an AsyncOrchestratedTestSpecification");
             logger.info("The endpoint %s will be sending %s input message bodies and  %s input message headers",
-                    new Object[] {specification.getTargetServiceUriGenerator(),inputMessageBodies.size(), inputMessageHeaders.size()});
+                    new Object[]{specification.getTargetServiceUriGenerator(), inputMessageBodies.size(), inputMessageHeaders.size()});
             return specification;
         }
     }

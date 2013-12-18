@@ -47,7 +47,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         }
     }
 
-    protected abstract static class Init<Product, Builder extends Init<Product, Builder,T>, T>
+    protected abstract static class Init<Product, Builder extends Init<Product, Builder, T>, T>
             extends ContentMockExpectation.AbstractContentBuilder<SyncMockExpectation, Builder> {
 
         protected Answer<T> responseBodyAnswer;
@@ -68,7 +68,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         @SuppressWarnings("unchecked")
         public final Builder responseBody(TestResource<T>... resources) {
             if (resources.length == 0)
-                logger.warn("No test resource response bodies were provided for endpoint %s, this is not recommended",endpointUri);
+                logger.warn("No test resource response bodies were provided for endpoint %s, this is not recommended", endpointUri);
 
             this.responseBodyAnswer = new AggregatedTestResourceAnswer<>(resources);
             return self();
@@ -77,7 +77,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
         @SuppressWarnings("unchecked")
         public Builder responseBody(Enumeration<TestResource<T>> resources) {
             if (!resources.hasMoreElements())
-                logger.warn("The enumeration provided no response bodies for endpoint %s, this is not recommended",endpointUri);
+                logger.warn("The enumeration provided no response bodies for endpoint %s, this is not recommended", endpointUri);
 
             List<TestResource<T>> remainingResources = new ArrayList<>();
 
@@ -85,7 +85,7 @@ public class SyncMockExpectation extends ContentMockExpectation {
                 remainingResources.add(resources.nextElement());
             }
 
-            return responseBody((TestResource<T>[])remainingResources.toArray());
+            return responseBody((TestResource<T>[]) remainingResources.toArray());
         }
 
         /**
@@ -97,26 +97,26 @@ public class SyncMockExpectation extends ContentMockExpectation {
         }
 
         @SuppressWarnings("unchecked")
-        public Builder responseHeaders(TestResource<Map<String,Object>>... resources) {
+        public Builder responseHeaders(TestResource<Map<String, Object>>... resources) {
             if (resources.length == 0)
-                logger.warn("No test resource response headers were provided for endpoint %s, this is not recommended",endpointUri);
+                logger.warn("No test resource response headers were provided for endpoint %s, this is not recommended", endpointUri);
 
             this.responseHeadersAnswer = new AggregatedTestResourceAnswer<>(resources);
             return self();
         }
 
         @SuppressWarnings("unchecked")
-        public Builder responseHeaders(Enumeration<TestResource<Map<String,Object>>> resources) {
+        public Builder responseHeaders(Enumeration<TestResource<Map<String, Object>>> resources) {
             if (!resources.hasMoreElements())
-                logger.warn("The enumeration provided no response headers for endpoint %s, this is not recommended",endpointUri);
+                logger.warn("The enumeration provided no response headers for endpoint %s, this is not recommended", endpointUri);
 
-            List<TestResource<Map<String,Object>>> remainingResources = new ArrayList<>();
+            List<TestResource<Map<String, Object>>> remainingResources = new ArrayList<>();
 
             while (resources.hasMoreElements()) {
                 remainingResources.add(resources.nextElement());
             }
 
-            return responseBody((TestResource<T>[])remainingResources.toArray());
+            return responseBody((TestResource<T>[]) remainingResources.toArray());
         }
 
         @SuppressWarnings("unchecked")
@@ -142,17 +142,17 @@ class AggregatedTestResourceAnswer<T> implements Answer {
 
     @SafeVarargs
     public AggregatedTestResourceAnswer(TestResource<T>... remaining) {
-       try {
-           for (TestResource<T> resource: remaining) {
-               values.add(resource.getValue());
-           }
-       } catch (Exception e) {
-           throw new RuntimeException(e);
-       }
+        try {
+            for (TestResource<T> resource : remaining) {
+                values.add(resource.getValue());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public T response(Exchange exchange) throws Exception {
-       return values.poll();
+        return values.poll();
     }
 }

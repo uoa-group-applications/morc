@@ -3,14 +3,11 @@ package nz.ac.auckland.integration.testing.resource;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
-import org.apache.commons.io.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -68,7 +65,7 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
         try {
             String expectedInput = getValue();
 
-            logger.trace("Expected Plain Text Value: {},\nActual Plain Text Value: {}",expectedInput,
+            logger.trace("Expected Plain Text Value: {},\nActual Plain Text Value: {}", expectedInput,
                     value);
 
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();

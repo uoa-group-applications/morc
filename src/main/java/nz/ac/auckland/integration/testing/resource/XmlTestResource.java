@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
@@ -105,8 +104,8 @@ public class XmlTestResource extends StaticTestResource<Document> implements Val
         try {
             Document expectedValue = getValue();
 
-            logger.trace("Expected XML Value: {},\nActual XML Value: {}",xmlUtilities.getDocumentAsString(expectedValue).trim()
-                    ,xmlUtilities.getDocumentAsString(value).trim());
+            logger.trace("Expected XML Value: {},\nActual XML Value: {}", xmlUtilities.getDocumentAsString(expectedValue).trim()
+                    , xmlUtilities.getDocumentAsString(value).trim());
 
             DetailedDiff difference = new DetailedDiff(new Diff(expectedValue, value));
             if (!difference.similar())

@@ -3,14 +3,14 @@ package nz.ac.auckland.integration.testing.resource;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
-import org.apache.commons.io.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -68,7 +68,7 @@ public class JsonTestResource extends StaticTestResource<String> implements Vali
         try {
             String expectedInput = getValue();
 
-            logger.trace("Expected JSON Input: {},\nActual JSON Input: {}",expectedInput,
+            logger.trace("Expected JSON Input: {},\nActual JSON Input: {}", expectedInput,
                     value);
 
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();

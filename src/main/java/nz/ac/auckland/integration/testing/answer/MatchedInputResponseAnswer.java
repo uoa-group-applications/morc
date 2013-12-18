@@ -1,13 +1,15 @@
 package nz.ac.auckland.integration.testing.answer;
 
-import nz.ac.auckland.integration.testing.expectation.SyncMockExpectation;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class MatchedInputResponseAnswer<T> implements Answer<T> {
 
@@ -17,7 +19,7 @@ public class MatchedInputResponseAnswer<T> implements Answer<T> {
 
     @SafeVarargs
     public MatchedInputResponseAnswer(MatchedResponse<T>... responseValues) {
-        this(false,responseValues);
+        this(false, responseValues);
     }
 
     @SafeVarargs
@@ -38,7 +40,7 @@ public class MatchedInputResponseAnswer<T> implements Answer<T> {
         }
 
         logger.warn("The exchange arriving at endpoint %s found no response match for body %s",
-                exchange.getFromEndpoint(),exchange.getIn().getBody(String.class));
+                exchange.getFromEndpoint(), exchange.getIn().getBody(String.class));
         return null;
     }
 

@@ -17,9 +17,9 @@ public class HeadersValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(HeadersValidator.class);
 
-    private TestResource<Map<String,Object>> resource;
+    private TestResource<Map<String, Object>> resource;
 
-    public HeadersValidator(TestResource<Map<String,Object>> resource) {
+    public HeadersValidator(TestResource<Map<String, Object>> resource) {
         this.resource = resource;
     }
 
@@ -42,7 +42,7 @@ public class HeadersValidator implements Validator {
             throw new RuntimeException(e);
         }
 
-        logger.trace("Expected Headers: {}, Actual Headers: {}",HeadersTestResource.formatHeaders(expectedHeaders),
+        logger.trace("Expected Headers: {}, Actual Headers: {}", HeadersTestResource.formatHeaders(expectedHeaders),
                 HeadersTestResource.formatHeaders(value));
 
         //I'm not interested if the input has any additional headers
