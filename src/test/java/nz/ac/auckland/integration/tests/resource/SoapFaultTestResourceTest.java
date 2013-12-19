@@ -3,7 +3,6 @@ package nz.ac.auckland.integration.tests.resource;
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,8 +29,7 @@ public class SoapFaultTestResourceTest extends Assert {
         SoapFault fault = resource.getValue();
         assertEquals(fault.getMessage(), "foo");
         assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
-        XmlValidator validator = new XmlValidator(detail);
-        assertTrue(validator.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
+        assertTrue(detail.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
     }
 
     @Test
@@ -43,7 +41,6 @@ public class SoapFaultTestResourceTest extends Assert {
         SoapFault fault = resource.getValue();
         assertEquals(fault.getMessage(), "foo");
         assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
-        XmlValidator validator = new XmlValidator(new XmlTestResource(xmlUtilities.getXmlAsDocument("<detail><foo/></detail>")));
-        assertTrue(validator.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
+        assertTrue(detail.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
     }
 }

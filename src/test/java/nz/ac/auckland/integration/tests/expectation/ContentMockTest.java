@@ -117,7 +117,7 @@ class TestContentMockExpectation extends ContentMockExpectation {
             return this;
         }
 
-        public TestContentMockExpectation build() {
+        public TestContentMockExpectation buildInternal() {
             return new TestContentMockExpectation(this);
         }
     }

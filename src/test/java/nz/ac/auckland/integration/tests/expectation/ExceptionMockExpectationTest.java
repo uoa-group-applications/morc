@@ -14,8 +14,7 @@ public class ExceptionMockExpectationTest extends Assert {
     @Test
     public void testExceptionAndMessage() throws Exception {
         ExceptionMockExpectation expectation = new ExceptionMockExpectation.Builder("vm:test")
-                .exceptionClass(IOException.class)
-                .message("test")
+                .exceptionResponse(new )
                 .build();
 
         try {

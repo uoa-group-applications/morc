@@ -81,7 +81,7 @@ public class AsyncMockTest extends Assert {
         Exchange exchange = new DefaultExchange(ctx);
         exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         HeadersValidator nullHeadersValidator = null;
-        XmlValidator nullValidator = null;
+        XmlTestResource nullValidator = null;
 
         assertTrue(generateExpectationBuilder().expectedHeaders(nullHeadersValidator)
                 .expectedBody(nullValidator).build().checkValid(exchange, 0));

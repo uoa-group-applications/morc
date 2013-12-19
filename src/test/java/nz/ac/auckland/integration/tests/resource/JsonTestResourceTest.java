@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.validator.JsonValidator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
@@ -48,32 +47,32 @@ public class JsonTestResourceTest extends Assert {
 
     @Test
     public void testCompareInput() throws Exception {
-        JsonValidator validator = new JsonValidator(new JsonTestResource(inputUrl));
+        JsonTestResource validator = new JsonTestResource(inputUrl);
         assertTrue(validator.validate(EXPECTED_VALUE));
     }
 
     @Test
     public void testCompareDifferentInput() throws Exception {
-        JsonValidator validator = new JsonValidator(new JsonTestResource(inputUrl));
+        JsonTestResource validator = new JsonTestResource(inputUrl);
         assertFalse(validator.validate("{\"name\":\"foo\"}"));
     }
 
     @Test
     public void testNullInput() throws Exception {
-        JsonValidator validator = new JsonValidator(new JsonTestResource(inputUrl));
+        JsonTestResource validator = new JsonTestResource(inputUrl);
         String nullStr = null;
         assertFalse(validator.validate(nullStr));
     }
 
     @Test
     public void testEmptyFile() throws Exception {
-        JsonValidator validator = new JsonValidator(new JsonTestResource(inputUrl2));
+        JsonTestResource validator = new JsonTestResource(inputUrl2);
         assertTrue(validator.validate(""));
     }
 
     @Test
     public void testPassValueToConstructor() throws Exception {
-        JsonValidator validator = new JsonValidator(new JsonTestResource("{\"foo\":\"baz\"}"));
+        JsonTestResource validator = new JsonTestResource("{\"foo\":\"baz\"}");
         assertTrue(validator.validate("{\"foo\":\"baz\"}"));
     }
 }

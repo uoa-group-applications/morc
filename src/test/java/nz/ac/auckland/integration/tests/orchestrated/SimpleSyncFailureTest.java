@@ -3,7 +3,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.Validator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -215,12 +215,13 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     public void testExceptionRequiredWithResponseValidatorButMissing() throws Exception {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
                 "Test Exception Required for validator but not thrown")
-                .exceptionResponseValidator(new Validator() {
+                .expectedResponse(new Validator() {
                     @Override
                     public boolean validate(Exchange exchange) {
                         return true;
                     }
                 })
+                .expectsExceptionResponse()
                 .build();
 
         AssertionError e = null;
@@ -240,7 +241,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
                 "Test Exception Required for validator and expectsExceptionResponse but not thrown")
                 .expectsExceptionResponse()
-                .exceptionResponseValidator(new Validator() {
+                .expectedResponse(new Validator() {
                     @Override
                     public boolean validate(Exchange exchange) {
                         return true;
@@ -283,7 +284,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     public void testExceptionFoundButValidatorReturnsFalse() throws Exception {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
                 "Test Exception Found but not expected")
-                .exceptionResponseValidator(new Validator() {
+                .expectsExceptionResponse()
+                .expectedResponse(new Validator() {
                     @Override
                     public boolean validate(Exchange exchange) {
                         return false;
@@ -333,7 +335,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     public void testExceptionValidatorWins() throws Exception {
         SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
                 "Test Exception Found but not expected")
-                .exceptionResponseValidator(new Validator() {
+                .expectedResponse(new Validator() {
                     @Override
                     public boolean validate(Exchange exchange) {
                         return false;

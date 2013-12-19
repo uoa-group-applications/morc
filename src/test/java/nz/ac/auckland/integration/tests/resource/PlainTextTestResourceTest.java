@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
-import nz.ac.auckland.integration.testing.validator.PlainTextValidator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,32 +22,32 @@ public class PlainTextTestResourceTest extends Assert {
 
     @Test
     public void testCompareInput() throws Exception {
-        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl));
+        PlainTextTestResource validator = new PlainTextTestResource(inputUrl);
         assertTrue(validator.validate(EXPECTED_VALUE));
     }
 
     @Test
     public void testCompareDifferentInput() throws Exception {
-        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl));
+        PlainTextTestResource validator = new PlainTextTestResource(inputUrl);
         assertFalse(validator.validate("sample"));
     }
 
     @Test
     public void testNullInput() throws Exception {
-        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl));
+        PlainTextTestResource validator = new PlainTextTestResource(inputUrl);
         String nullStr = null;
         assertFalse(validator.validate(nullStr));
     }
 
     @Test
     public void testEmptyFile() throws Exception {
-        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource(inputUrl2));
+        PlainTextTestResource validator = new PlainTextTestResource(inputUrl2);
         assertTrue(validator.validate(""));
     }
 
     @Test
     public void testPassValueToConstructor() throws Exception {
-        PlainTextValidator validator = new PlainTextValidator(new PlainTextTestResource("foo"));
+        PlainTextTestResource validator = new PlainTextTestResource("foo");
         assertTrue(validator.validate("foo"));
     }
 

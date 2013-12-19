@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.testing.specification;
 
-import nz.ac.auckland.integration.testing.EndpointUriGenerator;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
@@ -29,6 +28,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
     private Queue<TestResource<Map<String, Object>>> inputRequestHeaders;
     private Queue<Validator> responseBodyValidators;
     private Queue<HeadersValidator> responseHeadersValidators;
+    private boolean expectsExceptionResponse = false;
 
     /**
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
@@ -41,18 +41,16 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             final TestResource<Map<String, Object>> inputHeaders;
             final Validator responseBodyValidator;
             final HeadersValidator responseHeadersValidator;
-            final String targetServiceUri;
 
             //ensure we get all required resources in lock-step
             synchronized (this) {
-                targetServiceUri = getTargetServiceUriGenerator().getEndpoint();
                 inputBody = inputRequestBodies.poll();
                 inputHeaders = inputRequestHeaders.poll();
                 responseBodyValidator = responseBodyValidators.poll();
                 responseHeadersValidator = responseHeadersValidators.poll();
             }
 
-            final Endpoint endpoint = template.getCamelContext().getEndpoint(targetServiceUri);
+            final Endpoint endpoint = template.getCamelContext().getEndpoint(getEndpointUri());
             overrideEndpoint(endpoint);
 
             Exchange response;
@@ -109,8 +107,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             boolean validResponse = ((responseBodyValidator == null || responseBodyValidator.validate(response))
                     && (responseHeadersValidator == null || responseHeadersValidator.validate(response)));
 
-            //this ensures exception validation happens correctly
-            if (!validResponse && e != null) {
+            if (!expectsExceptionResponse && e != null) {
                 logger.warn("An unexpected exception was encountered", e);
                 return false;
             }
@@ -128,13 +125,10 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         private Queue<TestResource<Map<String, Object>>> inputRequestHeaders = new LinkedList<>();
         private Queue<Validator> responseBodyValidators = new LinkedList<>();
         private Queue<HeadersValidator> responseHeadersValidators = new LinkedList<>();
+        private boolean expectsExceptionResponse;
 
-        public Builder(String description, String endpointUri, String... endpointUris) {
-            super(description, endpointUri, endpointUris);
-        }
-
-        public Builder(String description, EndpointUriGenerator targetServiceUriGenerator) {
-            super(description, targetServiceUriGenerator);
+        public Builder(String description, String endpointUri) {
+            super(description, endpointUri);
         }
 
         protected Builder self() {
@@ -198,12 +192,25 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
+        public Builder expectedResponse(Validator... validators) {
+            return this.expectedResponseBody(validators);
+        }
+
+        public Builder expectedResponse(Enumeration<Validator> validators) {
+            return this.expectedResponseBody(validators);
+        }
+
+        public Builder expectsExceptionResponse() {
+            this.expectsExceptionResponse = true;
+            return self();
+        }
+
         public SyncOrchestratedTestSpecification build() {
             SyncOrchestratedTestSpecification specification = new SyncOrchestratedTestSpecification(this);
 
             logger.info("The endpoint %s will be sending %s request message bodies, %s request message headers, " +
                     "%s expected response body validators, and %s expected response headers validators",
-                    new Object[]{specification.getTargetServiceUriGenerator(), inputRequestBodies.size(), inputRequestHeaders.size(),
+                    new Object[]{specification.getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
                             responseBodyValidators.size(), responseHeadersValidators.size()});
 
             return specification;

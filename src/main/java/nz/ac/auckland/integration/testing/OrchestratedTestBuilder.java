@@ -44,9 +44,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
-    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String description, String endpointUri, String... endpointUris) {
+    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String description, String endpointUri) {
         AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification
-                .Builder(description, endpointUri, endpointUris);
+                .Builder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
     }
@@ -56,11 +56,19 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    protected SyncOrchestratedTestSpecification.Builder syncTest(String description, String endpointUri, String... endpointUris) {
+    protected SyncOrchestratedTestSpecification.Builder syncTest(String description, String endpointUri) {
         SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification
-                .Builder(description, endpointUri, endpointUris);
+                .Builder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
+    }
+
+    protected void multiEndpoint(OrchestratedTestSpecification.AbstractBuilder builder,
+                                 OrchestratedTestSpecification.AbstractBuilder... builders) {
+        specificationBuilders.remove(builder);
+        for (OrchestratedTestSpecification.AbstractBuilder b : builders) {
+            specificationBuilders.remove(b);
+        }
     }
 
     public static MockExpectation.OrderingType totalOrdering() {
@@ -141,7 +149,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param data A standard Java string which will be used for seeding a message, or comparing a value
      */
     @SuppressWarnings("unchecked")
-    public static TestResource<String> text(String data) {
+    public static PlainTextTestResource text(String data) {
         return new PlainTextTestResource(data);
     }
 
@@ -149,7 +157,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param file A file containing plain text
      */
     @SuppressWarnings("unchecked")
-    public static TestResource<String> text(File file) {
+    public static PlainTextTestResource text(File file) {
         return new PlainTextTestResource(file);
     }
 
@@ -157,12 +165,12 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param url A url pointing to a plain text document
      */
     @SuppressWarnings("unchecked")
-    public static TestResource<String> text(URL url) {
+    public static PlainTextTestResource text(URL url) {
         return new PlainTextTestResource(url);
     }
 
     @SuppressWarnings("unchecked")
-    public static TestResource<String>[] text(final List<InputStream> inputs) {
+    public static PlainTextTestResource[] text(final List<InputStream> inputs) {
         PlainTextTestResource[] resources = new PlainTextTestResource[inputs.size()];
 
         for (int i = 0; i < inputs.size(); i++) {

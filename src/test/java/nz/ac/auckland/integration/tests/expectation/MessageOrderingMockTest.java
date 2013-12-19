@@ -194,8 +194,12 @@ class TestMockExpectation extends MockExpectation {
             return this;
         }
 
-        public TestMockExpectation build() {
+        public TestMockExpectation buildInternal() {
             return new TestMockExpectation(this);
+        }
+
+        protected int expectedMessageCount() {
+            return 1;
         }
     }
 

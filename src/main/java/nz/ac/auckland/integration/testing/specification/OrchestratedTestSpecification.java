@@ -1,6 +1,5 @@
 package nz.ac.auckland.integration.testing.specification;
 
-import nz.ac.auckland.integration.testing.EndpointUriGenerator;
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
@@ -21,7 +20,7 @@ import java.util.*;
 public abstract class OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratedTestSpecification.class);
     private String description;
-    private EndpointUriGenerator targetServiceUriGenerator;
+    private String endpointUri;
     private List<MockExpectation> mockExpectations;
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
@@ -77,8 +76,8 @@ public abstract class OrchestratedTestSpecification {
         }
     }
 
-    public EndpointUriGenerator getTargetServiceUriGenerator() {
-        return targetServiceUriGenerator;
+    public String getEndpointUri() {
+        return endpointUri;
     }
 
     /**
@@ -115,7 +114,7 @@ public abstract class OrchestratedTestSpecification {
     public static abstract class AbstractBuilder<Product extends OrchestratedTestSpecification, Builder extends AbstractBuilder<Product, Builder>> {
 
         private String description;
-        private EndpointUriGenerator targetServiceUriGenerator;
+        private String endpointUri;
         private List<MockExpectation> mockExpectations;
         private int currentExpectationReceivedAtIndex = 0;
         private long sleepForTestCompletion = 15000;
@@ -129,17 +128,13 @@ public abstract class OrchestratedTestSpecification {
 
         public abstract Product build();
 
-        public AbstractBuilder(String description, String targetServiceUri, String... targetServiceUris) {
-            this(description, new MultiEndpointGenerator(targetServiceUri, targetServiceUris));
-        }
-
-        public AbstractBuilder(String description, EndpointUriGenerator targetServiceUriGenerator) {
+        public AbstractBuilder(String description, String endpointUri) {
             this.description = description;
             mockExpectations = new ArrayList<>();
             endpointOverrides = new ArrayList<>();
             //we don't want to use POJO to receive messages
             endpointOverrides.add(new CxfEndpointOverride());
-            this.targetServiceUriGenerator = targetServiceUriGenerator;
+            this.endpointUri = endpointUri;
         }
 
         /**
@@ -224,7 +219,7 @@ public abstract class OrchestratedTestSpecification {
     @SuppressWarnings("unchecked")
     protected OrchestratedTestSpecification(AbstractBuilder builder) {
         this.description = builder.description;
-        this.targetServiceUriGenerator = builder.targetServiceUriGenerator;
+        this.endpointUri = builder.endpointUri;
         this.mockExpectations = builder.mockExpectations;
         this.sleepForTestCompletion = builder.sleepForTestCompletion;
         this.endpointOverrides = builder.endpointOverrides;
@@ -234,41 +229,3 @@ public abstract class OrchestratedTestSpecification {
 
 }
 
-class MultiEndpointGenerator implements EndpointUriGenerator {
-
-    private Queue<String> uriQueue = new LinkedList<>();
-    private String lastResponse;
-    private String humanReadableFormat;
-
-    public MultiEndpointGenerator(String endpointUri, String... endpointUris) {
-        uriQueue.add(endpointUri);
-        Collections.addAll(uriQueue, endpointUris);
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("(");
-        builder.append(endpointUri);
-
-        for (String uri : endpointUris) {
-            uriQueue.add(uri);
-            builder.append(",");
-            builder.append(endpointUri);
-        }
-
-        builder.append(")");
-        humanReadableFormat = builder.toString();
-    }
-
-    @Override
-    public String getEndpoint() {
-        String endpointUri = uriQueue.poll();
-        if (endpointUri == null) return lastResponse;
-
-        lastResponse = endpointUri;
-        return endpointUri;
-    }
-
-    @Override
-    public String toString() {
-        return "EndpointGenerator: " + humanReadableFormat;
-    }
-}

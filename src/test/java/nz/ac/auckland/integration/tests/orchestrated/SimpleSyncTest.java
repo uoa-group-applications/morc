@@ -2,7 +2,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.expectation.MockExpectation;
-import nz.ac.auckland.integration.testing.Validator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -125,7 +125,7 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
 
         syncTest("direct:throwsException", "exception found and exception validator = true")
                 .expectsExceptionResponse()
-                .exceptionResponseValidator(new Validator() {
+                .expectedResponse(new Validator() {
                     @Override
                     public boolean validate(Exchange exchange) {
                         return exchange.getException() instanceof IOException;
