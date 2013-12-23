@@ -98,7 +98,7 @@ public abstract class OrchestratedTestSpecification {
     public boolean sendInput(ProducerTemplate template) {
 
         int i = 0;
-        //todo: turn this into a runner of some kind (support multi threading)
+        //will replace this with a runner/closure when JDK8 is released
         do {
             try {
                 if (i != 0) Thread.sleep(sendInterval);
