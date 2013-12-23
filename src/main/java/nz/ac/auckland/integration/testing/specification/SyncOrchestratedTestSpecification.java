@@ -205,11 +205,11 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
-        public SyncOrchestratedTestSpecification build() {
+        protected SyncOrchestratedTestSpecification buildInternal() {
             SyncOrchestratedTestSpecification specification = new SyncOrchestratedTestSpecification(this);
 
-            logger.info("The endpoint %s will be sending %s request message bodies, %s request message headers, " +
-                    "%s expected response body validators, and %s expected response headers validators",
+            logger.info("The endpoint {} will be sending {} request message bodies, {} request message headers, " +
+                    "{} expected response body validators, and {} expected response headers validators",
                     new Object[]{specification.getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
                             responseBodyValidators.size(), responseHeadersValidators.size()});
 
