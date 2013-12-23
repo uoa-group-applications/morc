@@ -51,6 +51,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return builder;
     }
 
+    protected Class<AsyncOrchestratedTestSpecification.Builder> asyncTest() {
+        return AsyncOrchestratedTestSpecification.Builder.class;
+    }
+
     /**
      * @param endpointUri The endpoint URI that a synchronous message should be sent to
      * @param description A description for the test specification that clearly identifies it
@@ -61,6 +65,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
                 .Builder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
+    }
+
+    protected Class<SyncOrchestratedTestSpecification.Builder> syncTest() {
+        return SyncOrchestratedTestSpecification.Builder.class;
     }
 
     protected void multiEndpoint(OrchestratedTestSpecification.AbstractBuilder builder,

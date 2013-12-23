@@ -106,7 +106,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
         /**
          * @throws IllegalArgumentException if no expectations are specified
          */
-        public AsyncOrchestratedTestSpecification build() {
+        protected AsyncOrchestratedTestSpecification buildInternal() {
             AsyncOrchestratedTestSpecification specification = new AsyncOrchestratedTestSpecification(this);
             if (specification.getMockExpectations().size() == 0)
                 throw new IllegalArgumentException("At least 1 mock expectation must be set for an AsyncOrchestratedTestSpecification");

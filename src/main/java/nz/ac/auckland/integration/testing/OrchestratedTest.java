@@ -11,6 +11,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jetty.JettyHttpEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.spi.LifecycleStrategy;
+import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -177,7 +179,31 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         if (specification == null)
             throw new IllegalStateException("A specification must be set in order to run an orchestrated test");
 
-        logger.info("Starting the test for specification: {}", specification.getDescription());
+        logger.info("Starting the test for specification: {} which consists of {} parts", specification.getDescription(),
+                specification.getPartCount());
+
+        //we need to ensure routes added by each test part are removed for the next part (each is independent of the other)
+        SpecificationPartLifecycleStrategySupport routeRemovalStrategy = new SpecificationPartLifecycleStrategySupport();
+        context.addLifecycleStrategy(routeRemovalStrategy);
+
+        OrchestratedTestSpecification currentPart = specification;
+        int partCount = 1;
+        do {
+            logger.debug("Starting test specification {} part {}",specification.getDescription(),partCount);
+            runSpecificationPart(currentPart);
+            logger.info("Successfully completed test specification {} part {}", specification.getDescription(), partCount);
+
+            currentPart = currentPart.getNextPart();
+            partCount++;
+            routeRemovalStrategy.resetContext(context);
+        } while (currentPart != null);
+
+        context.getLifecycleStrategies().remove(routeRemovalStrategy);
+
+        logger.info("Successfully completed the specification: " + specification.getDescription());
+    }
+
+    private void runSpecificationPart(OrchestratedTestSpecification spec) throws Exception {
 
         //Using a UUID as I don't want exchanges sitting on a previous mock mucking up the tests
         final MockEndpoint mockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
@@ -196,7 +222,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         int expectedMessageCount = 0;
 
         //put all of the expectations for each endpoint in an ordered queue
-        for (MockExpectation expectation : specification.getMockExpectations()) {
+        for (MockExpectation expectation : spec.getMockExpectations()) {
             Endpoint fromEndpoint = context.getEndpoint(expectation.getEndpointUri());
             overrideEndpoint(fromEndpoint);
             logger.trace("Preparing mock expectation: {}", expectation.getName());
@@ -220,9 +246,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             */
             if (expectation.getExpectedMessageCount() == 0 ||
                     expectation.getOrderingType() != MockExpectation.OrderingType.TOTAL) {
-                mockEndpoint.setSleepForEmptyTest(specification.getSleepForTestCompletion());
-                mockEndpoint.setAssertPeriod(specification.getSleepForTestCompletion());
-                mockEndpoint.setResultWaitTime(specification.getSleepForTestCompletion());
+                mockEndpoint.setSleepForEmptyTest(spec.getSleepForTestCompletion());
+                mockEndpoint.setAssertPeriod(spec.getSleepForTestCompletion());
+                mockEndpoint.setResultWaitTime(spec.getSleepForTestCompletion());
             }
 
             for (int i = 0; i < expectation.getExpectedMessageCount(); i++) {
@@ -416,10 +442,10 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         });
 
         //send the request through to the target endpoint, ensure it gets sent and there's a valid response
-        boolean testSendState = specification.sendInput(context.createProducerTemplate());
+        boolean testSendState = spec.sendInput(context.createProducerTemplate());
 
         if (!testSendState) throw new AssertionError("The message could not be sent to the target destination(s): "
-                + specification.getEndpointUri() + ", or the response was invalid");
+                + spec.getEndpointUri() + ", or the response was invalid");
 
         logger.trace("Starting to check if the mock endpoint assert is satisfied");
         mockEndpoint.assertIsSatisfied();
@@ -428,7 +454,6 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         //free any memory of all of the exchanges
         mockEndpoint.reset();
 
-        logger.info("Successfully completed the specification: " + specification.getDescription());
     }
 
     private boolean checkMockExpectationListContainsExchangeMatch(Exchange exchange, List<MockExpectation> mockExpectations) {
@@ -465,8 +490,25 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
         return false;
     }
+}
 
+class SpecificationPartLifecycleStrategySupport extends LifecycleStrategySupport {
 
+    private Collection<Route> addedRoutes;
+
+    public void resetContext(CamelContext context) throws Exception {
+        for (Route route : addedRoutes) {
+            context.stopRoute(route.getId());
+            context.removeRoute(route.getId());
+        }
+        addedRoutes = null;
+    }
+
+    @Override
+    public synchronized void onRoutesAdd(Collection<Route> routes) {
+        if (addedRoutes == null) addedRoutes = routes;
+        else addedRoutes.addAll(routes);
+    }
 }
 
 

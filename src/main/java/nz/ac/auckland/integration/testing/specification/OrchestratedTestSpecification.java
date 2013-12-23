@@ -8,6 +8,7 @@ import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -26,12 +27,22 @@ public abstract class OrchestratedTestSpecification {
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private int sendCount;
     private long sendInterval;
+    private int partCount;
+    private OrchestratedTestSpecification nextPart;
 
     /**
      * @return A description that explains what this tests is doing
      */
     public String getDescription() {
         return description;
+    }
+
+    public int getPartCount() {
+        return this.partCount;
+    }
+
+    public OrchestratedTestSpecification getNextPart() {
+        return this.nextPart;
     }
 
     /**
@@ -111,7 +122,8 @@ public abstract class OrchestratedTestSpecification {
     protected abstract boolean sendInputInternal(ProducerTemplate template);
 
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
-    public static abstract class AbstractBuilder<Product extends OrchestratedTestSpecification, Builder extends AbstractBuilder<Product, Builder>> {
+    public static abstract class AbstractBuilder<Product extends OrchestratedTestSpecification,
+            Builder extends AbstractBuilder<Product, Builder>> {
 
         private String description;
         private String endpointUri;
@@ -121,12 +133,12 @@ public abstract class OrchestratedTestSpecification {
         private Collection<EndpointOverride> endpointOverrides;
         private int sendCount = 1;
         private long sendInterval = 1000l;
+        private int partCount = 1;
+        private OrchestratedTestSpecification nextPart = null;
+
+        private AbstractBuilder nextPartBuilder;
 
         private Map<String, MockExpectation> mockExpectationByEndpoint = new HashMap<>();
-
-        protected abstract Builder self();
-
-        public abstract Product build();
 
         public AbstractBuilder(String description, String endpointUri) {
             this.description = description;
@@ -135,6 +147,19 @@ public abstract class OrchestratedTestSpecification {
             //we don't want to use POJO to receive messages
             endpointOverrides.add(new CxfEndpointOverride());
             this.endpointUri = endpointUri;
+        }
+
+        protected abstract Builder self();
+        protected abstract Product buildInternal();
+
+        @SuppressWarnings("unchecked")
+        public Product build() {
+            if (nextPartBuilder != null) {
+                nextPart = nextPartBuilder.build();
+                partCount = nextPart.getPartCount()+1;
+            }
+
+            return this.buildInternal();
         }
 
         /**
@@ -214,6 +239,22 @@ public abstract class OrchestratedTestSpecification {
             return self();
         }
 
+        @SuppressWarnings("unchecked")
+        public Builder addEndpoint(String endpointUri) {
+            return (Builder)addEndpoint(endpointUri,this.getClass());
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends AbstractBuilder<?,?>> T addEndpoint(String endpointUri, Class<T> clazz) {
+            try {
+                this.nextPartBuilder = clazz.getDeclaredConstructor(String.class,String.class)
+                        .newInstance(description,endpointUri);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                    | NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+            return (T)this.nextPartBuilder;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -225,7 +266,8 @@ public abstract class OrchestratedTestSpecification {
         this.endpointOverrides = builder.endpointOverrides;
         this.sendCount = builder.sendCount;
         this.sendInterval = builder.sendInterval;
+        this.partCount = builder.partCount;
+        this.nextPart = builder.nextPart;
     }
-
 }
 
