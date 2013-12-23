@@ -224,6 +224,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         this.inputRequestHeaders = builder.inputRequestHeaders;
         this.responseBodyValidators = builder.responseBodyValidators;
         this.responseHeadersValidators = builder.responseHeadersValidators;
+        this.expectsExceptionResponse = builder.expectsExceptionResponse;
     }
 
 }
