@@ -11,7 +11,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jetty.JettyHttpEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
-import org.apache.camel.spi.LifecycleStrategy;
 import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -189,7 +188,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         OrchestratedTestSpecification currentPart = specification;
         int partCount = 1;
         do {
-            logger.debug("Starting test specification {} part {}",specification.getDescription(),partCount);
+            logger.debug("Starting test specification {} part {}", specification.getDescription(), partCount);
             runSpecificationPart(currentPart);
             logger.info("Successfully completed test specification {} part {}", specification.getDescription(), partCount);
 

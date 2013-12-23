@@ -150,13 +150,14 @@ public abstract class OrchestratedTestSpecification {
         }
 
         protected abstract Builder self();
+
         protected abstract Product buildInternal();
 
         @SuppressWarnings("unchecked")
         public Product build() {
             if (nextPartBuilder != null) {
                 nextPart = nextPartBuilder.build();
-                partCount = nextPart.getPartCount()+1;
+                partCount = nextPart.getPartCount() + 1;
             }
 
             return this.buildInternal();
@@ -241,19 +242,19 @@ public abstract class OrchestratedTestSpecification {
 
         @SuppressWarnings("unchecked")
         public Builder addEndpoint(String endpointUri) {
-            return (Builder)addEndpoint(endpointUri,this.getClass());
+            return (Builder) addEndpoint(endpointUri, this.getClass());
         }
 
         @SuppressWarnings("unchecked")
-        public <T extends AbstractBuilder<?,?>> T addEndpoint(String endpointUri, Class<T> clazz) {
+        public <T extends AbstractBuilder<?, ?>> T addEndpoint(String endpointUri, Class<T> clazz) {
             try {
-                this.nextPartBuilder = clazz.getDeclaredConstructor(String.class,String.class)
-                        .newInstance(description,endpointUri);
+                this.nextPartBuilder = clazz.getDeclaredConstructor(String.class, String.class)
+                        .newInstance(description, endpointUri);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
-            return (T)this.nextPartBuilder;
+            return (T) this.nextPartBuilder;
         }
     }
 
