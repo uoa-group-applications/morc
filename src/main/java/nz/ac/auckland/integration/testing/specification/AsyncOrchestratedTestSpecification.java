@@ -110,7 +110,7 @@ public class AsyncOrchestratedTestSpecification extends OrchestratedTestSpecific
             AsyncOrchestratedTestSpecification specification = new AsyncOrchestratedTestSpecification(this);
             if (specification.getMockExpectations().size() == 0)
                 throw new IllegalArgumentException("At least 1 mock expectation must be set for an AsyncOrchestratedTestSpecification");
-            logger.info("The endpoint %s will be sending %s input message bodies and  %s input message headers",
+            logger.info("The endpoint {} will be sending {} input message bodies and {} input message headers",
                     new Object[]{specification.getEndpointUri(), inputMessageBodies.size(), inputMessageHeaders.size()});
             return specification;
         }

@@ -153,11 +153,11 @@ public abstract class MockExpectation {
             Product product = buildInternal();
             int childExpectedMessageCount = expectedMessageCount();
             if (childExpectedMessageCount < expectedMessageCount)
-                logger.warn("The endpoint %s has %s expected messages, but only %s validators have been provided",
+                logger.warn("The endpoint {} has {} expected messages, but only %s validators have been provided",
                         new Object[]{endpointUri, expectedMessageCount, childExpectedMessageCount});
 
             expectedMessageCount = childExpectedMessageCount;
-            logger.info("The expected received message count for the endpoint %s is %s", endpointUri, expectedMessageCount);
+            logger.info("The expected received message count for the endpoint {} is {}", endpointUri, expectedMessageCount);
             return product;
         }
 

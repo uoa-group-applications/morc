@@ -104,7 +104,7 @@ public abstract class ContentMockExpectation extends MockExpectation {
 
         protected int expectedMessageCount() {
             if (expectedBodyValidators.size() != expectedHeadersValidators.size())
-                logger.warn("A different number of body and header validators were provided for the endpoint %s", endpointUri);
+                logger.warn("A different number of body and header validators were provided for the endpoint {}", endpointUri);
 
             return Math.max(expectedBodyValidators.size(), expectedHeadersValidators.size());
         }

@@ -39,7 +39,7 @@ public class MatchedInputResponseAnswer<T> implements Answer<T> {
             }
         }
 
-        logger.warn("The exchange arriving at endpoint %s found no response match for body %s",
+        logger.warn("The exchange arriving at endpoint {} found no response match for body {}",
                 exchange.getFromEndpoint(), exchange.getIn().getBody(String.class));
         return null;
     }
