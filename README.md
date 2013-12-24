@@ -14,7 +14,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf:http://localhost:8090/services/pingService","Simple WS PING test")
+        syncTest("Simple WS PING test","cxf:http://localhost:8090/services/pingService")
             .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                 "<request>PING</request>" +
                              "</ns:pingRequest>"))
@@ -32,10 +32,10 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf://http://localhost:8090/services/securePingService?wsdlURL=SecurePingService.wsdl&" +
-            "properties.ws-security.username=user" +
-            "&properties.ws-security.password=pass",
-            "Simple WS PING test with WS-Security")
+        syncTest("Simple WS PING test with WS-Security","cxf://http://localhost:8090/services/securePingService?" +
+            "wsdlURL=SecurePingService.wsdl&" +
+            "properties.ws-security.username=user&" +
+            "properties.ws-security.password=pass")
             .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                 "<request>PING</request>" +
                              "</ns:pingRequest>"))
@@ -53,13 +53,13 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf:http://localhost:8090/services/pingService","Simple WS PING test with local resources")
+        syncTest("Simple WS PING test with local resources","cxf:http://localhost:8090/services/pingService")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")));
 
         //If there's a JSON service we can also ensure this is acting appropriately
         //(JSON comparisons are made using the Jackson library to unmarshal and compare each value)
-        syncTest("http://localhost:8091/jsonPingService", "Simple JSON PING")
+        syncTest("Simple JSON PING","http://localhost:8091/jsonPingService")
             .requestBody(json("{\"request\":\"PING\"}"))
             .expectedResponseBody(json("{\"response\":\"PONG\"}"));
     }
@@ -73,7 +73,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf:http://localhost:8090/services/pingServiceProxy","WS PING test with mock service expectation")
+        syncTest("WS PING test with mock service expectation","cxf:http://localhost:8090/services/pingServiceProxy")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
@@ -90,7 +90,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxy","WS PING test with multiple mock service expectations")
+        syncTest("WS PING test with multiple mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxy")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
@@ -109,7 +109,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered","WS PING test with multiple unordered mock service expectations")
+        syncTest("WS PING test with multiple unordered mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered")
             .requestBody(xml(classpath("/data/pingRequest1.xml")))
             .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
@@ -130,7 +130,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        asyncTest("vm:test.input", "Simple Asynchronous Canonicalizer Comparison")
+        asyncTest("Simple Asynchronous Canonicalizer Comparison","vm:test.input")
             .inputMessage(xml("<SystemField>foo</SystemField>"))
             .addExpectation(asyncExpectation("vm:test.output")
                     .expectedBody(xml("<CanonicalField>foo</CanonicalField>")));
@@ -145,7 +145,7 @@ import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
     @Override
     public void configure() {
-        syncTest("cxf:http://localhost:8090/services/pingServiceProxy","Test invalid message doesn't arrive at the endpoint and returns exception")
+        syncTest("Test invalid message doesn't arrive at the endpoint and returns exception","cxf:http://localhost:8090/services/pingServiceProxy")
             .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                                 "<request>PONG</request>" +
                                              "</ns:pingRequest>"))
