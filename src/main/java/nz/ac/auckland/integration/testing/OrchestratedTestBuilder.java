@@ -74,14 +74,6 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return SyncOrchestratedTestSpecification.Builder.class;
     }
 
-    protected void multiEndpoint(OrchestratedTestSpecification.AbstractBuilder builder,
-                                 OrchestratedTestSpecification.AbstractBuilder... builders) {
-        specificationBuilders.remove(builder);
-        for (OrchestratedTestSpecification.AbstractBuilder b : builders) {
-            specificationBuilders.remove(b);
-        }
-    }
-
     public static MockExpectation.OrderingType totalOrdering() {
         return MockExpectation.OrderingType.TOTAL;
     }
