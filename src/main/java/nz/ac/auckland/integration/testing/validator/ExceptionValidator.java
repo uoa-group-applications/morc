@@ -4,21 +4,35 @@ import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A class for ensuring an exception received is as expected based on the class and message
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class ExceptionValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(ExceptionValidator.class);
     private Class<? extends Exception> expectedExceptionClass;
     private String message;
 
+    /**
+     * A constructor that simply expects a subclass of java.lang.Exception
+     */
     public ExceptionValidator() {
         this.expectedExceptionClass = Exception.class;
     }
 
-
+    /**
+     * @param expectedExceptionClass The class of exception we expect to validate against
+     */
     public ExceptionValidator(Class<? extends Exception> expectedExceptionClass) {
         this.expectedExceptionClass = expectedExceptionClass;
     }
 
+    /**
+     * @param expectedExceptionClass    The class of exception we expect to validate against
+     * @param message                   The message this instance should be returning
+     */
     public ExceptionValidator(Class<? extends Exception> expectedExceptionClass, String message) {
         this(expectedExceptionClass);
         this.message = message;
