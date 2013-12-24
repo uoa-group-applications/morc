@@ -114,7 +114,7 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
         syncTest("direct:syncInputSyncOutput", "Test sync response")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(xml("<baz/>"),xml("<")).responseBody(xml("<foo/>")))
+                        .expectedBody(xml("<baz/>"), xml("<")).responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
         syncTest("direct:setHeaders", "Test Response Headers Validated")
@@ -149,12 +149,12 @@ public class SimpleSyncTest extends OrchestratedTestBuilder {
 
 
         MockExpectation.AbstractBuilder expectation1 = syncExpectation("seda:jsonExpectation")
-                                .expectedBody(json("{\"foo\":\"baz\"}"));
+                .expectedBody(json("{\"foo\":\"baz\"}"));
         MockExpectation.AbstractBuilder expectation2 = unreceivedExpectation("seda:nothingToSeeHere");
 
-        syncTest("seda:jsonRequest","addExpectationsTest")
+        syncTest("seda:jsonRequest", "addExpectationsTest")
                 .requestBody(json("{\"foo\":\"baz\"}"))
-                .addExpectations(expectation1,expectation2);
+                .addExpectations(expectation1, expectation2);
 
     }
 

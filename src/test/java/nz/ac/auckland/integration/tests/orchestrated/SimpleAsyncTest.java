@@ -30,7 +30,7 @@ public class SimpleAsyncTest extends OrchestratedTestBuilder {
     public void configure() {
         asyncTest("seda:asyncTestInput", "test async send body")
                 .inputMessage(xml("<test/>"))
-                .addExpectation(soapFaultExpectation("foo").responseBody(soapFault(null,null)))
+                .addExpectation(soapFaultExpectation("foo").responseBody(soapFault(null, null)))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")));
 
         asyncTest("seda:asyncTestInput", "test async send headers")

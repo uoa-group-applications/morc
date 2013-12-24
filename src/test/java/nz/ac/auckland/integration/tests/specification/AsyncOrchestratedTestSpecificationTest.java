@@ -5,7 +5,6 @@ import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.validator.XmlValidator;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -52,7 +51,7 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(input.validate(exchange));
         assertTrue(new HeadersValidator(headers).validate(exchange));
     }
 
@@ -76,7 +75,7 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(input.validate(exchange));
     }
 
     @Test

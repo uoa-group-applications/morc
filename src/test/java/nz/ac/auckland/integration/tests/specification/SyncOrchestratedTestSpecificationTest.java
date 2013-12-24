@@ -6,8 +6,7 @@ import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.Validator;
-import nz.ac.auckland.integration.testing.validator.XmlValidator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -62,7 +61,7 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(input.validate(exchange));
         assertTrue(new HeadersValidator(headers).validate(exchange));
 
     }
@@ -120,7 +119,7 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(input.validate(exchange));
     }
 
     @Test
@@ -251,39 +250,9 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         Exchange exchange = endpoint.getExchanges().get(0);
 
-        assertTrue(new XmlValidator(input).validate(exchange));
+        assertTrue(input.validate(exchange));
         assertTrue(new HeadersValidator(headers).validate(exchange));
 
-    }
-
-    @Test
-    public void testSetExpectedResponseBodyValidator() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:foo",
-                "test set expected body validator")
-                .expectedResponseBody(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return true;
-                    }
-                })
-                .build();
-
-        assertTrue(spec.getResponseBodyValidator().validate(null));
-    }
-
-    @Test
-    public void testSetExpectedResponseHeadersValidator() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:foo",
-                "test set expected headers validator")
-                .expectedResponseHeaders(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return true;
-                    }
-                })
-                .build();
-
-        assertTrue(spec.getResponseHeadersValidator().validate(null));
     }
 
     @Test
@@ -332,12 +301,13 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         try {
             SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
                     .Builder("direct:syncTestInput", "description")
-                    .exceptionResponseValidator(new Validator() {
+                    .expectedResponse(new Validator() {
                         @Override
                         public boolean validate(Exchange exchange) {
                             return false;
                         }
                     })
+                    .expectsExceptionResponse()
                     .expectedResponseBody(new PlainTextTestResource("foo"))
                     .build();
         } catch (IllegalArgumentException ex) {
@@ -363,27 +333,6 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
     }
 
     @Test
-    public void testBuildExceptionValidatorResponseHeadersSet() throws Exception {
-        HeadersTestResource headers = new HeadersTestResource(headersUrl);
-        IllegalArgumentException e = null;
-        try {
-            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
-                    .Builder("direct:syncTestInput", "description")
-                    .exceptionResponseValidator(new Validator() {
-                        @Override
-                        public boolean validate(Exchange exchange) {
-                            return false;
-                        }
-                    })
-                    .expectedResponseHeaders(headers)
-                    .build();
-        } catch (IllegalArgumentException ex) {
-            e = ex;
-        }
-        assertNotNull(e);
-    }
-
-    @Test
     public void testBuildExpectsExceptionResponseHeaderAndBodySet() throws Exception {
         HeadersTestResource headers = new HeadersTestResource(headersUrl);
         IllegalArgumentException e = null;
@@ -400,26 +349,4 @@ public class SyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         assertNotNull(e);
     }
 
-    @Test
-    public void testBuildExpectsExceptionExceptionValidatorResponseHeaderAndBodySet() throws Exception {
-        HeadersTestResource headers = new HeadersTestResource(headersUrl);
-        IllegalArgumentException e = null;
-        try {
-            SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification
-                    .Builder("direct:syncTestInput", "description")
-                    .expectedResponseBody(new PlainTextTestResource("foo"))
-                    .exceptionResponseValidator(new Validator() {
-                        @Override
-                        public boolean validate(Exchange exchange) {
-                            return false;
-                        }
-                    })
-                    .expectsExceptionResponse()
-                    .expectedResponseHeaders(headers)
-                    .build();
-        } catch (IllegalArgumentException ex) {
-            e = ex;
-        }
-        assertNotNull(e);
-    }
 }

@@ -1,25 +1,22 @@
 package nz.ac.auckland.integration.tests.specification;
 
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-import nz.ac.auckland.integration.testing.Validator;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.validator.*;
+import nz.ac.auckland.integration.testing.validator.HttpErrorValidator;
+import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
-import org.apache.cxf.binding.soap.SoapFault;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.io.File;
 import java.net.URL;
@@ -61,7 +58,7 @@ public class OrchestratedTestBuilderTest extends Assert {
         AsyncOrchestratedTestSpecification spec = builder.build();
 
         assertEquals(spec.getDescription(), "description");
-        assertEquals(spec.getTargetServiceUri(), "endpointUri");
+        assertEquals(spec.getEndpointUri(), "endpointUri");
     }
 
     @Test
@@ -70,7 +67,7 @@ public class OrchestratedTestBuilderTest extends Assert {
         SyncOrchestratedTestSpecification spec = builder.build();
 
         assertEquals(spec.getDescription(), "description");
-        assertEquals(spec.getTargetServiceUri(), "endpointUri");
+        assertEquals(spec.getEndpointUri(), "endpointUri");
     }
 
     @Test
@@ -84,13 +81,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testXmlFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/xml-test1.xml").toURI());
         XmlTestResource xml = OrchestratedTestBuilder.xml(f);
-        assertTrue(new XmlValidator(xml).validate(EXPECTED_XML_VALUE));
+        assertTrue(xml.validate(EXPECTED_XML_VALUE));
     }
 
     @Test
     public void testXmlURL() throws Exception {
         XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"));
-        assertTrue(new XmlValidator(xml).validate(EXPECTED_XML_VALUE));
+        assertTrue(xml.validate(EXPECTED_XML_VALUE));
     }
 
     @Test
@@ -103,13 +100,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testJsonFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/json-test1.json").toURI());
         JsonTestResource json = OrchestratedTestBuilder.json(f);
-        assertTrue(new JsonValidator(json).validate(EXPECTED_JSON_VALUE));
+        assertTrue(json.validate(EXPECTED_JSON_VALUE));
     }
 
     @Test
     public void testJsonURL() throws Exception {
         JsonTestResource json = OrchestratedTestBuilder.json(this.getClass().getResource("/data/json-test1.json"));
-        assertTrue(new JsonValidator(json).validate(EXPECTED_JSON_VALUE));
+        assertTrue(json.validate(EXPECTED_JSON_VALUE));
     }
 
     @Test
@@ -122,13 +119,13 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testPlainTextFile() throws Exception {
         File f = new File(this.getClass().getResource("/data/plaintext-test1.txt").toURI());
         PlainTextTestResource text = OrchestratedTestBuilder.text(f);
-        assertTrue(new PlainTextValidator(text).validate("test"));
+        assertTrue(text.validate("test"));
     }
 
     @Test
     public void testPlainTextURL() throws Exception {
         PlainTextTestResource text = OrchestratedTestBuilder.text(this.getClass().getResource("/data/plaintext-test1.txt"));
-        assertTrue(new PlainTextValidator(text).validate("test"));
+        assertTrue(text.validate("test"));
     }
 
     @Test
@@ -343,117 +340,6 @@ public class OrchestratedTestBuilderTest extends Assert {
     }
 
     @Test
-    public void testCreateXPathSelector() throws Exception {
-        XmlUtilities xmlUtilities = new XmlUtilities();
-
-        XmlTestResource resource = new XmlTestResource(
-                xmlUtilities.getXmlAsDocument("<v2:entity xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">HREmployee</v2:entity>"));
-
-        Document input = xmlUtilities.getXmlAsDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\"" +
-                " xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">\n" +
-                "\t<v2:entity >HREmployee</v2:entity>\n" +
-                "\t<v2:identifier name=\"uoaid\">2512472</v2:identifier>\n" +
-                "</v1:isOfInterest>\n");
-
-        XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
-
-        XmlValidator validator = new XmlValidator(resource, selector);
-        assertTrue(validator.validate(input));
-    }
-
-    @Test
-    public void testCreateXMLStringXpath() throws Exception {
-        XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
-
-        String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<v1:isOfInterest xmlns:v1=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1\"" +
-                " xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">\n" +
-                "\t<v2:entity >HREmployee</v2:entity>\n" +
-                "\t<v2:identifier name=\"uoaid\">2512472</v2:identifier>\n" +
-                "</v1:isOfInterest>\n";
-
-        XmlTestResource xml = OrchestratedTestBuilder.xml(input, selector);
-        DetailedDiff difference = new DetailedDiff(new Diff("<v2:entity xmlns:v2=\"http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2\">HREmployee</v2:entity>",
-                new XmlUtilities().getDocumentAsString(xml.getValue())));
-        assertTrue(difference.similar());
-    }
-
-    @Test
-    public void testCreateXMLFileXPath() throws Exception {
-        XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
-        XmlTestResource xml = OrchestratedTestBuilder.xml(new File("something"), selector);
-        assertNotNull(xml.getXpathSelector());
-    }
-
-    @Test
-    public void testCreateXMLURLXPath() throws Exception {
-        XPathSelector selector = OrchestratedTestBuilder.xpathSelector("/v1:isOfInterest/v2:entity",
-                OrchestratedTestBuilder.namespace("v1", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v1"),
-                OrchestratedTestBuilder.namespace("v2", "http://www.auckland.ac.nz/domain/application/wsdl/isofinterest/v2"));
-        XmlTestResource xml = OrchestratedTestBuilder.xml(this.getClass().getResource("/data/xml-test1.xml"), selector);
-        assertNotNull(xml.getXpathSelector());
-    }
-
-
-    @Test
-    public void testSoapFaultBuilder() throws Exception {
-        assertTrue(OrchestratedTestBuilder.soapFaultResponse() instanceof SoapFaultValidator.Builder);
-    }
-
-    @Test
-    public void testSoapFaultMessage() throws Exception {
-        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse("foo");
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setBody("foo");
-        assertTrue(validator.getFaultMessageValidator().validate(e));
-    }
-
-    @Test
-    public void testSoapFaultQName() throws Exception {
-        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER);
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
-
-        assertTrue(validator.getCodeValidator().validate(e));
-    }
-
-    @Test
-    public void testSoapFaultQNameMessage() throws Exception {
-        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo");
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
-
-        Exchange e1 = new DefaultExchange(new DefaultCamelContext());
-        e1.getIn().setBody("foo");
-
-        assertTrue(validator.getCodeValidator().validate(e));
-        assertTrue(validator.getFaultMessageValidator().validate(e1));
-    }
-
-    @Test
-    public void testSoapFaultCodeMessageDetail() throws Exception {
-        XmlTestResource xml = OrchestratedTestBuilder.xml("<foo/>");
-        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(OrchestratedTestBuilder.SOAPFAULT_SERVER, "foo", xml);
-
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setBody(OrchestratedTestBuilder.qname("http://schemas.xmlsoap.org/soap/envelope/", "Server"));
-
-        Exchange e1 = new DefaultExchange(new DefaultCamelContext());
-        e1.getIn().setBody("foo");
-
-        assertTrue(validator.getCodeValidator().validate(e));
-        assertTrue(validator.getFaultMessageValidator().validate(e1));
-        assertTrue(validator.getDetailValidator().validate("<foo/>"));
-    }
-
-    @Test
     public void testSoapFaultTestResourceQNameMessage() throws Exception {
         SoapFaultTestResource resource = OrchestratedTestBuilder.soapFault(OrchestratedTestBuilder.SOAPFAULT_CLIENT, "foo");
 
@@ -462,23 +348,9 @@ public class OrchestratedTestBuilderTest extends Assert {
     }
 
     @Test
-    public void testSoapFaultResponseValidator() throws Exception {
-        SoapFaultTestResource resource = new SoapFaultTestResource(OrchestratedTestBuilder.SOAPFAULT_CLIENT, "foo");
-
-        SoapFaultValidator validator = OrchestratedTestBuilder.soapFaultResponse(resource);
-
-        SoapFault fault = new SoapFault("foo", OrchestratedTestBuilder.SOAPFAULT_CLIENT);
-
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(fault);
-
-        assertTrue(validator.validate(e));
-    }
-
-    @Test
     public void testOrderingRequirements() throws Exception {
-        assertEquals(MockExpectation.OrderingType.NONE,OrchestratedTestBuilder.noOrdering());
-        assertEquals(MockExpectation.OrderingType.PARTIAL,OrchestratedTestBuilder.partialOrdering());
-        assertEquals(MockExpectation.OrderingType.TOTAL,OrchestratedTestBuilder.totalOrdering());
+        assertEquals(MockExpectation.OrderingType.NONE, OrchestratedTestBuilder.noOrdering());
+        assertEquals(MockExpectation.OrderingType.PARTIAL, OrchestratedTestBuilder.partialOrdering());
+        assertEquals(MockExpectation.OrderingType.TOTAL, OrchestratedTestBuilder.totalOrdering());
     }
 }

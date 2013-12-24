@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
-import nz.ac.auckland.integration.testing.utility.XPathSelector;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;

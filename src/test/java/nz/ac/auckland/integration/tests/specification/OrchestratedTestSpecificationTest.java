@@ -19,7 +19,7 @@ public class OrchestratedTestSpecificationTest extends Assert {
                 .build();
 
         assertEquals("description", spec.getDescription());
-        assertEquals("targetUri", spec.getTargetServiceUri());
+        assertEquals("targetUri", spec.getEndpointUri());
         assertEquals(1, spec.getMockExpectations().size());
     }
 
@@ -108,7 +108,7 @@ class TestOrchestratedTestSpecification extends OrchestratedTestSpecification {
         }
 
 
-        public TestOrchestratedTestSpecification build() {
+        public TestOrchestratedTestSpecification buildInternal() {
             return new TestOrchestratedTestSpecification(this);
         }
     }
