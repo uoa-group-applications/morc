@@ -54,6 +54,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return builder;
     }
 
+    /**
+     * @return A way of specifying that the next endpoint in the specification list should be asynchronous
+     */
     protected Class<AsyncOrchestratedTestSpecification.Builder> asyncTest() {
         return AsyncOrchestratedTestSpecification.Builder.class;
     }
@@ -70,18 +73,30 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return builder;
     }
 
+    /**
+     * @return A way of specifying that the next endpoint in the specification list should be synchronous
+     */
     protected Class<SyncOrchestratedTestSpecification.Builder> syncTest() {
         return SyncOrchestratedTestSpecification.Builder.class;
     }
 
+    /**
+     * @return We expect messages to be totally ordered (amongst endpoints)
+     */
     public static MockExpectation.OrderingType totalOrdering() {
         return MockExpectation.OrderingType.TOTAL;
     }
 
+    /**
+     * @return We expect messages to arrive at some point after we expect
+     */
     public static MockExpectation.OrderingType partialOrdering() {
         return MockExpectation.OrderingType.PARTIAL;
     }
 
+    /**
+     * @return We expect messages arrive at any point of the test
+     */
     public static MockExpectation.OrderingType noOrdering() {
         return MockExpectation.OrderingType.NONE;
     }
@@ -138,6 +153,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new JsonTestResource(url);
     }
 
+    /**
+     * @param inputs An InputStream reference to a JSON resource
+     */
     public static JsonTestResource[] json(final List<InputStream> inputs) {
         JsonTestResource[] resources = new JsonTestResource[inputs.size()];
 
@@ -172,6 +190,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new PlainTextTestResource(url);
     }
 
+    /**
+     * @param inputs An InputStream reference to a plain text resource
+     */
     @SuppressWarnings("unchecked")
     public static PlainTextTestResource[] text(final List<InputStream> inputs) {
         PlainTextTestResource[] resources = new PlainTextTestResource[inputs.size()];
@@ -204,6 +225,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new HeadersTestResource(url);
     }
 
+    /**
+     * @param inputs An InputStream reference to a headers (name=value pairs) resource
+     */
     public static HeadersTestResource[] headers(final List<InputStream> inputs) {
         HeadersTestResource[] resources = new HeadersTestResource[inputs.size()];
 
@@ -251,14 +275,26 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new SoapFaultTestResource(faultCode, message, xmlDetail);
     }
 
+    /**
+     * @return A validator for ensuring an exception occurs
+     */
     public static ExceptionValidator exception() {
         return new ExceptionValidator();
     }
 
+    /**
+     * @param exception The exception we expect to validate against
+     * @return          A validator for ensuring an exception occurs
+     */
     public static ExceptionValidator exception(Class<? extends Exception> exception) {
         return new ExceptionValidator(exception);
     }
 
+    /**
+     * @param exception The exception we expect to validate against
+     * @param message   The message in the exception we expect to validate against
+     * @return          A validator for ensuring an exception occurs
+     */
     public static ExceptionValidator exception(Class<? extends Exception> exception, String message) {
         return new ExceptionValidator(exception, message);
     }
@@ -280,29 +316,44 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new File(path);
     }
 
+    /**
+     * A convenience method for specifying matched input->output answers for expectations
+     */
     @SuppressWarnings("unchecked")
     public static MatchedInputResponseAnswer matchedResponse(MatchedInputResponseAnswer.MatchedResponse... responses) {
         return new MatchedInputResponseAnswer(responses);
     }
 
+    /**
+     * A convenience method for specifying matched input->output answers for expectations where matches are removed from the pool
+     */
     @SuppressWarnings("unchecked")
     public static MatchedInputResponseAnswer matchedResponse(boolean removeOnMatch,
                                                              MatchedInputResponseAnswer.MatchedResponse... responses) {
         return new MatchedInputResponseAnswer(removeOnMatch, responses);
     }
 
+    /**
+     * A convenience method for specifying matched input headers -> output headers for expectations
+     */
     @SafeVarargs
     public static MatchedInputResponseAnswer<Map<String, Object>> matchedHeadersResponse(
             MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>>... responses) {
         return new MatchedInputResponseAnswer<>(responses);
     }
 
+    /**
+     * A convenience method for specifying matched input headers -> output headers for expectations that are removed rom the pool
+     */
     @SafeVarargs
     public static MatchedInputResponseAnswer<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
                                                                                          MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>>... responses) {
         return new MatchedInputResponseAnswer<>(removeOnMatch, responses);
     }
 
+    /**
+     * A convenience method for specifying matched input validators to outputs
+     */
     @SuppressWarnings("unchecked")
     public static MatchedInputResponseAnswer.MatchedResponse answer(Validator validator, TestResource resource) {
         try {
@@ -312,6 +363,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         }
     }
 
+    /**
+     * A convenience method for specifying matched input header validators to output headers
+     */
     public static MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
                                                                                                TestResource<Map<String, Object>> resource) {
         try {
@@ -321,10 +375,22 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         }
     }
 
+    /**
+     * A way of paramaterizing resources so that values are updated according to Groovy GStrings
+     * @param template      A template of the string resource containing GString variables for substitution
+     * @param dataSource    A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                      list will result in another resource being returned
+     */
     public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
         return groovy(template, dataSource, GStringTemplateEngine.class);
     }
 
+    /**
+     * @param template          A template of the string resource containing template-appropriate variables for substitution
+     * @param dataSource        A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                          list will result in another resource being returned
+     * @param templateEngine    The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     */
     public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource,
                                            Class<? extends TemplateEngine> templateEngine) {
         List<InputStream> results = new ArrayList<>();
@@ -342,6 +408,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return results;
     }
 
+    /**
+     * @param urlpath   An Ant-style path to a directory containing test resources for (expected) input and output
+     * @return          A list of InputStreams that can be used as test resources
+     */
     public static List<InputStream> dir(String urlpath) {
         List<URL> resourceUrls = new ArrayList<>();
         List<InputStream> resourceStreams = new ArrayList<>();
@@ -371,7 +441,12 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return resourceStreams;
     }
 
-
+    /**
+     * This method can be used as a datasource for the groovy template
+     *
+     * @param csvResource   A reference to a CSV file that contains variable values. A header line sets the name of the variables
+     * @return              A list of variablename-value pairs
+     */
     public static List<Map<String, String>> csv(TestResource<String> csvResource) {
         CSVReader reader;
         List<Map<String, String>> output = new ArrayList<>();
@@ -437,6 +512,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return new ExceptionMockExpectation.Builder(endpointUri);
     }
 
+    /**
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     * @param exception   The exception that should be instantiated and thrown as part of the expectation
+     */
     public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception) {
         try {
@@ -454,6 +533,11 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         });
     }
 
+    /**
+     * @param endpointUri   The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     * @param exception     The exception that should be instantiated and thrown as part of the expectation
+     * @param message       The message to provide to the exception as part of the constructor call
+     */
     public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception,
                                                                         final String message) {
