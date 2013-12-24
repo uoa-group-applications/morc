@@ -22,6 +22,10 @@ public class ExceptionMockExpectation extends ContentMockExpectation {
      * This will throw the specified exception back to Camel for handling as appropriate
      */
     public void handleReceivedExchange(Exchange exchange) throws Exception {
+        if (exceptionResponse == null) {
+            logger.info("No exception response provided for endpoint {}, a standard Exception has been used",getEndpointUri());
+            throw new Exception();
+        }
         throw exceptionResponse.response(exchange);
     }
 
