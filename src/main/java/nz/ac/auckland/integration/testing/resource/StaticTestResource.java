@@ -7,7 +7,6 @@ import java.net.URL;
  * Used for retrieving static resources necessary for either sending values to an artifact under testing,
  * or validating an expectation
  * <p/>
- * todo: add toString method with sensible output
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
