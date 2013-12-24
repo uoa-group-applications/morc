@@ -34,9 +34,7 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
     }
 
     /**
-     * @param file a reference to a properties file
-     * @return A Map containing header/value key pairs
-     * @throws Exception
+     * @param stream an input stream we can read the file from (this will close it for you)
      */
     protected Map<String, Object> getResource(InputStream stream) throws Exception {
         Properties properties = new Properties();
@@ -51,6 +49,9 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
         return Collections.unmodifiableMap(headers);
     }
 
+    /**
+     * A convenience method for returning a human consumable string of a map of headers
+     */
     public static String formatHeaders(Map<String, Object> headers) {
         if (headers == null) return "";
 

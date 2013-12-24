@@ -49,7 +49,7 @@ public abstract class StaticTestResource<T> implements TestResource {
     }
 
     /**
-     * @param stream an input stream we can read the file from (this will close it for you!)
+     * @param stream an input stream we can read the file from (this will close it for you)
      * @return The test resource in the appropriate format
      * @throws Exception
      */

@@ -40,9 +40,7 @@ public class JsonTestResource extends StaticTestResource<String> implements Vali
     }
 
     /**
-     * @param file a reference to the JSON test resource
-     * @return A JSON string
-     * @throws Exception
+     * @param stream an input stream we can read the file from (this will close it for you)
      */
     protected String getResource(InputStream stream) throws Exception {
         return IOUtils.toString(stream, "UTF-8");
