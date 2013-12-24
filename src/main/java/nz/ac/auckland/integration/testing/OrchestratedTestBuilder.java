@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
+import nz.ac.auckland.integration.testing.answer.Answer;
 import nz.ac.auckland.integration.testing.answer.MatchedInputResponseAnswer;
 import nz.ac.auckland.integration.testing.expectation.*;
 import nz.ac.auckland.integration.testing.resource.*;
@@ -15,6 +16,7 @@ import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.validator.ExceptionValidator;
 import nz.ac.auckland.integration.testing.validator.HttpErrorValidator;
 import nz.ac.auckland.integration.testing.validator.Validator;
+import org.apache.camel.Exchange;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
@@ -25,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.*;
 
@@ -441,6 +444,42 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri) {
         return new ExceptionMockExpectation.Builder(endpointUri);
     }
+
+    public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri,
+                                                                        final Class<? extends Exception> exception) {
+        try {
+            exception.getConstructor();
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+        return new ExceptionMockExpectation.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
+            @Override
+            public Exception response(Exchange exchange) throws Exception {
+                Constructor<? extends Exception> constructor = exception.getConstructor();
+                return constructor.newInstance();
+            }
+        });
+    }
+
+    public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri,
+                                                                        final Class<? extends Exception> exception,
+                                                                        final String message) {
+        try {
+            exception.getConstructor(String.class);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+        return new ExceptionMockExpectation.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
+            @Override
+            public Exception response(Exchange exchange) throws Exception {
+                Constructor<? extends Exception> constructor = exception.getConstructor(String.class);
+                return constructor.newInstance(message);
+            }
+        });
+    }
+
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
