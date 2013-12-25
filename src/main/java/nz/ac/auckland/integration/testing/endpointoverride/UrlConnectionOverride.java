@@ -2,6 +2,11 @@ package nz.ac.auckland.integration.testing.endpointoverride;
 
 import org.apache.camel.Endpoint;
 
+/**
+ * A simple class to ensure that HTTP connections are torn down between tests
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class UrlConnectionOverride implements EndpointOverride {
     @Override
     public void overrideEndpoint(Endpoint endpoint) {
