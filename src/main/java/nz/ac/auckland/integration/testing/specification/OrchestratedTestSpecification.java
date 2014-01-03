@@ -2,13 +2,17 @@ package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.stub.Stub;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -37,10 +41,16 @@ public abstract class OrchestratedTestSpecification {
         return description;
     }
 
+    /**
+     * @return The number of parts involved in this specification, where each part is a specification in itself
+     */
     public int getPartCount() {
         return this.partCount;
     }
 
+    /**
+     * @return The next specification in the line for this test (recursive)
+     */
     public OrchestratedTestSpecification getNextPart() {
         return this.nextPart;
     }
@@ -136,6 +146,8 @@ public abstract class OrchestratedTestSpecification {
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
 
+        private Collection<String> endpointUriRegistry = new HashSet<>();
+
         private AbstractBuilder nextPartBuilder;
 
         private Map<String, MockExpectation> mockExpectationByEndpoint = new HashMap<>();
@@ -146,7 +158,11 @@ public abstract class OrchestratedTestSpecification {
             endpointOverrides = new ArrayList<>();
             //we don't want to use POJO to receive messages
             endpointOverrides.add(new CxfEndpointOverride());
-            this.endpointUri = endpointUri;
+            try {
+                this.endpointUri = URISupport.normalizeUri(endpointUri);
+            } catch (URISyntaxException | UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         protected abstract Builder self();
@@ -159,34 +175,39 @@ public abstract class OrchestratedTestSpecification {
                 nextPart = nextPartBuilder.build();
                 partCount = nextPart.getPartCount() + 1;
             }
-
             return this.buildInternal();
         }
 
         /**
-         * We use an Expectation Builder here as we have to do additional configuration before creation. This includes
+         * We use an EndpointSubscriber Builder here as we have to do additional configuration before creation. This includes
          * setting up the expected index that an expectation is received which means that previous calls to
          * MockExpectation.receivedAt() will be ignored.
          *
          * @param expectationBuilder The expectation builder used to seed the expectation
          * @throws IllegalArgumentException if expectations to the same endpoint have different ordering requirements
          */
-        public Builder addExpectation(MockExpectation.AbstractBuilder expectationBuilder) {
+        @SuppressWarnings("unchecked")
+        public Builder addExpectation(MockExpectation.MockExpectationBuilder expectationBuilder) {
 
             expectationBuilder.receivedAt(currentExpectationReceivedAtIndex);
 
-            MockExpectation expectation = expectationBuilder.build();
+            List<MockExpectation> expectations = expectationBuilder.build();
 
-            if (!mockExpectationByEndpoint.containsKey(expectation.getEndpointUri()))
-                mockExpectationByEndpoint.put(expectation.getEndpointUri(), expectation);
+            for (MockExpectation expectation : expectations) {
+                if (!mockExpectationByEndpoint.containsKey(expectation.getEndpointUri()))
+                    mockExpectationByEndpoint.put(expectation.getEndpointUri(), expectation);
 
-            if (expectation.isEndpointOrdered() != mockExpectationByEndpoint.get(expectation.getEndpointUri()).isEndpointOrdered())
-                throw new IllegalArgumentException("The endpoint for URI " + expectation.getEndpointUri() + " must have the same ordering " +
-                        "requirements for each expectation");
+                if (!endpointUriRegistry.contains(expectation.getEndpointUri()))
+                    endpointUriRegistry.add(expectation.getEndpointUri());
 
-            currentExpectationReceivedAtIndex += expectation.getExpectedMessageCount();
+                if (expectation.isEndpointOrdered() != mockExpectationByEndpoint.get(expectation.getEndpointUri()).isEndpointOrdered())
+                    throw new IllegalArgumentException("The endpoint for URI " + expectation.getEndpointUri() + " must have the same ordering " +
+                            "requirements for each expectation");
 
-            mockExpectations.add(expectation);
+                currentExpectationReceivedAtIndex++;
+
+                mockExpectations.add(expectation);
+            }
 
             return self();
         }
@@ -194,8 +215,8 @@ public abstract class OrchestratedTestSpecification {
         /**
          * A convenience method for adding multiple expectations at the same time
          */
-        public Builder addExpectations(MockExpectation.AbstractBuilder... expectationBuilders) {
-            for (MockExpectation.AbstractBuilder expectationBuilder : expectationBuilders) {
+        public Builder addExpectations(MockExpectation.MockExpectationBuilder... expectationBuilders) {
+            for (MockExpectation.MockExpectationBuilder expectationBuilder : expectationBuilders) {
                 self().addExpectation(expectationBuilder);
             }
 
@@ -269,6 +290,7 @@ public abstract class OrchestratedTestSpecification {
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
         this.nextPart = builder.nextPart;
+        this.stubs = builder.stubs;
     }
 }
 

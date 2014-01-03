@@ -71,7 +71,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
         return fault;
     }
 
-    public boolean validate(Exchange e) {
+    public boolean validate(Exchange e, int index) {
         if (e == null) return false;
         Throwable t = e.getException();
 
@@ -100,21 +100,21 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
 
         Exchange faultMessageExchange = new DefaultExchange(e.getContext());
         faultMessageExchange.getIn().setBody(fault.getMessage());
-        validMessage = faultMessageValidator.validate(faultMessageExchange);
+        validMessage = faultMessageValidator.validate(faultMessageExchange,0);
 
         if (!validMessage)
             logger.warn("The SOAP Fault message is not as expected; received {}", fault.getCode());
 
         Exchange codeExchange = new DefaultExchange(e.getContext());
         codeExchange.getIn().setBody(fault.getFaultCode());
-        validCode = codeValidator.validate(codeExchange);
+        validCode = codeValidator.validate(codeExchange,0);
 
         if (!validCode) logger.warn("The SOAP Fault code is not as expected; received {}", fault.getCode());
 
         if (detailValidator != null) {
             Exchange detailExchange = new DefaultExchange(e.getContext());
             detailExchange.getIn().setBody(fault.getDetail());
-            validDetail = detailValidator.validate(detailExchange);
+            validDetail = detailValidator.validate(detailExchange,0);
 
             String detail = xmlUtilities.getDocumentAsString(fault.getDetail());
             if (!validDetail) logger.warn("The SOAP Fault detail is not as expected; received {}", detail);
@@ -132,7 +132,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
         }
 
         @Override
-        public boolean validate(Exchange exchange) {
+        public boolean validate(Exchange exchange, int index) {
             //The receive QName is passed in from the body
             return exchange != null &&
                     exchange.getIn().getBody(QName.class) != null &&

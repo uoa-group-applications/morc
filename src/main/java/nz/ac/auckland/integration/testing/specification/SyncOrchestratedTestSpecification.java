@@ -36,7 +36,6 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
      */
     protected boolean sendInputInternal(ProducerTemplate template) {
         try {
-
             final TestResource inputBody;
             final TestResource<Map<String, Object>> inputHeaders;
             final Validator responseBodyValidator;
@@ -135,11 +134,17 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return this;
         }
 
+        /**
+         * @param resources A collection of test resources that can be used to send request bodies to a target endpoint
+         */
         public Builder requestBody(TestResource... resources) {
             Collections.addAll(inputRequestBodies, resources);
             return self();
         }
 
+        /**
+         * @param resources An enumeration that will be iterated over for sending request bodies to a target endpoint
+         */
         public Builder requestBody(Enumeration<TestResource> resources) {
             while (resources.hasMoreElements()) {
                 inputRequestBodies.add(resources.nextElement());
@@ -147,12 +152,18 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
+        /**
+         * @param resources A collection of test header resources that can be used to send request headers to a target endpoint
+         */
         @SafeVarargs
         public final Builder requestHeaders(TestResource<Map<String, Object>>... resources) {
             Collections.addAll(inputRequestHeaders, resources);
             return self();
         }
 
+        /**
+         * @param resources An enumeration that will be iterated over for sending request bodies to a target endpoint
+         */
         public Builder requestHeaders(Enumeration<TestResource<Map<String, Object>>> resources) {
             while (resources.hasMoreElements()) {
                 inputRequestHeaders.add(resources.nextElement());
@@ -160,11 +171,17 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
+        /**
+         * @param validators A collection of validators for the response body back from a callout
+         */
         public Builder expectedResponseBody(Validator... validators) {
             Collections.addAll(this.responseBodyValidators, validators);
             return self();
         }
 
+        /**
+         * @param validators An enumeration that will be iterated over for callout body validation
+         */
         public Builder expectedResponseBody(Enumeration<Validator> validators) {
             while (validators.hasMoreElements()) {
                 responseBodyValidators.add(validators.nextElement());
@@ -172,11 +189,17 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
+        /**
+         * @param responseHeadersValidators A collection of validators for response headers back from a callout
+         */
         public Builder expectedResponseHeaders(HeadersValidator... responseHeadersValidators) {
             Collections.addAll(this.responseHeadersValidators, responseHeadersValidators);
             return self();
         }
 
+        /**
+         * @param resources A collection of validators for response headers back from a callout
+         */
         @SafeVarargs
         public final Builder expectedResponseHeaders(TestResource<Map<String, Object>>... resources) {
             for (TestResource<Map<String, Object>> resource : resources) {
@@ -185,6 +208,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
+        /**
+         * @param resources An enumeration that will be iterated over for header validation from a callout
+         */
         public Builder expectedResponseHeaders(Enumeration<HeadersValidator> resources) {
             while (resources.hasMoreElements()) {
                 this.responseHeadersValidators.add(resources.nextElement());
@@ -192,14 +218,23 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             return self();
         }
 
+        /**
+         * @param validators A collection of validators for validating exchange responses for a callout
+         */
         public Builder expectedResponse(Validator... validators) {
             return this.expectedResponseBody(validators);
         }
 
+        /**
+         * @param validators An enumeration that will be iterated over for header validation for a callout
+         */
         public Builder expectedResponse(Enumeration<Validator> validators) {
             return this.expectedResponseBody(validators);
         }
 
+        /**
+         * Whether an exception should be expected back for this request
+         */
         public Builder expectsExceptionResponse() {
             this.expectsExceptionResponse = true;
             return self();

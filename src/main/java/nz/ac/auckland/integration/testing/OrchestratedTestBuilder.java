@@ -4,9 +4,12 @@ import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
-import nz.ac.auckland.integration.testing.answer.Answer;
-import nz.ac.auckland.integration.testing.answer.MatchedInputResponseAnswer;
-import nz.ac.auckland.integration.testing.expectation.*;
+import nz.ac.auckland.integration.testing.mock.builder.AsyncMockExpectationBuilder;
+import nz.ac.auckland.integration.testing.mock.builder.SoapFaultMockExpectationBuilder;
+import nz.ac.auckland.integration.testing.processor.MatchedResponseBodiesProcessor;
+import nz.ac.auckland.integration.testing.mock.*;
+import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockExpectationBuilder;
+import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockExpectationBuilder;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
@@ -320,44 +323,44 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * A convenience method for specifying matched input->output answers for expectations
      */
     @SuppressWarnings("unchecked")
-    public static MatchedInputResponseAnswer matchedResponse(MatchedInputResponseAnswer.MatchedResponse... responses) {
-        return new MatchedInputResponseAnswer(responses);
+    public static MatchedResponseBodiesProcessor matchedResponse(MatchedResponseBodiesProcessor.MatchedResponse... responses) {
+        return new MatchedResponseBodiesProcessor(responses);
     }
 
     /**
      * A convenience method for specifying matched input->output answers for expectations where matches are removed from the pool
      */
     @SuppressWarnings("unchecked")
-    public static MatchedInputResponseAnswer matchedResponse(boolean removeOnMatch,
-                                                             MatchedInputResponseAnswer.MatchedResponse... responses) {
-        return new MatchedInputResponseAnswer(removeOnMatch, responses);
+    public static MatchedResponseBodiesProcessor matchedResponse(boolean removeOnMatch,
+                                                             MatchedResponseBodiesProcessor.MatchedResponse... responses) {
+        return new MatchedResponseBodiesProcessor(removeOnMatch, responses);
     }
 
     /**
      * A convenience method for specifying matched input headers -> output headers for expectations
      */
     @SafeVarargs
-    public static MatchedInputResponseAnswer<Map<String, Object>> matchedHeadersResponse(
-            MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>>... responses) {
-        return new MatchedInputResponseAnswer<>(responses);
+    public static MatchedResponseBodiesProcessor<Map<String, Object>> matchedHeadersResponse(
+            MatchedResponseBodiesProcessor.MatchedResponse<Map<String, Object>>... responses) {
+        return new MatchedResponseBodiesProcessor<>(responses);
     }
 
     /**
      * A convenience method for specifying matched input headers -> output headers for expectations that are removed rom the pool
      */
     @SafeVarargs
-    public static MatchedInputResponseAnswer<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
-                                                                                         MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>>... responses) {
-        return new MatchedInputResponseAnswer<>(removeOnMatch, responses);
+    public static MatchedResponseBodiesProcessor<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
+                                                                                         MatchedResponseBodiesProcessor.MatchedResponse<Map<String, Object>>... responses) {
+        return new MatchedResponseBodiesProcessor<>(removeOnMatch, responses);
     }
 
     /**
      * A convenience method for specifying matched input validators to outputs
      */
     @SuppressWarnings("unchecked")
-    public static MatchedInputResponseAnswer.MatchedResponse answer(Validator validator, TestResource resource) {
+    public static MatchedResponseBodiesProcessor.MatchedResponse answer(Validator validator, TestResource resource) {
         try {
-            return new MatchedInputResponseAnswer.MatchedResponse(validator, resource);
+            return new MatchedResponseBodiesProcessor.MatchedResponse(validator, resource);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -366,10 +369,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * A convenience method for specifying matched input header validators to output headers
      */
-    public static MatchedInputResponseAnswer.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
+    public static MatchedResponseBodiesProcessor.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
                                                                                                TestResource<Map<String, Object>> resource) {
         try {
-            return new MatchedInputResponseAnswer.MatchedResponse<>(validator, resource);
+            return new MatchedResponseBodiesProcessor.MatchedResponse<>(validator, resource);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -487,36 +490,36 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static AsyncMockExpectation.Builder asyncExpectation(String endpointUri) {
-        return new AsyncMockExpectation.Builder(endpointUri);
+    public static AsyncMockExpectationBuilder asyncExpectation(String endpointUri) {
+        return new AsyncMockExpectationBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static HttpErrorMockExpectation.Builder httpErrorExpectation(String endpointUri) {
-        return new HttpErrorMockExpectation.Builder(endpointUri);
+    public static HttpErrorMockExpectationBuilder.Builder httpErrorExpectation(String endpointUri) {
+        return new HttpErrorMockExpectationBuilder.Builder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that the mock should listen to; should follow the Apache Camel URI format
      */
-    public static SoapFaultMockExpectation.Builder soapFaultExpectation(String endpointUri) {
-        return new SoapFaultMockExpectation.Builder(endpointUri);
+    public static SoapFaultMockExpectationBuilder.Builder soapFaultExpectation(String endpointUri) {
+        return new SoapFaultMockExpectationBuilder.Builder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri) {
-        return new ExceptionMockExpectation.Builder(endpointUri);
+    public static ExceptionMockExpectationBuilder.Builder exceptionExpectation(String endpointUri) {
+        return new ExceptionMockExpectationBuilder.Builder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      * @param exception   The exception that should be instantiated and thrown as part of the expectation
      */
-    public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri,
+    public static ExceptionMockExpectationBuilder.Builder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception) {
         try {
             exception.getConstructor();
@@ -524,7 +527,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
             throw new IllegalArgumentException(e);
         }
 
-        return new ExceptionMockExpectation.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
+        return new ExceptionMockExpectationBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
             @Override
             public Exception response(Exchange exchange) throws Exception {
                 Constructor<? extends Exception> constructor = exception.getConstructor();
@@ -536,9 +539,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri   The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      * @param exception     The exception that should be instantiated and thrown as part of the expectation
-     * @param message       The message to provide to the exception as part of the constructor call
+     * @param message
+     * @return
      */
-    public static ExceptionMockExpectation.Builder exceptionExpectation(String endpointUri,
+    public static ExceptionMockExpectationBuilder.Builder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception,
                                                                         final String message) {
         try {
@@ -547,7 +551,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
             throw new IllegalArgumentException(e);
         }
 
-        return new ExceptionMockExpectation.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
+        return new ExceptionMockExpectationBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
             @Override
             public Exception response(Exchange exchange) throws Exception {
                 Constructor<? extends Exception> constructor = exception.getConstructor(String.class);
@@ -560,8 +564,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static SyncMockExpectation.Builder syncExpectation(String endpointUri) {
-        return new SyncMockExpectation.Builder(endpointUri);
+    public static SyncMockExpectationBuilder.Builder syncExpectation(String endpointUri) {
+        return new SyncMockExpectationBuilder.Builder(endpointUri);
     }
 
     /**

@@ -74,7 +74,7 @@ public class XmlTestResource extends StaticTestResource<Document> implements Val
      * @param exchange The exchange containing the XML document to validate
      * @return true if the input and test resource are similar using XMLUnit's Diff.similar()
      */
-    public boolean validate(Exchange exchange) {
+    public boolean validate(Exchange exchange, int index) {
         Document value;
         try {
             value = exchange.getIn().getBody(Document.class);

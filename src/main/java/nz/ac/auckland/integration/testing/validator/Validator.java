@@ -8,5 +8,5 @@ import org.apache.camel.Exchange;
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public interface Validator {
-    public boolean validate(Exchange exchange);
+    public boolean validate(Exchange exchange, int index);
 }

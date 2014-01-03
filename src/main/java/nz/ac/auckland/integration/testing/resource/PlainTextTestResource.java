@@ -49,7 +49,7 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
      * @param exchange The exchange containing the text string to validate against
      * @return true if the input String is the same as the test resource using Java String equality
      */
-    public boolean validate(Exchange exchange) {
+    public boolean validate(Exchange exchange, int index) {
         String value;
         try {
             value = exchange.getIn().getBody(String.class);
