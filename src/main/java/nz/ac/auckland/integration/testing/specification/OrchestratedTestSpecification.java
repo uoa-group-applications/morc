@@ -2,10 +2,12 @@ package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
+import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
 import nz.ac.auckland.integration.testing.mock.MockExpectation;
-import nz.ac.auckland.integration.testing.stub.Stub;
-import org.apache.camel.Endpoint;
-import org.apache.camel.ProducerTemplate;
+import org.apache.camel.*;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.ProcessorDefinition;
+import org.apache.camel.spi.InterceptStrategy;
 import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * An orchestrated test is a declarative way of specifying a target for a message with a number
@@ -26,11 +29,12 @@ public abstract class OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratedTestSpecification.class);
     private String description;
     private String endpointUri;
-    private List<MockExpectation> mockExpectations;
+    private final Set<MockExpectation> mockExpectations;
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private int sendCount;
     private long sendInterval;
+    private int totalExpectedMessageCount;
     private int partCount;
     private OrchestratedTestSpecification nextPart;
 
@@ -58,8 +62,8 @@ public abstract class OrchestratedTestSpecification {
     /**
      * @return A list of expectations that need to be satisfied for the test to pass
      */
-    public List<MockExpectation> getMockExpectations() {
-        return Collections.unmodifiableList(mockExpectations);
+    public Set<MockExpectation> getMockExpectations() {
+        return Collections.unmodifiableSet(mockExpectations);
     }
 
     /**
@@ -101,11 +105,27 @@ public abstract class OrchestratedTestSpecification {
         return endpointUri;
     }
 
+    public void setUp(final CamelContext context) throws Exception {
+        context.addRoutes(new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                for (MockExpectation expectation : mockExpectations) {
+                    configureRoute(expectation.getExpectationFeederRoute());
+                }
+            }
+        });
+
+    }
+
+    public void tearDown(CamelContext context) {
+
+    }
+
     /**
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
      * @return Returns true if the message was successfully sent and, if there's a response, that it is valid
      */
-    public boolean sendInput(ProducerTemplate template) {
+    public void sendInput(ProducerTemplate template) {
 
         int i = 0;
         //will replace this with a runner/closure when JDK8 is released
@@ -120,13 +140,21 @@ public abstract class OrchestratedTestSpecification {
             boolean response = sendInputInternal(template);
             if (!response) {
                 logger.warn("Failed on sending input message {}", i + 1);
-                return false;
+                return;
             }
 
             i++;
         } while (i < sendCount);
 
         return true;
+    }
+
+    public void assertIsSatisfied() {
+        //countdown latch
+
+        //check endpoint ordering
+
+        //for each expectation we ensure it is running correctly
     }
 
     protected abstract boolean sendInputInternal(ProducerTemplate template);
@@ -137,16 +165,15 @@ public abstract class OrchestratedTestSpecification {
 
         private String description;
         private String endpointUri;
-        private List<MockExpectation> mockExpectations;
-        private int currentExpectationReceivedAtIndex = 0;
+        private Map<String,MockExpectation> mockExpectations;
+        private Queue<String> endpointOrdering;
         private long sleepForTestCompletion = 15000;
         private Collection<EndpointOverride> endpointOverrides;
         private int sendCount = 1;
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
-
-        private Collection<String> endpointUriRegistry = new HashSet<>();
+        private int totalExpectedMessageCount;
 
         private AbstractBuilder nextPartBuilder;
 
@@ -154,10 +181,11 @@ public abstract class OrchestratedTestSpecification {
 
         public AbstractBuilder(String description, String endpointUri) {
             this.description = description;
-            mockExpectations = new ArrayList<>();
+            mockExpectations = new HashMap<>();
             endpointOverrides = new ArrayList<>();
             //we don't want to use POJO to receive messages
             endpointOverrides.add(new CxfEndpointOverride());
+            endpointOverrides.add(new UrlConnectionOverride());
             try {
                 this.endpointUri = URISupport.normalizeUri(endpointUri);
             } catch (URISyntaxException | UnsupportedEncodingException e) {
@@ -167,13 +195,43 @@ public abstract class OrchestratedTestSpecification {
 
         protected abstract Builder self();
 
+        //todo: can we get rid of this?
         protected abstract Product buildInternal();
 
         @SuppressWarnings("unchecked")
         public Product build() {
+            //todo add endpoint overrides
+            //todo add interceptor
+
             if (nextPartBuilder != null) {
                 nextPart = nextPartBuilder.build();
                 partCount = nextPart.getPartCount() + 1;
+            }
+
+            InterceptStrategy interceptStrategy = new InterceptStrategy() {
+                Queue<String> endpointArrivalQueue = new ConcurrentLinkedQueue<>();
+
+                @Override
+                public Processor wrapProcessorInInterceptors(CamelContext context, ProcessorDefinition<?> definition,
+                                                             final Processor target, Processor nextTarget) throws Exception {
+
+                        return new Processor() {
+                            @Override
+                            public void process(Exchange exchange) throws Exception {
+                                if (target instanceof MockExpectation)
+                                    endpointArrivalQueue.add(exchange.getFromEndpoint().getEndpointUri());
+                            }
+                        };
+                }
+
+                public Queue<String> getEndpointArrivals() {
+                    return endpointArrivalQueue;
+                }
+            };
+
+            for (MockExpectation expectation : mockExpectations.values()) {
+                expectation.getExpectationFeederRoute().addInterceptStrategy(interceptStrategy);
+                totalExpectedMessageCount += expectation.getExpectedMessageCount();
             }
             return this.buildInternal();
         }
@@ -189,25 +247,24 @@ public abstract class OrchestratedTestSpecification {
         @SuppressWarnings("unchecked")
         public Builder addExpectation(MockExpectation.MockExpectationBuilder expectationBuilder) {
 
-            expectationBuilder.receivedAt(currentExpectationReceivedAtIndex);
+            //we need to merge the expectations
+            MockExpectation endpointExpectation = mockExpectations.get(expectationBuilder.getEndpointUri());
 
-            List<MockExpectation> expectations = expectationBuilder.build();
+            int currentEndpointExpectationMessageCount = 0;
 
-            for (MockExpectation expectation : expectations) {
-                if (!mockExpectationByEndpoint.containsKey(expectation.getEndpointUri()))
-                    mockExpectationByEndpoint.put(expectation.getEndpointUri(), expectation);
+            if (endpointExpectation != null)
+                currentEndpointExpectationMessageCount = endpointExpectation.getExpectedMessageCount();
 
-                if (!endpointUriRegistry.contains(expectation.getEndpointUri()))
-                    endpointUriRegistry.add(expectation.getEndpointUri());
+            MockExpectation mergedExpectation =
+                    expectationBuilder.build(endpointExpectation);
 
-                if (expectation.isEndpointOrdered() != mockExpectationByEndpoint.get(expectation.getEndpointUri()).isEndpointOrdered())
-                    throw new IllegalArgumentException("The endpoint for URI " + expectation.getEndpointUri() + " must have the same ordering " +
-                            "requirements for each expectation");
+            int mergedEndpointExpectationMessageCount =
+                    mergedExpectation.getExpectedMessageCount() - currentEndpointExpectationMessageCount;
 
-                currentExpectationReceivedAtIndex++;
+            for (int i = 0; i < mergedEndpointExpectationMessageCount; i++)
+                endpointOrdering.add(mergedExpectation.getEndpointUri());
 
-                mockExpectations.add(expectation);
-            }
+            mockExpectations.put(expectationBuilder.getEndpointUri(),mergedExpectation);
 
             return self();
         }
@@ -280,17 +337,17 @@ public abstract class OrchestratedTestSpecification {
     }
 
     @SuppressWarnings("unchecked")
-    protected OrchestratedTestSpecification(AbstractBuilder builder) {
+    private OrchestratedTestSpecification(AbstractBuilder builder) {
         this.description = builder.description;
         this.endpointUri = builder.endpointUri;
-        this.mockExpectations = builder.mockExpectations;
+        this.mockExpectations = builder.mockExpectations.entrySet();
         this.sleepForTestCompletion = builder.sleepForTestCompletion;
         this.endpointOverrides = builder.endpointOverrides;
         this.sendCount = builder.sendCount;
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
         this.nextPart = builder.nextPart;
-        this.stubs = builder.stubs;
+        this.totalExpectedMessageCount = builder.totalExpectedMessageCount;
     }
 }
 

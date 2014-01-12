@@ -1,9 +1,12 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
 import nz.ac.auckland.integration.testing.mock.MockExpectation;
-import nz.ac.auckland.integration.testing.processor.ResponseBodiesProcessor;
+import nz.ac.auckland.integration.testing.processor.MatchedResponseBodiesProcessor;
+import nz.ac.auckland.integration.testing.processor.ResponseBodyProcessor;
 import nz.ac.auckland.integration.testing.processor.ResponseHeadersProcessor;
 import nz.ac.auckland.integration.testing.resource.TestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,10 +16,10 @@ import java.util.Map;
 public class SyncMockExpectationBuilder<Builder extends SyncMockExpectationBuilder<Builder, T>, T>
         extends ContentMockExpectationBuilder<Builder> {
 
+    private static final Logger logger = LoggerFactory.getLogger(SyncMockExpectationBuilder.class);
+
     private List<T> responseBodyProcessors = new ArrayList<>();
     private List<Map<String, Object>> responseHeadersProcessors = new ArrayList<>();
-    private Class<? extends ResponseBodiesProcessor> responseBodiesProcessor = ResponseBodiesProcessor.class;
-    private Class<? extends ResponseHeadersProcessor> responseHeadersProcessor = ResponseHeadersProcessor.class;
     private boolean matchedResponses = false;
 
     public SyncMockExpectationBuilder(String endpointUri) {
@@ -74,44 +77,32 @@ public class SyncMockExpectationBuilder<Builder extends SyncMockExpectationBuild
         return self();
     }
 
-    public Builder responseBodyProcessor(Class<? extends ResponseBodiesProcessor> clazz) {
-        this.responseBodiesProcessor = clazz;
-        return self();
-    }
-
-    public Builder responseHeadersProcessor(Class<? extends ResponseHeadersProcessor> clazz) {
-        this.responseHeadersProcessor = clazz;
+    public Builder matchedResponses() {
+        matchedResponses = true;
         return self();
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
 
         int responseProcessorCount = Math.max(responseBodyProcessors.size(), responseHeadersProcessors.size());
 
-        //todo add .matchedResponses() (warn if totally ordered)
+        if (matchedResponses && getOrderingType() == MockExpectation.OrderingType.TOTAL && !isLenient())
+            logger.warn("Using matched responses with a totally ordered endpoint is probably not sensible");
 
-        ResponseBodiesProcessor bodiesProcessor;
-        ResponseHeadersProcessor headersProcessor;
+        MatchedResponseBodiesProcessor matchedResponseBodiesProcessor = new MatchedResponseBodiesProcessor();
 
-        try {
-            bodiesProcessor = responseBodiesProcessor.newInstance();
-            headersProcessor = responseHeadersProcessor.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        if (matchedResponses)
 
         for (int i = 0; i < responseProcessorCount; i++) {
+
             if (i < responseBodyProcessors.size())
-                bodiesProcessor.addResponseBody(responseBodyProcessors.get(i));
+                addProcessors(i, new ResponseBodyProcessor(responseBodyProcessors.get(i)));
 
             if (i < responseHeadersProcessors.size())
-                headersProcessor.addResponseHeaders(responseHeadersProcessors.get(i));
+                addProcessors(i,new ResponseHeadersProcessor(responseHeadersProcessors.get(i)));
         }
 
-        this.addRepeatedProcessor(bodiesProcessor);
-        this.addRepeatedProcessor(headersProcessor);
-
-        return super.build(previousExpectationPart, index);
+        return super.build(previousExpectationPart);
     }
 }

@@ -6,6 +6,8 @@ import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import nz.ac.auckland.integration.testing.mock.builder.AsyncMockExpectationBuilder;
 import nz.ac.auckland.integration.testing.mock.builder.SoapFaultMockExpectationBuilder;
+import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
+import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
 import nz.ac.auckland.integration.testing.processor.MatchedResponseBodiesProcessor;
 import nz.ac.auckland.integration.testing.mock.*;
 import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockExpectationBuilder;
@@ -14,11 +16,9 @@ import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.utility.XPathSelector;
+import nz.ac.auckland.integration.testing.utility.XPathValidator;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.validator.ExceptionValidator;
-import nz.ac.auckland.integration.testing.validator.HttpErrorValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.predicate.Validator;
 import org.apache.camel.Exchange;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
@@ -207,6 +207,15 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return resources;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T[] times(int count, T input) {
+        ArrayList<T> list = new ArrayList<T>();
+        for (int i = 0;i < count; i++) {
+            list.add(input);
+        }
+        return (T[])list.toArray();
+    }
+
     /**
      * @param data A map of headers and corresponding data that will be used for seeding a message, or comparing an expected value
      */
@@ -281,16 +290,16 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A validator for ensuring an exception occurs
      */
-    public static ExceptionValidator exception() {
-        return new ExceptionValidator();
+    public static ExceptionPredicate exception() {
+        return new ExceptionPredicate();
     }
 
     /**
      * @param exception The exception we expect to validate against
      * @return          A validator for ensuring an exception occurs
      */
-    public static ExceptionValidator exception(Class<? extends Exception> exception) {
-        return new ExceptionValidator(exception);
+    public static ExceptionPredicate exception(Class<? extends Exception> exception) {
+        return new ExceptionPredicate(exception);
     }
 
     /**
@@ -298,8 +307,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param message   The message in the exception we expect to validate against
      * @return          A validator for ensuring an exception occurs
      */
-    public static ExceptionValidator exception(Class<? extends Exception> exception, String message) {
-        return new ExceptionValidator(exception, message);
+    public static ExceptionPredicate exception(Class<? extends Exception> exception, String message) {
+        return new ExceptionPredicate(exception, message);
     }
 
     /**
@@ -588,30 +597,30 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
-    public static HttpErrorValidator httpExceptionResponse(Validator validator) {
-        return new HttpErrorValidator.Builder().responseBodyValidator(validator).build();
+    public static HttpErrorPredicate httpExceptionResponse(Validator validator) {
+        return new HttpErrorPredicate.Builder().responseBodyValidator(validator).build();
     }
 
     /**
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
-    public static HttpErrorValidator httpExceptionResponse(int statusCode, Validator validator) {
-        return new HttpErrorValidator.Builder().responseBodyValidator(validator).statusCode(statusCode).build();
+    public static HttpErrorPredicate httpExceptionResponse(int statusCode, Validator validator) {
+        return new HttpErrorPredicate.Builder().responseBodyValidator(validator).statusCode(statusCode).build();
     }
 
     /**
      * @return A validation builder for setting http exception response values
      */
-    public static HttpErrorValidator.Builder httpExceptionResponse() {
-        return new HttpErrorValidator.Builder();
+    public static HttpErrorPredicate.Builder httpExceptionResponse() {
+        return new HttpErrorPredicate.Builder();
     }
 
     /**
      * @param statusCode The HTTP status code that is expected to be received back
      * @return A validator that ensures that the HTTP response meets the expected XML response body
      */
-    public static HttpErrorValidator httpExceptionResponse(int statusCode) {
-        return new HttpErrorValidator.Builder().statusCode(statusCode).build();
+    public static HttpErrorPredicate httpExceptionResponse(int statusCode) {
+        return new HttpErrorPredicate.Builder().statusCode(statusCode).build();
     }
 
     /**
@@ -651,13 +660,13 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param namespaces a collection of namespace pairs used for evaluating the xpath
      * @return an xpath selector to be used for the xml test resource
      */
-    public static XPathSelector xpathSelector(String xpath, NS... namespaces) {
+    public static XPathValidator xpathSelector(String xpath, NS... namespaces) {
         Map<String, String> namespaceMap = new HashMap<>();
         for (NS namespace : namespaces) {
             namespaceMap.put(namespace.prefix, namespace.uri);
         }
 
-        return new XPathSelector(xpath, namespaceMap);
+        return new XPathValidator(xpath, namespaceMap);
     }
 
     //this is used by JUnit to initialize each instance of this specification

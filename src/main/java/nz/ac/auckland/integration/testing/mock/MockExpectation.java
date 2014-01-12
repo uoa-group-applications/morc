@@ -1,9 +1,9 @@
 package nz.ac.auckland.integration.testing.mock;
 
-import nz.ac.auckland.integration.testing.validator.OrderValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.util.URISupport;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -45,10 +45,11 @@ public class MockExpectation implements Processor {
     private boolean lenient = false;
     private OrderingType orderingType;
     private List<List<Processor>> processors;
-    private List<List<Validator>> validators;
+    private List<List<Predicate>> predicates;
     private int expectedMessageCount;
     private AtomicInteger messageCounter = new AtomicInteger();
     private boolean exchangesValid = true;
+    private RouteDefinition expectationFeederRoute;
 
     public enum OrderingType {
         TOTAL,
@@ -89,43 +90,56 @@ public class MockExpectation implements Processor {
         return processors;
     }
 
-    public List<List<Validator>> getValidators() {
-        return validators;
+    public List<List<Predicate>> getPredicates() {
+        return predicates;
     }
 
     public int getExpectedMessageCount() {
         return expectedMessageCount;
     }
 
-    protected synchronized void validateExchange(Exchange exchange, int messageIndex) {
-        if (!isEndpointOrdered || orderingType != OrderingType.NONE) {
-            List<Validator> exchangeValidators = validators.remove(0);
-            exchangesValid = exchangesValid && validateExchangeList(exchange,messageIndex,exchangeValidators);
+    public RouteDefinition getExpectationFeederRoute() {
+        return expectationFeederRoute;
+    }
+
+    protected synchronized void validateExchange(Exchange exchange) {
+        if (predicates.size() == 0) {
+            exchangesValid = false;
+            return;
+        }
+
+        if (!isEndpointOrdered) {
+            List<Predicate> exchangePredicates = predicates.remove(0);
+            exchangesValid = exchangesValid && validateExchangeList(exchange,exchangePredicates);
         } else {
-            Iterator<List<Validator>> validatorLists = validators.iterator();
-            while (validatorLists.hasNext()) {
-                exchangesValid = exchangesValid && validateExchangeList(exchange,messageIndex, validatorLists.next());
+            Iterator<List<Predicate>> predicatesLists = predicates.iterator();
+            while (predicatesLists.hasNext()) {
+                exchangesValid = exchangesValid && validateExchangeList(exchange, predicatesLists.next());
                 if (exchangesValid) {
-                    validatorLists.remove();
+                    predicatesLists.remove();
                     break;
                 }
             }
         }
     }
 
-    private boolean validateExchangeList(Exchange exchange, int messageIndex, List<Validator> validators) {
+    private boolean validateExchangeList(Exchange exchange, List<Predicate> predicates) {
         boolean validExchange = true;
 
-        for (Validator validator : validators) {
-            boolean valid = validator.validate(exchange, messageIndex);
+        for (Predicate predicate : predicates) {
+            boolean valid = predicate.matches(exchange);
             validExchange = valid && validExchange;
         }
 
         return validExchange;
     }
 
-    public boolean isValid() {
-        return (lenient || exchangesValid && validators.size() == 0 && expectedMessageCount == messageCounter.get());
+    public void assertIsSatisfied() {
+
+        //do a countdown latch
+
+        //throw assertion error
+        // (lenient || exchangesValid && validators.size() == 0 && expectedMessageCount == messageCounter.get());
     }
 
     /**
@@ -139,9 +153,8 @@ public class MockExpectation implements Processor {
         //todo log incoming message (debug/trace/info)
 
         int currentEndpointMessageIndex = messageCounter.getAndIncrement();
-        int currentOverallMessageIndex = exchange.getProperty("SOAUnitMessageIndex",Integer.class);
 
-        validateExchange(exchange,currentOverallMessageIndex);
+        validateExchange(exchange);
 
         //todo I think i broke math here
         if (currentEndpointMessageIndex >= processors.size() && !isLenient()) {
@@ -167,11 +180,14 @@ public class MockExpectation implements Processor {
         private boolean isEndpointOrdered = true;
         private boolean lenient = false;
         private List<List<Processor>> processors = new ArrayList<>();
-        private List<List<Validator>> validators = new ArrayList<>();
+        private List<List<Predicate>> predicates = new ArrayList<>();
         private int expectedMessageCount = 1;
+        private RouteDefinition expectationFeederRoute = null;
 
         private List<Processor> repeatedProcessors = new ArrayList<>();
-        private List<Validator> repeatedValidators = new ArrayList<>();
+        private List<Predicate> repeatedPredicates = new ArrayList<>();
+
+        private long assertPeriod = 15000l;
 
         /**
          * @param endpointUri A Camel Endpoint URI to listen to for expected messages
@@ -228,45 +244,56 @@ public class MockExpectation implements Processor {
             return self();
         }
 
-        public Builder addValidators(Validator... validators) {
-            this.validators.add(Arrays.asList(validators));
+        public Builder addPredicates(Predicate... predicates) {
+            this.predicates.add(Arrays.asList(predicates));
             return self();
         }
 
-        public Builder addValidators(int index, Validator... validators) {
-            while (index > this.validators.size()) {
-                this.validators.add(new ArrayList<Validator>());
+        public Builder addPredicates(int index, Predicate... predicates) {
+            while (index > this.predicates.size()) {
+                this.predicates.add(new ArrayList<Predicate>());
             }
-            this.validators.get(index).addAll(Arrays.asList(validators));
+            this.predicates.get(index).addAll(Arrays.asList(predicates));
             return self();
         }
 
-        public Builder addRepeatedValidator(Validator validator) {
-            repeatedValidators.add(validator);
+        public Builder addRepeatedPredicate(Predicate predicate) {
+            repeatedPredicates.add(predicate);
             return self();
         }
 
-        public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+        public Builder expectationFeederRoute(RouteDefinition expectationFeederRoute) {
+            this.expectationFeederRoute = expectationFeederRoute;
+            return self();
+        }
+
+        public MockExpectation build(MockExpectation previousExpectationPart) {
 
             if (expectedMessageCount < 0)
                 throw new IllegalStateException("The expected message count for the expectation on endpoint "
                         + endpointUri + " must be at least 0");
 
-            expectedMessageCount = Math.max(expectedMessageCount, validators.size());
+            expectedMessageCount = Math.max(expectedMessageCount, predicates.size());
 
-            //do repeated validators and repeated expectations
+            //if !endpointOrdering then wrap predicates
+
+            if (predicates.size() < expectedMessageCount)
+                logger.warn("...");
+
+            Processor[] repeatedProcessorsArray = repeatedProcessors.toArray(new Processor[repeatedProcessors.size()]);
+            Predicate[] repeatedPredicatesArray = repeatedPredicates.toArray(new Predicate[repeatedPredicates.size()]);
+
+            //do repeated predicates and repeated expectations (this will also pad out processors and predicates up
+            //expected message count)
             for (int i = 0; i < expectedMessageCount; i++) {
-                addProcessors(i,repeatedProcessors.toArray(new Processor[repeatedProcessors.size()]));
-                addValidators(i,repeatedValidators.toArray(new Validator[repeatedValidators.size()]));
-
-                //add an order validator
-                addValidators(i, new OrderValidator(index+i,orderingType));
+                addProcessors(i,repeatedProcessorsArray);
+                addPredicates(i,repeatedPredicatesArray);
             }
 
-            //ensure the number of processors doesn't mess up the next expextation
+            //ensure the number of processors doesn't mess up the next expectation
             if (processors.size() > expectedMessageCount) {
                 logger.warn("The endpoint {} has {} expected messages but only {} message processors",
-                        new Object[] {endpointUri,validators.size(),processors.size()});
+                        new Object[] {endpointUri,predicates.size(),processors.size()});
 
                 if (!lenient) {
                     logger.warn("The additional processors for expectation endpoint {} are being removed to match the " +
@@ -285,6 +312,7 @@ public class MockExpectation implements Processor {
                     throw new IllegalStateException("The endpoint do not much for merging expectation " +
                             previousExpectationPart.getEndpointUri() + " and " + endpointUri);
 
+                //this isn't really necessary for sync ordering...
                 if (previousExpectationPart.isEndpointOrdered() != isEndpointOrdered)
                     throw new IllegalStateException("The endpoint ordering must be the same for all expectation parts of " +
                             "endpoint " + endpointUri);
@@ -294,13 +322,17 @@ public class MockExpectation implements Processor {
 
                 if (previousExpectationPart.getOrderingType() != orderingType)
                     throw new IllegalStateException("The ordering type must be same for all expectations on an endpoint: "
-                            + getEndpointUri());
+                            + endpointUri);
 
-                //prepend the previous validators/processors onto this list ot make an updated expectation
-                this.validators.addAll(0, previousExpectationPart.getValidators());
+                if (expectationFeederRoute != null)
+                    throw new IllegalStateException("The expectation feeder route for the endpoint " + endpointUri +
+                                            " can only be specified in the first expectation part");
+
+                //prepend the previous predicates/processors onto this list ot make an updated expectation
+                this.predicates.addAll(0, previousExpectationPart.getPredicates());
                 this.processors.addAll(0, previousExpectationPart.getProcessors());
                 this.expectedMessageCount += previousExpectationPart.getExpectedMessageCount();
-
+                this.expectationFeederRoute = previousExpectationPart.getExpectationFeederRoute();
             }
 
             return new MockExpectation(this);
@@ -310,12 +342,12 @@ public class MockExpectation implements Processor {
             return (Builder)this;
         }
 
-        protected String getEndpointUri() {
+        public String getEndpointUri() {
             return this.endpointUri;
         }
 
-        protected List<List<Validator>> getValidators() {
-            return Collections.unmodifiableList(validators);
+        protected List<List<Predicate>> getPredicates() {
+            return Collections.unmodifiableList(predicates);
         }
 
         protected List<List<Processor>> getProcessors() {
@@ -324,6 +356,10 @@ public class MockExpectation implements Processor {
 
         protected OrderingType getOrderingType() {
             return this.orderingType;
+        }
+
+        protected boolean isLenient() {
+            return this.lenient;
         }
 
     }
@@ -335,7 +371,14 @@ public class MockExpectation implements Processor {
         this.isEndpointOrdered = builder.isEndpointOrdered;
         this.lenient = builder.lenient;
         this.processors = builder.processors;
-        this.validators = builder.validators;
+        this.predicates = builder.predicates;
         this.expectedMessageCount = builder.expectedMessageCount;
+
+        this.expectationFeederRoute = builder.expectationFeederRoute;
+
+        //set up a default expectation feeder route
+        if (expectationFeederRoute == null) expectationFeederRoute = new RouteDefinition().convertBodyTo(String.class);
+        //todo: ensure we only add the feed the first time
+        expectationFeederRoute.from(endpointUri).process(this);
     }
 }

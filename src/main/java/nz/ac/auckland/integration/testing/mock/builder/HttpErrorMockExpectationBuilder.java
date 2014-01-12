@@ -29,7 +29,7 @@ public class HttpErrorMockExpectationBuilder extends SyncMockExpectationBuilder<
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
         this.addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
@@ -37,7 +37,7 @@ public class HttpErrorMockExpectationBuilder extends SyncMockExpectationBuilder<
             }
         });
 
-        return super.build(previousExpectationPart,index);
+        return super.build(previousExpectationPart);
     }
 
 }

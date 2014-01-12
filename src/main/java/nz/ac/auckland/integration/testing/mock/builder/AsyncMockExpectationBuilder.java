@@ -19,12 +19,12 @@ public class AsyncMockExpectationBuilder extends ContentMockExpectationBuilder {
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
         if (getOrderingType() == MockExpectation.OrderingType.TOTAL) {
             logger.warn("The asynchronous endpoint {} used total ordering, this was changed to partial ordering",
                     getEndpointUri());
             ordering(MockExpectation.OrderingType.PARTIAL);
         }
-        return super.build(previousExpectationPart,index);
+        return super.build(previousExpectationPart);
     }
 }

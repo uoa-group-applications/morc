@@ -1,7 +1,8 @@
-package nz.ac.auckland.integration.testing.validator;
+package nz.ac.auckland.integration.testing.predicate;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultExchange;
 import org.slf4j.Logger;
@@ -14,19 +15,19 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class HttpErrorValidator implements Validator {
+public class HttpErrorPredicate implements Predicate {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpErrorValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpErrorPredicate.class);
 
-    private Validator responseBodyValidator;
-    private Validator responseHeadersValidator;
+    private Predicate responseBodyValidator;
+    private Predicate responseHeadersValidator;
     private int statusCode;
 
-    public Validator getResponseBodyValidator() {
+    public Predicate getResponseBodyValidator() {
         return responseBodyValidator;
     }
 
-    public Validator getResponseHeadersValidator() {
+    public Predicate getResponseHeadersValidator() {
         return responseHeadersValidator;
     }
 
@@ -35,7 +36,7 @@ public class HttpErrorValidator implements Validator {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean validate(Exchange e) {
+    public boolean matches(Exchange e) {
         if (e == null) return false;
         Throwable t = e.getException();
         if (!(t instanceof HttpOperationFailedException)) {
@@ -61,12 +62,12 @@ public class HttpErrorValidator implements Validator {
             validStatus = false;
         }
 
-        if (responseBodyValidator != null && !responseBodyValidator.validate(validationExchange)) {
+        if (responseBodyValidator != null && !responseBodyValidator.matches(validationExchange)) {
             logger.warn("The HTTP exception response body is not as expected");
             validBody = false;
         }
 
-        if (responseHeadersValidator != null && !responseHeadersValidator.validate(validationExchange)) {
+        if (responseHeadersValidator != null && !responseHeadersValidator.matches(validationExchange)) {
             logger.warn("The HTTP exception response headers are not as expected");
             validHeaders = false;
         }
@@ -76,23 +77,23 @@ public class HttpErrorValidator implements Validator {
     }
 
     public static class Builder {
-        private Validator responseBodyValidator;
-        private Validator responseHeadersValidator;
+        private Predicate responseBodyValidator;
+        private Predicate responseHeadersValidator;
         private int statusCode;
 
         /**
          * @param responseBodyValidator A validator for the expected error response body
          */
-        public Builder responseBodyValidator(Validator responseBodyValidator) {
+        public Builder responseBodyValidator(Predicate responseBodyValidator) {
             this.responseBodyValidator = responseBodyValidator;
             return this;
         }
 
         /**
-         * @param responseHeadersValidator A validator for the HTTP response headers
+         * @param responseHeadersPredicate A validator for the HTTP response headers
          */
-        public Builder responseHeadersValidator(HeadersValidator responseHeadersValidator) {
-            this.responseHeadersValidator = responseHeadersValidator;
+        public Builder responseHeadersValidator(HeadersPredicate responseHeadersPredicate) {
+            this.responseHeadersValidator = responseHeadersPredicate;
             return this;
         }
 
@@ -101,7 +102,7 @@ public class HttpErrorValidator implements Validator {
          */
         @SuppressWarnings("unchecked")
         public Builder responseHeadersValidator(HeadersTestResource resource) {
-            this.responseHeadersValidator = new HeadersValidator(resource);
+            this.responseHeadersValidator = new HeadersPredicate(resource);
             return this;
         }
 
@@ -113,12 +114,12 @@ public class HttpErrorValidator implements Validator {
             return this;
         }
 
-        public HttpErrorValidator build() {
-            HttpErrorValidator validator = new HttpErrorValidator();
-            validator.responseBodyValidator = this.responseBodyValidator;
-            validator.responseHeadersValidator = this.responseHeadersValidator;
-            validator.statusCode = this.statusCode;
-            return validator;
+        public HttpErrorPredicate build() {
+            HttpErrorPredicate predicate = new HttpErrorPredicate();
+            predicate.responseBodyValidator = this.responseBodyValidator;
+            predicate.responseHeadersValidator = this.responseHeadersValidator;
+            predicate.statusCode = this.statusCode;
+            return predicate;
         }
     }
 }

@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.TypeConversionException;
 import org.apache.cxf.helpers.IOUtils;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import java.net.URL;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class PlainTextTestResource extends StaticTestResource<String> implements Validator {
+public class PlainTextTestResource extends StaticTestResource<String> implements Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(PlainTextTestResource.class);
 
@@ -49,7 +49,7 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
      * @param exchange The exchange containing the text string to validate against
      * @return true if the input String is the same as the test resource using Java String equality
      */
-    public boolean validate(Exchange exchange, int index) {
+    public boolean matches(Exchange exchange) {
         String value;
         try {
             value = exchange.getIn().getBody(String.class);

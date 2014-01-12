@@ -1,8 +1,8 @@
 package nz.ac.auckland.integration.testing.resource;
 
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.TypeConversionException;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -21,7 +21,7 @@ import java.net.URL;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class XmlTestResource extends StaticTestResource<Document> implements Validator {
+public class XmlTestResource extends StaticTestResource<Document> implements Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlTestResource.class);
     private XmlUtilities xmlUtilities = new XmlUtilities();
@@ -74,7 +74,7 @@ public class XmlTestResource extends StaticTestResource<Document> implements Val
      * @param exchange The exchange containing the XML document to validate
      * @return true if the input and test resource are similar using XMLUnit's Diff.similar()
      */
-    public boolean validate(Exchange exchange, int index) {
+    public boolean matches(Exchange exchange) {
         Document value;
         try {
             value = exchange.getIn().getBody(Document.class);

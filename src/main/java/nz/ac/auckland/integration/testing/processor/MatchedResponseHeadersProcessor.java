@@ -1,8 +1,8 @@
 package nz.ac.auckland.integration.testing.processor;
 
 import nz.ac.auckland.integration.testing.resource.TestResource;
-import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class MatchedResponseHeadersProcessor implements Processor {
 
         while (responseIterator.hasNext()) {
             MatchedResponse matchedResponse = responseIterator.next();
-            if (matchedResponse.inputValidator.validate(exchange,0)) {
+            if (matchedResponse.inputPredicate.matches(exchange)) {
                 exchange.getOut().setHeaders(matchedResponse.response);
             }
         }
@@ -48,15 +48,15 @@ public class MatchedResponseHeadersProcessor implements Processor {
      * An approach class for making input->output pairs
      */
     public static class MatchedResponse {
-        private Validator inputValidator;
+        private Predicate inputPredicate;
         private Map<String,Object> response;
 
         /**
          * @param inputValidator    A way of validating the input as what we expect for a match
          * @param response          A test resource response for this given input match
          */
-        public MatchedResponse(Validator inputValidator, TestResource<Map<String,Object>> response) throws Exception {
-            this.inputValidator = inputValidator;
+        public MatchedResponse(Predicate inputPredicate, TestResource<Map<String,Object>> response) throws Exception {
+            this.inputPredicate = inputPredicate;
             this.response = response.getValue();
         }
 
@@ -64,8 +64,8 @@ public class MatchedResponseHeadersProcessor implements Processor {
          * @param inputValidator    A way of validating the input as what we expect for a match
          * @param response          A response for this given input match
          */
-        public MatchedResponse(Validator inputValidator, Map<String,Object> response) {
-            this.inputValidator = inputValidator;
+        public MatchedResponse(Predicate inputPredicate, Map<String,Object> response) {
+            this.inputPredicate = inputPredicate;
             this.response = response;
         }
     }

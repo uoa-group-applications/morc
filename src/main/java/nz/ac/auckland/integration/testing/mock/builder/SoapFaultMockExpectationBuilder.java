@@ -20,14 +20,14 @@ public class SoapFaultMockExpectationBuilder extends SyncMockExpectationBuilder<
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
         addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
                 exchange.getOut().setFault(true);
             }
         });
-        return super.build(previousExpectationPart,index);
+        return super.build(previousExpectationPart);
     }
 }
 

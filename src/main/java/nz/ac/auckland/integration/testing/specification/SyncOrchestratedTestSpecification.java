@@ -2,12 +2,8 @@ package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
-import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
-import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
+import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
+import org.apache.camel.*;
 import org.apache.camel.util.ExchangeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +22,14 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
     private Queue<TestResource> inputRequestBodies;
     private Queue<TestResource<Map<String, Object>>> inputRequestHeaders;
-    private Queue<Validator> responseBodyValidators;
-    private Queue<HeadersValidator> responseHeadersValidators;
+    private Queue<Predicate> responseBodyPredicates;
+    private Queue<HeadersPredicate> responseHeadersPredicates;
     private boolean expectsExceptionResponse = false;
+
+    @Override
+    public void assertIsSatisfied() {
+        super.assertIsSatisfied();
+    }
 
     /**
      * @param template An Apache Camel template that can be used to send messages to a target endpoint
@@ -38,15 +39,15 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         try {
             final TestResource inputBody;
             final TestResource<Map<String, Object>> inputHeaders;
-            final Validator responseBodyValidator;
-            final HeadersValidator responseHeadersValidator;
+            final Predicate responseBodyPredicate;
+            final HeadersPredicate responseHeadersPredicate;
 
             //ensure we get all required resources in lock-step
             synchronized (this) {
                 inputBody = inputRequestBodies.poll();
                 inputHeaders = inputRequestHeaders.poll();
-                responseBodyValidator = responseBodyValidators.poll();
-                responseHeadersValidator = responseHeadersValidators.poll();
+                responseBodyPredicate = responseBodyPredicates.poll();
+                responseHeadersPredicate = responseHeadersPredicates.poll();
             }
 
             final Endpoint endpoint = template.getCamelContext().getEndpoint(getEndpointUri());
@@ -103,8 +104,8 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             logger.trace("Synchronous response headers: {}, body: {}",
                     HeadersTestResource.formatHeaders(response.getIn().getHeaders()), response.getIn().getBody(String.class));
 
-            boolean validResponse = ((responseBodyValidator == null || responseBodyValidator.validate(response))
-                    && (responseHeadersValidator == null || responseHeadersValidator.validate(response)));
+            boolean validResponse = ((responseBodyPredicate == null || responseBodyPredicate.matches(response))
+                    && (responseHeadersPredicate == null || responseHeadersPredicate.matches(response)));
 
             if (!expectsExceptionResponse && e != null) {
                 logger.warn("An unexpected exception was encountered", e);
@@ -122,8 +123,8 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
         private Queue<TestResource> inputRequestBodies = new LinkedList<>();
         private Queue<TestResource<Map<String, Object>>> inputRequestHeaders = new LinkedList<>();
-        private Queue<Validator> responseBodyValidators = new LinkedList<>();
-        private Queue<HeadersValidator> responseHeadersValidators = new LinkedList<>();
+        private Queue<Predicate> responseBodyPredicates = new LinkedList<>();
+        private Queue<HeadersPredicate> responseHeadersPredicates = new LinkedList<>();
         private boolean expectsExceptionResponse;
 
         public Builder(String description, String endpointUri) {
@@ -174,26 +175,26 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param validators A collection of validators for the response body back from a callout
          */
-        public Builder expectedResponseBody(Validator... validators) {
-            Collections.addAll(this.responseBodyValidators, validators);
+        public Builder expectedResponseBody(Predicate... predicates) {
+            Collections.addAll(this.responseBodyPredicates, predicates);
             return self();
         }
 
         /**
          * @param validators An enumeration that will be iterated over for callout body validation
          */
-        public Builder expectedResponseBody(Enumeration<Validator> validators) {
-            while (validators.hasMoreElements()) {
-                responseBodyValidators.add(validators.nextElement());
+        public Builder expectedResponseBody(Enumeration<Predicate> predicates) {
+            while (predicates.hasMoreElements()) {
+                responseBodyPredicates.add(predicates.nextElement());
             }
             return self();
         }
 
         /**
-         * @param responseHeadersValidators A collection of validators for response headers back from a callout
+         * @param responseHeadersPredicates A collection of validators for response headers back from a callout
          */
-        public Builder expectedResponseHeaders(HeadersValidator... responseHeadersValidators) {
-            Collections.addAll(this.responseHeadersValidators, responseHeadersValidators);
+        public Builder expectedResponseHeaders(HeadersPredicate... responseHeadersPredicates) {
+            Collections.addAll(this.responseHeadersPredicates, responseHeadersPredicates);
             return self();
         }
 
@@ -203,7 +204,7 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         @SafeVarargs
         public final Builder expectedResponseHeaders(TestResource<Map<String, Object>>... resources) {
             for (TestResource<Map<String, Object>> resource : resources) {
-                this.responseHeadersValidators.add(new HeadersValidator(resource));
+                this.responseHeadersPredicates.add(new HeadersPredicate(resource));
             }
             return self();
         }
@@ -211,9 +212,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param resources An enumeration that will be iterated over for header validation from a callout
          */
-        public Builder expectedResponseHeaders(Enumeration<HeadersValidator> resources) {
+        public Builder expectedResponseHeaders(Enumeration<HeadersPredicate> resources) {
             while (resources.hasMoreElements()) {
-                this.responseHeadersValidators.add(resources.nextElement());
+                this.responseHeadersPredicates.add(resources.nextElement());
             }
             return self();
         }
@@ -221,15 +222,15 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
         /**
          * @param validators A collection of validators for validating exchange responses for a callout
          */
-        public Builder expectedResponse(Validator... validators) {
-            return this.expectedResponseBody(validators);
+        public Builder expectedResponse(Predicate... predicators) {
+            return this.expectedResponseBody(predicators);
         }
 
         /**
          * @param validators An enumeration that will be iterated over for header validation for a callout
          */
-        public Builder expectedResponse(Enumeration<Validator> validators) {
-            return this.expectedResponseBody(validators);
+        public Builder expectedResponse(Enumeration<Predicate> predicators) {
+            return this.expectedResponseBody(predicators);
         }
 
         /**
@@ -244,9 +245,9 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
             SyncOrchestratedTestSpecification specification = new SyncOrchestratedTestSpecification(this);
 
             logger.info("The endpoint {} will be sending {} request message bodies, {} request message headers, " +
-                    "{} expected response body validators, and {} expected response headers validators",
+                    "{} expected response body predicates, and {} expected response headers predicate",
                     new Object[]{specification.getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
-                            responseBodyValidators.size(), responseHeadersValidators.size()});
+                            responseBodyPredicates.size(), responseHeadersPredicates.size()});
 
             return specification;
         }
@@ -257,8 +258,8 @@ public class SyncOrchestratedTestSpecification extends OrchestratedTestSpecifica
 
         this.inputRequestBodies = builder.inputRequestBodies;
         this.inputRequestHeaders = builder.inputRequestHeaders;
-        this.responseBodyValidators = builder.responseBodyValidators;
-        this.responseHeadersValidators = builder.responseHeadersValidators;
+        this.responseBodyPredicates = builder.responseBodyPredicates;
+        this.responseHeadersPredicates = builder.responseHeadersPredicates;
         this.expectsExceptionResponse = builder.expectsExceptionResponse;
     }
 

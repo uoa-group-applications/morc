@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class XPathSelector {
+public class XPathValidator {
     String xpathStatement;
     Map<String, String> namespaces;
 
@@ -27,7 +27,7 @@ public class XPathSelector {
      * @param xpathStatement a statement that must return a single element for comparison
      * @param namespaces     a collection of prefix:namespace pairs for evaluating the statement
      */
-    public XPathSelector(String xpathStatement, Map<String, String> namespaces) {
+    public XPathValidator(String xpathStatement, Map<String, String> namespaces) {
         this.namespaces = namespaces;
         this.xpathStatement = xpathStatement;
     }
@@ -35,7 +35,7 @@ public class XPathSelector {
     /**
      * @param xpathStatement a statement that must return a single element for comparison
      */
-    public XPathSelector(String xpathStatement) {
+    public XPathValidator(String xpathStatement) {
         this.xpathStatement = xpathStatement;
     }
 

@@ -29,7 +29,7 @@ public class ExceptionMockExpectationBuilder extends ContentMockExpectationBuild
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
         if (exceptionResponse == null) {
             logger.info("No exception response provided for endpoint {}, a standard Exception has been used",
                     getEndpointUri());
@@ -42,6 +42,6 @@ public class ExceptionMockExpectationBuilder extends ContentMockExpectationBuild
                 exchange.setException(exceptionResponse);
             }
         });
-        return super.build(previousExpectationPart,index);
+        return super.build(previousExpectationPart);
     }
 }

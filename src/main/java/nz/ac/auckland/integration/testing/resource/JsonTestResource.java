@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.testing.resource;
 
-import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.TypeConversionException;
 import org.apache.cxf.helpers.IOUtils;
 import org.codehaus.jackson.JsonNode;
@@ -19,7 +19,7 @@ import java.net.URL;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class JsonTestResource extends StaticTestResource<String> implements Validator {
+public class JsonTestResource extends StaticTestResource<String> implements Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonTestResource.class);
 
@@ -50,7 +50,7 @@ public class JsonTestResource extends StaticTestResource<String> implements Vali
      * @param exchange The exchange containing the JSON string to validate
      * @return true if the Json trees match (uses the Jackson ObjectMapper to unmarshal the string and compare using Java equality)
      */
-    public boolean validate(Exchange exchange, int index) {
+    public boolean matches(Exchange exchange) {
         String value;
         try {
             value = exchange.getIn().getBody(String.class);

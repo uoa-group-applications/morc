@@ -2,8 +2,8 @@ package nz.ac.auckland.integration.testing.mock.builder;
 
 import nz.ac.auckland.integration.testing.mock.MockExpectation;
 import nz.ac.auckland.integration.testing.resource.TestResource;
-import nz.ac.auckland.integration.testing.validator.HeadersValidator;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
+import org.apache.camel.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +23,8 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
 
     private static final Logger logger = LoggerFactory.getLogger(ContentMockExpectationBuilder.class);
 
-    List<Validator> expectedBodyValidators = new ArrayList<>();
-    List<HeadersValidator> expectedHeadersValidators = new ArrayList<>();
+    List<Predicate> expectedBodyPredicates = new ArrayList<>();
+    List<HeadersPredicate> expectedHeadersPredicates = new ArrayList<>();
 
     @Override
     protected Builder self() {
@@ -42,8 +42,8 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
      * @param validators A list of validators that check the body is as expected; each validator should match
      *                   to a headers validator, and an expectation will be generated for each pair
      */
-    public Builder expectedBody(Validator... validators) {
-        Collections.addAll(expectedBodyValidators, validators);
+    public Builder expectedBody(Predicate... validators) {
+        Collections.addAll(expectedBodyPredicates, validators);
         return self();
     }
 
@@ -51,8 +51,8 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
      * @param validators An list of validators that check the headers are as expected; each validator should match
      *                   to a body validator, and an expectation will be generated for each pair
      */
-    public Builder expectedHeaders(HeadersValidator... validators) {
-        Collections.addAll(expectedHeadersValidators, validators);
+    public Builder expectedHeaders(HeadersPredicate... validators) {
+        Collections.addAll(expectedHeadersPredicates, validators);
         return self();
     }
 
@@ -63,35 +63,35 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
     @SafeVarargs
     public final Builder expectedHeaders(TestResource<Map<String, Object>>... resources) {
         for (TestResource<Map<String, Object>> resource : resources) {
-            expectedHeadersValidators.add(new HeadersValidator(resource));
+            expectedHeadersPredicates.add(new HeadersPredicate(resource));
         }
         return self();
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
 
-        int validatorSize = Math.max(expectedBodyValidators.size(),expectedHeadersValidators.size());
+        int validatorSize = Math.max(expectedBodyPredicates.size(), expectedHeadersPredicates.size());
 
         logger.info("{} body validators, and {} header validators provided for endpoint {}",
-                new Object[] {expectedBodyValidators.size(),expectedHeadersValidators.size(), getEndpointUri()});
+                new Object[]{expectedBodyPredicates.size(), expectedHeadersPredicates.size(), getEndpointUri()});
 
         for (int i = 0; i < validatorSize; i++) {
 
-            Validator expectedBodyValidator = null;
-            HeadersValidator expectedHeadersValidator = null;
+            Predicate expectedBodyPredicate = null;
+            HeadersPredicate expectedHeadersPredicate = null;
 
             //because null validators are accepted we don't have to set them
-            if (i < expectedBodyValidators.size())
-                expectedBodyValidator = expectedBodyValidators.get(i);
-            if (i < expectedHeadersValidators.size())
-                expectedHeadersValidator = expectedHeadersValidators.get(i);
+            if (i < expectedBodyPredicates.size())
+                expectedBodyPredicate = expectedBodyPredicates.get(i);
+            if (i < expectedHeadersPredicates.size())
+                expectedHeadersPredicate = expectedHeadersPredicates.get(i);
 
-            this.addValidators(i,expectedBodyValidator,expectedHeadersValidator);
+            this.addPredicates(i,expectedBodyPredicate, expectedHeadersPredicate);
 
         }
 
-        return super.build(previousExpectationPart,index);
+        return super.build(previousExpectationPart);
     }
 
 }

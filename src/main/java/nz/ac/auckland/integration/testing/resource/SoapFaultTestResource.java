@@ -1,8 +1,8 @@
 package nz.ac.auckland.integration.testing.resource;
 
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.validator.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import javax.xml.parsers.DocumentBuilder;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SoapFaultTestResource implements TestResource<SoapFault>, Validator {
+public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(SoapFaultTestResource.class);
 
@@ -71,7 +71,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
         return fault;
     }
 
-    public boolean validate(Exchange e, int index) {
+    public boolean matches(Exchange e) {
         if (e == null) return false;
         Throwable t = e.getException();
 
@@ -82,9 +82,9 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
 
         SoapFault fault = (SoapFault) t;
 
-        Validator faultMessageValidator;
-        Validator codeValidator;
-        Validator detailValidator = null;
+        Predicate faultMessageValidator;
+        Predicate codeValidator;
+        Predicate detailValidator = null;
 
         try {
             SoapFault expectedValue = getValue();
@@ -100,21 +100,21 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
 
         Exchange faultMessageExchange = new DefaultExchange(e.getContext());
         faultMessageExchange.getIn().setBody(fault.getMessage());
-        validMessage = faultMessageValidator.validate(faultMessageExchange,0);
+        validMessage = faultMessageValidator.matches(faultMessageExchange);
 
         if (!validMessage)
             logger.warn("The SOAP Fault message is not as expected; received {}", fault.getCode());
 
         Exchange codeExchange = new DefaultExchange(e.getContext());
         codeExchange.getIn().setBody(fault.getFaultCode());
-        validCode = codeValidator.validate(codeExchange,0);
+        validCode = codeValidator.matches(codeExchange);
 
         if (!validCode) logger.warn("The SOAP Fault code is not as expected; received {}", fault.getCode());
 
         if (detailValidator != null) {
             Exchange detailExchange = new DefaultExchange(e.getContext());
             detailExchange.getIn().setBody(fault.getDetail());
-            validDetail = detailValidator.validate(detailExchange,0);
+            validDetail = detailValidator.matches(detailExchange);
 
             String detail = xmlUtilities.getDocumentAsString(fault.getDetail());
             if (!validDetail) logger.warn("The SOAP Fault detail is not as expected; received {}", detail);
@@ -123,7 +123,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
         return validMessage && validCode && validDetail;
     }
 
-    private static class QNameValidator implements Validator {
+    private static class QNameValidator implements Predicate {
 
         private QName expectedCode;
 
@@ -132,7 +132,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Validator
         }
 
         @Override
-        public boolean validate(Exchange exchange, int index) {
+        public boolean matches(Exchange exchange) {
             //The receive QName is passed in from the body
             return exchange != null &&
                     exchange.getIn().getBody(QName.class) != null &&

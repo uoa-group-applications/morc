@@ -1,6 +1,7 @@
-package nz.ac.auckland.integration.testing.validator;
+package nz.ac.auckland.integration.testing.predicate;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,23 +10,23 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class ExceptionValidator implements Validator {
+public class ExceptionPredicate implements Predicate {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionPredicate.class);
     private Class<? extends Exception> expectedExceptionClass;
     private String message;
 
     /**
      * A constructor that simply expects a subclass of java.lang.Exception
      */
-    public ExceptionValidator() {
+    public ExceptionPredicate() {
         this.expectedExceptionClass = Exception.class;
     }
 
     /**
      * @param expectedExceptionClass The class of exception we expect to validate against
      */
-    public ExceptionValidator(Class<? extends Exception> expectedExceptionClass) {
+    public ExceptionPredicate(Class<? extends Exception> expectedExceptionClass) {
         this.expectedExceptionClass = expectedExceptionClass;
     }
 
@@ -33,12 +34,12 @@ public class ExceptionValidator implements Validator {
      * @param expectedExceptionClass    The class of exception we expect to validate against
      * @param message                   The message this instance should be returning
      */
-    public ExceptionValidator(Class<? extends Exception> expectedExceptionClass, String message) {
+    public ExceptionPredicate(Class<? extends Exception> expectedExceptionClass, String message) {
         this(expectedExceptionClass);
         this.message = message;
     }
 
-    public boolean validate(Exchange exchange) {
+    public boolean matches(Exchange exchange) {
         Exception e = exchange.getException();
 
         if (e == null) {

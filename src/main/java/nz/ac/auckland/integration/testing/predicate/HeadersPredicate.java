@@ -1,8 +1,9 @@
-package nz.ac.auckland.integration.testing.validator;
+package nz.ac.auckland.integration.testing.predicate;
 
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +14,13 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class HeadersValidator implements Validator {
+public class HeadersPredicate implements Predicate {
 
-    private static final Logger logger = LoggerFactory.getLogger(HeadersValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(HeadersPredicate.class);
 
     private TestResource<Map<String, Object>> resource;
 
-    public HeadersValidator(TestResource<Map<String, Object>> resource) {
+    public HeadersPredicate(TestResource<Map<String, Object>> resource) {
         this.resource = resource;
     }
 
@@ -27,12 +28,12 @@ public class HeadersValidator implements Validator {
      * @param exchange The exchange containing the headers we need to validate
      * @return true if each header in the test resource is in input; additional headers in the input will be ignored
      */
-    public boolean validate(Exchange exchange) {
+    public boolean matches(Exchange exchange) {
         Map<String, Object> value = exchange.getIn().getHeaders();
-        return value != null && validate(value);
+        return value != null && matches(value);
     }
 
-    public boolean validate(Map<String, Object> value) {
+    public boolean matches(Map<String, Object> value) {
         if (value == null) return false;
         Map<String, Object> expectedHeaders;
 

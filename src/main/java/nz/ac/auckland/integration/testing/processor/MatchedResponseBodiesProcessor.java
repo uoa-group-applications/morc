@@ -1,14 +1,13 @@
 package nz.ac.auckland.integration.testing.processor;
 
 import nz.ac.auckland.integration.testing.resource.TestResource;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.predicate.Validator;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -36,7 +35,7 @@ public class MatchedResponseBodiesProcessor implements Processor {
 
         while (responseIterator.hasNext()) {
             MatchedResponse matchedResponse = responseIterator.next();
-            if (matchedResponse.inputValidator.validate(exchange,0)) {
+            if (matchedResponse.inputValidator.validate(exchange)) {
                 exchange.getOut().setBody(matchedResponse.response);
             }
         }

@@ -12,6 +12,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jetty.JettyHttpEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -157,6 +158,8 @@ public class OrchestratedTest extends CamelSpringTestSupport {
      * @return A Camel RouteBuilder that creates routes for the expectations
      */
     protected RouteBuilder generateMockFeedRoute(final Endpoint expectationEndpoint, final Endpoint mockEndpoint) {
+
+
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
@@ -204,6 +207,32 @@ public class OrchestratedTest extends CamelSpringTestSupport {
     }
 
     private void runSpecificationPart(OrchestratedTestSpecification spec) throws Exception {
+
+        spec.getMockExpectations()
+
+        /*
+         * for each expectation
+         *  get mock(UUID)
+         *  string together from->routebuilder->log->mock->log (how to distinguish this one InOut)
+         *  expectedmessagecount
+         *  predicates + processors (NONE - done by reporter + endpoint ordering issues - special assertions)
+         *  lenient? Take single/default processor (default implementation)
+         *  add reporting processor/validator
+         *  what about sending messages?
+         *
+         *
+         *  from("dataset").to("endpoint")
+         *  or
+         *  from("dataset").to("endpoint").to("mock").exceptionHandler().true()
+         *  dataset that uses TestResources
+         *   how long to wait?
+         *
+         *
+         *  how long to run test?
+         *
+         *  assert is satisfied
+         *
+         */
 
         //Using a UUID as I don't want exchanges sitting on a previous mock mucking up the tests
         final MockEndpoint mockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);

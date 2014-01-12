@@ -26,13 +26,13 @@ public class UnreceivedMockExpectationBuilder extends MockExpectation.MockExpect
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart, int index) {
+    public MockExpectation build(MockExpectation previousExpectationPart) {
         super.expectedMessageCount(0);
 
-        if (getValidators().size() != 0)
+        if (getPredicates().size() != 0)
             throw new IllegalStateException("No validators should be specified for an unreceived mock expectation on " +
                     "endpoint: " + getEndpointUri() + " as no messages are expected to be validated against");
 
-        return super.build(previousExpectationPart,index);
+        return super.build(previousExpectationPart);
     }
 }
