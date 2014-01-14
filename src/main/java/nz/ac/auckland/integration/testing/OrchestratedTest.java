@@ -2,9 +2,7 @@ package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
 import nz.ac.auckland.integration.testing.mock.MockExpectation;
-import nz.ac.auckland.integration.testing.mock.UnreceivedMockExpectation;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
@@ -208,7 +206,64 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
     private void runSpecificationPart(OrchestratedTestSpecification spec) throws Exception {
 
-        spec.getMockExpectations()
+        Set<MockExpectation> expectations = spec.getMockExpectations();
+
+        EndpointOrderValidator endpointOrderValidator = new EndpointOrderValidator();
+
+        Collection<MockEndpoint> mockEndpoints = new HashSet<>();
+
+        for (final MockExpectation expectation : expectations) {
+            MockEndpoint expectationMockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(),MockEndpoint.class);
+
+            mockEndpoints.add(expectationMockEndpoint);
+
+            expectation.getExpectationFeederRoute().log("incoming body").to(expectationMockEndpoint)
+                .choice().when(new Predicate() {
+                @Override
+                public boolean matches(Exchange exchange) {
+                    return exchange.getPattern() == ExchangePattern.InOut;
+                }
+            }).log("outgoing body");
+
+            expectationMockEndpoint.expectedMessageCount(expectation.getExpectedMessageCount());
+            for (int i = 0; i < expectation.getProcessors().size(); i++) {
+                expectationMockEndpoint.whenExchangeReceived(i,expectation.getProcessors().get(i));
+            }
+
+            expectationMockEndpoint.whenAnyExchangeReceived(defaultprocessor);
+
+            context.addRouteDefinition(expectation.getExpectationFeederRoute());
+
+            expectationMockEndpoint.expectedMessageCount(expectation.getExpectedMessageCount());
+            expectationMockEndpoint.expectedMessagesMatches(expectation.getPredicates()
+                    .toArray(new Predicate[expectation.getPredicates().size()]));
+            expectationMockEndpoint.setReporter(endpointOrderValidator);
+
+            expectationMockEndpoint.setRetainFirst(expectation.getExpectedMessageCount());
+
+            //todo: refine this in the future
+            expectationMockEndpoint.setSleepForEmptyTest(spec.getSleepForTestCompletion());
+            expectationMockEndpoint.setAssertPeriod(spec.getSleepForTestCompletion());
+            expectationMockEndpoint.setResultWaitTime(spec.getSleepForTestCompletion());
+
+        }
+
+        //send messages - to mock
+
+        for (MockEndpoint endpoint : mockEndpoints) {
+            try {
+                endpoint.assertIsSatisfied();
+            } catch (AssertionError e) {
+                //ignore if lenient
+            }
+        }
+
+        endpointOrderValidator.validate();
+
+        //at end remove routes and mocks
+        for (MockExpectation expectation : expectations)
+            context.removeRouteDefinition(expectation.getExpectationFeederRoute());
+
 
         /*
          * for each expectation
@@ -540,6 +595,19 @@ class SpecificationPartLifecycleStrategySupport extends LifecycleStrategySupport
         if (addedRoutes == null) addedRoutes = routes;
         else addedRoutes.addAll(routes);
     }
+}
+
+class EndpointOrderValidator implements Processor {
+
+    //todo this needs to be threadsafe
+    Queue<Endpoint> endpointQueue = new LinkedList<>();
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        endpointQueue.add(exchange.getFromEndpoint());
+    }
+
+
 }
 
 

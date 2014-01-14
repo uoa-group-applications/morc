@@ -32,6 +32,7 @@ public abstract class OrchestratedTestSpecification {
     private final Set<MockExpectation> mockExpectations;
     private long sleepForTestCompletion;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
+    private List<MockExpectation> endpointOrdering;
     private int sendCount;
     private long sendInterval;
     private int totalExpectedMessageCount;
@@ -43,6 +44,10 @@ public abstract class OrchestratedTestSpecification {
      */
     public String getDescription() {
         return description;
+    }
+
+    public List<MockExpectation> getEndpointOrdering() {
+        return Collections.unmodifiableList(this.endpointOrdering);
     }
 
     /**
@@ -146,7 +151,6 @@ public abstract class OrchestratedTestSpecification {
             i++;
         } while (i < sendCount);
 
-        return true;
     }
 
     public void assertIsSatisfied() {

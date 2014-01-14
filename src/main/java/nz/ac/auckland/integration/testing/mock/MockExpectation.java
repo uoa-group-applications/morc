@@ -44,8 +44,8 @@ public class MockExpectation implements Processor {
     private boolean isEndpointOrdered = true;
     private boolean lenient = false;
     private OrderingType orderingType;
-    private List<List<Processor>> processors;
-    private List<List<Predicate>> predicates;
+    private List<Processor> processors;
+    private List<Predicate> predicates;
     private int expectedMessageCount;
     private AtomicInteger messageCounter = new AtomicInteger();
     private boolean exchangesValid = true;
@@ -86,11 +86,11 @@ public class MockExpectation implements Processor {
         return lenient;
     }
 
-    public List<List<Processor>> getProcessors() {
+    public List<Processor> getProcessors() {
         return processors;
     }
 
-    public List<List<Predicate>> getPredicates() {
+    public List<Predicate> getPredicates() {
         return predicates;
     }
 
@@ -364,6 +364,22 @@ public class MockExpectation implements Processor {
 
     }
 
+    public static class DefaultProcessor implements Processor {
+
+        private List<Processor> processors;
+        private AtomicInteger processorIndex = new AtomicInteger(0);
+
+        public DefaultProcessor(List<Processor> processors) {
+            this.processors = processors;
+        }
+
+        @Override
+        public void process(Exchange exchange) throws Exception {
+            int offset = processorIndex.getAndIncrement() % processors.size();
+            processors.get(offset).process(exchange);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     protected MockExpectation(MockExpectationBuilder builder) {
         this.endpointUri = builder.endpointUri;
@@ -374,11 +390,13 @@ public class MockExpectation implements Processor {
         this.predicates = builder.predicates;
         this.expectedMessageCount = builder.expectedMessageCount;
 
+        //if !endpointOrdering then will have to wrap
+
         this.expectationFeederRoute = builder.expectationFeederRoute;
 
         //set up a default expectation feeder route
         if (expectationFeederRoute == null) expectationFeederRoute = new RouteDefinition().convertBodyTo(String.class);
         //todo: ensure we only add the feed the first time
-        expectationFeederRoute.from(endpointUri).process(this);
+        expectationFeederRoute.from(endpointUri);
     }
 }
