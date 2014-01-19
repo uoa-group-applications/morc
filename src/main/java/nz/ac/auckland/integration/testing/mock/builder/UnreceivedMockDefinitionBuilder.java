@@ -1,24 +1,24 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
-import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UnreceivedMockExpectationBuilder extends MockExpectation.MockExpectationBuilder<UnreceivedMockExpectationBuilder> {
+public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefinitionBuilder<UnreceivedMockDefinitionBuilder> {
 
-    private static final Logger logger = LoggerFactory.getLogger(UnreceivedMockExpectationBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnreceivedMockDefinitionBuilder.class);
 
-    public UnreceivedMockExpectationBuilder(String endpointUri) {
+    public UnreceivedMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }
 
     @Override
-    protected UnreceivedMockExpectationBuilder self() {
+    protected UnreceivedMockDefinitionBuilder self() {
         return this;
     }
 
     @Override
-    public UnreceivedMockExpectationBuilder expectedMessageCount(int expectedMessageCount) {
+    public UnreceivedMockDefinitionBuilder expectedMessageCount(int expectedMessageCount) {
         if (expectedMessageCount != 0)
             throw new IllegalArgumentException("The expected message count for an unreceived mock expectation must " +
                     "be 0");
@@ -26,7 +26,7 @@ public class UnreceivedMockExpectationBuilder extends MockExpectation.MockExpect
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousExpectationPart) {
         super.expectedMessageCount(0);
 
         if (getPredicates().size() != 0)

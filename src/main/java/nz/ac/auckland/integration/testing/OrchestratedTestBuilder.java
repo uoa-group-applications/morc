@@ -4,14 +4,13 @@ import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
-import nz.ac.auckland.integration.testing.mock.builder.AsyncMockExpectationBuilder;
-import nz.ac.auckland.integration.testing.mock.builder.SoapFaultMockExpectationBuilder;
+import nz.ac.auckland.integration.testing.mock.builder.*;
 import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
 import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
 import nz.ac.auckland.integration.testing.processor.MatchedResponseBodiesProcessor;
 import nz.ac.auckland.integration.testing.mock.*;
-import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockExpectationBuilder;
-import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockExpectationBuilder;
+import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockDefinitionBuilder;
+import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockDefinitionBuilder;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
@@ -57,6 +56,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
         return builder;
     }
 
+    //todo: add delay processor
+
     /**
      * @return A way of specifying that the next endpoint in the specification list should be asynchronous
      */
@@ -86,22 +87,22 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return We expect messages to be totally ordered (amongst endpoints)
      */
-    public static MockExpectation.OrderingType totalOrdering() {
-        return MockExpectation.OrderingType.TOTAL;
+    public static MockDefinition.OrderingType totalOrdering() {
+        return MockDefinition.OrderingType.TOTAL;
     }
 
     /**
      * @return We expect messages to arrive at some point after we expect
      */
-    public static MockExpectation.OrderingType partialOrdering() {
-        return MockExpectation.OrderingType.PARTIAL;
+    public static MockDefinition.OrderingType partialOrdering() {
+        return MockDefinition.OrderingType.PARTIAL;
     }
 
     /**
      * @return We expect messages arrive at any point of the test
      */
-    public static MockExpectation.OrderingType noOrdering() {
-        return MockExpectation.OrderingType.NONE;
+    public static MockDefinition.OrderingType noOrdering() {
+        return MockDefinition.OrderingType.NONE;
     }
 
     /**
@@ -499,36 +500,36 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static AsyncMockExpectationBuilder asyncExpectation(String endpointUri) {
-        return new AsyncMockExpectationBuilder(endpointUri);
+    public static AsyncMockDefinitionBuilder asyncExpectation(String endpointUri) {
+        return new AsyncMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static HttpErrorMockExpectationBuilder.Builder httpErrorExpectation(String endpointUri) {
-        return new HttpErrorMockExpectationBuilder.Builder(endpointUri);
+    public static HttpErrorMockDefinitionBuilder.Builder httpErrorExpectation(String endpointUri) {
+        return new HttpErrorMockDefinitionBuilder.Builder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that the mock should listen to; should follow the Apache Camel URI format
      */
-    public static SoapFaultMockExpectationBuilder.Builder soapFaultExpectation(String endpointUri) {
-        return new SoapFaultMockExpectationBuilder.Builder(endpointUri);
+    public static SoapFaultMockDefinitionBuilder.Builder soapFaultExpectation(String endpointUri) {
+        return new SoapFaultMockDefinitionBuilder.Builder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static ExceptionMockExpectationBuilder.Builder exceptionExpectation(String endpointUri) {
-        return new ExceptionMockExpectationBuilder.Builder(endpointUri);
+    public static ExceptionMockDefinitionBuilder.Builder exceptionExpectation(String endpointUri) {
+        return new ExceptionMockDefinitionBuilder.Builder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      * @param exception   The exception that should be instantiated and thrown as part of the expectation
      */
-    public static ExceptionMockExpectationBuilder.Builder exceptionExpectation(String endpointUri,
+    public static ExceptionMockDefinitionBuilder.Builder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception) {
         try {
             exception.getConstructor();
@@ -536,7 +537,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
             throw new IllegalArgumentException(e);
         }
 
-        return new ExceptionMockExpectationBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
+        return new ExceptionMockDefinitionBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
             @Override
             public Exception response(Exchange exchange) throws Exception {
                 Constructor<? extends Exception> constructor = exception.getConstructor();
@@ -551,7 +552,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param message
      * @return
      */
-    public static ExceptionMockExpectationBuilder.Builder exceptionExpectation(String endpointUri,
+    public static ExceptionMockDefinitionBuilder.Builder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception,
                                                                         final String message) {
         try {
@@ -560,7 +561,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
             throw new IllegalArgumentException(e);
         }
 
-        return new ExceptionMockExpectationBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
+        return new ExceptionMockDefinitionBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
             @Override
             public Exception response(Exchange exchange) throws Exception {
                 Constructor<? extends Exception> constructor = exception.getConstructor(String.class);

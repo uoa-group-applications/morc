@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
-import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -15,21 +15,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class ExceptionMockExpectationBuilder extends ContentMockExpectationBuilder<ExceptionMockExpectationBuilder> {
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionMockExpectationBuilder.class);
+public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilder<ExceptionMockDefinitionBuilder> {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionMockDefinitionBuilder.class);
     private Exception exceptionResponse;
 
-    public ExceptionMockExpectationBuilder(String endpointUri) {
+    public ExceptionMockDefinitionBuilder(String endpointUri) {
          super(endpointUri);
     }
 
-    public ExceptionMockExpectationBuilder exceptionResponse(Exception exception) {
+    public ExceptionMockDefinitionBuilder exceptionResponse(Exception exception) {
         this.exceptionResponse = exception;
         return self();
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousExpectationPart) {
         if (exceptionResponse == null) {
             logger.info("No exception response provided for endpoint {}, a standard Exception has been used",
                     getEndpointUri());

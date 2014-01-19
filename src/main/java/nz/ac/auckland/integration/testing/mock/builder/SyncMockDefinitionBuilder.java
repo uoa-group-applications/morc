@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
-import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.processor.MatchedResponseBodiesProcessor;
 import nz.ac.auckland.integration.testing.processor.ResponseBodyProcessor;
 import nz.ac.auckland.integration.testing.processor.ResponseHeadersProcessor;
@@ -13,16 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class SyncMockExpectationBuilder<Builder extends SyncMockExpectationBuilder<Builder, T>, T>
-        extends ContentMockExpectationBuilder<Builder> {
+public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder<Builder, T>, T>
+        extends ContentMockDefinitionBuilder<Builder> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SyncMockExpectationBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(SyncMockDefinitionBuilder.class);
 
     private List<T> responseBodyProcessors = new ArrayList<>();
     private List<Map<String, Object>> responseHeadersProcessors = new ArrayList<>();
     private boolean matchedResponses = false;
 
-    public SyncMockExpectationBuilder(String endpointUri) {
+    public SyncMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }
 
@@ -83,12 +83,9 @@ public class SyncMockExpectationBuilder<Builder extends SyncMockExpectationBuild
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousExpectationPart) {
 
         int responseProcessorCount = Math.max(responseBodyProcessors.size(), responseHeadersProcessors.size());
-
-        if (matchedResponses && getOrderingType() == MockExpectation.OrderingType.TOTAL && !isLenient())
-            logger.warn("Using matched responses with a totally ordered endpoint is probably not sensible");
 
         MatchedResponseBodiesProcessor matchedResponseBodiesProcessor = new MatchedResponseBodiesProcessor();
 

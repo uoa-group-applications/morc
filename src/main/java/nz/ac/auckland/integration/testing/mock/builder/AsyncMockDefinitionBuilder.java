@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
-import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,20 +10,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class AsyncMockExpectationBuilder extends ContentMockExpectationBuilder {
+public class AsyncMockDefinitionBuilder extends ContentMockDefinitionBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncMockExpectationBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(AsyncMockDefinitionBuilder.class);
 
-    public AsyncMockExpectationBuilder(String endpointUri) {
+    public AsyncMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart) {
-        if (getOrderingType() == MockExpectation.OrderingType.TOTAL) {
+    public MockDefinition build(MockDefinition previousExpectationPart) {
+        if (getOrderingType() == MockDefinition.OrderingType.TOTAL) {
             logger.warn("The asynchronous endpoint {} used total ordering, this was changed to partial ordering",
                     getEndpointUri());
-            ordering(MockExpectation.OrderingType.PARTIAL);
+            ordering(MockDefinition.OrderingType.PARTIAL);
         }
         return super.build(previousExpectationPart);
     }

@@ -2,7 +2,7 @@ package nz.ac.auckland.integration.testing;
 
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
@@ -10,7 +10,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.jetty.JettyHttpEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
-import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -206,13 +205,13 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
     private void runSpecificationPart(OrchestratedTestSpecification spec) throws Exception {
 
-        Set<MockExpectation> expectations = spec.getMockExpectations();
+        Set<MockDefinition> expectations = spec.getMockDefinitions();
 
         EndpointOrderValidator endpointOrderValidator = new EndpointOrderValidator();
 
         Collection<MockEndpoint> mockEndpoints = new HashSet<>();
 
-        for (final MockExpectation expectation : expectations) {
+        for (final MockDefinition expectation : expectations) {
             MockEndpoint expectationMockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(),MockEndpoint.class);
 
             mockEndpoints.add(expectationMockEndpoint);
@@ -261,20 +260,19 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         endpointOrderValidator.validate();
 
         //at end remove routes and mocks
-        for (MockExpectation expectation : expectations)
+        for (MockDefinition expectation : expectations)
             context.removeRouteDefinition(expectation.getExpectationFeederRoute());
 
 
         /*
          * for each expectation
          *  get mock(UUID)
-         *  string together from->routebuilder->log->mock->log (how to distinguish this one InOut)
-         *  expectedmessagecount
+         *  if (lenientPredicate != null)
+         *  string together from->routebuilder->log->predicate->mock->log (how to distinguish this one InOut)
+         *  expectedmessagecount                              ->processor
          *  predicates + processors (NONE - done by reporter + endpoint ordering issues - special assertions)
          *  lenient? Take single/default processor (default implementation)
          *  add reporting processor/validator
-         *  what about sending messages?
-         *
          *
          *  from("dataset").to("endpoint")
          *  or
@@ -293,20 +291,20 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         final MockEndpoint mockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
         logger.debug("Obtaining new mock: {}", mockEndpoint.getEndpointUri());
 
-        final Map<Endpoint, Queue<MockExpectation>> mockEndpointExpectations = new HashMap<>();
-        final Map<String, List<MockExpectation>> unorderedEndpointExpectations = new HashMap<>();
-        final Queue<MockExpectation> indexedExpectations = new PriorityQueue<>(11, new Comparator<MockExpectation>() {
+        final Map<Endpoint, Queue<MockDefinition>> mockEndpointExpectations = new HashMap<>();
+        final Map<String, List<MockDefinition>> unorderedEndpointExpectations = new HashMap<>();
+        final Queue<MockDefinition> indexedExpectations = new PriorityQueue<>(11, new Comparator<MockDefinition>() {
             @Override
-            public int compare(MockExpectation expectation1, MockExpectation expectation2) {
+            public int compare(MockDefinition expectation1, MockDefinition expectation2) {
                 return expectation1.getReceivedAt() - expectation2.getReceivedAt();
             }
         });
-        final List<MockExpectation> unorderedExpectations = new ArrayList<>();
+        final List<MockDefinition> unorderedExpectations = new ArrayList<>();
 
         int expectedMessageCount = 0;
 
         //put all of the expectations for each endpoint in an ordered queue
-        for (MockExpectation expectation : spec.getMockExpectations()) {
+        for (MockDefinition expectation : spec.getMockDefinitions()) {
             Endpoint fromEndpoint = context.getEndpoint(expectation.getEndpointUri());
             overrideEndpoint(fromEndpoint);
             logger.trace("Preparing mock expectation: {}", expectation.getName());
@@ -314,7 +312,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             if (!mockEndpointExpectations.containsKey(fromEndpoint)) {
                 //we want a concurrent queue because it is possible that an async request will access
                 //values simultaneously
-                ConcurrentLinkedQueue<MockExpectation> queue = new ConcurrentLinkedQueue<>();
+                ConcurrentLinkedQueue<MockDefinition> queue = new ConcurrentLinkedQueue<>();
 
                 mockEndpointExpectations.put(fromEndpoint, queue);
                 logger.trace("Created new mock expectations queue for: {}", fromEndpoint.getEndpointUri());
@@ -326,21 +324,21 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
             //if there's more than one we expect them all to happen one after another; UnreceivedMockExpectation
             //will have nothing added (as expected)
-            Queue<MockExpectation> expectationQueue = mockEndpointExpectations.get(fromEndpoint);
+            Queue<MockDefinition> expectationQueue = mockEndpointExpectations.get(fromEndpoint);
 
             /*
                 Only setup these additional waits if we don't expect any messages to be sent to the endpoint, and also
                 if the messages are expected to arrive out of order (which typically means that an asynchronous messaging
                 system is in use and hence we're not sure when they'll arrive).
             */
-            if (expectation.getOrderingType() != MockExpectation.OrderingType.TOTAL) {
+            if (expectation.getOrderingType() != MockDefinition.OrderingType.TOTAL) {
                 mockEndpoint.setSleepForEmptyTest(spec.getSleepForTestCompletion());
                 mockEndpoint.setAssertPeriod(spec.getSleepForTestCompletion());
                 mockEndpoint.setResultWaitTime(spec.getSleepForTestCompletion());
             }
 
             expectationQueue.add(expectation);
-            if (expectation.getOrderingType() == MockExpectation.OrderingType.NONE)
+            if (expectation.getOrderingType() == MockDefinition.OrderingType.NONE)
                 unorderedExpectations.add(expectation);
 
             indexedExpectations.add(expectation);
@@ -348,9 +346,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             //these are needed later to evaluate out-of-order delivery
             if (!expectation.isEndpointOrdered()) {
                 if (!unorderedEndpointExpectations.containsKey(expectation.getEndpointUri()))
-                    unorderedEndpointExpectations.put(expectation.getEndpointUri(), new ArrayList<MockExpectation>());
+                    unorderedEndpointExpectations.put(expectation.getEndpointUri(), new ArrayList<MockDefinition>());
 
-                List<MockExpectation> endpointExpectations = unorderedEndpointExpectations.get(expectation.getEndpointUri());
+                List<MockDefinition> endpointExpectations = unorderedEndpointExpectations.get(expectation.getEndpointUri());
                 endpointExpectations.add(expectation);
             }
 
@@ -366,11 +364,11 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         mockEndpoint.whenAnyExchangeReceived(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                Queue<MockExpectation> expectations = mockEndpointExpectations.get(exchange.getFromEndpoint());
+                Queue<MockDefinition> expectations = mockEndpointExpectations.get(exchange.getFromEndpoint());
                 if (expectations == null)
                     throw new IllegalStateException("The endpoint URI has no expectations," +
                             " or you are using a direct-to-direct route: " + exchange.getFromEndpoint());
-                MockExpectation expectation = expectations.poll();
+                MockDefinition expectation = expectations.poll();
 
                 logger.trace("An exchange has been received from the endpoint: {}, headers: {}, body: {}",
                         new String[]{exchange.getFromEndpoint().getEndpointUri(),
@@ -421,12 +419,12 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             public void run() {
 
                 //we only require order of async messages by endpoint
-                Map<String, LinkedList<MockExpectation>> partiallyOrderedExpectations = new HashMap<>();
+                Map<String, LinkedList<MockDefinition>> partiallyOrderedExpectations = new HashMap<>();
 
                 //copy the list because we are going to iterate over it, and may do so again for re-assertion
-                Queue<MockExpectation> orderedExpectationsCopy = new LinkedList<>(Arrays.asList(indexedExpectations.toArray(new MockExpectation[indexedExpectations.size()])));
-                List<MockExpectation> unorderedExpectationsCopy = new ArrayList<>(unorderedExpectations);
-                Map<String, List<MockExpectation>> unorderedEndpointExpectationsCopy = new HashMap<>();
+                Queue<MockDefinition> orderedExpectationsCopy = new LinkedList<>(Arrays.asList(indexedExpectations.toArray(new MockDefinition[indexedExpectations.size()])));
+                List<MockDefinition> unorderedExpectationsCopy = new ArrayList<>(unorderedExpectations);
+                Map<String, List<MockDefinition>> unorderedEndpointExpectationsCopy = new HashMap<>();
                 for (String key : unorderedEndpointExpectations.keySet()) {
                     unorderedEndpointExpectationsCopy.put(key, new ArrayList<>(unorderedEndpointExpectations.get(key)));
                 }
@@ -456,14 +454,14 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
                         int currentOffset = currentOrderedExpectationsOffset++;
 
-                        MockExpectation expected = orderedExpectationsCopy.poll();
+                        MockDefinition expected = orderedExpectationsCopy.poll();
 
                         logger.debug("Ordered EndpointSubscriber Index: {}, Comparing Exchange: {} with expectation: {}",
                                 new String[]{Integer.toString(currentOffset),
                                         currentExchange.getExchangeId(), expected.getName()});
 
                         //we've already validated all of these - they are only in the list to understand total order
-                        if (expected.getOrderingType() == MockExpectation.OrderingType.NONE) continue;
+                        if (expected.getOrderingType() == MockDefinition.OrderingType.NONE) continue;
 
                         boolean comparisonResult = expected.validate(currentExchange, currentOffset);
 
@@ -494,16 +492,16 @@ public class OrchestratedTest extends CamelSpringTestSupport {
                                 throw orderError;
                         }
 
-                        if (expected.getOrderingType() == MockExpectation.OrderingType.TOTAL ||
+                        if (expected.getOrderingType() == MockDefinition.OrderingType.TOTAL ||
                                 (expected.isEndpointOrdered() && currentExchange.getFromEndpoint().getEndpointUri().equals(expected.getEndpointUri())))
                             throw orderError;
 
                         //it might pop up in the future so we need to add it
                         if (!partiallyOrderedExpectations.containsKey(expected.getEndpointUri())) {
-                            LinkedList<MockExpectation> mockList = new LinkedList<>();
+                            LinkedList<MockDefinition> mockList = new LinkedList<>();
                             partiallyOrderedExpectations.put(expected.getEndpointUri(), mockList);
                         }
-                        Queue<MockExpectation> partiallyOrderedMockList = partiallyOrderedExpectations.get(expected.getEndpointUri());
+                        Queue<MockDefinition> partiallyOrderedMockList = partiallyOrderedExpectations.get(expected.getEndpointUri());
 
                         partiallyOrderedMockList.add(expected);
                         logger.trace("The expectation: {} is partially ordered and may be encountered in the future - " +
@@ -514,14 +512,14 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
                 for (String partiallyOrderedEndpoint : partiallyOrderedExpectations.keySet()) {
                     if (partiallyOrderedExpectations.get(partiallyOrderedEndpoint).size() > 0) {
-                        MockExpectation expectation = partiallyOrderedExpectations.get(partiallyOrderedEndpoint).poll();
+                        MockDefinition expectation = partiallyOrderedExpectations.get(partiallyOrderedEndpoint).poll();
                         throw new AssertionError("The expectation: " + expectation.getName() +
                                 " was not met for partially ordered criteria to the endpoint: " + partiallyOrderedEndpoint);
                     }
                 }
 
                 if (unorderedExpectationsCopy.size() > 0) {
-                    MockExpectation expectation = unorderedExpectationsCopy.get(0);
+                    MockDefinition expectation = unorderedExpectationsCopy.get(0);
                     throw new AssertionError("The expectation: " + expectation.getName() + " was not satisfied");
                 }
             }
@@ -542,11 +540,11 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
     }
 
-    private boolean checkMockExpectationListContainsExchangeMatch(Exchange exchange, List<MockExpectation> mockExpectations) {
-        for (MockExpectation expectation : mockExpectations) {
+    private boolean checkMockExpectationListContainsExchangeMatch(Exchange exchange, List<MockDefinition> mockDefinitions) {
+        for (MockDefinition expectation : mockDefinitions) {
             //we're using it's own received at index because we know it's valid
             if (expectation.validate(exchange, expectation.getReceivedAt())) {
-                mockExpectations.remove(expectation);
+                mockDefinitions.remove(expectation);
                 //we've matched up this exchange... move onto the next one
                 logger.debug("Exchange: {} from endpoint: {} has met the endpoint expectation: {}",
                         new String[]{exchange.getExchangeId(), expectation.getEndpointUri(), expectation.getName()});
@@ -557,10 +555,10 @@ public class OrchestratedTest extends CamelSpringTestSupport {
         return false;
     }
 
-    private boolean testPartiallyOrderedExpectationEndpointMatch(Exchange exchange, List<MockExpectation> mockExpectations, int expectationIndex) {
-        for (MockExpectation partialMock : mockExpectations) {
+    private boolean testPartiallyOrderedExpectationEndpointMatch(Exchange exchange, List<MockDefinition> mockDefinitions, int expectationIndex) {
+        for (MockDefinition partialMock : mockDefinitions) {
             if (partialMock.validate(exchange, expectationIndex)) {
-                mockExpectations.remove(partialMock);
+                mockDefinitions.remove(partialMock);
                 logger.debug("Exchange: {} has met the partially ordered expectation for: {}",
                         exchange.getExchangeId(), partialMock.getName());
                 return true;

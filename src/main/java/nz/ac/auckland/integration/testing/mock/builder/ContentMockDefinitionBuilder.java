@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
-import nz.ac.auckland.integration.testing.mock.MockExpectation;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import org.apache.camel.Predicate;
@@ -18,10 +18,10 @@ import java.util.*;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockExpectationBuilder<Builder>>
-        extends MockExpectation.MockExpectationBuilder<Builder> {
+public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDefinitionBuilder<Builder>>
+        extends MockDefinition.MockDefinitionBuilder<Builder> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContentMockExpectationBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(ContentMockDefinitionBuilder.class);
 
     List<Predicate> expectedBodyPredicates = new ArrayList<>();
     List<HeadersPredicate> expectedHeadersPredicates = new ArrayList<>();
@@ -34,7 +34,7 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
     /**
      * @param endpointUri A Camel Endpoint URI to listen to for expected messages
      */
-    public ContentMockExpectationBuilder(String endpointUri) {
+    public ContentMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }
 
@@ -69,7 +69,7 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
     }
 
     @Override
-    public MockExpectation build(MockExpectation previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousExpectationPart) {
 
         int validatorSize = Math.max(expectedBodyPredicates.size(), expectedHeadersPredicates.size());
 
@@ -87,7 +87,7 @@ public class ContentMockExpectationBuilder<Builder extends MockExpectation.MockE
             if (i < expectedHeadersPredicates.size())
                 expectedHeadersPredicate = expectedHeadersPredicates.get(i);
 
-            this.addPredicates(i,expectedBodyPredicate, expectedHeadersPredicate);
+            this.addPredicates(i, expectedBodyPredicate, expectedHeadersPredicate);
 
         }
 

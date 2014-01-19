@@ -36,20 +36,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class MockExpectation implements Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(MockExpectation.class);
+public class MockDefinition {
+
+    private static final Logger logger = LoggerFactory.getLogger(MockDefinition.class);
 
     private String endpointUri;
     private boolean isEndpointOrdered = true;
-    private boolean lenient = false;
     private OrderingType orderingType;
     private List<Processor> processors;
     private List<Predicate> predicates;
     private int expectedMessageCount;
-    private AtomicInteger messageCounter = new AtomicInteger();
-    private boolean exchangesValid = true;
     private RouteDefinition expectationFeederRoute;
+    private Predicate lenientSelector;
+    private Processor lenientProcessor;
 
     public enum OrderingType {
         TOTAL,
@@ -82,16 +82,12 @@ public class MockExpectation implements Processor {
         return isEndpointOrdered;
     }
 
-    public boolean isLenient() {
-        return lenient;
-    }
-
     public List<Processor> getProcessors() {
-        return processors;
+        return Collections.unmodifiableList(processors);
     }
 
     public List<Predicate> getPredicates() {
-        return predicates;
+        return Collections.unmodifiableList(predicates);
     }
 
     public int getExpectedMessageCount() {
@@ -102,87 +98,25 @@ public class MockExpectation implements Processor {
         return expectationFeederRoute;
     }
 
-    protected synchronized void validateExchange(Exchange exchange) {
-        if (predicates.size() == 0) {
-            exchangesValid = false;
-            return;
-        }
-
-        if (!isEndpointOrdered) {
-            List<Predicate> exchangePredicates = predicates.remove(0);
-            exchangesValid = exchangesValid && validateExchangeList(exchange,exchangePredicates);
-        } else {
-            Iterator<List<Predicate>> predicatesLists = predicates.iterator();
-            while (predicatesLists.hasNext()) {
-                exchangesValid = exchangesValid && validateExchangeList(exchange, predicatesLists.next());
-                if (exchangesValid) {
-                    predicatesLists.remove();
-                    break;
-                }
-            }
-        }
+    public Predicate getLenientSelector() {
+        return lenientSelector;
     }
 
-    private boolean validateExchangeList(Exchange exchange, List<Predicate> predicates) {
-        boolean validExchange = true;
-
-        for (Predicate predicate : predicates) {
-            boolean valid = predicate.matches(exchange);
-            validExchange = valid && validExchange;
-        }
-
-        return validExchange;
-    }
-
-    public void assertIsSatisfied() {
-
-        //do a countdown latch
-
-        //throw assertion error
-        // (lenient || exchangesValid && validators.size() == 0 && expectedMessageCount == messageCounter.get());
-    }
-
-    /**
-     * This is what is called by the test once a message has arrived at an endpoint. It is useful in setting the
-     * outgoing response in the case of a synchronous expectation
-     *
-     * @param exchange The Camel exchange that needs to be modified, or handled once it has been received
-     * @throws Exception
-     */
-    public void process(Exchange exchange) throws Exception {
-        //todo log incoming message (debug/trace/info)
-
-        int currentEndpointMessageIndex = messageCounter.getAndIncrement();
-
-        validateExchange(exchange);
-
-        //todo I think i broke math here
-        if (currentEndpointMessageIndex >= processors.size() && !isLenient()) {
-            logger.warn("A message was received to endpoint {} but the expectation provided no processor for this " +
-                    "message",endpointUri);
-            return;
-        } else {
-            currentEndpointMessageIndex = currentEndpointMessageIndex % processors.size();
-        }
-
-        for (Processor processor : processors.get(currentEndpointMessageIndex)) {
-            processor.process(exchange);
-        }
-    }
 
     /*
         Using details from: https://weblogs.java.net/node/642849
      */
-    public static class MockExpectationBuilder<Builder extends MockExpectationBuilder<Builder>> {
+    public static class MockDefinitionBuilder<Builder extends MockDefinitionBuilder<Builder>> {
 
         private String endpointUri;
         private OrderingType orderingType = OrderingType.TOTAL;
         private boolean isEndpointOrdered = true;
-        private boolean lenient = false;
+        private Predicate lenientSelector = null;
         private List<List<Processor>> processors = new ArrayList<>();
         private List<List<Predicate>> predicates = new ArrayList<>();
         private int expectedMessageCount = 1;
         private RouteDefinition expectationFeederRoute = null;
+        private Class<? extends DefaultProcessor> lenientProcessorClass = DefaultProcessor.class;
 
         private List<Processor> repeatedProcessors = new ArrayList<>();
         private List<Predicate> repeatedPredicates = new ArrayList<>();
@@ -192,7 +126,7 @@ public class MockExpectation implements Processor {
         /**
          * @param endpointUri A Camel Endpoint URI to listen to for expected messages
          */
-        public MockExpectationBuilder(String endpointUri) {
+        public MockDefinitionBuilder(String endpointUri) {
             try {
                 this.endpointUri = URISupport.normalizeUri(endpointUri);
             } catch (URISyntaxException | UnsupportedEncodingException e) {
@@ -222,12 +156,26 @@ public class MockExpectation implements Processor {
         }
 
         public Builder lenient() {
-            this.lenient = true;
+            return lenient(new Predicate() {
+                            @Override
+                            public boolean matches(Exchange exchange) {
+                                return true;
+                            }
+                        });
+        }
+
+        public Builder lenient(Predicate lenientSelector) {
+            this.lenientSelector = lenientSelector;
             return self();
         }
 
         public Builder addProcessors(Processor... processors) {
             this.processors.add(Arrays.asList(processors));
+            return self();
+        }
+
+        public Builder lenientProcessor(Class<? extends DefaultProcessor> lenientProcessorClass) {
+            this.lenientProcessorClass = lenientProcessorClass;
             return self();
         }
 
@@ -267,7 +215,7 @@ public class MockExpectation implements Processor {
             return self();
         }
 
-        public MockExpectation build(MockExpectation previousExpectationPart) {
+        public MockDefinition build(MockDefinition previousExpectationPart) {
 
             if (expectedMessageCount < 0)
                 throw new IllegalStateException("The expected message count for the expectation on endpoint "
@@ -275,7 +223,16 @@ public class MockExpectation implements Processor {
 
             expectedMessageCount = Math.max(expectedMessageCount, predicates.size());
 
-            //if !endpointOrdering then wrap predicates
+            if (lenientSelector != null && previousExpectationPart.lenientSelector != null)
+                throw new IllegalStateException("endpoint .. lenient selector");
+
+            if (lenientSelector != null) {
+                if (expectedMessageCount > 0)
+                    logger.warn("");
+
+                expectedMessageCount = 0;
+                predicates.clear();
+            }
 
             if (predicates.size() < expectedMessageCount)
                 logger.warn("...");
@@ -295,15 +252,30 @@ public class MockExpectation implements Processor {
                 logger.warn("The endpoint {} has {} expected messages but only {} message processors",
                         new Object[] {endpointUri,predicates.size(),processors.size()});
 
-                if (!lenient) {
-                    logger.warn("The additional processors for expectation endpoint {} are being removed to match the " +
-                            "expected message count",endpointUri);
-                    while (processors.size() > expectedMessageCount) {
-                        List<Processor> removedProcessors = processors.remove(processors.size()-1);
-                        logger.debug("The endpoint {} is having the expectation processors removed: {}",
-                                endpointUri,StringUtils.join(removedProcessors,","));
-                    }
+                //what about lenient? add to lenient processor
+
+
+                logger.warn("The additional processors for expectation endpoint {} are being removed to match the " +
+                        "expected message count",endpointUri);
+                while (processors.size() > expectedMessageCount) {
+                    List<Processor> removedProcessors = processors.remove(processors.size()-1);
+                    logger.debug("The endpoint {} is having the expectation processors removed: {}",
+                            endpointUri,StringUtils.join(removedProcessors,","));
                 }
+
+            }
+
+            List<Processor> singleProcessorList = new ArrayList<>();
+            List<Predicate> singlePredicateList = new ArrayList<>();
+
+            //we know number of processors/predicates is same size as expectedMessageCount
+            for (int i = 0; i < expectedMessageCount; i++) {
+                singleProcessorList.add(new DefaultProcessor(processors.get(i)));
+                singlePredicateList.add(new DefaultPredicate(predicates.get(i)));
+            }
+
+            if (previousExpectationPart == null && !isEndpointOrdered) {
+                //create internal list predicate
             }
 
             if (previousExpectationPart != null) {
@@ -317,9 +289,6 @@ public class MockExpectation implements Processor {
                     throw new IllegalStateException("The endpoint ordering must be the same for all expectation parts of " +
                             "endpoint " + endpointUri);
 
-                if (previousExpectationPart.isLenient())
-                    throw new IllegalStateException("Only one lenient expectation is allowed for an endpoint: " + getEndpointUri());
-
                 if (previousExpectationPart.getOrderingType() != orderingType)
                     throw new IllegalStateException("The ordering type must be same for all expectations on an endpoint: "
                             + endpointUri);
@@ -328,6 +297,14 @@ public class MockExpectation implements Processor {
                     throw new IllegalStateException("The expectation feeder route for the endpoint " + endpointUri +
                                             " can only be specified in the first expectation part");
 
+                if (!isEndpointOrdered) {
+                    //if (predicates != null)
+                    //  cast predicates.get(0)
+                    //  if not null add new predicates to internal list
+                    //else
+                    //  create internal list predicate
+                }
+
                 //prepend the previous predicates/processors onto this list ot make an updated expectation
                 this.predicates.addAll(0, previousExpectationPart.getPredicates());
                 this.processors.addAll(0, previousExpectationPart.getProcessors());
@@ -335,7 +312,7 @@ public class MockExpectation implements Processor {
                 this.expectationFeederRoute = previousExpectationPart.getExpectationFeederRoute();
             }
 
-            return new MockExpectation(this);
+            return new MockDefinition(this);
         }
 
         protected Builder self() {
@@ -357,17 +334,11 @@ public class MockExpectation implements Processor {
         protected OrderingType getOrderingType() {
             return this.orderingType;
         }
-
-        protected boolean isLenient() {
-            return this.lenient;
-        }
-
     }
 
     public static class DefaultProcessor implements Processor {
 
-        private List<Processor> processors;
-        private AtomicInteger processorIndex = new AtomicInteger(0);
+        protected List<Processor> processors;
 
         public DefaultProcessor(List<Processor> processors) {
             this.processors = processors;
@@ -375,20 +346,37 @@ public class MockExpectation implements Processor {
 
         @Override
         public void process(Exchange exchange) throws Exception {
-            int offset = processorIndex.getAndIncrement() % processors.size();
-            processors.get(offset).process(exchange);
+            for (Processor processor : processors) {
+                processor.process(exchange);
+            }
+        }
+    }
+
+    public static class DefaultPredicate implements Predicate {
+        private List<Predicate> predicates;
+
+        public DefaultPredicate(List<Predicate> predicates) {
+            this.predicates = predicates;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            for (Predicate predicate : predicates) {
+                if (!predicate.matches(exchange)) return false;
+            }
+            return true;
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected MockExpectation(MockExpectationBuilder builder) {
+    protected MockDefinition(MockDefinitionBuilder builder) {
         this.endpointUri = builder.endpointUri;
         this.orderingType = builder.orderingType;
         this.isEndpointOrdered = builder.isEndpointOrdered;
-        this.lenient = builder.lenient;
         this.processors = builder.processors;
         this.predicates = builder.predicates;
         this.expectedMessageCount = builder.expectedMessageCount;
+
 
         //if !endpointOrdering then will have to wrap
 
