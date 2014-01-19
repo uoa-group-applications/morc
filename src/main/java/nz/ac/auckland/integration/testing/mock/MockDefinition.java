@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -102,26 +103,33 @@ public class MockDefinition {
         return lenientSelector;
     }
 
+    public Processor getLenientProcessor() {
+        return lenientProcessor;
+    }
 
-    /*
-        Using details from: https://weblogs.java.net/node/642849
-     */
+
     public static class MockDefinitionBuilder<Builder extends MockDefinitionBuilder<Builder>> {
 
         private String endpointUri;
         private OrderingType orderingType = OrderingType.TOTAL;
         private boolean isEndpointOrdered = true;
         private Predicate lenientSelector = null;
-        private List<List<Processor>> processors = new ArrayList<>();
-        private List<List<Predicate>> predicates = new ArrayList<>();
+        private List<List<Processor>> partProcessors = new ArrayList<>();
+        private List<List<Predicate>> partPredicates = new ArrayList<>();
         private int expectedMessageCount = 1;
         private RouteDefinition expectationFeederRoute = null;
-        private Class<? extends DefaultProcessor> lenientProcessorClass = DefaultProcessor.class;
+        private Class<? extends LenientProcessor> lenientProcessorClass = LenientProcessor.class;
+        private LenientProcessor lenientProcessor;
 
         private List<Processor> repeatedProcessors = new ArrayList<>();
         private List<Predicate> repeatedPredicates = new ArrayList<>();
 
-        private long assertPeriod = 15000l;
+        //final list of processors/predicates after build
+        private List<Processor> processors;
+        private List<Predicate> predicates;
+
+
+        private long assertionTime = 15000l;
 
         /**
          * @param endpointUri A Camel Endpoint URI to listen to for expected messages
@@ -170,20 +178,20 @@ public class MockDefinition {
         }
 
         public Builder addProcessors(Processor... processors) {
-            this.processors.add(Arrays.asList(processors));
+            this.partProcessors.add(Arrays.asList(processors));
             return self();
         }
 
-        public Builder lenientProcessor(Class<? extends DefaultProcessor> lenientProcessorClass) {
+        public Builder lenientProcessor(Class<? extends LenientProcessor> lenientProcessorClass) {
             this.lenientProcessorClass = lenientProcessorClass;
             return self();
         }
 
         public Builder addProcessors(int index, Processor... processors) {
-            while (index > this.processors.size()) {
-                this.processors.add(new ArrayList<Processor>());
+            while (index > this.partProcessors.size()) {
+                this.partProcessors.add(new ArrayList<Processor>());
             }
-            this.processors.get(index).addAll(Arrays.asList(processors));
+            this.partProcessors.get(index).addAll(Arrays.asList(processors));
             return self();
         }
 
@@ -193,20 +201,25 @@ public class MockDefinition {
         }
 
         public Builder addPredicates(Predicate... predicates) {
-            this.predicates.add(Arrays.asList(predicates));
+            this.partPredicates.add(Arrays.asList(predicates));
             return self();
         }
 
         public Builder addPredicates(int index, Predicate... predicates) {
-            while (index > this.predicates.size()) {
-                this.predicates.add(new ArrayList<Predicate>());
+            while (index > this.partPredicates.size()) {
+                this.partPredicates.add(new ArrayList<Predicate>());
             }
-            this.predicates.get(index).addAll(Arrays.asList(predicates));
+            this.partPredicates.get(index).addAll(Arrays.asList(predicates));
             return self();
         }
 
         public Builder addRepeatedPredicate(Predicate predicate) {
             repeatedPredicates.add(predicate);
+            return self();
+        }
+
+        public Builder assertionTime(long assertionTime) {
+            this.assertionTime = assertionTime;
             return self();
         }
 
@@ -221,57 +234,57 @@ public class MockDefinition {
                 throw new IllegalStateException("The expected message count for the expectation on endpoint "
                         + endpointUri + " must be at least 0");
 
-            expectedMessageCount = Math.max(expectedMessageCount, predicates.size());
+            expectedMessageCount = Math.max(expectedMessageCount, partPredicates.size());
 
             if (lenientSelector != null && previousExpectationPart.lenientSelector != null)
-                throw new IllegalStateException("endpoint .. lenient selector");
+                throw new IllegalStateException(endpointUri + " can have only one part of a mock endpoint defined as lenient");
 
             if (lenientSelector != null) {
                 if (expectedMessageCount > 0)
-                    logger.warn("");
+                    logger.warn("Expectations for a lenient endpoint part {} will be ignored",endpointUri);
 
                 expectedMessageCount = 0;
-                predicates.clear();
+                partPredicates.clear();
+
+                try {
+                    List<Processor> lenientProcessorList = new ArrayList<>();
+                    for (List<Processor> processorList : partProcessors)
+                        lenientProcessorList.add(new MultiProcessor(processorList));
+                    lenientProcessor = lenientProcessorClass.getDeclaredConstructor(List.class)
+                            .newInstance(lenientProcessorList);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                        | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
-            if (predicates.size() < expectedMessageCount)
-                logger.warn("...");
+            if (partPredicates.size() < expectedMessageCount)
+                logger.warn("The endpoint {} has fewer partPredicates provided than the expected message count",endpointUri);
 
             Processor[] repeatedProcessorsArray = repeatedProcessors.toArray(new Processor[repeatedProcessors.size()]);
             Predicate[] repeatedPredicatesArray = repeatedPredicates.toArray(new Predicate[repeatedPredicates.size()]);
 
-            //do repeated predicates and repeated expectations (this will also pad out processors and predicates up
+            //do repeated partPredicates and repeated expectations (this will also pad out partProcessors and partPredicates up
             //expected message count)
             for (int i = 0; i < expectedMessageCount; i++) {
                 addProcessors(i,repeatedProcessorsArray);
                 addPredicates(i,repeatedPredicatesArray);
             }
 
-            //ensure the number of processors doesn't mess up the next expectation
-            if (processors.size() > expectedMessageCount) {
-                logger.warn("The endpoint {} has {} expected messages but only {} message processors",
-                        new Object[] {endpointUri,predicates.size(),processors.size()});
+            //ensure the number of partProcessors doesn't mess up the next expectation
+            if (partProcessors.size() > expectedMessageCount) {
+                if (lenientSelector != null) logger.warn("The endpoint {} has {} expected messages but only {} message partProcessors",
+                        new Object[] {endpointUri, partPredicates.size(), partProcessors.size()});
 
-                //what about lenient? add to lenient processor
-
-
-                logger.warn("The additional processors for expectation endpoint {} are being removed to match the " +
+                if (lenientSelector != null)
+                    logger.warn("The additional partProcessors for expectation endpoint {} are being removed to match the " +
                         "expected message count",endpointUri);
-                while (processors.size() > expectedMessageCount) {
-                    List<Processor> removedProcessors = processors.remove(processors.size()-1);
-                    logger.debug("The endpoint {} is having the expectation processors removed: {}",
+
+                while (partProcessors.size() > expectedMessageCount) {
+                    List<Processor> removedProcessors = partProcessors.remove(partProcessors.size()-1);
+                    logger.debug("The endpoint {} is having the partProcessors removed: {}",
                             endpointUri,StringUtils.join(removedProcessors,","));
                 }
-
-            }
-
-            List<Processor> singleProcessorList = new ArrayList<>();
-            List<Predicate> singlePredicateList = new ArrayList<>();
-
-            //we know number of processors/predicates is same size as expectedMessageCount
-            for (int i = 0; i < expectedMessageCount; i++) {
-                singleProcessorList.add(new DefaultProcessor(processors.get(i)));
-                singlePredicateList.add(new DefaultPredicate(predicates.get(i)));
             }
 
             if (previousExpectationPart == null && !isEndpointOrdered) {
@@ -298,14 +311,14 @@ public class MockDefinition {
                                             " can only be specified in the first expectation part");
 
                 if (!isEndpointOrdered) {
-                    //if (predicates != null)
-                    //  cast predicates.get(0)
-                    //  if not null add new predicates to internal list
+                    //if (partPredicates != null)
+                    //  cast partPredicates.get(0)
+                    //  if not null add new partPredicates to internal list
                     //else
                     //  create internal list predicate
                 }
 
-                //prepend the previous predicates/processors onto this list ot make an updated expectation
+                //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
                 this.predicates.addAll(0, previousExpectationPart.getPredicates());
                 this.processors.addAll(0, previousExpectationPart.getProcessors());
                 this.expectedMessageCount += previousExpectationPart.getExpectedMessageCount();
@@ -323,12 +336,12 @@ public class MockDefinition {
             return this.endpointUri;
         }
 
-        protected List<List<Predicate>> getPredicates() {
-            return Collections.unmodifiableList(predicates);
+        protected List<List<Predicate>> getPartPredicates() {
+            return Collections.unmodifiableList(partPredicates);
         }
 
-        protected List<List<Processor>> getProcessors() {
-            return Collections.unmodifiableList(processors);
+        protected List<List<Processor>> getPartProcessors() {
+            return Collections.unmodifiableList(partProcessors);
         }
 
         protected OrderingType getOrderingType() {
@@ -336,11 +349,11 @@ public class MockDefinition {
         }
     }
 
-    public static class DefaultProcessor implements Processor {
+    public static class MultiProcessor implements Processor {
 
         protected List<Processor> processors;
 
-        public DefaultProcessor(List<Processor> processors) {
+        public MultiProcessor(List<Processor> processors) {
             this.processors = processors;
         }
 
@@ -352,10 +365,10 @@ public class MockDefinition {
         }
     }
 
-    public static class DefaultPredicate implements Predicate {
+    public static class MultiPredicate implements Predicate {
         private List<Predicate> predicates;
 
-        public DefaultPredicate(List<Predicate> predicates) {
+        public MultiPredicate(List<Predicate> predicates) {
             this.predicates = predicates;
         }
 
@@ -368,6 +381,23 @@ public class MockDefinition {
         }
     }
 
+
+    public static class LenientProcessor implements Processor {
+        private List<Processor> processors;
+        private AtomicInteger messageIndex = new AtomicInteger(0);
+
+        public LenientProcessor(List<Processor> processors) {
+            this.processors = processors;
+        }
+
+        public void process(Exchange exchange) throws Exception {
+            if (processors.size() == 0) return;
+            //the default implementation will cycle through the responses/partProcessors
+            int processorOffset = messageIndex.getAndIncrement() % processors.size();
+            processors.get(processorOffset).process(exchange);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     protected MockDefinition(MockDefinitionBuilder builder) {
         this.endpointUri = builder.endpointUri;
@@ -376,7 +406,7 @@ public class MockDefinition {
         this.processors = builder.processors;
         this.predicates = builder.predicates;
         this.expectedMessageCount = builder.expectedMessageCount;
-
+        this.lenientProcessor = builder.lenientProcessor;
 
         //if !endpointOrdering then will have to wrap
 

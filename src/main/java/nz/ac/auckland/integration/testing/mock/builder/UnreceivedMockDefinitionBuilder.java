@@ -29,7 +29,7 @@ public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefiniti
     public MockDefinition build(MockDefinition previousExpectationPart) {
         super.expectedMessageCount(0);
 
-        if (getPredicates().size() != 0)
+        if (getPartPredicates().size() != 0)
             throw new IllegalStateException("No validators should be specified for an unreceived mock expectation on " +
                     "endpoint: " + getEndpointUri() + " as no messages are expected to be validated against");
 
