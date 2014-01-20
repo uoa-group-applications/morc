@@ -20,14 +20,14 @@ public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilder<So
     }
 
     @Override
-    public MockDefinition build(MockDefinition previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousDefinitionPart) {
         addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
                 exchange.getOut().setFault(true);
             }
         });
-        return super.build(previousExpectationPart);
+        return super.build(previousDefinitionPart);
     }
 }
 

@@ -112,7 +112,7 @@ public abstract class OrchestratedTestSpecification {
             @Override
             public void configure() throws Exception {
                 for (MockDefinition expectation : mockDefinitions) {
-                    configureRoute(expectation.getExpectationFeederRoute());
+                    configureRoute(expectation.getMockFeederRoute());
                 }
             }
         });

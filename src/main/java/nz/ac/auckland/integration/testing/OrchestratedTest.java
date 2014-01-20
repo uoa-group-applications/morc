@@ -216,7 +216,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
             mockEndpoints.add(expectationMockEndpoint);
 
-            expectation.getExpectationFeederRoute().log("incoming body").to(expectationMockEndpoint)
+            expectation.getMockFeederRoute().log("incoming body").to(expectationMockEndpoint)
                 .choice().when(new Predicate() {
                 @Override
                 public boolean matches(Exchange exchange) {
@@ -231,7 +231,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
             expectationMockEndpoint.whenAnyExchangeReceived(defaultprocessor);
 
-            context.addRouteDefinition(expectation.getExpectationFeederRoute());
+            context.addRouteDefinition(expectation.getMockFeederRoute());
 
             expectationMockEndpoint.expectedMessageCount(expectation.getExpectedMessageCount());
             expectationMockEndpoint.expectedMessagesMatches(expectation.getPredicates()
@@ -261,7 +261,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
 
         //at end remove routes and mocks
         for (MockDefinition expectation : expectations)
-            context.removeRouteDefinition(expectation.getExpectationFeederRoute());
+            context.removeRouteDefinition(expectation.getMockFeederRoute());
 
 
         /*

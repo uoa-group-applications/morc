@@ -29,7 +29,7 @@ public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilder<Ht
     }
 
     @Override
-    public MockDefinition build(MockDefinition previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousDefinitionPart) {
         this.addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
@@ -37,7 +37,7 @@ public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilder<Ht
             }
         });
 
-        return super.build(previousExpectationPart);
+        return super.build(previousDefinitionPart);
     }
 
 }

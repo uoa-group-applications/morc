@@ -20,19 +20,19 @@ public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefiniti
     @Override
     public UnreceivedMockDefinitionBuilder expectedMessageCount(int expectedMessageCount) {
         if (expectedMessageCount != 0)
-            throw new IllegalArgumentException("The expected message count for an unreceived mock definition must " +
-                    "be 0");
+            throw new IllegalArgumentException("The expected message count for an unreceived mock definition on " +
+                    "endpoint " + getEndpointUri() + " must be 0");
         return super.expectedMessageCount(0);
     }
 
     @Override
-    public MockDefinition build(MockDefinition previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousDefinitionPart) {
         super.expectedMessageCount(0);
 
         if (getPartPredicates().size() != 0)
             throw new IllegalStateException("No validators should be specified for an unreceived mock definition on " +
-                    "endpoint: " + getEndpointUri() + " as no messages are expected to be validated against");
+                    "endpoint " + getEndpointUri() + " as no messages are expected to be validated against");
 
-        return super.build(previousExpectationPart);
+        return super.build(previousDefinitionPart);
     }
 }

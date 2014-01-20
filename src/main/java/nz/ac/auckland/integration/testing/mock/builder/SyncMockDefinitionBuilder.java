@@ -83,7 +83,7 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
     }
 
     @Override
-    public MockDefinition build(MockDefinition previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousDefinitionPart) {
 
         int responseProcessorCount = Math.max(responseBodyProcessors.size(), responseHeadersProcessors.size());
 
@@ -100,6 +100,6 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
                 addProcessors(i,new ResponseHeadersProcessor(responseHeadersProcessors.get(i)));
         }
 
-        return super.build(previousExpectationPart);
+        return super.build(previousDefinitionPart);
     }
 }

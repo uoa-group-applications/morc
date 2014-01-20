@@ -69,7 +69,7 @@ public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDef
     }
 
     @Override
-    public MockDefinition build(MockDefinition previousExpectationPart) {
+    public MockDefinition build(MockDefinition previousDefinitionPart) {
 
         int validatorSize = Math.max(expectedBodyPredicates.size(), expectedHeadersPredicates.size());
 
@@ -83,7 +83,7 @@ public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDef
                 this.addPredicates(i,expectedHeadersPredicates.get(i));
         }
 
-        return super.build(previousExpectationPart);
+        return super.build(previousDefinitionPart);
     }
 
 }

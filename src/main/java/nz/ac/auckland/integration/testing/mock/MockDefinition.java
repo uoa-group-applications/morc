@@ -5,10 +5,8 @@ import nz.ac.auckland.integration.testing.processor.MultiProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
-import org.apache.camel.model.FromDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.util.URISupport;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +49,7 @@ public class MockDefinition {
     private List<Processor> processors;
     private List<Predicate> predicates;
     private int expectedMessageCount;
-    private RouteDefinition expectationFeederRoute;
+    private RouteDefinition mockFeederRoute;
     private Predicate lenientSelector;
     private LenientProcessor lenientProcessor;
     private long assertionTime;
@@ -99,8 +97,8 @@ public class MockDefinition {
         return expectedMessageCount;
     }
 
-    public RouteDefinition getExpectationFeederRoute() {
-        return expectationFeederRoute;
+    public RouteDefinition getMockFeederRoute() {
+        return mockFeederRoute;
     }
 
     public Predicate getLenientSelector() {
@@ -124,7 +122,7 @@ public class MockDefinition {
         private List<List<Processor>> partProcessors = new ArrayList<>();
         private List<List<Predicate>> partPredicates = new ArrayList<>();
         private int expectedMessageCount = 1;
-        private RouteDefinition expectationFeederRoute = null;
+        private RouteDefinition mockFeederRoute = null;
         private Class<? extends LenientProcessor> lenientProcessorClass = LenientProcessor.class;
         private LenientProcessor lenientProcessor;
 
@@ -224,8 +222,8 @@ public class MockDefinition {
             return self();
         }
 
-        public Builder expectationFeederRoute(RouteDefinition expectationFeederRoute) {
-            this.expectationFeederRoute = expectationFeederRoute;
+        public Builder mockFeederRoute(RouteDefinition mockFeederRoute) {
+            this.mockFeederRoute = mockFeederRoute;
             return self();
         }
 
@@ -234,7 +232,7 @@ public class MockDefinition {
             return self();
         }
 
-        public MockDefinition build(MockDefinition previousExpectationPart) {
+        public MockDefinition build(MockDefinition previousDefinitionPart) {
 
             if (expectedMessageCount < 0)
                 throw new IllegalStateException("The expected message count for the mock definition on endpoint "
@@ -242,7 +240,7 @@ public class MockDefinition {
 
             expectedMessageCount = Math.max(expectedMessageCount, partPredicates.size());
 
-            if (lenientSelector != null && previousExpectationPart.lenientSelector != null)
+            if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)
                 throw new IllegalStateException(endpointUri + " can have only one part of a mock endpoint defined as lenient");
 
             if (lenientSelector != null) {
@@ -293,40 +291,40 @@ public class MockDefinition {
                         new Object[] {endpointUri, partPredicates.size(), partProcessors.size()});
             }
 
-            if (previousExpectationPart == null) {
+            if (previousDefinitionPart == null) {
                 //set up a default expectation feeder route (sending to a mock will be added later)
-                if (expectationFeederRoute == null) expectationFeederRoute = new RouteDefinition().convertBodyTo(String.class);
-                expectationFeederRoute.from(endpointUri);
+                if (mockFeederRoute == null) mockFeederRoute = new RouteDefinition().convertBodyTo(String.class);
+                mockFeederRoute.from(endpointUri);
             }
 
-            if (previousExpectationPart != null) {
+            if (previousDefinitionPart != null) {
 
-                if (!previousExpectationPart.getEndpointUri().equals(endpointUri))
-                    throw new IllegalStateException("The endpoints do not much for merging expectation endpoint " +
-                            previousExpectationPart.getEndpointUri() + " with endpoint " + endpointUri);
+                if (!previousDefinitionPart.getEndpointUri().equals(endpointUri))
+                    throw new IllegalStateException("The endpoints do not much for merging mock definition endpoint " +
+                            previousDefinitionPart.getEndpointUri() + " with endpoint " + endpointUri);
 
-                if (previousExpectationPart.isEndpointOrdered() != isEndpointOrdered)
-                    throw new IllegalStateException("The endpoint ordering must be the same for all expectation parts of " +
+                if (previousDefinitionPart.isEndpointOrdered() != isEndpointOrdered)
+                    throw new IllegalStateException("The endpoint ordering must be the same for all mock definition parts of " +
                             "endpoint " + endpointUri);
 
-                if (previousExpectationPart.getOrderingType() != orderingType)
-                    throw new IllegalStateException("The ordering type must be same for all expectations on an endpoint "
+                if (previousDefinitionPart.getOrderingType() != orderingType)
+                    throw new IllegalStateException("The ordering type must be same for all mock definition parts on an endpoint "
                             + endpointUri);
 
-                if (expectationFeederRoute != null)
-                    throw new IllegalStateException("The expectation feeder route for the endpoint " + endpointUri +
-                                            " can only be specified in the first expectation part");
+                if (mockFeederRoute != null)
+                    throw new IllegalStateException("The mock feeder route for the endpoint " + endpointUri +
+                                            " can only be specified in the first mock definition part");
 
                 //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
-                this.predicates.addAll(0, previousExpectationPart.getPredicates());
-                this.processors.addAll(0, previousExpectationPart.getProcessors());
-                this.expectedMessageCount += previousExpectationPart.getExpectedMessageCount();
-                this.expectationFeederRoute = previousExpectationPart.getExpectationFeederRoute();
-                this.isEndpointOrdered = previousExpectationPart.isEndpointOrdered;
+                this.predicates.addAll(0, previousDefinitionPart.getPredicates());
+                this.processors.addAll(0, previousDefinitionPart.getProcessors());
+                this.expectedMessageCount += previousDefinitionPart.getExpectedMessageCount();
+                this.mockFeederRoute = previousDefinitionPart.getMockFeederRoute();
+                this.isEndpointOrdered = previousDefinitionPart.isEndpointOrdered;
                 //we know if this isn't null then we have checked this expectation hasn't set a selector/processor
-                if (previousExpectationPart.lenientSelector != null) {
-                    this.lenientSelector = previousExpectationPart.lenientSelector;
-                    this.lenientProcessor = previousExpectationPart.lenientProcessor;
+                if (previousDefinitionPart.lenientSelector != null) {
+                    this.lenientSelector = previousDefinitionPart.lenientSelector;
+                    this.lenientProcessor = previousDefinitionPart.lenientProcessor;
                 }
             }
 
@@ -383,6 +381,6 @@ public class MockDefinition {
         this.lenientSelector = builder.lenientSelector;
         this.assertionTime = builder.assertionTime;
 
-        this.expectationFeederRoute = builder.expectationFeederRoute;
+        this.mockFeederRoute = builder.mockFeederRoute;
     }
 }
