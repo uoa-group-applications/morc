@@ -21,7 +21,7 @@ public class AsyncMockDefinitionBuilder extends ContentMockDefinitionBuilder {
     @Override
     public MockDefinition build(MockDefinition previousExpectationPart) {
         if (getOrderingType() == MockDefinition.OrderingType.TOTAL) {
-            logger.warn("The asynchronous endpoint {} used total ordering, this was changed to partial ordering",
+            logger.warn("The asynchronous mock definition endpoint {} used total ordering, this was changed to partial ordering",
                     getEndpointUri());
             ordering(MockDefinition.OrderingType.PARTIAL);
         }

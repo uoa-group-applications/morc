@@ -280,6 +280,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
          *  dataset that uses TestResources
          *   how long to wait?
          *
+         * endpointordering -> look at Mock.expectedBodiesReceivedInAnyOrder
          *
          *  how long to run test?
          *

@@ -73,22 +73,14 @@ public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDef
 
         int validatorSize = Math.max(expectedBodyPredicates.size(), expectedHeadersPredicates.size());
 
-        logger.info("{} body validators, and {} header validators provided for endpoint {}",
+        logger.info("{} body validators, and {} header validators provided for mock definition endpoint {}",
                 new Object[]{expectedBodyPredicates.size(), expectedHeadersPredicates.size(), getEndpointUri()});
 
         for (int i = 0; i < validatorSize; i++) {
-
-            Predicate expectedBodyPredicate = null;
-            HeadersPredicate expectedHeadersPredicate = null;
-
-            //because null validators are accepted we don't have to set them
             if (i < expectedBodyPredicates.size())
-                expectedBodyPredicate = expectedBodyPredicates.get(i);
+                this.addPredicates(i,expectedBodyPredicates.get(i));
             if (i < expectedHeadersPredicates.size())
-                expectedHeadersPredicate = expectedHeadersPredicates.get(i);
-
-            this.addPredicates(i, expectedBodyPredicate, expectedHeadersPredicate);
-
+                this.addPredicates(i,expectedHeadersPredicates.get(i));
         }
 
         return super.build(previousExpectationPart);
