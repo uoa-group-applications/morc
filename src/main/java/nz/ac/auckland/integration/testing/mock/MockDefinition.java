@@ -298,7 +298,6 @@ public class MockDefinition {
             }
 
             if (previousDefinitionPart != null) {
-
                 if (!previousDefinitionPart.getEndpointUri().equals(endpointUri))
                     throw new IllegalStateException("The endpoints do not much for merging mock definition endpoint " +
                             previousDefinitionPart.getEndpointUri() + " with endpoint " + endpointUri);
@@ -308,7 +307,7 @@ public class MockDefinition {
                             "endpoint " + endpointUri);
 
                 if (previousDefinitionPart.getOrderingType() != orderingType)
-                    throw new IllegalStateException("The ordering type must be same for all mock definition parts on an endpoint "
+                    throw new IllegalStateException("The ordering type must be same for all mock definition parts on the endpoint "
                             + endpointUri);
 
                 if (mockFeederRoute != null)
