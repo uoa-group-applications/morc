@@ -237,7 +237,7 @@ public class MockDefinition {
         public MockDefinition build(MockDefinition previousExpectationPart) {
 
             if (expectedMessageCount < 0)
-                throw new IllegalStateException("The expected message count for the expectation on endpoint "
+                throw new IllegalStateException("The expected message count for the mock definition on endpoint "
                         + endpointUri + " must be at least 0");
 
             expectedMessageCount = Math.max(expectedMessageCount, partPredicates.size());
