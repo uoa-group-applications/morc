@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.testing.processor;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.predicate.Validator;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public class MatchedResponseBodiesProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(MatchedResponseBodiesProcessor.class);
     private Collection<MatchedResponse> responses = new HashSet<>();
 
+    //todo add remove on match
 
     public void addMatchedResponse(MatchedResponse matchedResponse) {
         responses.add(matchedResponse);
@@ -31,12 +33,13 @@ public class MatchedResponseBodiesProcessor implements Processor {
      */
     @Override
     public void process(Exchange exchange) throws Exception {
+        //todo make this threadsafe
         Iterator<MatchedResponse> responseIterator = responses.iterator();
 
         while (responseIterator.hasNext()) {
             MatchedResponse matchedResponse = responseIterator.next();
-            if (matchedResponse.inputValidator.validate(exchange)) {
-                exchange.getOut().setBody(matchedResponse.response);
+            if (matchedResponse.inputPredicate.matches(exchange)) {
+                matchedResponse.responseProcessor.process(exchange);
             }
         }
 
@@ -49,25 +52,12 @@ public class MatchedResponseBodiesProcessor implements Processor {
      * An approach class for making input->output pairs
      */
     public static class MatchedResponse {
-        private Validator inputValidator;
-        private Object response;
+        private Predicate inputPredicate;
+        private Processor responseProcessor;
 
-        /**
-         * @param inputValidator    A way of validating the input as what we expect for a match
-         * @param response          A test resource response for this given input match
-         */
-        public MatchedResponse(Validator inputValidator, TestResource response) throws Exception {
-            this.inputValidator = inputValidator;
-            this.response = response.getValue();
-        }
-
-        /**
-         * @param inputValidator    A way of validating the input as what we expect for a match
-         * @param response          A response for this given input match
-         */
-        public MatchedResponse(Validator inputValidator, Object response) {
-            this.inputValidator = inputValidator;
-            this.response = response;
+        public MatchedResponse(Predicate inputPredicate, Processor responseProcessor) throws Exception {
+            this.inputPredicate = inputPredicate;
+            this.responseProcessor = responseProcessor;
         }
     }
 }
