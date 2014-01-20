@@ -99,7 +99,7 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
         return validate(doc);
     }
 
-    public boolean validate(Document value) {
+    public synchronized boolean validate(Document value) {
         if (value == null) return false;
         try {
             Document expectedValue = getValue();

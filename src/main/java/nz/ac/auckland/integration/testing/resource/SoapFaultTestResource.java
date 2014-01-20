@@ -71,7 +71,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate
         return fault;
     }
 
-    public boolean matches(Exchange e) {
+    public synchronized boolean matches(Exchange e) {
         if (e == null) return false;
         Throwable t = e.getException();
 

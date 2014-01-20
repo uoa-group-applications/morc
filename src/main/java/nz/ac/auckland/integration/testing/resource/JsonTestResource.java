@@ -50,7 +50,7 @@ public class JsonTestResource extends StaticTestResource<String> implements Pred
      * @param exchange The exchange containing the JSON string to validate
      * @return true if the Json trees match (uses the Jackson ObjectMapper to unmarshal the string and compare using Java equality)
      */
-    public boolean matches(Exchange exchange) {
+    public synchronized boolean matches(Exchange exchange) {
         String value;
         try {
             value = exchange.getIn().getBody(String.class);
