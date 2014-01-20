@@ -20,7 +20,7 @@ public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilder
     private Exception exceptionResponse;
 
     public ExceptionMockDefinitionBuilder(String endpointUri) {
-         super(endpointUri);
+        super(endpointUri);
     }
 
     public ExceptionMockDefinitionBuilder exceptionResponse(Exception exception) {

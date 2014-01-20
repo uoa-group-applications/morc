@@ -1,13 +1,16 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
-import nz.ac.auckland.integration.testing.resource.TestResource;
 import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class to set expectations for bodies and headers for
@@ -28,7 +31,7 @@ public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDef
 
     @Override
     protected Builder self() {
-        return (Builder)this;
+        return (Builder) this;
     }
 
     /**
@@ -78,9 +81,9 @@ public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDef
 
         for (int i = 0; i < validatorSize; i++) {
             if (i < expectedBodyPredicates.size())
-                this.addPredicates(i,expectedBodyPredicates.get(i));
+                this.addPredicates(i, expectedBodyPredicates.get(i));
             if (i < expectedHeadersPredicates.size())
-                this.addPredicates(i,expectedHeadersPredicates.get(i));
+                this.addPredicates(i, expectedHeadersPredicates.get(i));
         }
 
         return super.build(previousDefinitionPart);

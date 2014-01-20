@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -169,11 +172,11 @@ public class MockDefinition {
 
         public Builder lenient() {
             return lenient(new Predicate() {
-                            @Override
-                            public boolean matches(Exchange exchange) {
-                                return true;
-                            }
-                        });
+                @Override
+                public boolean matches(Exchange exchange) {
+                    return true;
+                }
+            });
         }
 
         public Builder lenient(Predicate lenientSelector) {
@@ -245,7 +248,7 @@ public class MockDefinition {
 
             if (lenientSelector != null) {
                 if (expectedMessageCount > 0)
-                    logger.warn("Expectations for a lenient endpoint part {} will be ignored",endpointUri);
+                    logger.warn("Expectations for a lenient endpoint part {} will be ignored", endpointUri);
 
                 expectedMessageCount = 0;
                 partPredicates.clear();
@@ -267,7 +270,7 @@ public class MockDefinition {
             }
 
             if (partPredicates.size() < expectedMessageCount)
-                logger.warn("The endpoint {} has fewer part predicates provided than the expected message count",endpointUri);
+                logger.warn("The endpoint {} has fewer part predicates provided than the expected message count", endpointUri);
 
             Processor[] repeatedProcessorsArray = repeatedProcessors.toArray(new Processor[repeatedProcessors.size()]);
             Predicate[] repeatedPredicatesArray = repeatedPredicates.toArray(new Predicate[repeatedPredicates.size()]);
@@ -276,8 +279,8 @@ public class MockDefinition {
             //expected message count)
             for (int i = 0; i < expectedMessageCount; i++) {
                 //note the lenient repeated processors are added above
-                addProcessors(i,repeatedProcessorsArray);
-                addPredicates(i,repeatedPredicatesArray);
+                addProcessors(i, repeatedProcessorsArray);
+                addPredicates(i, repeatedPredicatesArray);
 
                 //the final single processor/predicates lists
                 processors.add(new MultiProcessor(partProcessors.get(i)));
@@ -288,7 +291,7 @@ public class MockDefinition {
             if (partProcessors.size() > expectedMessageCount && lenientSelector != null) {
                 logger.warn("The mock definition endpoint {} has {} expected messages but only {} message " +
                         "part processors; the additional processors will be ignored to match the expected message count",
-                        new Object[] {endpointUri, partPredicates.size(), partProcessors.size()});
+                        new Object[]{endpointUri, partPredicates.size(), partProcessors.size()});
             }
 
             if (previousDefinitionPart == null) {
@@ -312,7 +315,7 @@ public class MockDefinition {
 
                 if (mockFeederRoute != null)
                     throw new IllegalStateException("The mock feeder route for the endpoint " + endpointUri +
-                                            " can only be specified in the first mock definition part");
+                            " can only be specified in the first mock definition part");
 
                 //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
                 this.predicates.addAll(0, previousDefinitionPart.getPredicates());
@@ -331,7 +334,7 @@ public class MockDefinition {
         }
 
         protected Builder self() {
-            return (Builder)this;
+            return (Builder) this;
         }
 
         public String getEndpointUri() {
@@ -351,6 +354,7 @@ public class MockDefinition {
         }
     }
 
+    //any processors added should be thread safe!
     public static class LenientProcessor implements Processor {
         private List<Processor> processors;
         private AtomicInteger messageIndex = new AtomicInteger(0);

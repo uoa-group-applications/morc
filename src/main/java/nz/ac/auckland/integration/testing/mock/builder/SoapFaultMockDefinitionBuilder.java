@@ -10,7 +10,7 @@ import org.apache.cxf.binding.soap.SoapFault;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilder<SoapFaultMockDefinitionBuilder,SoapFault> {
+public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilder<SoapFaultMockDefinitionBuilder, SoapFault> {
 
     /**
      * @param endpointUri This MUST be a CXF endpoint URI

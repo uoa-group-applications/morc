@@ -33,7 +33,7 @@ public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilder<Ht
         this.addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE,statusCode);
+                exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
             }
         });
 

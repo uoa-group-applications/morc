@@ -91,14 +91,14 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
 
         if (matchedResponses)
 
-        for (int i = 0; i < responseProcessorCount; i++) {
+            for (int i = 0; i < responseProcessorCount; i++) {
 
-            if (i < responseBodyProcessors.size())
-                addProcessors(i, new ResponseBodyProcessor(responseBodyProcessors.get(i)));
+                if (i < responseBodyProcessors.size())
+                    addProcessors(i, new ResponseBodyProcessor(responseBodyProcessors.get(i)));
 
-            if (i < responseHeadersProcessors.size())
-                addProcessors(i,new ResponseHeadersProcessor(responseHeadersProcessors.get(i)));
-        }
+                if (i < responseHeadersProcessors.size())
+                    addProcessors(i, new ResponseHeadersProcessor(responseHeadersProcessors.get(i)));
+            }
 
         return super.build(previousDefinitionPart);
     }
