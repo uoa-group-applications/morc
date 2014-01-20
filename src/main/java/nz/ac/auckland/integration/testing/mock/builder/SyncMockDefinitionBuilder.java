@@ -66,7 +66,6 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
      */
     @SuppressWarnings("unchecked")
     public Builder responseHeaders(TestResource<Map<String, Object>>... resources) {
-
         for (TestResource<Map<String, Object>> resource : resources) {
             try {
                 this.responseHeadersProcessors.add(resource.getValue());
