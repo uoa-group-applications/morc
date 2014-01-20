@@ -71,9 +71,16 @@ public class ContentMockDefinitionBuilder<Builder extends MockDefinition.MockDef
         return self();
     }
 
+    protected List<Predicate> getExpectedBodyPredicates() {
+        return Collections.unmodifiableList(expectedBodyPredicates);
+    }
+
+    protected List<HeadersPredicate> getExpectedHeadersPredicates() {
+        return Collections.unmodifiableList(expectedHeadersPredicates);
+    }
+
     @Override
     public MockDefinition build(MockDefinition previousDefinitionPart) {
-
         int validatorSize = Math.max(expectedBodyPredicates.size(), expectedHeadersPredicates.size());
 
         logger.info("{} body validators, and {} header validators provided for mock definition endpoint {}",
