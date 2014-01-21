@@ -184,13 +184,13 @@ public class MockDefinition {
             return self();
         }
 
-        public Builder addProcessors(Processor... processors) {
-            this.partProcessors.add(Arrays.asList(processors));
+        public Builder lenientProcessor(Class<? extends LenientProcessor> lenientProcessorClass) {
+            this.lenientProcessorClass = lenientProcessorClass;
             return self();
         }
 
-        public Builder lenientProcessor(Class<? extends LenientProcessor> lenientProcessorClass) {
-            this.lenientProcessorClass = lenientProcessorClass;
+        public Builder addProcessors(Processor... processors) {
+            this.partProcessors.add(Arrays.asList(processors));
             return self();
         }
 
