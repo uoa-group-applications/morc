@@ -241,9 +241,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
             expectationMockEndpoint.setRetainFirst(expectation.getExpectedMessageCount());
 
             //todo: refine this in the future
-            expectationMockEndpoint.setSleepForEmptyTest(spec.getSleepForTestCompletion());
-            expectationMockEndpoint.setAssertPeriod(spec.getSleepForTestCompletion());
-            expectationMockEndpoint.setResultWaitTime(spec.getSleepForTestCompletion());
+            expectationMockEndpoint.setSleepForEmptyTest(spec.getAssertTime());
+            expectationMockEndpoint.setAssertPeriod(spec.getAssertTime());
+            expectationMockEndpoint.setResultWaitTime(spec.getAssertTime());
 
         }
 
@@ -276,10 +276,11 @@ public class OrchestratedTest extends CamelSpringTestSupport {
          *
          *  from("dataset").to("endpoint")
          *  or
-         *  from("dataset").to("endpoint").to("mock").exceptionHandler().true()
+         *  //use .onCompletion() instead, also one thread at a time
+         *  from("dataset").to("endpoint").to("mock").exceptionHandler().true() (this will break with InOnly?)
          *  dataset that uses TestResources
          *   how long to wait?
-         *
+         * camelContext.getExecutorServiceManager().newSingleThreadExecutor(this, endpoint.getEndpointUri());
          * endpointordering -> look at Mock.expectedBodiesReceivedInAnyOrder
          *
          *  how long to run test?
@@ -333,9 +334,9 @@ public class OrchestratedTest extends CamelSpringTestSupport {
                 system is in use and hence we're not sure when they'll arrive).
             */
             if (expectation.getOrderingType() != MockDefinition.OrderingType.TOTAL) {
-                mockEndpoint.setSleepForEmptyTest(spec.getSleepForTestCompletion());
-                mockEndpoint.setAssertPeriod(spec.getSleepForTestCompletion());
-                mockEndpoint.setResultWaitTime(spec.getSleepForTestCompletion());
+                mockEndpoint.setSleepForEmptyTest(spec.getAssertTime());
+                mockEndpoint.setAssertPeriod(spec.getAssertTime());
+                mockEndpoint.setResultWaitTime(spec.getAssertTime());
             }
 
             expectationQueue.add(expectation);
@@ -402,7 +403,7 @@ public class OrchestratedTest extends CamelSpringTestSupport {
                             public void process(Exchange exchange) throws Exception {
                                 exchange.setProperty("orchestratedTestFromURI", exchange.getFromEndpoint().getEndpointUri());
                             }
-                        })
+                        }).onCompletion().threads(1)
                         .log(LoggingLevel.DEBUG, OrchestratedTest.class.getName(), "An exchange has been received from the endpoint: ${property.orchestratedTestFromURI}")
                         .to(mockEndpoint);
             }

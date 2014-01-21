@@ -7,7 +7,7 @@ import groovy.text.TemplateEngine;
 import nz.ac.auckland.integration.testing.mock.builder.*;
 import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
 import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
-import nz.ac.auckland.integration.testing.processor.MatchedResponseBodiesProcessor;
+import nz.ac.auckland.integration.testing.processor.MatchedResponseProcessor;
 import nz.ac.auckland.integration.testing.mock.*;
 import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockDefinitionBuilder;
 import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockDefinitionBuilder;
@@ -333,44 +333,44 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * A convenience method for specifying matched input->output answers for expectations
      */
     @SuppressWarnings("unchecked")
-    public static MatchedResponseBodiesProcessor matchedResponse(MatchedResponseBodiesProcessor.MatchedResponse... responses) {
-        return new MatchedResponseBodiesProcessor(responses);
+    public static MatchedResponseProcessor matchedResponse(MatchedResponseProcessor.MatchedResponse... responses) {
+        return new MatchedResponseProcessor(responses);
     }
 
     /**
      * A convenience method for specifying matched input->output answers for expectations where matches are removed from the pool
      */
     @SuppressWarnings("unchecked")
-    public static MatchedResponseBodiesProcessor matchedResponse(boolean removeOnMatch,
-                                                             MatchedResponseBodiesProcessor.MatchedResponse... responses) {
-        return new MatchedResponseBodiesProcessor(removeOnMatch, responses);
+    public static MatchedResponseProcessor matchedResponse(boolean removeOnMatch,
+                                                             MatchedResponseProcessor.MatchedResponse... responses) {
+        return new MatchedResponseProcessor(removeOnMatch, responses);
     }
 
     /**
      * A convenience method for specifying matched input headers -> output headers for expectations
      */
     @SafeVarargs
-    public static MatchedResponseBodiesProcessor<Map<String, Object>> matchedHeadersResponse(
-            MatchedResponseBodiesProcessor.MatchedResponse<Map<String, Object>>... responses) {
-        return new MatchedResponseBodiesProcessor<>(responses);
+    public static MatchedResponseProcessor<Map<String, Object>> matchedHeadersResponse(
+            MatchedResponseProcessor.MatchedResponse<Map<String, Object>>... responses) {
+        return new MatchedResponseProcessor<>(responses);
     }
 
     /**
      * A convenience method for specifying matched input headers -> output headers for expectations that are removed rom the pool
      */
     @SafeVarargs
-    public static MatchedResponseBodiesProcessor<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
-                                                                                         MatchedResponseBodiesProcessor.MatchedResponse<Map<String, Object>>... responses) {
-        return new MatchedResponseBodiesProcessor<>(removeOnMatch, responses);
+    public static MatchedResponseProcessor<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
+                                                                                         MatchedResponseProcessor.MatchedResponse<Map<String, Object>>... responses) {
+        return new MatchedResponseProcessor<>(removeOnMatch, responses);
     }
 
     /**
      * A convenience method for specifying matched input validators to outputs
      */
     @SuppressWarnings("unchecked")
-    public static MatchedResponseBodiesProcessor.MatchedResponse answer(Validator validator, TestResource resource) {
+    public static MatchedResponseProcessor.MatchedResponse answer(Validator validator, TestResource resource) {
         try {
-            return new MatchedResponseBodiesProcessor.MatchedResponse(validator, resource);
+            return new MatchedResponseProcessor.MatchedResponse(validator, resource);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -379,10 +379,10 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * A convenience method for specifying matched input header validators to output headers
      */
-    public static MatchedResponseBodiesProcessor.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
+    public static MatchedResponseProcessor.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
                                                                                                TestResource<Map<String, Object>> resource) {
         try {
-            return new MatchedResponseBodiesProcessor.MatchedResponse<>(validator, resource);
+            return new MatchedResponseProcessor.MatchedResponse<>(validator, resource);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
