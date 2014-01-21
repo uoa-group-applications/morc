@@ -74,7 +74,7 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
      * @param exchange The exchange containing the XML document to validate
      * @return true if the input and test resource are similar using XMLUnit's Diff.similar()
      */
-    public boolean matches(Exchange exchange) {
+    public synchronized boolean matches(Exchange exchange) {
         Document value;
         try {
             value = exchange.getIn().getBody(Document.class);
@@ -99,7 +99,7 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
         return validate(doc);
     }
 
-    public synchronized boolean validate(Document value) {
+    public boolean validate(Document value) {
         if (value == null) return false;
         try {
             Document expectedValue = getValue();
