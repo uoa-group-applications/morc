@@ -287,6 +287,8 @@ public class MockDefinition {
                 predicates.add(new MultiPredicate(partPredicates.get(i)));
             }
 
+            //getProcessors - for each processor, combine list, add repeated processor and return
+
             //ensure the number of partProcessors doesn't mess up the next expectation
             if (partProcessors.size() > expectedMessageCount && lenientSelector != null) {
                 logger.warn("The mock definition endpoint {} has {} expected messages but only {} message " +
@@ -316,6 +318,12 @@ public class MockDefinition {
                 if (mockFeederRoute != null)
                     throw new IllegalStateException("The mock feeder route for the endpoint " + endpointUri +
                             " can only be specified in the first mock definition part");
+
+                if (previousDefinitionPart.getAssertionTime() != assertionTime) {
+                    logger.warn("The assertion time for a subsequent mock definition part on endpoint {} has a different " +
+                            "assertion time - the first will be used and will apply to the endpoint as a whole",endpointUri);
+                    this.assertionTime = previousDefinitionPart.getAssertionTime();
+                }
 
                 //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
                 this.predicates.addAll(0, previousDefinitionPart.getPredicates());
