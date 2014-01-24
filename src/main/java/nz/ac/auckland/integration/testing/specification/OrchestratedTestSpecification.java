@@ -1,5 +1,7 @@
 package nz.ac.auckland.integration.testing.specification;
 
+import nz.ac.auckland.integration.testing.MorcBuilder;
+import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
@@ -107,8 +109,7 @@ public abstract class OrchestratedTestSpecification {
     protected abstract boolean sendInputInternal(ProducerTemplate template);
 
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
-    public static abstract class AbstractBuilder<Product extends OrchestratedTestSpecification,
-            Builder extends AbstractBuilder<Product, Builder>> {
+    public static class OrchestratedTestSpecificationBuilder<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
 
         private String description;
         private String endpointUri;
@@ -152,7 +153,7 @@ public abstract class OrchestratedTestSpecification {
         protected abstract Product buildInternal();
 
         @SuppressWarnings("unchecked")
-        public Product build() {
+        public OrchestratedTestSpecification build() {
             if (nextPartBuilder != null) {
                 nextPart = nextPartBuilder.build();
                 partCount = nextPart.getPartCount() + 1;
@@ -263,41 +264,6 @@ public abstract class OrchestratedTestSpecification {
             return (T) this.nextPartBuilder;
         }
 
-        public Builder addProcessors(Processor... processors) {
-            this.partProcessors.add(Arrays.asList(processors));
-            return self();
-        }
-
-        public Builder addProcessors(int index, Processor... processors) {
-            while (index > this.partProcessors.size()) {
-                this.partProcessors.add(new ArrayList<Processor>());
-            }
-            this.partProcessors.get(index).addAll(Arrays.asList(processors));
-            return self();
-        }
-
-        public Builder addRepeatedProcessor(Processor processor) {
-            repeatedProcessors.add(processor);
-            return self();
-        }
-
-        public Builder addPredicates(Predicate... predicates) {
-            this.partPredicates.add(Arrays.asList(predicates));
-            return self();
-        }
-
-        public Builder addPredicates(int index, Predicate... predicates) {
-            while (index > this.partPredicates.size()) {
-                this.partPredicates.add(new ArrayList<Predicate>());
-            }
-            this.partPredicates.get(index).addAll(Arrays.asList(predicates));
-            return self();
-        }
-
-        public Builder addRepeatedPredicate(Predicate predicate) {
-            repeatedPredicates.add(predicate);
-            return self();
-        }
     }
 
     @SuppressWarnings("unchecked")
