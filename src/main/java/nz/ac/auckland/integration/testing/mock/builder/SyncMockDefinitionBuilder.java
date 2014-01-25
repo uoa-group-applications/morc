@@ -7,10 +7,7 @@ import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder<Builder, T>, T>
         extends ContentMockDefinitionBuilder<Builder> {
@@ -24,12 +21,9 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
         super(endpointUri);
     }
 
-    /**
-     * @param providedResponseBody The body that should be returned back to the client
-     */
     @SafeVarargs
-    public final Builder responseBody(T... providedResponseBody) {
-        this.responseBodyProcessors.addAll(Arrays.asList(providedResponseBody));
+    public final Builder responseBody(T... providedResponseBodies) {
+        Collections.addAll(responseBodyProcessors,providedResponseBodies);
         return self();
     }
 
@@ -54,7 +48,7 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
      */
     @SafeVarargs
     public final Builder responseHeaders(Map<String, Object>... providedResponseHeaders) {
-        this.responseHeadersProcessors.addAll(Arrays.asList(providedResponseHeaders));
+        Collections.addAll(responseHeadersProcessors, providedResponseHeaders);
         return self();
     }
 
