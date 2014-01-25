@@ -101,7 +101,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
             finalProcessors.add(new MultiProcessor(repeatedProcessors));
         }
 
-        return Collections.unmodifiableList(finalProcessors);
+        return finalProcessors;
     }
 
     protected List<Predicate> getPredicates() {
@@ -126,10 +126,10 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
             finalPredicates.add(new MultiPredicate(repeatedPredicates));
         }
 
-        return Collections.unmodifiableList(finalPredicates);
+        return finalPredicates;
     }
 
-    protected String getEndpointUri() {
+    public String getEndpointUri() {
         return this.endpointUri;
     }
 
