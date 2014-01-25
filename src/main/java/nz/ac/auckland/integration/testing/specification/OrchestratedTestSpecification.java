@@ -252,6 +252,10 @@ public class OrchestratedTestSpecification {
             return (T) this.nextPartBuilder;
         }
 
+        protected Map<String,MockDefinition> getMockExpectations() {
+            return Collections.unmodifiableMap(mockExpectations);
+        }
+
     }
 
     @SuppressWarnings("unchecked")

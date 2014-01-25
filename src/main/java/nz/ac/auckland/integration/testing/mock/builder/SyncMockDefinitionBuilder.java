@@ -1,8 +1,8 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
-import nz.ac.auckland.integration.testing.processor.ResponseBodyProcessor;
-import nz.ac.auckland.integration.testing.processor.ResponseHeadersProcessor;
+import nz.ac.auckland.integration.testing.processor.BodyProcessor;
+import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,10 +74,10 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
 
         for (int i = 0; i < responseProcessorCount; i++) {
             if (i < responseBodyProcessors.size())
-                addProcessors(i, new ResponseBodyProcessor(responseBodyProcessors.get(i)));
+                addProcessors(i, new BodyProcessor(responseBodyProcessors.get(i)));
 
             if (i < responseHeadersProcessors.size())
-                addProcessors(i, new ResponseHeadersProcessor(responseHeadersProcessors.get(i)));
+                addProcessors(i, new HeadersProcessor(responseHeadersProcessors.get(i)));
         }
         return super.build(previousDefinitionPart);
     }

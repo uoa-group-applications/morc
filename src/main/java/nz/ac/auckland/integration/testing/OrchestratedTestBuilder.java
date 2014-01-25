@@ -14,7 +14,7 @@ import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockDefinitionBu
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.utility.XPathValidator;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import nz.ac.auckland.integration.testing.predicate.Validator;
@@ -70,8 +70,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    protected SyncOrchestratedTestSpecification.Builder syncTest(String description, String endpointUri) {
-        SyncOrchestratedTestSpecification.Builder builder = new SyncOrchestratedTestSpecification
+    protected SyncOrchestratedTestBuilder.Builder syncTest(String description, String endpointUri) {
+        SyncOrchestratedTestBuilder.Builder builder = new SyncOrchestratedTestBuilder
                 .Builder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
@@ -80,8 +80,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A way of specifying that the next endpoint in the specification list should be synchronous
      */
-    protected Class<SyncOrchestratedTestSpecification.Builder> syncTest() {
-        return SyncOrchestratedTestSpecification.Builder.class;
+    protected Class<SyncOrchestratedTestBuilder.Builder> syncTest() {
+        return SyncOrchestratedTestBuilder.Builder.class;
     }
 
     /**
