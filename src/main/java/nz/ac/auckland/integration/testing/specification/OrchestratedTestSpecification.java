@@ -1,19 +1,15 @@
 package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.MorcBuilder;
-import nz.ac.auckland.integration.testing.OrchestratedTest;
 import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.apache.camel.*;
-import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -46,21 +42,21 @@ public class OrchestratedTestSpecification {
     }
 
     public Queue<MockDefinition> getEndpointOrdering() {
-        return this.endpointOrdering;
+        return endpointOrdering;
     }
 
     /**
      * @return The number of parts involved in this specification, where each part is a specification in itself
      */
     public int getPartCount() {
-        return this.partCount;
+        return partCount;
     }
 
     /**
      * @return The next specification in the line for this test (recursive)
      */
     public OrchestratedTestSpecification getNextPart() {
-        return this.nextPart;
+        return nextPart;
     }
 
     /**
@@ -75,28 +71,21 @@ public class OrchestratedTestSpecification {
      *         Only applies with asynchronous/partially ordered/unreceived expectations
      */
     public long getAssertTime() {
-        return this.assertTime;
-    }
-
-    /**
-     * @return The endpoint overrides that modify the receiving endpoint
-     */
-    public Collection<EndpointOverride> getEndpointOverrides() {
-        return Collections.unmodifiableCollection(this.endpointOverrides);
+        return assertTime;
     }
 
     /**
      * @return The number of times the message will be sent to the endpoint
      */
     public int getSendCount() {
-        return this.sendCount;
+        return sendCount;
     }
 
     /**
      * @return The interval in milliseconds between sending multiple messages
      */
     public long getSendInterval() {
-        return this.sendInterval;
+        return sendInterval;
     }
 
     public String getEndpointUri() {
@@ -111,6 +100,10 @@ public class OrchestratedTestSpecification {
         return processors;
     }
 
+    public Collection<EndpointOverride> getEndpointOverrides() {
+        return endpointOverrides;
+    }
+
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
     public static class OrchestratedTestSpecificationBuilder<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
 
@@ -118,7 +111,6 @@ public class OrchestratedTestSpecification {
         private Map<String,MockDefinition> mockExpectations = new HashMap<>();
         private Queue<String> endpointOrdering = new LinkedList<>();
         private long assertTime = 15000l;
-        private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
         private int sendCount = 1;
         private long sendInterval = 1000l;
         private int partCount = 1;
@@ -134,10 +126,6 @@ public class OrchestratedTestSpecification {
         public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
             super (endpointUri);
             this.description = description;
-
-            //we don't want to use POJO to receive messages
-            endpointOverrides.add(new CxfEndpointOverride());
-            endpointOverrides.add(new UrlConnectionOverride());
         }
 
 
@@ -194,14 +182,6 @@ public class OrchestratedTestSpecification {
                 addExpectation(expectationBuilder);
             }
 
-            return self();
-        }
-
-        /**
-         * @param override An override used for modifying an endpoint for *receiving* a message
-         */
-        public Builder addEndpointOverride(EndpointOverride override) {
-            endpointOverrides.add(override);
             return self();
         }
 
@@ -264,7 +244,7 @@ public class OrchestratedTestSpecification {
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.entrySet();
         this.assertTime = builder.assertTime;
-        this.endpointOverrides = builder.endpointOverrides;
+        this.endpointOverrides = builder.getEndpointOverrides();
         this.sendCount = builder.sendCount;
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;

@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.testing.mock;
 
 import nz.ac.auckland.integration.testing.MorcBuilder;
+import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.predicate.MultiPredicate;
 import nz.ac.auckland.integration.testing.processor.MultiProcessor;
 import org.apache.camel.Exchange;
@@ -14,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -57,6 +55,7 @@ public class MockDefinition {
     private Predicate lenientSelector;
     private LenientProcessor lenientProcessor;
     private long assertionTime;
+    private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
     public enum OrderingType {
         TOTAL,
@@ -115,6 +114,10 @@ public class MockDefinition {
 
     public long getAssertionTime() {
         return assertionTime;
+    }
+
+    public Collection<EndpointOverride> getEndpointOverrides() {
+        return endpointOverrides;
     }
 
     //public static class MockDefinitionBuilder<Builder extends MockDefinitionBuilder<Builder>> {
@@ -315,7 +318,7 @@ public class MockDefinition {
         this.lenientProcessor = builder.lenientProcessor;
         this.lenientSelector = builder.lenientSelector;
         this.assertionTime = builder.assertionTime;
-
+        this.endpointOverrides = builder.getEndpointOverrides();
         this.mockFeederRoute = builder.mockFeederRoute;
     }
 }
