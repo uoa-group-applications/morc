@@ -222,6 +222,11 @@ public class MockDefinition {
                 logger.warn("An endpoint uri {} mock definition part is marked as lenient but predicates have been " +
                         "provided - these will be ignored",getEndpointUri());
 
+            if (lenientSelector == null) {
+                predicates = getPredicates(expectedMessageCount);
+                processors = getProcessors(expectedMessageCount);
+            }
+
             if (previousDefinitionPart != null) {
                 if (!previousDefinitionPart.getEndpointUri().equals(getEndpointUri()))
                     throw new IllegalStateException("The endpoints do not match for merging mock definition endpoint " +
@@ -250,10 +255,7 @@ public class MockDefinition {
 
                 //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
                 if (lenientSelector == null) {
-                    predicates = getPredicates(expectedMessageCount);
                     predicates.addAll(0, previousDefinitionPart.getPredicates());
-
-                    processors = getProcessors(expectedMessageCount);
                     processors.addAll(0, previousDefinitionPart.getProcessors());
                 } else {
                     predicates = previousDefinitionPart.getPredicates();
