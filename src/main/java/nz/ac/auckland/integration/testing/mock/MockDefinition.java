@@ -222,8 +222,13 @@ public class MockDefinition {
                 logger.warn("An endpoint uri {} mock definition part is marked as lenient but predicates have been " +
                         "provided - these will be ignored",getEndpointUri());
 
-            predicates = getPredicates(expectedMessageCount);
-            processors = getProcessors(expectedMessageCount);
+            if (lenientSelector == null) {
+                predicates = getPredicates(expectedMessageCount);
+                processors = getProcessors(expectedMessageCount);
+            } else {
+                predicates = new ArrayList<>();
+                processors = new ArrayList<>();
+            }
 
             if (previousDefinitionPart != null) {
                 if (!previousDefinitionPart.getEndpointUri().equals(getEndpointUri()))
