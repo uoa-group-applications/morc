@@ -7,18 +7,19 @@ import groovy.text.TemplateEngine;
 import nz.ac.auckland.integration.testing.mock.builder.*;
 import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
 import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
+import nz.ac.auckland.integration.testing.processor.BodyProcessor;
+import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
 import nz.ac.auckland.integration.testing.processor.MatchedResponseProcessor;
 import nz.ac.auckland.integration.testing.mock.*;
 import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockDefinitionBuilder;
 import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockDefinitionBuilder;
 import nz.ac.auckland.integration.testing.resource.*;
-import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.utility.XPathValidator;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
-import nz.ac.auckland.integration.testing.predicate.Validator;
-import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
@@ -30,13 +31,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 
-@RunWith(value = OrchestratedParameterized.class)
-public abstract class OrchestratedTestBuilder extends OrchestratedTest {
+@RunWith(value = MorcParameterized.class)
+public abstract class MorcTestBuilder extends MorcTest {
 
-    private List<OrchestratedTestSpecification.AbstractBuilder> specificationBuilders = new ArrayList<>();
+    private List<OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder> specificationBuilders = new ArrayList<>();
     private static XmlUtilities xmlUtilities = new XmlUtilities();
 
     public static final QName SOAPFAULT_CLIENT = qname("http://schemas.xmlsoap.org/soap/envelope/", "Client");
@@ -49,9 +51,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
-    protected AsyncOrchestratedTestSpecification.Builder asyncTest(String description, String endpointUri) {
-        AsyncOrchestratedTestSpecification.Builder builder = new AsyncOrchestratedTestSpecification
-                .Builder(description, endpointUri);
+    protected AsyncOrchestratedTestBuilder asyncTest(String description, String endpointUri) {
+        AsyncOrchestratedTestBuilder builder = new AsyncOrchestratedTestBuilder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
     }
@@ -61,8 +62,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A way of specifying that the next endpoint in the specification list should be asynchronous
      */
-    protected Class<AsyncOrchestratedTestSpecification.Builder> asyncTest() {
-        return AsyncOrchestratedTestSpecification.Builder.class;
+    protected Class<AsyncOrchestratedTestBuilder> asyncTest() {
+        return AsyncOrchestratedTestBuilder.class;
     }
 
     /**
@@ -70,9 +71,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param description A description for the test specification that clearly identifies it
      * @return An synchronous test specification builder with the endpoint uri and description configured
      */
-    protected SyncOrchestratedTestBuilder.Builder syncTest(String description, String endpointUri) {
-        SyncOrchestratedTestBuilder.Builder builder = new SyncOrchestratedTestBuilder
-                .Builder(description, endpointUri);
+    protected SyncOrchestratedTestBuilder syncTest(String description, String endpointUri) {
+        SyncOrchestratedTestBuilder builder = new SyncOrchestratedTestBuilder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
     }
@@ -80,8 +80,8 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A way of specifying that the next endpoint in the specification list should be synchronous
      */
-    protected Class<SyncOrchestratedTestBuilder.Builder> syncTest() {
-        return SyncOrchestratedTestBuilder.Builder.class;
+    protected Class<SyncOrchestratedTestBuilder> syncTest() {
+        return SyncOrchestratedTestBuilder.class;
     }
 
     /**
@@ -316,7 +316,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param path A path to a resource on the current classpath
      */
     public static URL classpath(String path) {
-        URL resource = OrchestratedTest.class.getResource(path);
+        URL resource = MorcTest.class.getResource(path);
         if (resource == null) throw new RuntimeException("The classpath resource could not be found: " + path);
 
         return resource;
@@ -338,39 +338,12 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     }
 
     /**
-     * A convenience method for specifying matched input->output answers for expectations where matches are removed from the pool
-     */
-    @SuppressWarnings("unchecked")
-    public static MatchedResponseProcessor matchedResponse(boolean removeOnMatch,
-                                                             MatchedResponseProcessor.MatchedResponse... responses) {
-        return new MatchedResponseProcessor(removeOnMatch, responses);
-    }
-
-    /**
-     * A convenience method for specifying matched input headers -> output headers for expectations
-     */
-    @SafeVarargs
-    public static MatchedResponseProcessor<Map<String, Object>> matchedHeadersResponse(
-            MatchedResponseProcessor.MatchedResponse<Map<String, Object>>... responses) {
-        return new MatchedResponseProcessor<>(responses);
-    }
-
-    /**
-     * A convenience method for specifying matched input headers -> output headers for expectations that are removed rom the pool
-     */
-    @SafeVarargs
-    public static MatchedResponseProcessor<Map<String, Object>> matchedHeadersResponse(boolean removeOnMatch,
-                                                                                         MatchedResponseProcessor.MatchedResponse<Map<String, Object>>... responses) {
-        return new MatchedResponseProcessor<>(removeOnMatch, responses);
-    }
-
-    /**
      * A convenience method for specifying matched input validators to outputs
      */
     @SuppressWarnings("unchecked")
-    public static MatchedResponseProcessor.MatchedResponse answer(Validator validator, TestResource resource) {
+    public static MatchedResponseProcessor.MatchedResponse answer(Predicate predicate, TestResource resource) {
         try {
-            return new MatchedResponseProcessor.MatchedResponse(validator, resource);
+            return new MatchedResponseProcessor.MatchedResponse(predicate, new BodyProcessor(resource));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -379,10 +352,9 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * A convenience method for specifying matched input header validators to output headers
      */
-    public static MatchedResponseProcessor.MatchedResponse<Map<String, Object>> headerAnswer(Validator validator,
-                                                                                               TestResource<Map<String, Object>> resource) {
+    public static MatchedResponseProcessor.MatchedResponse headerAnswer(Predicate predicate,TestResource<Map<String, Object>> resource) {
         try {
-            return new MatchedResponseProcessor.MatchedResponse<>(validator, resource);
+            return new MatchedResponseProcessor.MatchedResponse(predicate, new HeadersProcessor(resource.getValue()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -507,43 +479,36 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static HttpErrorMockDefinitionBuilder.Builder httpErrorExpectation(String endpointUri) {
-        return new HttpErrorMockDefinitionBuilder.Builder(endpointUri);
+    public static HttpErrorMockDefinitionBuilder httpErrorExpectation(String endpointUri) {
+        return new HttpErrorMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that the mock should listen to; should follow the Apache Camel URI format
      */
-    public static SoapFaultMockDefinitionBuilder.Builder soapFaultExpectation(String endpointUri) {
-        return new SoapFaultMockDefinitionBuilder.Builder(endpointUri);
+    public static SoapFaultMockDefinitionBuilder soapFaultExpectation(String endpointUri) {
+        return new SoapFaultMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static ExceptionMockDefinitionBuilder.Builder exceptionExpectation(String endpointUri) {
-        return new ExceptionMockDefinitionBuilder.Builder(endpointUri);
+    public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri) {
+        return new ExceptionMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      * @param exception   The exception that should be instantiated and thrown as part of the expectation
      */
-    public static ExceptionMockDefinitionBuilder.Builder exceptionExpectation(String endpointUri,
+    public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception) {
         try {
-            exception.getConstructor();
-        } catch (NoSuchMethodException e) {
+            Constructor<? extends Exception> constructor = exception.getConstructor();
+            return new ExceptionMockDefinitionBuilder(endpointUri).exception(constructor.newInstance());
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalArgumentException(e);
         }
-
-        return new ExceptionMockDefinitionBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
-            @Override
-            public Exception response(Exchange exchange) throws Exception {
-                Constructor<? extends Exception> constructor = exception.getConstructor();
-                return constructor.newInstance();
-            }
-        });
     }
 
     /**
@@ -552,37 +517,30 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
      * @param message
      * @return
      */
-    public static ExceptionMockDefinitionBuilder.Builder exceptionExpectation(String endpointUri,
+    public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri,
                                                                         final Class<? extends Exception> exception,
                                                                         final String message) {
         try {
-            exception.getConstructor(String.class);
-        } catch (NoSuchMethodException e) {
+            Constructor<? extends Exception> constructor = exception.getConstructor(String.class);
+            return new ExceptionMockDefinitionBuilder(endpointUri).exception(constructor.newInstance(message));
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new IllegalArgumentException(e);
         }
-
-        return new ExceptionMockDefinitionBuilder.Builder(endpointUri).exceptionResponse(new Answer<Exception>() {
-            @Override
-            public Exception response(Exchange exchange) throws Exception {
-                Constructor<? extends Exception> constructor = exception.getConstructor(String.class);
-                return constructor.newInstance(message);
-            }
-        });
     }
 
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static SyncMockExpectationBuilder.Builder syncExpectation(String endpointUri) {
-        return new SyncMockExpectationBuilder.Builder(endpointUri);
+    public static SyncMockDefinitionBuilder syncExpectation(String endpointUri) {
+        return new SyncMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public static UnreceivedMockExpectation.Builder unreceivedExpectation(String endpointUri) {
-        return new UnreceivedMockExpectation.Builder(endpointUri);
+    public static UnreceivedMockDefinitionBuilder unreceivedExpectation(String endpointUri) {
+        return new UnreceivedMockDefinitionBuilder(endpointUri);
     }
 
     public static class HeaderValue {
@@ -598,15 +556,15 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
     /**
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
-    public static HttpErrorPredicate httpExceptionResponse(Validator validator) {
-        return new HttpErrorPredicate.Builder().responseBodyValidator(validator).build();
+    public static HttpErrorPredicate httpExceptionResponse(Predicate predicate) {
+        return new HttpErrorPredicate.Builder().bodyValidator(predicate).build();
     }
 
     /**
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
-    public static HttpErrorPredicate httpExceptionResponse(int statusCode, Validator validator) {
-        return new HttpErrorPredicate.Builder().responseBodyValidator(validator).statusCode(statusCode).build();
+    public static HttpErrorPredicate httpExceptionResponse(int statusCode, Predicate predicate) {
+        return new HttpErrorPredicate.Builder().bodyValidator(predicate).statusCode(statusCode).build();
     }
 
     /**
@@ -676,7 +634,7 @@ public abstract class OrchestratedTestBuilder extends OrchestratedTest {
 
         List<OrchestratedTestSpecification> specifications = new ArrayList<>();
 
-        for (OrchestratedTestSpecification.AbstractBuilder builder : specificationBuilders) {
+        for (OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder builder : specificationBuilders) {
             OrchestratedTestSpecification spec = builder.build();
             specifications.add(spec);
         }
