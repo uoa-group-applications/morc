@@ -20,13 +20,13 @@ import java.util.List;
  * A heavily modified version of JUnit's Parameterized class that
  * assumes there's a public static void configure() method available
  * to configure a set of test specifications which will then be retrieved
- * using the getSpecifications method of OrchestratedTest
+ * using the getSpecifications method of MorcTest
  * <p/>
  * Any copyright for similar code will be under the EPL license for JUnit
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class OrchestratedParameterized extends Suite {
+public class MorcParameterized extends Suite {
 
     private class TestClassRunnerForParameters extends BlockJUnit4ClassRunner {
         private final OrchestratedTestSpecification specification;
@@ -43,7 +43,7 @@ public class OrchestratedParameterized extends Suite {
         @Override
         public Object createTest() throws Exception {
             Constructor co = getTestClass().getJavaClass().getConstructor();
-            OrchestratedTest test = (OrchestratedTest) co.newInstance();
+            MorcTest test = (MorcTest) co.newInstance();
             test.setSpecification(specification);
 
             return test;
@@ -78,10 +78,10 @@ public class OrchestratedParameterized extends Suite {
     private final ArrayList<Runner> runners = new ArrayList<Runner>();
 
     @SuppressWarnings("unchecked")
-    public OrchestratedParameterized(Class<? extends OrchestratedTestBuilder> klass) throws Throwable {
+    public MorcParameterized(Class<? extends MorcTestBuilder> klass) throws Throwable {
         super(klass, Collections.<Runner>emptyList());
 
-        Method getSpecifications = OrchestratedTestBuilder.class.getDeclaredMethod("getSpecifications");
+        Method getSpecifications = MorcTestBuilder.class.getDeclaredMethod("getSpecifications");
         getSpecifications.setAccessible(true);
         List<OrchestratedTestSpecification> specifications = (List) getSpecifications.invoke(klass.newInstance());
 

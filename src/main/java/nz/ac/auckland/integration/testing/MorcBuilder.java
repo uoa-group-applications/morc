@@ -1,5 +1,8 @@
 package nz.ac.auckland.integration.testing;
 
+import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
+import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
+import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
 import nz.ac.auckland.integration.testing.predicate.MultiPredicate;
 import nz.ac.auckland.integration.testing.processor.MultiProcessor;
 import org.apache.camel.Predicate;
@@ -10,15 +13,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
 
     private String endpointUri;
     private static final Logger logger = LoggerFactory.getLogger(MorcBuilder.class);
+
+    private List<List<Processor>> processors = new ArrayList<>();
+    private List<List<Predicate>> predicates = new ArrayList<>();
+
+    private List<Processor> repeatedProcessors = new ArrayList<>();
+    private List<Predicate> repeatedPredicates = new ArrayList<>();
+
+    private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
     public MorcBuilder(String endpointUri) {
         try {
@@ -26,13 +34,11 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
         } catch (URISyntaxException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+
+        //we don't want to use POJO to receive messages
+        endpointOverrides.add(new CxfEndpointOverride());
+        endpointOverrides.add(new UrlConnectionOverride());
     }
-
-    private List<List<Processor>> processors = new ArrayList<>();
-    private List<List<Predicate>> predicates = new ArrayList<>();
-
-    private List<Processor> repeatedProcessors = new ArrayList<>();
-    private List<Predicate> repeatedPredicates = new ArrayList<>();
 
     public Builder addProcessors(Processor... processors) {
         this.processors.add(Arrays.asList(processors));
@@ -127,6 +133,21 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
         }
 
         return finalPredicates;
+    }
+
+    /**
+     * @param override An override used for modifying an endpoint for *receiving* a message
+     */
+    public Builder addEndpointOverride(EndpointOverride override) {
+        endpointOverrides.add(override);
+        return self();
+    }
+
+    /**
+     * @return The endpoint overrides that modify the sending endpoint
+     */
+    public Collection<EndpointOverride> getEndpointOverrides() {
+        return Collections.unmodifiableCollection(this.endpointOverrides);
     }
 
     public String getEndpointUri() {
