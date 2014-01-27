@@ -17,29 +17,29 @@ import org.slf4j.LoggerFactory;
  */
 public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilder<ExceptionMockDefinitionBuilder> {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionMockDefinitionBuilder.class);
-    private Exception exceptionResponse;
+    private Exception exception;
 
     public ExceptionMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }
 
-    public ExceptionMockDefinitionBuilder exceptionResponse(Exception exception) {
-        this.exceptionResponse = exception;
+    public ExceptionMockDefinitionBuilder exception(Exception exception) {
+        this.exception = exception;
         return self();
     }
 
     @Override
     public MockDefinition build(MockDefinition previousDefinitionPart) {
-        if (exceptionResponse == null) {
+        if (exception == null) {
             logger.info("No exception response provided for mock definition endpoint {}, a standard Exception has been used",
                     getEndpointUri());
-            exceptionResponse = new Exception();
+            exception = new Exception();
         }
 
         addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                exchange.setException(exceptionResponse);
+                exchange.setException(exception);
             }
         });
         return super.build(previousDefinitionPart);
