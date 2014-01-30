@@ -147,7 +147,6 @@ public class MorcTest extends CamelSpringTestSupport {
             Set<MockDefinition> mockDefinitions = spec.getMockDefinitions();
 
             MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(),MockEndpoint.class);
-            mockEndpoints.add(orderCheckMock);
             orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
 
             //set up the mocks
@@ -205,7 +204,7 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 mockDefinition.getMockFeederRoute()
                         .routeId(mockDefinition.getEndpointUri())
-                        .wireTap("mock:foo")
+                        .wireTap(orderCheckMock.getEndpointUri())
                         .log(LoggingLevel.DEBUG, "Endpoint ${routeId} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
@@ -249,6 +248,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
                     mockEndpoint.assertIsSatisfied();
+
+            orderCheckMock.assertIsSatisfied();
 
             //We now need to check that messages have arrived in the correct order
             Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes = new ArrayList<>(spec.getEndpointNodesOrdering());
