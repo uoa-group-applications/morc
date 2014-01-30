@@ -146,7 +146,9 @@ public class MorcTest extends CamelSpringTestSupport {
         try {
             Set<MockDefinition> mockDefinitions = spec.getMockDefinitions();
 
-            EndpointOrderValidator orderChecker = new EndpointOrderValidator();
+            MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(),MockEndpoint.class);
+            mockEndpoints.add(orderCheckMock);
+            //orderCheckMock.expectedMessageCount(...);
 
             //set up the mocks
             for (final MockDefinition mockDefinition : mockDefinitions) {
@@ -203,6 +205,7 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 mockDefinition.getMockFeederRoute()
                         .routeId(mockDefinition.getEndpointUri())
+                        .wireTap("mock:foo")
                         .log(LoggingLevel.DEBUG, "Endpoint ${routeId} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
@@ -247,29 +250,18 @@ public class MorcTest extends CamelSpringTestSupport {
             for (MockEndpoint mockEndpoint : mockEndpoints)
                     mockEndpoint.assertIsSatisfied();
 
-            //order checker assert is valid todo replace with with an interceptor + mock
-            //todo this needs to handle partial and unordered!
+            //We now need to check that messages have arrived in the correct order
+            Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes = new ArrayList<>(spec.getEndpointNodesOrdering());
+            for (Exchange e : orderCheckMock.getExchanges()) {
+                OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes,e.getFromEndpoint().getEndpointUri());
 
-            /*
-            todo we might be able to sort out direct-direct problem now using separate mocks
-            Set unordered
-            for expectedEndpointUri mockDefinitionEndpointUri
-                while (exchange)
-                    if exchange.getUri == mockDefinitionEndpointUri break
-                    if (expectedEndpointUri.UNORDERED && unordered.remove(exchange)) break
-                    if !expectedEndpointUri.TOTAL => unordered.add(exchange); continue
+                //this means we don't expect to have seen the message at this point
+                if (node == null)
+                    throw new AssertionError("");
 
-                    throw new exception("yolo")
-
-            for each unordered
-                check remaining exchanges
-
-             */
-
-            for (MockDefinition mockDefinition : spec.getEndpointOrdering()) {
-                String receivedEndpointUri = orderChecker.getEndpointQueue().poll().getEndpointUri();
-                if (!mockDefinition.getEndpointUri().equals(receivedEndpointUri))
-                    throw new AssertionError("A message arrived in the wrong order to the endpoint " + receivedEndpointUri);
+                //we've encountered a message to this endpoint and should remove it from the set
+                endpointNodes.remove(node);
+                endpointNodes.addAll(node.getChildrenNodes());
             }
 
         } finally {
@@ -280,21 +272,15 @@ public class MorcTest extends CamelSpringTestSupport {
                 mockEndpoint.reset();
         }
     }
-}
 
-class EndpointOrderValidator implements Processor {
+    private OrchestratedTestSpecification.EndpointNode findEndpointNodeMatch(Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes, String endpointUri) {
+        for (OrchestratedTestSpecification.EndpointNode node : endpointNodes) {
+            if (node.getEndpointUri().equals(endpointUri)) return node;
+        }
 
-    private Queue<Endpoint> endpointQueue = new ConcurrentLinkedQueue<>();
-
-    @Override
-    public void process(Exchange exchange) throws Exception {
-        endpointQueue.add(exchange.getFromEndpoint());
+        //not found, which should cause an exception
+        return null;
     }
-
-    Queue<Endpoint> getEndpointQueue() {
-        return endpointQueue;
-    }
-
 }
 
 class MessagePublishDataSet implements DataSet {

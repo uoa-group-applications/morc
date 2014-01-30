@@ -24,7 +24,7 @@ public class OrchestratedTestSpecification {
     private final Set<MockDefinition> mockDefinitions;
     private long assertTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
-    private List<MockDefinition> endpointOrdering;
+    private Collection<EndpointNode> endpointNodesOrdering;
     private int sendCount;
     private long sendInterval;
     private int partCount;
@@ -39,8 +39,8 @@ public class OrchestratedTestSpecification {
         return description;
     }
 
-    public List<MockDefinition> getEndpointOrdering() {
-        return Collections.unmodifiableList(endpointOrdering);
+    public Collection<EndpointNode> getEndpointNodesOrdering() {
+        return Collections.unmodifiableCollection(endpointNodesOrdering);
     }
 
     /**
@@ -107,13 +107,14 @@ public class OrchestratedTestSpecification {
 
         private String description;
         private Map<String,MockDefinition> mockExpectations = new HashMap<>();
-        private List<String> endpointOrdering = new ArrayList<>();
         private long assertTime = 15000l;
         private int sendCount = 1;
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
         //todo: add time to wait for all requests to be sent
+        private Collection<EndpointNode> endpointNodesOrdering = new ArrayList<>();
+        private EndpointNode currentTotalOrderLeafEndpoint;
 
         //final list of single processors and predicates
         private List<Processor> processors;
@@ -164,8 +165,35 @@ public class OrchestratedTestSpecification {
             int mergedEndpointExpectationMessageCount =
                     mergedExpectation.getExpectedMessageCount() - currentEndpointExpectationMessageCount;
 
-            for (int i = 0; i < mergedEndpointExpectationMessageCount; i++)
-                endpointOrdering.add(mergedExpectation.getEndpointUri());
+            //we need to build a tree based on ordering types which will be expanded to a set during validation
+
+            //endpoints with no relative ordering are always in the base set
+            if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.NONE) {
+                //these will always be in the accepted set
+                for (int i = 0; i < mergedEndpointExpectationMessageCount; i++)
+                    endpointNodesOrdering.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+            }
+
+            //endpoints partially ordered to other endpoints will be added to the set after they are encountered
+            //by a totally ordered endpoint unless they occur at the start of an expectation builder
+            if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.PARTIAL) {
+                for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
+                    if (currentTotalOrderLeafEndpoint == null) endpointNodesOrdering.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                    else currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                }
+            }
+
+            //only TOTAL ordered can have children and will create order (a tree structure) which is added to the set
+            //on endpoint ordering matches
+            if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.TOTAL) {
+                for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
+                    EndpointNode nextTotalOrderedNode = new EndpointNode(endpointExpectation.getEndpointUri());
+                    if (currentTotalOrderLeafEndpoint == null) endpointNodesOrdering.add(nextTotalOrderedNode);
+                    else currentTotalOrderLeafEndpoint.childrenNodes.add(nextTotalOrderedNode);
+
+                    currentTotalOrderLeafEndpoint = nextTotalOrderedNode;
+                }
+            }
 
             mockExpectations.put(mockDefinitionBuilder.getEndpointUri(), mergedExpectation);
 
@@ -247,9 +275,26 @@ public class OrchestratedTestSpecification {
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
         this.nextPart = builder.nextPart;
-        this.endpointOrdering = builder.endpointOrdering;
+        this.endpointNodesOrdering = builder.endpointNodesOrdering;
         this.processors = builder.processors;
         this.predicates = builder.predicates;
+    }
+
+    public static class EndpointNode {
+        private String endpointUri;
+        private Collection<EndpointNode> childrenNodes = new ArrayList<>();
+
+        public EndpointNode(String endpointUri) {
+            this.endpointUri = endpointUri;
+        }
+
+        public Collection<EndpointNode> getChildrenNodes() {
+            return Collections.unmodifiableCollection(childrenNodes);
+        }
+
+        public String getEndpointUri() {
+            return this.endpointUri;
+        }
     }
 }
 
