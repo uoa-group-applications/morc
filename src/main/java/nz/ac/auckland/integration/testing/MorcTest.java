@@ -140,12 +140,11 @@ public class MorcTest extends CamelSpringTestSupport {
 
         Set<MockEndpoint> mockEndpoints = new HashSet<>();
         Set<RouteDefinition> createdRoutes = new HashSet<>();
+        MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
+        orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
 
         try {
             Set<MockDefinition> mockDefinitions = spec.getMockDefinitions();
-
-            MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
-            orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
 
             //set up the mocks
             for (final MockDefinition mockDefinition : mockDefinitions) {
@@ -269,6 +268,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
                 mockEndpoint.reset();
+
+            orderCheckMock.reset();
         }
     }
 
