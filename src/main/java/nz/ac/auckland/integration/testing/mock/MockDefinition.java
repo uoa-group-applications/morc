@@ -2,20 +2,18 @@ package nz.ac.auckland.integration.testing.mock;
 
 import nz.ac.auckland.integration.testing.MorcBuilder;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.predicate.MultiPredicate;
-import nz.ac.auckland.integration.testing.processor.MultiProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -223,7 +221,7 @@ public class MockDefinition {
 
             if (lenientSelector != null && getPredicates().size() > 0)
                 logger.warn("An endpoint uri {} mock definition part is marked as lenient but predicates have been " +
-                        "provided - these will be ignored",getEndpointUri());
+                        "provided - these will be ignored", getEndpointUri());
 
             if (lenientSelector == null) {
                 predicates = getPredicates(expectedMessageCount);
@@ -252,7 +250,7 @@ public class MockDefinition {
 
                 if (previousDefinitionPart.getAssertionTime() != assertionTime) {
                     logger.warn("The assertion time for a subsequent mock definition part on endpoint {} has a different " +
-                            "assertion time - the first will be used and will apply to the endpoint as a whole",getEndpointUri());
+                            "assertion time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
                     this.assertionTime = previousDefinitionPart.getAssertionTime();
                 }
 

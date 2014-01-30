@@ -12,7 +12,7 @@ public class HeadersProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(HeadersProcessor.class);
 
-    private Map<String,Object> responseHeaders = new HashMap<>();
+    private Map<String, Object> responseHeaders = new HashMap<>();
 
     public HeadersProcessor(Map<String, Object> responseHeaders) {
         this.responseHeaders = responseHeaders;

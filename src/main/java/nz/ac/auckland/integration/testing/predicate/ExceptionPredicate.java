@@ -31,8 +31,8 @@ public class ExceptionPredicate implements Predicate {
     }
 
     /**
-     * @param expectedExceptionClass    The class of exception we expect to validate against
-     * @param message                   The message this instance should be returning
+     * @param expectedExceptionClass The class of exception we expect to validate against
+     * @param message                The message this instance should be returning
      */
     public ExceptionPredicate(Class<? extends Exception> expectedExceptionClass, String message) {
         this(expectedExceptionClass);

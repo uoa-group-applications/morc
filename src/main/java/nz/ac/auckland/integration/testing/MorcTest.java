@@ -10,7 +10,6 @@ import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.model.RouteDefinition;
-import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -20,7 +19,6 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
@@ -146,7 +144,7 @@ public class MorcTest extends CamelSpringTestSupport {
         try {
             Set<MockDefinition> mockDefinitions = spec.getMockDefinitions();
 
-            MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(),MockEndpoint.class);
+            MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
             orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
 
             //set up the mocks
@@ -157,7 +155,7 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 mockEndpoint.setExpectedMessageCount(mockDefinition.getExpectedMessageCount());
                 for (int i = 0; i < mockDefinition.getProcessors().size(); i++)
-                    mockEndpoint.whenExchangeReceived(i,mockDefinition.getProcessors().get(i));
+                    mockEndpoint.whenExchangeReceived(i, mockDefinition.getProcessors().get(i));
 
                 //todo clear this up - assert times
                 mockEndpoint.setSleepForEmptyTest(mockDefinition.getAssertionTime());
@@ -197,7 +195,7 @@ public class MorcTest extends CamelSpringTestSupport {
                     mockDefinition.getMockFeederRoute()
                             .choice()
                             .when(mockDefinition.getLenientSelector())
-                            .log(LoggingLevel.DEBUG,"Endpoint ${routeId} received message for lenient processing")
+                            .log(LoggingLevel.DEBUG, "Endpoint ${routeId} received message for lenient processing")
                             .process(mockDefinition.getLenientProcessor())
                             .otherwise();
                 }
@@ -208,7 +206,7 @@ public class MorcTest extends CamelSpringTestSupport {
                         .log(LoggingLevel.DEBUG, "Endpoint ${routeId} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
-                        .log(LoggingLevel.DEBUG,"Endpoint ${routeId} returning back to client body: ${body}, headers: ${headers}");
+                        .log(LoggingLevel.DEBUG, "Endpoint ${routeId} returning back to client body: ${body}, headers: ${headers}");
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
                 for (EndpointOverride override : mockDefinition.getEndpointOverrides())
@@ -224,37 +222,37 @@ public class MorcTest extends CamelSpringTestSupport {
             sendingMockEndpoint.expectedMessageCount(spec.getProcessors().size());
             sendingMockEndpoint.expectedMessagesMatches(spec.getPredicates().toArray(new Predicate[spec.getPredicates().size()]));
             for (int i = 0; i < spec.getProcessors().size(); i++)
-                sendingMockEndpoint.whenExchangeReceived(i,spec.getProcessors().get(i));
+                sendingMockEndpoint.whenExchangeReceived(i, spec.getProcessors().get(i));
 
             RouteDefinition publishRouteDefinition = new RouteDefinition();
 
-            publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(),new DataSetComponent(),
+            publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), new DataSetComponent(),
                     new MessagePublishDataSet(spec.getProcessors())))
-                .log(LoggingLevel.DEBUG,"Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
-                .to(spec.getEndpointUri())
-                .onCompletion()
-                    .log(LoggingLevel.DEBUG,"Received response to endpoint " + spec.getEndpointOverrides() + " body: ${body}, headers: ${headers}")
+                    .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
+                    .to(spec.getEndpointUri())
+                    .onCompletion()
+                    .log(LoggingLevel.DEBUG, "Received response to endpoint " + spec.getEndpointOverrides() + " body: ${body}, headers: ${headers}")
                     .to(sendingMockEndpoint)
-                    .executorService(context.getExecutorServiceManager().newSingleThreadExecutor(this,spec.getEndpointUri()))
-                .end();
+                    .executorService(context.getExecutorServiceManager().newSingleThreadExecutor(this, spec.getEndpointUri()))
+                    .end();
 
             createdRoutes.add(publishRouteDefinition);
 
             Endpoint targetEndpoint = getMandatoryEndpoint(spec.getEndpointUri());
             for (EndpointOverride override : spec.getEndpointOverrides())
-                    override.overrideEndpoint(targetEndpoint);
+                override.overrideEndpoint(targetEndpoint);
 
             sendingMockEndpoint.assertIsSatisfied();
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
-                    mockEndpoint.assertIsSatisfied();
+                mockEndpoint.assertIsSatisfied();
 
             orderCheckMock.assertIsSatisfied();
 
             //We now need to check that messages have arrived in the correct order
             Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes = new ArrayList<>(spec.getEndpointNodesOrdering());
             for (Exchange e : orderCheckMock.getExchanges()) {
-                OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes,e.getFromEndpoint().getEndpointUri());
+                OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes, e.getFromEndpoint().getEndpointUri());
 
                 //this means we don't expect to have seen the message at this point
                 if (node == null)
@@ -296,14 +294,17 @@ class MessagePublishDataSet implements DataSet {
     public void populateMessage(Exchange exchange, long messageIndex) throws Exception {
         processors.get((int) messageIndex).process(exchange);
     }
+
     @Override
     public long getSize() {
         return processors.size();
     }
+
     @Override
     public void assertMessageExpected(DataSetEndpoint endpoint, Exchange expected, Exchange actual, long messageIndex) throws Exception {
         throw new UnsupportedOperationException();
     }
+
     @Override
     public long getReportCount() {
         return processors.size();

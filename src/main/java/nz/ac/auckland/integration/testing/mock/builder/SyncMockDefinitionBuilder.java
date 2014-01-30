@@ -7,7 +7,10 @@ import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder<Builder, T>, T>
         extends ContentMockDefinitionBuilder<Builder> {
@@ -23,7 +26,7 @@ public class SyncMockDefinitionBuilder<Builder extends SyncMockDefinitionBuilder
 
     @SafeVarargs
     public final Builder responseBody(T... providedResponseBodies) {
-        Collections.addAll(responseBodyProcessors,providedResponseBodies);
+        Collections.addAll(responseBodyProcessors, providedResponseBodies);
         return self();
     }
 

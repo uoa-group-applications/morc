@@ -3,7 +3,8 @@ package nz.ac.auckland.integration.testing.specification;
 import nz.ac.auckland.integration.testing.MorcBuilder;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
-import org.apache.camel.*;
+import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,7 @@ public class OrchestratedTestSpecification {
     public static class OrchestratedTestSpecificationBuilder<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
 
         private String description;
-        private Map<String,MockDefinition> mockExpectations = new HashMap<>();
+        private Map<String, MockDefinition> mockExpectations = new HashMap<>();
         private long assertTime = 15000l;
         private int sendCount = 1;
         private long sendInterval = 1000l;
@@ -129,7 +130,7 @@ public class OrchestratedTestSpecification {
         private OrchestratedTestSpecificationBuilder nextPartBuilder;
 
         public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
-            super (endpointUri);
+            super(endpointUri);
             this.description = description;
         }
 
@@ -186,8 +187,10 @@ public class OrchestratedTestSpecification {
             //by a totally ordered endpoint unless they occur at the start of an expectation builder
             if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.PARTIAL) {
                 for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
-                    if (currentTotalOrderLeafEndpoint == null) endpointNodesOrdering.add(new EndpointNode(endpointExpectation.getEndpointUri()));
-                    else currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                    if (currentTotalOrderLeafEndpoint == null)
+                        endpointNodesOrdering.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                    else
+                        currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(endpointExpectation.getEndpointUri()));
                 }
             }
 
@@ -266,7 +269,7 @@ public class OrchestratedTestSpecification {
             return (T) this.nextPartBuilder;
         }
 
-        protected Map<String,MockDefinition> getMockExpectations() {
+        protected Map<String, MockDefinition> getMockExpectations() {
             return Collections.unmodifiableMap(mockExpectations);
         }
 

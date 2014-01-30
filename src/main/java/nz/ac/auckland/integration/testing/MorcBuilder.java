@@ -15,7 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.*;
 
-public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
+public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
     private String endpointUri;
     private static final Logger logger = LoggerFactory.getLogger(MorcBuilder.class);
@@ -86,15 +86,15 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
 
         if (expectedSize < localProcessors.size()) {
             logger.warn("The endpoint uri {} has been provided with more processors than there are expected messages; " +
-                    "the remainder will be removed",endpointUri);
+                    "the remainder will be removed", endpointUri);
             while (localProcessors.size() > expectedSize) {
-                localProcessors.remove(localProcessors.size()-1);
+                localProcessors.remove(localProcessors.size() - 1);
             }
         }
 
         if (expectedSize > localProcessors.size() && repeatedPredicates.size() == 0)
             logger.warn("The endpoint uri {} has fewer processors than there are expected messages; " +
-                    "nothing will happen to these messages when they arrive",endpointUri);
+                    "nothing will happen to these messages when they arrive", endpointUri);
 
         for (List<Processor> localProcessor : localProcessors) {
             List<Processor> orderedProcessors = new ArrayList<>(localProcessor);
@@ -102,7 +102,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
             finalProcessors.add(new MultiProcessor(orderedProcessors));
         }
 
-        for (int i = expectedSize-1; i < localProcessors.size(); i++) {
+        for (int i = expectedSize - 1; i < localProcessors.size(); i++) {
             //this may well be empty
             finalProcessors.add(new MultiProcessor(repeatedProcessors));
         }
@@ -120,7 +120,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>>  {
 
         if (expectedSize > localPredicates.size() && repeatedPredicates.size() != 0)
             logger.warn("The endpoint uri {} has more messages expected than provided predicates; subsequent messages " +
-                    "will be accepted without any validation",endpointUri);
+                    "will be accepted without any validation", endpointUri);
 
         for (List<Predicate> localPredicate : localPredicates) {
             List<Predicate> orderedPredicates = new ArrayList<>(localPredicate);

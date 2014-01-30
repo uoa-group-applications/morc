@@ -4,15 +4,13 @@ import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.mock.builder.*;
 import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
 import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
 import nz.ac.auckland.integration.testing.processor.BodyProcessor;
 import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
 import nz.ac.auckland.integration.testing.processor.MatchedResponseProcessor;
-import nz.ac.auckland.integration.testing.mock.*;
-import nz.ac.auckland.integration.testing.mock.builder.ExceptionMockDefinitionBuilder;
-import nz.ac.auckland.integration.testing.mock.builder.HttpErrorMockDefinitionBuilder;
 import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
@@ -211,10 +209,10 @@ public abstract class MorcTestBuilder extends MorcTest {
     @SuppressWarnings("unchecked")
     public static <T> T[] times(int count, T input) {
         ArrayList<T> list = new ArrayList<T>();
-        for (int i = 0;i < count; i++) {
+        for (int i = 0; i < count; i++) {
             list.add(input);
         }
-        return (T[])list.toArray();
+        return (T[]) list.toArray();
     }
 
     /**
@@ -297,7 +295,7 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * @param exception The exception we expect to validate against
-     * @return          A validator for ensuring an exception occurs
+     * @return A validator for ensuring an exception occurs
      */
     public static ExceptionPredicate exception(Class<? extends Exception> exception) {
         return new ExceptionPredicate(exception);
@@ -306,7 +304,7 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * @param exception The exception we expect to validate against
      * @param message   The message in the exception we expect to validate against
-     * @return          A validator for ensuring an exception occurs
+     * @return A validator for ensuring an exception occurs
      */
     public static ExceptionPredicate exception(Class<? extends Exception> exception, String message) {
         return new ExceptionPredicate(exception, message);
@@ -352,7 +350,7 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * A convenience method for specifying matched input header validators to output headers
      */
-    public static MatchedResponseProcessor.MatchedResponse headerAnswer(Predicate predicate,TestResource<Map<String, Object>> resource) {
+    public static MatchedResponseProcessor.MatchedResponse headerAnswer(Predicate predicate, TestResource<Map<String, Object>> resource) {
         try {
             return new MatchedResponseProcessor.MatchedResponse(predicate, new HeadersProcessor(resource.getValue()));
         } catch (Exception e) {
@@ -362,19 +360,20 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
-     * @param template      A template of the string resource containing GString variables for substitution
-     * @param dataSource    A list of name=value pairs that will be used for variable substitution. Each entry in the
-     *                      list will result in another resource being returned
+     *
+     * @param template   A template of the string resource containing GString variables for substitution
+     * @param dataSource A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                   list will result in another resource being returned
      */
     public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
         return groovy(template, dataSource, GStringTemplateEngine.class);
     }
 
     /**
-     * @param template          A template of the string resource containing template-appropriate variables for substitution
-     * @param dataSource        A list of name=value pairs that will be used for variable substitution. Each entry in the
-     *                          list will result in another resource being returned
-     * @param templateEngine    The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     * @param template       A template of the string resource containing template-appropriate variables for substitution
+     * @param dataSource     A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                       list will result in another resource being returned
+     * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
     public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource,
                                            Class<? extends TemplateEngine> templateEngine) {
@@ -394,8 +393,8 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
-     * @param urlpath   An Ant-style path to a directory containing test resources for (expected) input and output
-     * @return          A list of InputStreams that can be used as test resources
+     * @param urlpath An Ant-style path to a directory containing test resources for (expected) input and output
+     * @return A list of InputStreams that can be used as test resources
      */
     public static List<InputStream> dir(String urlpath) {
         List<URL> resourceUrls = new ArrayList<>();
@@ -429,8 +428,8 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * This method can be used as a datasource for the groovy template
      *
-     * @param csvResource   A reference to a CSV file that contains variable values. A header line sets the name of the variables
-     * @return              A list of variablename-value pairs
+     * @param csvResource A reference to a CSV file that contains variable values. A header line sets the name of the variables
+     * @return A list of variablename-value pairs
      */
     public static List<Map<String, String>> csv(TestResource<String> csvResource) {
         CSVReader reader;
@@ -502,7 +501,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param exception   The exception that should be instantiated and thrown as part of the expectation
      */
     public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri,
-                                                                        final Class<? extends Exception> exception) {
+                                                                      final Class<? extends Exception> exception) {
         try {
             Constructor<? extends Exception> constructor = exception.getConstructor();
             return new ExceptionMockDefinitionBuilder(endpointUri).exception(constructor.newInstance());
@@ -512,14 +511,14 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
-     * @param endpointUri   The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
-     * @param exception     The exception that should be instantiated and thrown as part of the expectation
+     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
+     * @param exception   The exception that should be instantiated and thrown as part of the expectation
      * @param message
      * @return
      */
     public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri,
-                                                                        final Class<? extends Exception> exception,
-                                                                        final String message) {
+                                                                      final Class<? extends Exception> exception,
+                                                                      final String message) {
         try {
             Constructor<? extends Exception> constructor = exception.getConstructor(String.class);
             return new ExceptionMockDefinitionBuilder(endpointUri).exception(constructor.newInstance(message));

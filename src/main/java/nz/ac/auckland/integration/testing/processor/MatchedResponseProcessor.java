@@ -6,7 +6,9 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * An answer that will return a response back to the client based on the incoming exchange message
@@ -23,15 +25,15 @@ public class MatchedResponseProcessor implements Processor {
     }
 
     /**
-     * @param exchange  The exchange received by an expectation that will invoke a given response
-     *                  note that processors and predicates must be thread safe
+     * @param exchange The exchange received by an expectation that will invoke a given response
+     *                 note that processors and predicates must be thread safe
      */
     @Override
     public void process(Exchange exchange) throws Exception {
         for (MatchedResponse matchedResponse : responses) {
             if (matchedResponse.inputPredicate.matches(exchange)) {
                 logger.debug("Matched input for predicate {} at endpoint {}",
-                        matchedResponse.inputPredicate,exchange.getFromEndpoint());
+                        matchedResponse.inputPredicate, exchange.getFromEndpoint());
                 matchedResponse.responseProcessor.process(exchange);
                 return;
             }

@@ -1,16 +1,15 @@
 package nz.ac.auckland.integration.testing.specification;
 
-import nz.ac.auckland.integration.testing.MorcBuilder;
 import nz.ac.auckland.integration.testing.processor.BodyProcessor;
 import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
-import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
-import org.apache.camel.Endpoint;
-import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A complete test specification including all expectations for asynchronously sending a message
@@ -31,13 +30,13 @@ public class AsyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecif
     }
 
     public Builder inputMessage(TestResource... resources) {
-        Collections.addAll(inputMessageBodies,resources);
+        Collections.addAll(inputMessageBodies, resources);
         return self();
     }
 
     @SafeVarargs
     public final Builder inputHeaders(Map<String, Object>... resources) {
-        Collections.addAll(inputMessageHeaders,resources);
+        Collections.addAll(inputMessageHeaders, resources);
         return self();
     }
 
@@ -52,7 +51,7 @@ public class AsyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecif
         logger.info("The endpoint {} will be sending {} input message bodies and {} input message headers",
                 new Object[]{getEndpointUri(), inputMessageBodies.size(), inputMessageHeaders.size()});
 
-        int messageCount = Math.max(inputMessageBodies.size(),inputMessageHeaders.size());
+        int messageCount = Math.max(inputMessageBodies.size(), inputMessageHeaders.size());
 
         for (int i = 0; i < messageCount; i++) {
             if (i < inputMessageBodies.size())

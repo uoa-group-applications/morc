@@ -76,7 +76,7 @@ public class SyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecifi
                 new Object[]{getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
                         responseBodyPredicates.size(), responseHeadersPredicates.size()});
 
-        int messageCount = Math.max(inputRequestBodies.size(),inputRequestHeaders.size());
+        int messageCount = Math.max(inputRequestBodies.size(), inputRequestHeaders.size());
         for (int i = 0; i < messageCount; i++) {
             if (i < inputRequestBodies.size())
                 addProcessors(i, new BodyProcessor(inputRequestBodies.get(i)));
@@ -85,7 +85,7 @@ public class SyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecifi
                 addProcessors(i, new HeadersProcessor(inputRequestHeaders.get(i)));
         }
 
-        int responseCount = Math.max(responseBodyPredicates.size(),responseHeadersPredicates.size());
+        int responseCount = Math.max(responseBodyPredicates.size(), responseHeadersPredicates.size());
         for (int i = 0; i < responseCount; i++) {
             if (i < responseBodyPredicates.size())
                 addPredicates(i, responseBodyPredicates.get(i));
