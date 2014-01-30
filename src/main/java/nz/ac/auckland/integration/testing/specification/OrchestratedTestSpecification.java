@@ -1,9 +1,7 @@
 package nz.ac.auckland.integration.testing.specification;
 
 import nz.ac.auckland.integration.testing.MorcBuilder;
-import nz.ac.auckland.integration.testing.endpointoverride.CxfEndpointOverride;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
-import nz.ac.auckland.integration.testing.endpointoverride.UrlConnectionOverride;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.apache.camel.*;
 import org.slf4j.Logger;
@@ -26,7 +24,7 @@ public class OrchestratedTestSpecification {
     private final Set<MockDefinition> mockDefinitions;
     private long assertTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
-    private Queue<MockDefinition> endpointOrdering;
+    private List<MockDefinition> endpointOrdering;
     private int sendCount;
     private long sendInterval;
     private int partCount;
@@ -41,8 +39,8 @@ public class OrchestratedTestSpecification {
         return description;
     }
 
-    public Queue<MockDefinition> getEndpointOrdering() {
-        return endpointOrdering;
+    public List<MockDefinition> getEndpointOrdering() {
+        return Collections.unmodifiableList(endpointOrdering);
     }
 
     /**
@@ -109,7 +107,7 @@ public class OrchestratedTestSpecification {
 
         private String description;
         private Map<String,MockDefinition> mockExpectations = new HashMap<>();
-        private Queue<String> endpointOrdering = new LinkedList<>();
+        private List<String> endpointOrdering = new ArrayList<>();
         private long assertTime = 15000l;
         private int sendCount = 1;
         private long sendInterval = 1000l;
