@@ -148,7 +148,7 @@ public class MorcTest extends CamelSpringTestSupport {
 
             MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(),MockEndpoint.class);
             mockEndpoints.add(orderCheckMock);
-            //orderCheckMock.expectedMessageCount(...);
+            orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
 
             //set up the mocks
             for (final MockDefinition mockDefinition : mockDefinitions) {
