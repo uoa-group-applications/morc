@@ -62,6 +62,10 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         return self();
     }
 
+    public SyncOrchestratedTestBuilder expectedResponse(Predicate... predicates) {
+        return super.addPredicates(predicates);
+    }
+
     public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
         Collections.addAll(this.responseBodyPredicates, predicates);
         return self();
