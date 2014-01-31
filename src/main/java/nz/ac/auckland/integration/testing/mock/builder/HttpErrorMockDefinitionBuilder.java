@@ -12,7 +12,7 @@ import org.apache.camel.Processor;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilder<HttpErrorMockDefinitionBuilder, Processor> {
+public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilderInit<HttpErrorMockDefinitionBuilder, Processor> {
 
     private int statusCode = 500;
 

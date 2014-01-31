@@ -17,8 +17,7 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class AsyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<Builder>>
-        extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<Builder> {
+public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<AsyncOrchestratedTestBuilder> {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestBuilder.class);
 
@@ -29,13 +28,13 @@ public class AsyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecif
         super(description, endpointUri);
     }
 
-    public Builder inputMessage(TestResource... resources) {
+    public AsyncOrchestratedTestBuilder inputMessage(TestResource... resources) {
         Collections.addAll(inputMessageBodies, resources);
         return self();
     }
 
     @SafeVarargs
-    public final Builder inputHeaders(Map<String, Object>... resources) {
+    public final AsyncOrchestratedTestBuilder inputHeaders(Map<String, Object>... resources) {
         Collections.addAll(inputMessageHeaders, resources);
         return self();
     }

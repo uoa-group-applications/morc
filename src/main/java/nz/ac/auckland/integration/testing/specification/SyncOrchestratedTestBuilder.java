@@ -20,8 +20,7 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<Builder>>
-        extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<Builder> {
+public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<SyncOrchestratedTestBuilder> {
 
     private static final Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestBuilder.class);
 
@@ -37,7 +36,7 @@ public class SyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecifi
     /**
      * @param resources A collection of test resources that can be used to send request bodies to a target endpoint
      */
-    public Builder requestBody(TestResource... resources) {
+    public SyncOrchestratedTestBuilder requestBody(TestResource... resources) {
         Collections.addAll(inputRequestBodies, resources);
         return self();
     }
@@ -46,23 +45,23 @@ public class SyncOrchestratedTestBuilder<Builder extends OrchestratedTestSpecifi
      * @param resources A collection of test header resources that can be used to send request headers to a target endpoint
      */
     @SafeVarargs
-    public final Builder requestHeaders(Map<String, Object>... resources) {
+    public final SyncOrchestratedTestBuilder requestHeaders(Map<String, Object>... resources) {
         Collections.addAll(inputRequestHeaders, resources);
         return self();
     }
 
-    public Builder expectedResponseBody(Predicate... predicates) {
+    public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
         Collections.addAll(this.responseBodyPredicates, predicates);
         return self();
     }
 
-    public Builder expectedResponseHeaders(HeadersPredicate... responseHeadersPredicates) {
+    public SyncOrchestratedTestBuilder expectedResponseHeaders(HeadersPredicate... responseHeadersPredicates) {
         Collections.addAll(this.responseHeadersPredicates, responseHeadersPredicates);
         return self();
     }
 
     @SafeVarargs
-    public final Builder expectedResponseHeaders(TestResource<Map<String, Object>>... resources) {
+    public final SyncOrchestratedTestBuilder expectedResponseHeaders(TestResource<Map<String, Object>>... resources) {
         for (TestResource<Map<String, Object>> resource : resources) {
             this.responseHeadersPredicates.add(new HeadersPredicate(resource));
         }

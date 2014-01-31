@@ -118,8 +118,17 @@ public class MockDefinition {
         return endpointOverrides;
     }
 
+    public static class MockDefinitionBuilder extends MockDefinitionBuilderInit<MockDefinitionBuilder> {
+        /**
+         * @param endpointUri A Camel Endpoint URI to listen to for expected messages
+         */
+        public MockDefinitionBuilder(String endpointUri) {
+            super(endpointUri);
+        }
+    }
+
     //public static class MockDefinitionBuilder<Builder extends MockDefinitionBuilder<Builder>> {
-    public static class MockDefinitionBuilder<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
+    public static class MockDefinitionBuilderInit<Builder extends MockDefinitionBuilderInit<Builder>> extends MorcBuilder<Builder> {
 
         private OrderingType orderingType = OrderingType.TOTAL;
         private boolean isEndpointOrdered = true;
@@ -138,7 +147,7 @@ public class MockDefinition {
         /**
          * @param endpointUri A Camel Endpoint URI to listen to for expected messages
          */
-        public MockDefinitionBuilder(String endpointUri) {
+        public MockDefinitionBuilderInit(String endpointUri) {
             super(endpointUri);
         }
 
@@ -306,7 +315,7 @@ public class MockDefinition {
     }
 
     @SuppressWarnings("unchecked")
-    private MockDefinition(MockDefinitionBuilder builder) {
+    private MockDefinition(MockDefinitionBuilderInit builder) {
         this.endpointUri = builder.getEndpointUri();
         this.orderingType = builder.orderingType;
         this.isEndpointOrdered = builder.isEndpointOrdered;

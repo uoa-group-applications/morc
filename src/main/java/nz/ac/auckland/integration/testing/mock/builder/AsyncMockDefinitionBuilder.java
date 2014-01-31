@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class AsyncMockDefinitionBuilder extends ContentMockDefinitionBuilder {
+public class AsyncMockDefinitionBuilder extends ContentMockDefinitionBuilder<AsyncMockDefinitionBuilder> {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncMockDefinitionBuilder.class);
 

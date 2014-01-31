@@ -4,7 +4,7 @@ import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefinitionBuilder<UnreceivedMockDefinitionBuilder> {
+public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefinitionBuilderInit<UnreceivedMockDefinitionBuilder> {
 
     private static final Logger logger = LoggerFactory.getLogger(UnreceivedMockDefinitionBuilder.class);
 

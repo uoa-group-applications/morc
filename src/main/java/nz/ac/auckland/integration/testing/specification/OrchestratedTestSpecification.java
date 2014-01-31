@@ -134,8 +134,6 @@ public class OrchestratedTestSpecification {
             this.description = description;
         }
 
-
-        @SuppressWarnings("unchecked")
         public OrchestratedTestSpecification build() {
             if (nextPartBuilder != null) {
                 nextPart = nextPartBuilder.build();
@@ -155,8 +153,7 @@ public class OrchestratedTestSpecification {
          * @param mockDefinitionBuilder The expectation builder used to seed the expectation
          * @throws IllegalArgumentException if expectations to the same endpoint have different ordering requirements
          */
-        @SuppressWarnings("unchecked")
-        public Builder addExpectation(MockDefinition.MockDefinitionBuilder mockDefinitionBuilder) {
+        public Builder addExpectation(MockDefinition.MockDefinitionBuilderInit mockDefinitionBuilder) {
 
             //we need to merge the expectations
             MockDefinition endpointExpectation = mockExpectations.get(mockDefinitionBuilder.getEndpointUri());
@@ -177,28 +174,28 @@ public class OrchestratedTestSpecification {
             //we need to build a tree based on ordering types which will be expanded to a set during validation
 
             //endpoints with no relative ordering are always in the base set
-            if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.NONE) {
+            if (mergedExpectation.getOrderingType() == MockDefinition.OrderingType.NONE) {
                 //these will always be in the accepted set
                 for (int i = 0; i < mergedEndpointExpectationMessageCount; i++)
-                    endpointNodesOrdering.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                    endpointNodesOrdering.add(new EndpointNode(mergedExpectation.getEndpointUri()));
             }
 
             //endpoints partially ordered to other endpoints will be added to the set after they are encountered
             //by a totally ordered endpoint unless they occur at the start of an expectation builder
-            if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.PARTIAL) {
+            if (mergedExpectation.getOrderingType() == MockDefinition.OrderingType.PARTIAL) {
                 for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
                     if (currentTotalOrderLeafEndpoint == null)
-                        endpointNodesOrdering.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                        endpointNodesOrdering.add(new EndpointNode(mergedExpectation.getEndpointUri()));
                     else
-                        currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(endpointExpectation.getEndpointUri()));
+                        currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(mergedExpectation.getEndpointUri()));
                 }
             }
 
             //only TOTAL ordered can have children and will create order (a tree structure) which is added to the set
             //on endpoint ordering matches
-            if (endpointExpectation.getOrderingType() == MockDefinition.OrderingType.TOTAL) {
+            if (mergedExpectation.getOrderingType() == MockDefinition.OrderingType.TOTAL) {
                 for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
-                    EndpointNode nextTotalOrderedNode = new EndpointNode(endpointExpectation.getEndpointUri());
+                    EndpointNode nextTotalOrderedNode = new EndpointNode(mergedExpectation.getEndpointUri());
                     if (currentTotalOrderLeafEndpoint == null) endpointNodesOrdering.add(nextTotalOrderedNode);
                     else currentTotalOrderLeafEndpoint.childrenNodes.add(nextTotalOrderedNode);
 
@@ -214,8 +211,8 @@ public class OrchestratedTestSpecification {
         /**
          * A convenience method for adding multiple expectations at the same time
          */
-        public Builder addExpectations(MockDefinition.MockDefinitionBuilder... expectationBuilders) {
-            for (MockDefinition.MockDefinitionBuilder expectationBuilder : expectationBuilders) {
+        public Builder addExpectations(MockDefinition.MockDefinitionBuilderInit... expectationBuilders) {
+            for (MockDefinition.MockDefinitionBuilderInit expectationBuilder : expectationBuilders) {
                 addExpectation(expectationBuilder);
             }
 
@@ -254,7 +251,7 @@ public class OrchestratedTestSpecification {
 
         @SuppressWarnings("unchecked")
         public Builder addEndpoint(String endpointUri) {
-            return (Builder) addEndpoint(endpointUri, this.getClass());
+            return (Builder)addEndpoint(endpointUri, this.getClass());
         }
 
         @SuppressWarnings("unchecked")
