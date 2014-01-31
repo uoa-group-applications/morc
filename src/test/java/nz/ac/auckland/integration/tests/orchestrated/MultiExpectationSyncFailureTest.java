@@ -1,9 +1,6 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
-import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -12,7 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nz.ac.auckland.integration.testing.OrchestratedTestBuilder.*;
+import static nz.ac.auckland.integration.testing.MorcTestBuilder.*;
 
 public class MultiExpectationSyncFailureTest extends CamelTestSupport {
 

@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.tests.expectation;
 
-import nz.ac.auckland.integration.testing.expectation.ContentMockExpectation;
+import nz.ac.auckland.integration.testing.expectation.ContentMockDefinition;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import org.apache.camel.Exchange;
@@ -22,7 +22,7 @@ public class ContentMockTest extends Assert {
 
     @Test
     public void testNoBodyNoHeaders() throws Exception {
-        TestContentMockExpectation expectation = new TestContentMockExpectation.Builder("seda:test").build();
+        TestContentMockDefinition expectation = new TestContentMockDefinition.Builder("seda:test").build();
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
         exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         assertTrue(expectation.checkValid(exchange, 0));
@@ -31,7 +31,7 @@ public class ContentMockTest extends Assert {
     @Test
     public void testBodyNoHeaders() throws Exception {
         XmlTestResource resource = new XmlTestResource(bodyUrl);
-        TestContentMockExpectation expectation = new TestContentMockExpectation.Builder("seda:test")
+        TestContentMockDefinition expectation = new TestContentMockDefinition.Builder("seda:test")
                 .expectedBody(resource).build();
 
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -45,7 +45,7 @@ public class ContentMockTest extends Assert {
     public void testBodyAndHeaders() throws Exception {
         XmlTestResource resource = new XmlTestResource(bodyUrl);
         HeadersTestResource headers = new HeadersTestResource(headersUrl);
-        TestContentMockExpectation expectation = new TestContentMockExpectation.Builder("seda:test")
+        TestContentMockDefinition expectation = new TestContentMockDefinition.Builder("seda:test")
                 .expectedBody(resource)
                 .expectedHeaders(headers)
                 .build();
@@ -61,7 +61,7 @@ public class ContentMockTest extends Assert {
     @Test
     public void testInvalidBody() throws Exception {
         XmlTestResource resource = new XmlTestResource(bodyUrl);
-        TestContentMockExpectation expectation = new TestContentMockExpectation.Builder("seda:test")
+        TestContentMockDefinition expectation = new TestContentMockDefinition.Builder("seda:test")
                 .expectedBody(resource).build();
 
         Exchange exchange = new DefaultExchange(new DefaultCamelContext());
@@ -76,7 +76,7 @@ public class ContentMockTest extends Assert {
         XmlTestResource resource = new XmlTestResource(bodyUrl);
         HeadersTestResource headers = new HeadersTestResource(headersUrl);
 
-        TestContentMockExpectation expectation = new TestContentMockExpectation.Builder("seda:test")
+        TestContentMockDefinition expectation = new TestContentMockDefinition.Builder("seda:test")
                 .expectedBody(resource)
                 .expectedHeaders(headers)
                 .build();
@@ -95,7 +95,7 @@ public class ContentMockTest extends Assert {
 
 }
 
-class TestContentMockExpectation extends ContentMockExpectation {
+class TestContentMockDefinition extends ContentMockDefinition {
 
     @Override
     public void handleReceivedExchange(Exchange exchange) throws Exception {
@@ -107,7 +107,7 @@ class TestContentMockExpectation extends ContentMockExpectation {
         return "test";
     }
 
-    public static class Builder extends ContentMockExpectation.AbstractContentBuilder<TestContentMockExpectation, Builder> {
+    public static class Builder extends ContentMockDefinition.AbstractContentBuilder<TestContentMockDefinition, Builder> {
 
         public Builder(String endpointUri) {
             super(endpointUri);
@@ -117,12 +117,12 @@ class TestContentMockExpectation extends ContentMockExpectation {
             return this;
         }
 
-        public TestContentMockExpectation buildInternal() {
-            return new TestContentMockExpectation(this);
+        public TestContentMockDefinition buildInternal() {
+            return new TestContentMockDefinition(this);
         }
     }
 
-    protected TestContentMockExpectation(Builder builder) {
+    protected TestContentMockDefinition(Builder builder) {
         super(builder);
     }
 }

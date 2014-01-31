@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
@@ -10,7 +9,7 @@ import org.apache.camel.builder.RouteBuilder;
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
  */
-public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
+public class MultiExpectationSyncTest extends MorcTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -180,9 +179,9 @@ public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                         //this will receive the message last
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").ordering(MockExpectation.OrderingType.PARTIAL))
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").ordering(MockDefinition.OrderingType.PARTIAL))
                         //this will receive the message first
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").ordering(MockExpectation.OrderingType.PARTIAL));
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").ordering(MockDefinition.OrderingType.PARTIAL));
 
         syncTest("direct:multiSend1", "Send unordered messages to same sync endpoint without endpoint ordering")
                 .requestBody(xml("<foo/>"))
@@ -197,13 +196,13 @@ public class MultiExpectationSyncTest extends OrchestratedTestBuilder {
         syncTest("direct:multiSend2", "Send unordered messages to two different sync destinations without total ordering or endpoint ordering")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
                         .expectedBody(xml("<fourth/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
                         .expectedBody(xml("<third/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
                         .expectedBody(xml("<second/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockExpectation.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
                         .expectedBody(xml("<first/>")));
 
         syncTest("direct:syncAtEnd", "Send async messages out of order such that sync arrives first")

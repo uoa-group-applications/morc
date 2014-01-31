@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.tests.expectation;
 
-import nz.ac.auckland.integration.testing.expectation.SyncMockExpectation;
+import nz.ac.auckland.integration.testing.expectation.SyncMockDefinition;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
 
 import java.net.URL;
 
-public class SyncMockExpectationTest extends Assert {
+public class SyncMockDefinitionTest extends Assert {
 
     URL headersUrl = this.getClass().getResource("/data/header-test1.properties");
     URL responseUrl = this.getClass().getResource("/data/xml-response1.xml");
@@ -29,7 +29,7 @@ public class SyncMockExpectationTest extends Assert {
 
         XmlTestResource output = new XmlTestResource(responseUrl);
         HeadersTestResource headers = new HeadersTestResource(headersUrl);
-        SyncMockExpectation mockTest = new SyncMockExpectation.Builder("vm:test")
+        SyncMockDefinition mockTest = new SyncMockDefinition.Builder("vm:test")
                 .responseBody(output)
                 .responseHeaders(headers)
                 .build();
@@ -47,7 +47,7 @@ public class SyncMockExpectationTest extends Assert {
         Exchange exchange = new DefaultExchange(ctx);
 
         XmlTestResource output = new XmlTestResource(responseUrl);
-        SyncMockExpectation mockTest = new SyncMockExpectation.Builder("vm:test")
+        SyncMockDefinition mockTest = new SyncMockDefinition.Builder("vm:test")
                 .responseBody(output)
                 .build();
 
@@ -64,7 +64,7 @@ public class SyncMockExpectationTest extends Assert {
         Exchange exchange = new DefaultExchange(ctx);
 
         HeadersTestResource headers = new HeadersTestResource(headersUrl);
-        SyncMockExpectation mockTest = new SyncMockExpectation.Builder("vm:test")
+        SyncMockDefinition mockTest = new SyncMockDefinition.Builder("vm:test")
                 .responseHeaders(headers)
                 .build();
 
@@ -79,7 +79,7 @@ public class SyncMockExpectationTest extends Assert {
         CamelContext ctx = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(ctx);
 
-        SyncMockExpectation mockTest = new SyncMockExpectation.Builder("vm:test")
+        SyncMockDefinition mockTest = new SyncMockDefinition.Builder("vm:test")
                 .build();
 
         mockTest.handleReceivedExchange(exchange);
@@ -94,7 +94,7 @@ public class SyncMockExpectationTest extends Assert {
         Exchange exchange = new DefaultExchange(ctx);
         exchange.setFromEndpoint(new DirectEndpoint("vm:nope", null));
 
-        SyncMockExpectation mockTest = new SyncMockExpectation.Builder("vm:test")
+        SyncMockDefinition mockTest = new SyncMockDefinition.Builder("vm:test")
                 .build();
 
         assertFalse(mockTest.checkValid(exchange, 0));

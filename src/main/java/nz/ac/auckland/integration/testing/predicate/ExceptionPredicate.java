@@ -40,14 +40,14 @@ public class ExceptionPredicate implements Predicate {
     }
 
     public boolean matches(Exchange exchange) {
-        Exception e = exchange.getException();
+        Throwable t = exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class);
 
-        if (e == null) {
+        if (t == null) {
             logger.warn("An exception was expected to be received");
             return false;
         }
 
-        logger.debug("An execution exception was encountered", e);
-        return e.getClass().equals(expectedExceptionClass) || message == null || message.equals(e.getMessage());
+        logger.debug("An execution exception was encountered", t);
+        return t.getClass().equals(expectedExceptionClass) || message == null || message.equals(t.getMessage());
     }
 }

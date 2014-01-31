@@ -1,12 +1,13 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
+import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
  * Simple 1 expectation tests for sending and receiving messages using the Camel infrastructure
  */
-public class SimpleAsyncTest extends OrchestratedTestBuilder {
+public class SimpleAsyncTest extends MorcTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {

@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.tests.expectation;
 
 import nz.ac.auckland.integration.testing.answer.Answer;
-import nz.ac.auckland.integration.testing.expectation.ExceptionMockExpectation;
+import nz.ac.auckland.integration.testing.expectation.ExceptionMockDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -10,10 +10,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class ExceptionMockExpectationTest extends Assert {
+public class ExceptionMockDefinitionTest extends Assert {
     @Test
     public void testExceptionAndMessage() throws Exception {
-        ExceptionMockExpectation expectation = new ExceptionMockExpectation.Builder("vm:test")
+        ExceptionMockDefinition expectation = new ExceptionMockDefinition.Builder("vm:test")
                 .exceptionResponse(new Answer<Exception>() {
                     @Override
                     public Exception response(Exchange exchange) throws Exception {
@@ -31,7 +31,7 @@ public class ExceptionMockExpectationTest extends Assert {
 
     @Test
     public void testExceptionNoMessage() throws Exception {
-        ExceptionMockExpectation expectation = new ExceptionMockExpectation.Builder("vm:test")
+        ExceptionMockDefinition expectation = new ExceptionMockDefinition.Builder("vm:test")
                 .exceptionResponse(new Answer<Exception>() {
                     @Override
                     public Exception response(Exchange exchange) throws Exception {
@@ -49,7 +49,7 @@ public class ExceptionMockExpectationTest extends Assert {
 
     @Test
     public void testNoException() throws Exception {
-        ExceptionMockExpectation expectation = new ExceptionMockExpectation.Builder("vm:test")
+        ExceptionMockDefinition expectation = new ExceptionMockDefinition.Builder("vm:test")
                 .build();
 
         try {

@@ -63,7 +63,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     }
 
     public SyncOrchestratedTestBuilder expectedResponse(Predicate... predicates) {
-        return super.addPredicates(predicates);
+        return this.expectedResponseBody(predicates);
     }
 
     public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
@@ -93,8 +93,13 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
 
         int messageCount = Math.max(inputRequestBodies.size(), inputRequestHeaders.size());
         for (int i = 0; i < messageCount; i++) {
-            if (i < inputRequestBodies.size())
-                addProcessors(i, new BodyProcessor(inputRequestBodies.get(i)));
+            if (i < inputRequestBodies.size()) {
+                try {
+                    addProcessors(i, new BodyProcessor(inputRequestBodies.get(i).getValue()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             if (i < inputRequestHeaders.size())
                 addProcessors(i, new HeadersProcessor(inputRequestHeaders.get(i)));

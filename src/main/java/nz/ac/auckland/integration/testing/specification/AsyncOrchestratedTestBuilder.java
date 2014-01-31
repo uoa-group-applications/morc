@@ -53,8 +53,13 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
         int messageCount = Math.max(inputMessageBodies.size(), inputMessageHeaders.size());
 
         for (int i = 0; i < messageCount; i++) {
-            if (i < inputMessageBodies.size())
-                addProcessors(i, new BodyProcessor(inputMessageBodies.get(i)));
+            if (i < inputMessageBodies.size()) {
+                try {
+                    addProcessors(i, new BodyProcessor(inputMessageBodies.get(i).getValue()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             if (i < inputMessageHeaders.size())
                 addProcessors(i, new HeadersProcessor(inputMessageHeaders.get(i)));

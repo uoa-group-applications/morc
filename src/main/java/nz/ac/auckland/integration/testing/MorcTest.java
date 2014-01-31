@@ -4,13 +4,16 @@ import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
+import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.component.dataset.DataSet;
 import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.language.ConstantExpression;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
+import org.apache.camel.util.URISupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -18,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -144,7 +149,7 @@ public class MorcTest extends CamelSpringTestSupport {
         orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
 
         try {
-            Set<MockDefinition> mockDefinitions = spec.getMockDefinitions();
+            Collection<MockDefinition> mockDefinitions = spec.getMockDefinitions();
 
             //set up the mocks
             for (final MockDefinition mockDefinition : mockDefinitions) {
@@ -152,9 +157,10 @@ public class MorcTest extends CamelSpringTestSupport {
                 logger.debug("Obtained new mock: {}", mockEndpoint.getEndpointUri());
                 mockEndpoints.add(mockEndpoint);
 
+                //why do we need i+1??
                 mockEndpoint.setExpectedMessageCount(mockDefinition.getExpectedMessageCount());
                 for (int i = 0; i < mockDefinition.getProcessors().size(); i++)
-                    mockEndpoint.whenExchangeReceived(i, mockDefinition.getProcessors().get(i));
+                    mockEndpoint.whenExchangeReceived(i+1, mockDefinition.getProcessors().get(i));
 
                 //todo clear this up - assert times
                 mockEndpoint.setSleepForEmptyTest(mockDefinition.getAssertionTime());
@@ -200,12 +206,14 @@ public class MorcTest extends CamelSpringTestSupport {
                 }
 
                 mockDefinition.getMockFeederRoute()
-                        .routeId(mockDefinition.getEndpointUri())
+                        .routeId(MorcTest.class.getCanonicalName() + "." + mockDefinition.getEndpointUri())
+                        .setProperty("endpointUri",new ConstantExpression(mockDefinition.getEndpointUri()))
                         .wireTap(orderCheckMock.getEndpointUri())
-                        .log(LoggingLevel.DEBUG, "Endpoint ${routeId} received body: ${body}, headers: ${headers}")
+                        .log(LoggingLevel.INFO,"Endpoint ${property.endpointUri} received a message")
+                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
-                        .log(LoggingLevel.DEBUG, "Endpoint ${routeId} returning back to client body: ${body}, headers: ${headers}");
+                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to client body: ${body}, headers: ${headers}");
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
                 for (EndpointOverride override : mockDefinition.getEndpointOverrides())
@@ -216,31 +224,43 @@ public class MorcTest extends CamelSpringTestSupport {
             }
 
             //set up sending messages to the target system under testing
-            final MockEndpoint sendingMockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
+            final MockEndpoint sendingMockEndpoint = context.getEndpoint("mock:responses-" + UUID.randomUUID(), MockEndpoint.class);
             mockEndpoints.add(sendingMockEndpoint);
             sendingMockEndpoint.expectedMessageCount(spec.getProcessors().size());
             sendingMockEndpoint.expectedMessagesMatches(spec.getPredicates().toArray(new Predicate[spec.getPredicates().size()]));
-            for (int i = 0; i < spec.getProcessors().size(); i++)
-                sendingMockEndpoint.whenExchangeReceived(i, spec.getProcessors().get(i));
 
             RouteDefinition publishRouteDefinition = new RouteDefinition();
 
-            publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), new DataSetComponent(),
-                    new MessagePublishDataSet(spec.getProcessors())))
-                    .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
-                    .to(spec.getEndpointUri())
-                    .onCompletion()
-                    .log(LoggingLevel.DEBUG, "Received response to endpoint " + spec.getEndpointOverrides() + " body: ${body}, headers: ${headers}")
-                    .to(sendingMockEndpoint)
-                    .executorService(context.getExecutorServiceManager().newSingleThreadExecutor(this, spec.getEndpointUri()))
-                    .end();
+            //setup the route for sending messages
+            DataSetComponent component = new DataSetComponent();
+            component.setCamelContext(context);
 
-            createdRoutes.add(publishRouteDefinition);
-
+            //apply endpoint overrides to the producer endpoint
             Endpoint targetEndpoint = getMandatoryEndpoint(spec.getEndpointUri());
             for (EndpointOverride override : spec.getEndpointOverrides())
                 override.overrideEndpoint(targetEndpoint);
 
+            publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
+                    new MessagePublishDataSet(spec.getProcessors())))
+                    .routeId(MorcTest.class.getCanonicalName() + ".publish")
+                    .onCompletion()
+                        .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
+                            .log(LoggingLevel.DEBUG, "Received exception response to endpoint " + spec.getEndpointUri()
+                                    + " exception: ${exception}, headers: ${headers}")
+                        .otherwise()
+                            .log(LoggingLevel.DEBUG, "Received response to endpoint " + spec.getEndpointUri()
+                                    + " body: ${body}, headers: ${headers}")
+                        .end()
+                        .to(sendingMockEndpoint)
+                    .end()
+                    .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
+                    .to(targetEndpoint);
+
+            context.addRouteDefinition(publishRouteDefinition);
+
+            createdRoutes.add(publishRouteDefinition);
+
+            //todo assert times
             sendingMockEndpoint.assertIsSatisfied();
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
@@ -251,8 +271,9 @@ public class MorcTest extends CamelSpringTestSupport {
             //We now need to check that messages have arrived in the correct order
             Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes = new ArrayList<>(spec.getEndpointNodesOrdering());
             for (Exchange e : orderCheckMock.getExchanges()) {
-                OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes, e.getFromEndpoint().getEndpointUri());
+                OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes, e.getFromEndpoint());
 
+                //todo make this exception useful...
                 //this means we don't expect to have seen the message at this point
                 if (node == null)
                     throw new AssertionError("");
@@ -273,11 +294,10 @@ public class MorcTest extends CamelSpringTestSupport {
         }
     }
 
-    private OrchestratedTestSpecification.EndpointNode findEndpointNodeMatch(Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes, String endpointUri) {
+    private OrchestratedTestSpecification.EndpointNode findEndpointNodeMatch(Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes, Endpoint endpoint) {
         for (OrchestratedTestSpecification.EndpointNode node : endpointNodes) {
-            if (node.getEndpointUri().equals(endpointUri)) return node;
+            if (endpoint.equals(context.getEndpoint(node.getEndpointUri()))) return node;
         }
-
         //not found, which should cause an exception
         return null;
     }

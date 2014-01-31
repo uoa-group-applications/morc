@@ -38,7 +38,7 @@ public class HttpErrorPredicate implements Predicate {
     @SuppressWarnings("unchecked")
     public boolean matches(Exchange e) {
         if (e == null) return false;
-        Throwable t = e.getException();
+        Throwable t = e.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class);
         if (!(t instanceof HttpOperationFailedException)) {
             logger.error("An unexpected error occurred during exception validation", t);
             return false;

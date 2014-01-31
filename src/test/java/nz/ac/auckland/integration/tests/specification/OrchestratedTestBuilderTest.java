@@ -182,32 +182,32 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testAsyncExpectation() throws Exception {
-        AsyncMockExpectation.Builder builder = OrchestratedTestBuilder.asyncExpectation("foo");
+        AsyncMockDefinition.Builder builder = OrchestratedTestBuilder.asyncExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
     @Test
     public void testSyncExpectation() throws Exception {
-        SyncMockExpectation.Builder builder = OrchestratedTestBuilder.syncExpectation("foo");
+        SyncMockDefinition.Builder builder = OrchestratedTestBuilder.syncExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
 
     @Test
     public void testCxfFaultExpectation() throws Exception {
-        HttpErrorMockExpectation.Builder builder = OrchestratedTestBuilder.httpErrorExpectation("foo");
+        HttpErrorMockDefinition.Builder builder = OrchestratedTestBuilder.httpErrorExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
     @Test
     public void testExceptionExpectation() throws Exception {
-        ExceptionMockExpectation.Builder builder = OrchestratedTestBuilder.exceptionExpectation("foo");
+        ExceptionMockDefinition.Builder builder = OrchestratedTestBuilder.exceptionExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
     @Test
     public void testUnreceivedExpectation() throws Exception {
-        UnreceivedMockExpectation.Builder builder = OrchestratedTestBuilder.unreceivedExpectation("foo");
+        UnreceivedMockDefinition.Builder builder = OrchestratedTestBuilder.unreceivedExpectation("foo");
         assertEquals("foo", builder.build().getEndpointUri());
     }
 
@@ -349,8 +349,8 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testOrderingRequirements() throws Exception {
-        assertEquals(MockExpectation.OrderingType.NONE, OrchestratedTestBuilder.noOrdering());
-        assertEquals(MockExpectation.OrderingType.PARTIAL, OrchestratedTestBuilder.partialOrdering());
-        assertEquals(MockExpectation.OrderingType.TOTAL, OrchestratedTestBuilder.totalOrdering());
+        assertEquals(MockDefinition.OrderingType.NONE, OrchestratedTestBuilder.noOrdering());
+        assertEquals(MockDefinition.OrderingType.PARTIAL, OrchestratedTestBuilder.partialOrdering());
+        assertEquals(MockDefinition.OrderingType.TOTAL, OrchestratedTestBuilder.totalOrdering());
     }
 }

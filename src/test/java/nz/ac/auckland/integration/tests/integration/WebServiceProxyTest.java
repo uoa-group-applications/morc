@@ -1,11 +1,12 @@
 package nz.ac.auckland.integration.tests.integration;
 
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
+import nz.ac.auckland.integration.testing.MorcTestBuilder;
+import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.cxf.binding.soap.SoapFault;
 
-public class WebServiceProxyTest extends OrchestratedTestBuilder {
+public class WebServiceProxyTest extends MorcTestBuilder {
 
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
@@ -32,7 +33,7 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
     @Override
     public void configure() {
-        /*syncTest("Simple WS proxy test","jetty:http://localhost:8090/testWS")
+        syncTest("Simple WS proxy test","jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
@@ -42,7 +43,6 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("Simple WS proxy failure test","jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectsExceptionResponse()
                 .expectedResponse(httpExceptionResponse(500))
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
@@ -51,7 +51,6 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
         syncTest("Simple WS proxy failure test with body","jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponse(httpExceptionResponse(501,xml(classpath("/data/pingSoapFault.xml"))))
-                .expectsExceptionResponse()
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingSoapFault.xml")))
@@ -74,22 +73,20 @@ public class WebServiceProxyTest extends OrchestratedTestBuilder {
 
         syncTest("CXF WS Fault Test","cxf:http://localhost:8092/testWSFault")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .expectsExceptionResponse()
                 .expectedResponse(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
 
         syncTest("CXF WS Fault Test with detail","cxf:http://localhost:8092/testWSFaultDetail")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .expectsExceptionResponse()
                 .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
                         xml("<detail><foo/></detail>")));
 
         syncTest("Simple test to show SOAP Fault expectation","cxf:http://localhost:8092/targetWS")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .expectsExceptionResponse()
+                .addPredicates(0,new ExceptionPredicate())
                 .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Fault",
                         xml("<detail><foo/></detail>")))
                 .addExpectation(soapFaultExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
-                        .responseBody(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));*/
+                        .responseBody(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));
 
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))

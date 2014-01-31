@@ -1,7 +1,7 @@
 package nz.ac.auckland.integration.tests.expectation;
 
-import nz.ac.auckland.integration.testing.expectation.AsyncMockExpectation;
-import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.expectation.AsyncMockDefinition;
+import nz.ac.auckland.integration.testing.expectation.MockDefinition;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.validator.HeadersValidator;
@@ -23,10 +23,10 @@ public class AsyncMockTest extends Assert {
 
     @Test
     public void testConfiguration() throws Exception {
-        AsyncMockExpectation expectation = new AsyncMockExpectation.Builder("test").build();
+        AsyncMockDefinition expectation = new AsyncMockDefinition.Builder("test").build();
 
         assertEquals(expectation.getType(), "async");
-        assertTrue(expectation.getOrderingType() != MockExpectation.OrderingType.TOTAL);
+        assertTrue(expectation.getOrderingType() != MockDefinition.OrderingType.TOTAL);
     }
 
     @Test
@@ -43,8 +43,8 @@ public class AsyncMockTest extends Assert {
         assertEquals(0, exchange.getProperties().size());
     }
 
-    private AsyncMockExpectation.Builder generateExpectationBuilder() {
-        return new AsyncMockExpectation.Builder("seda:test")
+    private AsyncMockDefinition.Builder generateExpectationBuilder() {
+        return new AsyncMockDefinition.Builder("seda:test")
                 .name("firstExpectation")
                 .expectedBody(new XmlTestResource(bodyUrl))
                 .expectedHeaders(new HeadersTestResource(headersUrl));
@@ -95,7 +95,7 @@ public class AsyncMockTest extends Assert {
         exchange.getIn().setBody(new XmlTestResource(bodyUrl).getValue());
         exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
 
-        AsyncMockExpectation expectation = new AsyncMockExpectation.Builder("seda:test")
+        AsyncMockDefinition expectation = new AsyncMockDefinition.Builder("seda:test")
                 .name("firstExpectation")
                 .expectedBody(new XmlTestResource(bodyUrl))
                 .build();
@@ -142,7 +142,7 @@ public class AsyncMockTest extends Assert {
         exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setHeaders(new HeadersTestResource(headersUrl).getValue());
 
-        MockExpectation expectation = generateExpectationBuilder().receivedAt(0).build();
+        MockDefinition expectation = generateExpectationBuilder().receivedAt(0).build();
 
         assertTrue(expectation.checkValid(exchange, 5));
     }
@@ -156,7 +156,7 @@ public class AsyncMockTest extends Assert {
         exchange.setFromEndpoint(new SedaEndpoint("seda://test", new SedaComponent(), null));
         exchange.getIn().setHeaders(new HeadersTestResource(headersUrl).getValue());
 
-        MockExpectation expectation = generateExpectationBuilder().receivedAt(1).build();
+        MockDefinition expectation = generateExpectationBuilder().receivedAt(1).build();
 
         assertFalse(expectation.checkValid(exchange, 0));
     }
@@ -164,8 +164,8 @@ public class AsyncMockTest extends Assert {
     @Test
     public void testMultipleBuilders() throws Exception {
 
-        MockExpectation expectation1 = generateExpectationBuilder().receivedAt(1).build();
-        MockExpectation expectation2 = generateExpectationBuilder().receivedAt(2).build();
+        MockDefinition expectation1 = generateExpectationBuilder().receivedAt(1).build();
+        MockDefinition expectation2 = generateExpectationBuilder().receivedAt(2).build();
 
         assertEquals(1, expectation1.getReceivedAt());
         assertEquals(2, expectation2.getReceivedAt());

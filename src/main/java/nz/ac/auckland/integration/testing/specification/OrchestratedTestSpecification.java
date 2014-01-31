@@ -22,7 +22,7 @@ public class OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratedTestSpecification.class);
     private String description;
     private String endpointUri;
-    private final Set<MockDefinition> mockDefinitions;
+    private Collection<MockDefinition> mockDefinitions;
     private long assertTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private Collection<EndpointNode> endpointNodesOrdering;
@@ -62,8 +62,8 @@ public class OrchestratedTestSpecification {
     /**
      * @return A list of expectations that need to be satisfied for the test to pass
      */
-    public Set<MockDefinition> getMockDefinitions() {
-        return Collections.unmodifiableSet(mockDefinitions);
+    public Collection<MockDefinition> getMockDefinitions() {
+        return Collections.unmodifiableCollection(mockDefinitions);
     }
 
     /**
@@ -276,7 +276,7 @@ public class OrchestratedTestSpecification {
     private OrchestratedTestSpecification(OrchestratedTestSpecificationBuilder builder) {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
-        this.mockDefinitions = builder.mockExpectations.entrySet();
+        this.mockDefinitions = builder.mockExpectations.values();
         this.assertTime = builder.assertTime;
         this.endpointOverrides = builder.getEndpointOverrides();
         this.sendCount = builder.sendCount;

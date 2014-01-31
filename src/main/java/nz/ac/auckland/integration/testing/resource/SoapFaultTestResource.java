@@ -73,7 +73,7 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate
 
     public synchronized boolean matches(Exchange e) {
         if (e == null) return false;
-        Throwable t = e.getException();
+        Throwable t = e.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class);
 
         if (!(t instanceof SoapFault)) {
             logger.warn("An unexpected error occurred during SOAP Fault validation", t);

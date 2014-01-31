@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.tests.expectation;
 
-import nz.ac.auckland.integration.testing.expectation.MockExpectation;
+import nz.ac.auckland.integration.testing.expectation.MockDefinition;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.seda.SedaComponent;
@@ -14,7 +14,7 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testTotalOrderedEndpointTotalOrderedOneMessage() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
                 .build();
 
@@ -30,7 +30,7 @@ public class MessageOrderingMockTest extends Assert {
     @Test
     public void testTotalOrderedEndpointTotalOrderedManyMessages() throws Exception {
 
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
                 .expectedMessageCount(3)
                 .build();
@@ -48,7 +48,7 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testTotalOrderedNotEndpointTotalOrderedOneMessage() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
                 .endpointNotOrdered()
                 .expectedMessageCount(1)
@@ -65,7 +65,7 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testTotalOrderedNotEndpointTotalOrderedManyMessages() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
                 .endpointNotOrdered()
                 .expectedMessageCount(3)
@@ -84,9 +84,9 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testNotTotalOrderedEndpointTotalOrderedOneMessage() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
-                .ordering(MockExpectation.OrderingType.PARTIAL)
+                .ordering(MockDefinition.OrderingType.PARTIAL)
                 .expectedMessageCount(1)
                 .build();
 
@@ -101,9 +101,9 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testNotTotalOrderedEndpointTotalOrderedManyMessages() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
-                .ordering(MockExpectation.OrderingType.PARTIAL)
+                .ordering(MockDefinition.OrderingType.PARTIAL)
                 .expectedMessageCount(3)
                 .build();
 
@@ -120,9 +120,9 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testNotTotalOrderedNotEndpointTotalOrderedOneMessage() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
-                .ordering(MockExpectation.OrderingType.PARTIAL)
+                .ordering(MockDefinition.OrderingType.PARTIAL)
                 .endpointNotOrdered()
                 .expectedMessageCount(1)
                 .build();
@@ -138,10 +138,10 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testNotTotalOrderedNotEndpointTotalOrderedManyMessages() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
                 .endpointNotOrdered()
-                .ordering(MockExpectation.OrderingType.PARTIAL)
+                .ordering(MockDefinition.OrderingType.PARTIAL)
                 .expectedMessageCount(3)
                 .build();
 
@@ -158,10 +158,10 @@ public class MessageOrderingMockTest extends Assert {
 
     @Test
     public void testNoneOrdering() throws Exception {
-        TestMockExpectation expectation = new TestMockExpectation.Builder("seda:test")
+        TestMockDefinition expectation = new TestMockDefinition.Builder("seda:test")
                 .receivedAt(1)
                 .endpointNotOrdered()
-                .ordering(MockExpectation.OrderingType.NONE)
+                .ordering(MockDefinition.OrderingType.NONE)
                 .expectedMessageCount(3)
                 .build();
 
@@ -177,14 +177,14 @@ public class MessageOrderingMockTest extends Assert {
 }
 
 //I'm interesting in seeing how the super class behaves
-class TestMockExpectation extends MockExpectation {
+class TestMockDefinition extends MockDefinition {
 
     @Override
     public void handleReceivedExchange(Exchange exchange) throws Exception {
         //noop
     }
 
-    public static class Builder extends MockExpectation.AbstractBuilder<TestMockExpectation, Builder> {
+    public static class Builder extends MockDefinition.AbstractBuilder<TestMockDefinition, Builder> {
 
         public Builder(String endpointUri) {
             super(endpointUri);
@@ -194,8 +194,8 @@ class TestMockExpectation extends MockExpectation {
             return this;
         }
 
-        public TestMockExpectation buildInternal() {
-            return new TestMockExpectation(this);
+        public TestMockDefinition buildInternal() {
+            return new TestMockDefinition(this);
         }
 
         protected int expectedMessageCount() {
@@ -208,7 +208,7 @@ class TestMockExpectation extends MockExpectation {
         return "test";
     }
 
-    protected TestMockExpectation(Builder builder) {
+    protected TestMockDefinition(Builder builder) {
         super(builder);
     }
 }

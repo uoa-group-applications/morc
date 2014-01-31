@@ -18,7 +18,7 @@ public class MultiPredicate implements Predicate {
 
     @Override
     public boolean matches(Exchange exchange) {
-        //todo: add logging
+        //todo: add logging, toString
         for (Predicate predicate : predicates) {
             if (!predicate.matches(exchange)) return false;
         }

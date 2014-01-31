@@ -10,7 +10,7 @@
     <logger name="nz.ac.auckland.integration" additivity="false" level="trace">
         <appender-ref ref="consoleAppender"/>
     </logger>
-    <root level="warn">
+    <root level="info">
         <appender-ref ref="consoleAppender"/>
     </root>
 </configuration>

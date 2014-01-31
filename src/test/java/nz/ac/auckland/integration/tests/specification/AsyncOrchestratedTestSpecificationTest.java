@@ -1,6 +1,6 @@
 package nz.ac.auckland.integration.tests.specification;
 
-import nz.ac.auckland.integration.testing.expectation.UnreceivedMockExpectation;
+import nz.ac.auckland.integration.testing.expectation.UnreceivedMockDefinition;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestSpecification;
@@ -37,7 +37,7 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
 
         AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification
                 .Builder("seda:asyncTestInput", "description")
-                .addExpectation(new UnreceivedMockExpectation.Builder("seda:nowhere"))
+                .addExpectation(new UnreceivedMockDefinition.Builder("seda:nowhere"))
                 .inputHeaders(headers)
                 .inputMessage(input)
                 .build();
@@ -63,7 +63,7 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
         AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification
                 .Builder("seda:asyncTestInput", "description")
                 .inputMessage(input)
-                .addExpectation(new UnreceivedMockExpectation.Builder("seda:nowhere"))
+                .addExpectation(new UnreceivedMockDefinition.Builder("seda:nowhere"))
                 .build();
 
         MockEndpoint endpoint = getMockEndpoint("mock:asyncTest");
@@ -82,7 +82,7 @@ public class AsyncOrchestratedTestSpecificationTest extends CamelTestSupport {
     public void testSendNoBodyNoHeaders() throws Exception {
         AsyncOrchestratedTestSpecification spec = new AsyncOrchestratedTestSpecification
                 .Builder("seda:asyncTestInput", "description")
-                .addExpectation(new UnreceivedMockExpectation.Builder("seda:nowhere"))
+                .addExpectation(new UnreceivedMockDefinition.Builder("seda:nowhere"))
                 .build();
 
         MockEndpoint endpoint = getMockEndpoint("mock:asyncTest");
