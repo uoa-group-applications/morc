@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilder<ExceptionMockDefinitionBuilder> {
+public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilderInit<ExceptionMockDefinitionBuilder> {
     private static final Logger logger = LoggerFactory.getLogger(ExceptionMockDefinitionBuilder.class);
     private Exception exception;
 
