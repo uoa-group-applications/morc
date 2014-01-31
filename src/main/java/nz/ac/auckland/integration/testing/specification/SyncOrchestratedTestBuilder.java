@@ -50,6 +50,18 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         return self();
     }
 
+    @SafeVarargs
+    public final SyncOrchestratedTestBuilder requestHeaders(TestResource<Map<String,Object>>... resources) {
+        for (TestResource<Map<String,Object>> resource : resources) {
+            try {
+                inputRequestHeaders.add(resource.getValue());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return self();
+    }
+
     public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
         Collections.addAll(this.responseBodyPredicates, predicates);
         return self();
