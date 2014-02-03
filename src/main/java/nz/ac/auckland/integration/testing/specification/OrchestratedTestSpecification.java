@@ -26,7 +26,6 @@ public class OrchestratedTestSpecification {
     private long assertTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private Collection<EndpointNode> endpointNodesOrdering;
-    private int sendCount;
     private long sendInterval;
     private int partCount;
     private OrchestratedTestSpecification nextPart;
@@ -75,13 +74,6 @@ public class OrchestratedTestSpecification {
     }
 
     /**
-     * @return The number of times the message will be sent to the endpoint
-     */
-    public int getSendCount() {
-        return sendCount;
-    }
-
-    /**
      * @return The interval in milliseconds between sending multiple messages
      */
     public long getSendInterval() {
@@ -114,7 +106,6 @@ public class OrchestratedTestSpecification {
         private String description;
         private Map<String, MockDefinition> mockExpectations = new HashMap<>();
         private long assertTime = 15000l;
-        private int sendCount = 1;
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
@@ -141,6 +132,8 @@ public class OrchestratedTestSpecification {
             }
 
             processors = getProcessors();
+            if (processors.size() == 0) throw new IllegalStateException("The specification for endpoint " + getEndpointUri() +
+                    " must specify at least one message processor to send messages");
             predicates = getPredicates();
             return new OrchestratedTestSpecification(this);
         }
@@ -230,16 +223,6 @@ public class OrchestratedTestSpecification {
         }
 
         /**
-         * @param sendCount The number of times to send the message, defaults to 1
-         */
-        public Builder sendCount(int sendCount) {
-            if (sendCount < 1)
-                throw new IllegalArgumentException("You must be able to send at least one message with sendCount");
-            this.sendCount = sendCount;
-            return self();
-        }
-
-        /**
          * @param sendInterval The interval in milliseconds between sending multiple messages, defaults to 1000ms
          */
         public Builder sendInterval(long sendInterval) {
@@ -279,7 +262,6 @@ public class OrchestratedTestSpecification {
         this.mockDefinitions = builder.mockExpectations.values();
         this.assertTime = builder.assertTime;
         this.endpointOverrides = builder.getEndpointOverrides();
-        this.sendCount = builder.sendCount;
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
         this.nextPart = builder.nextPart;
