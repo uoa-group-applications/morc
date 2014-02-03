@@ -1,10 +1,11 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTest;
+import nz.ac.auckland.integration.testing.MorcTest;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
-import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestSpecification;
-import nz.ac.auckland.integration.testing.validator.Validator;
+import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
+import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nz.ac.auckland.integration.testing.OrchestratedTestBuilder.*;
+import static nz.ac.auckland.integration.testing.MorcTestBuilder.*;
 
 public class SimpleSyncFailureTest extends CamelTestSupport {
 
@@ -68,8 +69,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testDelayedDeliveryFails() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutputDelayed",
-                "Test delayed delivery fails")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test delayed delivery fails",
+                "vm:syncInputAsyncOutputDelayed")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
@@ -78,7 +79,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -90,13 +91,13 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testInvalidResponseFails() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputNoCallouts", "Test fails on invalid response")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid response","vm:syncInputNoCallouts")
                 .expectedResponseBody(xml("<foo/>"))
                 .build();
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -108,14 +109,14 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationBodyInvalid() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation body")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation body","vm:syncInputAsyncOutput")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget").expectedBody(xml("<baz/>")))
                 .build();
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -128,7 +129,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationHeadersInvalid() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncInputAsyncOutput", "Test fails on invalid expectation headers")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation headers","vm:syncInputAsyncOutput")
                 .requestHeaders(headers(new HeaderValue("foo", "baz")))
                 .addExpectation(asyncExpectation("vm:asyncTarget")
                         .expectedHeaders(headers(new HeaderValue("foo", "baz"), new HeaderValue("abc", "def"))))
@@ -136,7 +137,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -149,8 +150,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testSendMoreExchangesThanExpectations() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncMultiTestPublisher",
-                "Test fails on more exchanges than expectations")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on more exchanges than expectations",
+                "vm:syncMultiTestPublisher")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget3")
                         .expectedBody(xml("<moo/>")))
@@ -158,7 +159,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -175,83 +176,14 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
         headers.put("abc", "123");
         headers.put("foo", "baz");
 
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
-                "Test unexpected response headers")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test unexpected response headers",
+                "vm:syncHeaderResponse")
                 .expectedResponseHeaders(new HeadersTestResource(headers))
                 .build();
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
-            test.setUp();
-            test.runOrchestratedTest();
-        } catch (AssertionError ex) {
-            e = ex;
-            logger.info("Exception ({}): ", spec.getDescription(), e);
-        }
-        assertNotNull(e);
-    }
-
-    @Test
-    public void testExceptionRequiredButMissing() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
-                "Test Exception Required but not thrown")
-                .expectsExceptionResponse()
-                .build();
-
-        AssertionError e = null;
-        try {
-            OrchestratedTest test = new OrchestratedTest(spec);
-            test.setUp();
-            test.runOrchestratedTest();
-        } catch (AssertionError ex) {
-            e = ex;
-            logger.info("Exception ({}): ", spec.getDescription(), e);
-        }
-        assertNotNull(e);
-    }
-
-    @Test
-    public void testExceptionRequiredWithResponseValidatorButMissing() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
-                "Test Exception Required for validator but not thrown")
-                .expectedResponse(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return true;
-                    }
-                })
-                .expectsExceptionResponse()
-                .build();
-
-        AssertionError e = null;
-        try {
-            OrchestratedTest test = new OrchestratedTest(spec);
-            test.setUp();
-            test.runOrchestratedTest();
-        } catch (AssertionError ex) {
-            e = ex;
-            logger.info("Exception ({}): ", spec.getDescription(), e);
-        }
-        assertNotNull(e);
-    }
-
-    @Test
-    public void testExceptionRequiredBothKinds() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:syncHeaderResponse",
-                "Test Exception Required for validator and expectsExceptionResponse but not thrown")
-                .expectsExceptionResponse()
-                .expectedResponse(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return true;
-                    }
-                })
-                .build();
-
-        AssertionError e = null;
-        try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -263,39 +195,14 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExceptionFoundButUnexpectedWithNoValidator() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
-                "Test Exception Found but not expected")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test Exception Found but not expected",
+                "vm:exceptionThrower")
                 .requestBody(text("foo"))
                 .build();
 
         AssertionError e = null;
         try {
-            OrchestratedTest test = new OrchestratedTest(spec);
-            test.setUp();
-            test.runOrchestratedTest();
-        } catch (AssertionError ex) {
-            e = ex;
-            logger.info("Exception ({}): ", spec.getDescription(), e);
-        }
-        assertNotNull(e);
-    }
-
-    @Test
-    public void testExceptionFoundButValidatorReturnsFalse() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
-                "Test Exception Found but not expected")
-                .expectsExceptionResponse()
-                .expectedResponse(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return false;
-                    }
-                })
-                .build();
-
-        AssertionError e = null;
-        try {
-            OrchestratedTest test = new OrchestratedTest(spec);
+            MorcTest test = new MorcTest(spec);
             test.setUp();
             test.runOrchestratedTest();
         } catch (AssertionError ex) {
@@ -320,40 +227,10 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     }
 
-    class BadOrchestratedTest extends OrchestratedTest {
+    class BadOrchestratedTest extends MorcTest {
         public BadOrchestratedTest() {
             //we never set the spec!
         }
-    }
-
-    @Test
-    public void testUnorderedExpectationsCopySizeGreater0() throws Exception {
-
-    }
-
-    @Test
-    public void testExceptionValidatorWins() throws Exception {
-        SyncOrchestratedTestSpecification spec = new SyncOrchestratedTestSpecification.Builder("vm:exceptionThrower",
-                "Test Exception Found but not expected")
-                .expectedResponse(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return false;
-                    }
-                })
-                .expectsExceptionResponse()
-                .build();
-
-        AssertionError e = null;
-        try {
-            OrchestratedTest test = new OrchestratedTest(spec);
-            test.setUp();
-            test.runOrchestratedTest();
-        } catch (AssertionError ex) {
-            e = ex;
-            logger.info("Exception ({}): ", spec.getDescription(), e);
-        }
-        assertNotNull(e);
     }
 
 }

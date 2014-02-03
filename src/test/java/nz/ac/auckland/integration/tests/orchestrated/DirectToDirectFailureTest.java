@@ -1,17 +1,17 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
+import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import org.apache.camel.builder.RouteBuilder;
 
 /**
  * I want to illustrate that direct-to-direct routes don't have the
  * fromEndpoint set correctly
  */
-public class DirectToDirectFailureTest extends OrchestratedTestBuilder {
+public class DirectToDirectFailureTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("direct:direct2direct", "Test direct to direct expectation where Camel doesn't set fromEndpoint properly")
+        syncTest("Test direct to direct expectation where Camel doesn't set fromEndpoint properly","direct:direct2direct")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("direct:directExpectation")
                         .expectedBody(xml("<foo/>")));
@@ -35,6 +35,7 @@ public class DirectToDirectFailureTest extends OrchestratedTestBuilder {
         try {
             super.runOrchestratedTest();
         } catch (AssertionError ex) {
+            ex.printStackTrace();
             e = ex;
         }
 

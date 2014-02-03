@@ -5,6 +5,7 @@ import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.mock.builder.ContentMockDefinitionBuilder;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -70,83 +71,72 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("direct:syncInputAsyncOutput", "Simple send body to async output with valid response")
+        syncTest("Simple send body to async output with valid response","direct:syncInputAsyncOutput")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<baz/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
-
-        syncTest("direct:syncInputAsyncOutput", "Ensure unresolved message count is zero and still valid")
+        syncTest("Ensure unresolved message count is zero and still valid","direct:syncInputAsyncOutput")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(unreceivedExpectation("seda:nothingToSeeHere"));
 
-        syncTest("direct:syncMultiTestPublisher", "Multiple messages received by expectation")
+        syncTest("Multiple messages received by expectation","direct:syncMultiTestPublisher")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
                         .expectedMessageCount(3)
                         .expectedBody(xml("<moo/>")));
 
-        syncTest("direct:syncInputNoCallouts", "Message with no expectations")
+        syncTest("Message with no expectations","direct:syncInputNoCallouts")
                 .expectedResponseBody(xml("<abc/>"))
                 .requestBody(xml("<foo/>"));
 
-        syncTest("direct:syncMultiTestPublisher", "Test total ordering response the same")
+        syncTest("Test total ordering response the same","direct:syncMultiTestPublisher")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
                         .expectedMessageCount(3).ordering(MockDefinition.OrderingType.PARTIAL));
 
-        syncTest("direct:syncMultiTestPublisher", "Test endpoint ordering response the same")
+        syncTest("Test endpoint ordering response the same","direct:syncMultiTestPublisher")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
                         .expectedMessageCount(3).ordering(MockDefinition.OrderingType.PARTIAL));
 
-        syncTest("direct:syncMultiTestPublisher", "Test no ordering response the same")
+        syncTest("Test no ordering response the same","direct:syncMultiTestPublisher")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
                         .expectedMessageCount(3).ordering(MockDefinition.OrderingType.PARTIAL).endpointNotOrdered());
 
-        syncTest("direct:syncInputAsyncOutput", "Test headers are handled appropriately")
+        syncTest("Test headers are handled appropriately","direct:syncInputAsyncOutput")
                 .requestBody(xml("<baz/>"))
                 .requestHeaders(headers(header("foo", "baz"), header("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTarget")
                         .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
-        syncTest("direct:syncInputSyncOutput", "Test sync response")
+        syncTest("Test sync response","direct:syncInputSyncOutput")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(xml("<baz/>"), xml("<")).responseBody(xml("<foo/>")))
+                        .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
-        syncTest("direct:setHeaders", "Test Response Headers Validated")
+        syncTest("Test Response Headers Validated","direct:setHeaders")
+                .requestBody(text("1"))
                 .expectedResponseHeaders(headers(header("abc", "123"), header("foo", "baz")));
 
-        //syncTest("direct:throwsException", "exception found, expectsExceptionResponse and no validator")
-        //        .expectsExceptionResponse();
-
-        new ContentMockDefinitionBuilder("").expectedBody().expectedMessageCount(1);
-
-        /*syncTest("direct:throwsException", "exception found and exception validator = true")
-                .expectsExceptionResponse()
-                .expectedResponse(new Validator() {
-                    @Override
-                    public boolean validate(Exchange exchange) {
-                        return exchange.getException() instanceof IOException;
-                    }
-                });*/
-
         //we don't expect this to throw an exception back due to the async nature
-        syncTest("direct:asyncHandOff", "exception thrown after async call")
+        syncTest("exception thrown after async call","direct:asyncHandOff")
+                .requestBody(text("1"))
                 .expectedResponseBody(text("working"));
 
-        syncTest("direct:jsonResponse", "test json validation in response")
+        syncTest("test json validation in response","direct:jsonResponse")
+                .requestBody(text("1"))
                 .expectedResponseBody(json("{\"foo\":\"baz\"}"));
 
-        syncTest("direct:propertiesTest", "check properties set correctly")
+        syncTest("check properties set correctly","direct:propertiesTest")
+                .requestBody(text("1"))
                 .expectedResponseBody(text("foo"));
 
-        syncTest("seda:jsonRequest", "Test JSON Expectation")
+        syncTest("Test JSON Expectation","seda:jsonRequest")
                 .requestBody(json("{\"foo\":\"baz\"}"))
                 .addExpectation(syncExpectation("seda:jsonExpectation")
                         .expectedBody(json("{\"foo\":\"baz\"}")));
@@ -156,7 +146,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
                 .expectedBody(json("{\"foo\":\"baz\"}"));
         MockDefinition.MockDefinitionBuilderInit expectation2 = unreceivedExpectation("seda:nothingToSeeHere");
 
-        syncTest("seda:jsonRequest", "addExpectationsTest")
+        syncTest("addExpectationsTest","seda:jsonRequest")
                 .requestBody(json("{\"foo\":\"baz\"}"))
                 .addExpectations(expectation1, expectation2);
 
