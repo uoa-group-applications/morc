@@ -132,7 +132,7 @@ public class OrchestratedTestSpecification {
             }
 
             processors = getProcessors();
-            if (processors.size() == 0) throw new IllegalStateException("The specification for endpoint " + getEndpointUri() +
+            if (processors.size() == 0) throw new IllegalStateException("The specification for test " + description +
                     " must specify at least one message processor to send messages");
             predicates = getPredicates();
             return new OrchestratedTestSpecification(this);
@@ -251,6 +251,10 @@ public class OrchestratedTestSpecification {
 
         protected Map<String, MockDefinition> getMockExpectations() {
             return Collections.unmodifiableMap(mockExpectations);
+        }
+
+        protected String getDescription() {
+            return this.description;
         }
 
     }

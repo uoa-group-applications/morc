@@ -57,8 +57,8 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
      */
     public OrchestratedTestSpecification build() {
         if (getMockExpectations().size() == 0)
-            throw new IllegalArgumentException("At least 1 mock expectation must be set for an " +
-                    "asynchronous test specification");
+            throw new IllegalArgumentException("At least 1 mock expectation must be set for the " +
+                    "asynchronous test specification " + getDescription());
 
         logger.info("The endpoint {} will be sending {} input message bodies and {} input message headers",
                 new Object[]{getEndpointUri(), inputMessageBodies.size(), inputMessageHeaders.size()});
