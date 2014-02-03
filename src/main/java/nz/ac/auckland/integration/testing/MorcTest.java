@@ -170,31 +170,27 @@ public class MorcTest extends CamelSpringTestSupport {
                 if (mockDefinition.isEndpointOrdered())
                     mockEndpoint.expectedMessagesMatches(mockDefinition.getPredicates()
                             .toArray(new Predicate[mockDefinition.getPredicates().size()]));
-                else {
-                    final List<Predicate> equalsPredicatesList = new ArrayList<>();
-                    for (final Predicate predicate : mockDefinition.getPredicates()) {
-                        equalsPredicatesList.add(new Predicate() {
-                            @Override
-                            public boolean matches(Exchange exchange) {
-                                return predicate.matches(exchange);
-                            }
-
-                            @Override
-                            public boolean equals(Object object) {
-                                return (object instanceof Exchange) && predicate.matches((Exchange) object);
-                            }
-                        });
-                    }
-
+                else
                     mockEndpoint.expects(new Runnable() {
                         public void run() {
-                            List<Predicate> equalsPredicatesListCopy = new ArrayList<>(equalsPredicatesList);
+                            //need to use a new copy each time for the case of re-assertion
+                            ArrayList<Predicate> predicatesCopy = new ArrayList<>(mockDefinition.getPredicates());
                             for (Exchange exchange : mockEndpoint.getExchanges())
                                 assertTrue("Message " + exchange + " was received but not matched against a predicate " +
-                                        "on endpoint " + mockDefinition.getEndpointUri(), equalsPredicatesListCopy.remove(exchange));
+                                        "on endpoint " + mockDefinition.getEndpointUri(), remove(predicatesCopy,exchange));
+                        }
+
+                        private boolean remove(ArrayList<Predicate> predicates, Exchange exchange) {
+                            for (Iterator<Predicate> iterator = predicates.iterator(); iterator.hasNext(); ) {
+                                if (iterator.next().matches(exchange)) {
+                                    iterator.remove();
+                                    return true;
+                                }
+                            }
+                            return false;
                         }
                     });
-                }
+
 
                 if (mockDefinition.getLenientSelector() != null) {
                     mockDefinition.getMockFeederRoute()
@@ -272,10 +268,8 @@ public class MorcTest extends CamelSpringTestSupport {
             for (Exchange e : orderCheckMock.getExchanges()) {
                 OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes, e.getFromEndpoint());
 
-                //todo make this exception useful...
                 //this means we don't expect to have seen the message at this point
-                if (node == null)
-                    throw new AssertionError("");
+                assertNotNull("add useful exception message here",node);
 
                 //we've encountered a message to this endpoint and should remove it from the set
                 endpointNodes.remove(node);

@@ -102,7 +102,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
             finalProcessors.add(new MultiProcessor(orderedProcessors));
         }
 
-        for (int i = expectedSize; i < localProcessors.size(); i++) {
+        for (int i = localProcessors.size(); i < expectedSize; i++) {
             //this may well be empty
             finalProcessors.add(new MultiProcessor(repeatedProcessors));
         }
@@ -128,7 +128,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
             finalPredicates.add(new MultiPredicate(orderedPredicates));
         }
 
-        for (int i = expectedSize; i < localPredicates.size(); i++) {
+        for (int i = localPredicates.size(); i < expectedSize; i++) {
             finalPredicates.add(new MultiPredicate(repeatedPredicates));
         }
 
