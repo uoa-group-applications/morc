@@ -19,7 +19,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
             public void configure() throws Exception {
                 from("direct:syncInput")
                         .to("seda:asyncTargetInternal?waitForTaskToComplete=Never")
-                        .to("seda:syncTarget");
+                        .to("seda:syncTarget?waitForTaskToComplete=Always");
 
                 from("seda:asyncTargetInternal")
                         .setBody(constant("<async/>"))
@@ -34,13 +34,13 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 from("direct:syncInputMultiAsync")
                         .to("seda:asyncTargetInternal?waitForTaskToComplete=Never")
                         .to("seda:asyncTargetInternal1?waitForTaskToComplete=Never")
-                        .to("seda:syncTarget");
+                        .to("seda:syncTarget?waitForTaskToComplete=Always");
 
                 from("direct:syncInputMultiAsyncToSameDest")
                         .to("seda:asyncTargetInternal?waitForTaskToComplete=Never")
                         .to("seda:asyncTargetInternal1?waitForTaskToComplete=Never")
                         .to("seda:asyncTargetInternal1?waitForTaskToComplete=Never")
-                        .to("seda:syncTarget");
+                        .to("seda:syncTarget?waitForTaskToComplete=Always");
 
                 from("direct:multiSend")
                         .process(new Processor() {
@@ -207,11 +207,13 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                         .expectedBody(xml("<first/>")));
 
         syncTest("Send async messages out of order such that sync arrives first","direct:syncAtEnd")
+                .requestBody(text("0"))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")).endpointNotOrdered())
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")).endpointNotOrdered())
                 .addExpectation(syncExpectation(("seda:b")));
 
         asyncTest("send mis-ordered","direct:endpointWithSyncOrdering")
+                .inputMessage(text("0"))
                 .addExpectation(asyncExpectation("seda:a"))
                 .addExpectation(asyncExpectation("seda:b"))
                 .addExpectation(syncExpectation("seda:s"));
