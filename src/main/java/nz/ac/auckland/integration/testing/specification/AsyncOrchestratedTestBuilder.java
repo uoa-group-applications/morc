@@ -39,6 +39,19 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
         return self();
     }
 
+    @SafeVarargs
+    public final AsyncOrchestratedTestBuilder inputHeaders(TestResource<Map<String,Object>>... resources) {
+        for (TestResource<Map<String,Object>> resource: resources) {
+            try {
+                inputMessageHeaders.add(resource.getValue());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return self();
+    }
+
     /**
      * @throws IllegalArgumentException if no expectations are specified
      */
