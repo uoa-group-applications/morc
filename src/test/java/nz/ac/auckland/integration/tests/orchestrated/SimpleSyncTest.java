@@ -27,7 +27,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
                 //we use seda so that the from endpoint changes
                 from("direct:syncInputSyncOutput")
-                        .to("seda:syncTarget");
+                        .to("seda:syncTarget?waitForTaskToComplete=Always");
 
                 from("direct:syncMultiTestPublisher")
                         .process(new Processor() {
@@ -116,7 +116,8 @@ public class SimpleSyncTest extends MorcTestBuilder {
         syncTest("Test sync response","direct:syncInputSyncOutput")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(xml("<baz/>")).responseBody(xml("<foo/>")))
+                        .expectedBody(xml("<baz/>"))
+                        .responseBody(xml("<foo/>")))
                 .expectedResponseBody(xml("<foo/>"));
 
         syncTest("Test Response Headers Validated","direct:setHeaders")
