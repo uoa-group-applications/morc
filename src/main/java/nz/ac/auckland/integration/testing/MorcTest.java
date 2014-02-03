@@ -242,19 +242,18 @@ public class MorcTest extends CamelSpringTestSupport {
 
             publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
                     new MessagePublishDataSet(spec.getProcessors())))
-                    .routeId(MorcTest.class.getCanonicalName() + ".publish")
-                    .onCompletion()
-                        .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
-                            .log(LoggingLevel.DEBUG, "Received exception response to endpoint " + spec.getEndpointUri()
-                                    + " exception: ${exception}, headers: ${headers}")
-                        .otherwise()
-                            .log(LoggingLevel.DEBUG, "Received response to endpoint " + spec.getEndpointUri()
-                                    + " body: ${body}, headers: ${headers}")
-                        .end()
-                        .to(sendingMockEndpoint)
-                    .end()
+                    .routeId(MorcTest.class.getCanonicalName() + ".publish").handleFault()
+                    .onException(Throwable.class).continued(true).end()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
-                    .to(targetEndpoint);
+                    .to(targetEndpoint)
+                    .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
+                        .log(LoggingLevel.DEBUG, "Received exception response to endpoint " + spec.getEndpointUri()
+                                + " exception: ${exception}, headers: ${headers}")
+                    .otherwise()
+                        .log(LoggingLevel.DEBUG, "Received response to endpoint " + spec.getEndpointUri()
+                                + " body: ${body}, headers: ${headers}")
+                    .end()
+                    .to(sendingMockEndpoint);
 
             context.addRouteDefinition(publishRouteDefinition);
 
