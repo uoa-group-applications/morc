@@ -556,14 +556,14 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
     public static HttpErrorPredicate httpExceptionResponse(Predicate predicate) {
-        return new HttpErrorPredicate.Builder().bodyValidator(predicate).build();
+        return new HttpErrorPredicate.Builder().bodyPredicate(predicate).build();
     }
 
     /**
      * @return A validator that ensures that the HTTP response body meets the expected response
      */
     public static HttpErrorPredicate httpExceptionResponse(int statusCode, Predicate predicate) {
-        return new HttpErrorPredicate.Builder().bodyValidator(predicate).statusCode(statusCode).build();
+        return new HttpErrorPredicate.Builder().bodyPredicate(predicate).statusCode(statusCode).build();
     }
 
     /**

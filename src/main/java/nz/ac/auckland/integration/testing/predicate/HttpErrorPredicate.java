@@ -19,16 +19,16 @@ public class HttpErrorPredicate implements Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpErrorPredicate.class);
 
-    private Predicate bodyValidator;
-    private Predicate headersValidator;
+    private Predicate bodyPredicate;
+    private Predicate headersPredicate;
     private int statusCode;
 
-    public Predicate getBodyValidator() {
-        return bodyValidator;
+    public Predicate getBodyPredicate() {
+        return bodyPredicate;
     }
 
-    public Predicate getHeadersValidator() {
-        return headersValidator;
+    public Predicate getHeadersPredicate() {
+        return headersPredicate;
     }
 
     public int getStatusCode() {
@@ -62,12 +62,12 @@ public class HttpErrorPredicate implements Predicate {
             validStatus = false;
         }
 
-        if (bodyValidator != null && !bodyValidator.matches(validationExchange)) {
+        if (bodyPredicate != null && !bodyPredicate.matches(validationExchange)) {
             logger.warn("The HTTP exception response body is not as expected");
             validBody = false;
         }
 
-        if (headersValidator != null && !headersValidator.matches(validationExchange)) {
+        if (headersPredicate != null && !headersPredicate.matches(validationExchange)) {
             logger.warn("The HTTP exception response headers are not as expected");
             validHeaders = false;
         }
@@ -77,23 +77,23 @@ public class HttpErrorPredicate implements Predicate {
     }
 
     public static class Builder {
-        private Predicate bodyValidator;
-        private Predicate headersValidator;
+        private Predicate bodyPredicate;
+        private Predicate headersPredicate;
         private int statusCode;
 
         /**
-         * @param bodyValidator A validator for the expected error response body
+         * @param bodyPredicate A validator for the expected error response body
          */
-        public Builder bodyValidator(Predicate bodyValidator) {
-            this.bodyValidator = bodyValidator;
+        public Builder bodyPredicate(Predicate bodyPredicate) {
+            this.bodyPredicate = bodyPredicate;
             return this;
         }
 
         /**
          * @param headersPredicate A validator for the HTTP response headers
          */
-        public Builder headersValidator(HeadersPredicate headersPredicate) {
-            this.headersValidator = headersPredicate;
+        public Builder headersPredicate(HeadersPredicate headersPredicate) {
+            this.headersPredicate = headersPredicate;
             return this;
         }
 
@@ -101,8 +101,8 @@ public class HttpErrorPredicate implements Predicate {
          * @param resource A resource containing the expected response headers
          */
         @SuppressWarnings("unchecked")
-        public Builder headersValidator(HeadersTestResource resource) {
-            this.headersValidator = new HeadersPredicate(resource);
+        public Builder headersPredicate(HeadersTestResource resource) {
+            this.headersPredicate = new HeadersPredicate(resource);
             return this;
         }
 
@@ -116,8 +116,8 @@ public class HttpErrorPredicate implements Predicate {
 
         public HttpErrorPredicate build() {
             HttpErrorPredicate predicate = new HttpErrorPredicate();
-            predicate.bodyValidator = this.bodyValidator;
-            predicate.headersValidator = this.headersValidator;
+            predicate.bodyPredicate = this.bodyPredicate;
+            predicate.headersPredicate = this.headersPredicate;
             predicate.statusCode = this.statusCode;
             return predicate;
         }
