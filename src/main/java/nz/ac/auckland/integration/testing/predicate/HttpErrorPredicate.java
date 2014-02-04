@@ -84,7 +84,7 @@ public class HttpErrorPredicate implements Predicate {
         /**
          * @param bodyPredicate A validator for the expected error response body
          */
-        public Builder bodyPredicate(Predicate bodyPredicate) {
+        public Builder responseBody(Predicate bodyPredicate) {
             this.bodyPredicate = bodyPredicate;
             return this;
         }
@@ -92,7 +92,7 @@ public class HttpErrorPredicate implements Predicate {
         /**
          * @param headersPredicate A validator for the HTTP response headers
          */
-        public Builder headersPredicate(HeadersPredicate headersPredicate) {
+        public Builder responseHeaders(HeadersPredicate headersPredicate) {
             this.headersPredicate = headersPredicate;
             return this;
         }
@@ -101,7 +101,7 @@ public class HttpErrorPredicate implements Predicate {
          * @param resource A resource containing the expected response headers
          */
         @SuppressWarnings("unchecked")
-        public Builder headersPredicate(HeadersTestResource resource) {
+        public Builder responseHeaders(HeadersTestResource resource) {
             this.headersPredicate = new HeadersPredicate(resource);
             return this;
         }
