@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.testing.specification;
 import nz.ac.auckland.integration.testing.MorcBuilder;
 import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
+import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -113,6 +114,7 @@ public class OrchestratedTestSpecification {
         private Collection<EndpointNode> endpointNodesOrdering = new ArrayList<>();
         private EndpointNode currentTotalOrderLeafEndpoint;
         private int totalMessageCount = 0;
+        private boolean expectsException = false;
 
         //final list of single processors and predicates
         private List<Processor> processors;
@@ -130,6 +132,21 @@ public class OrchestratedTestSpecification {
                 nextPart = nextPartBuilder.build();
                 partCount = nextPart.getPartCount() + 1;
             }
+
+            if (!expectsException)
+                addRepeatedPredicate(new Predicate() {
+                    @Override
+                    public boolean matches(Exchange exchange) {
+                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class) == null;
+                    }
+                });
+            else
+                addRepeatedPredicate(new Predicate() {
+                    @Override
+                    public boolean matches(Exchange exchange) {
+                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class) != null;
+                    }
+                });
 
             processors = getProcessors();
             if (processors.size() == 0) throw new IllegalStateException("The specification for test " + description +
@@ -235,6 +252,11 @@ public class OrchestratedTestSpecification {
         @SuppressWarnings("unchecked")
         public Builder addEndpoint(String endpointUri) {
             return (Builder)addEndpoint(endpointUri, this.getClass());
+        }
+
+        public Builder expectsException() {
+            this.expectsException = true;
+            return self();
         }
 
         @SuppressWarnings("unchecked")
