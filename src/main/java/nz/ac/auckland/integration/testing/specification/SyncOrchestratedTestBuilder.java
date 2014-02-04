@@ -4,7 +4,10 @@ import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import nz.ac.auckland.integration.testing.processor.BodyProcessor;
 import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
 import nz.ac.auckland.integration.testing.resource.TestResource;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +93,13 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
                 "{} expected response body predicates, and {} expected response headers predicate",
                 new Object[]{getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
                         responseBodyPredicates.size(), responseHeadersPredicates.size()});
+
+        addRepeatedProcessor(new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                exchange.setPattern(ExchangePattern.InOut);
+            }
+        });
 
         int messageCount = Math.max(inputRequestBodies.size(), inputRequestHeaders.size());
         for (int i = 0; i < messageCount; i++) {

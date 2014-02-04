@@ -151,7 +151,11 @@ public class OrchestratedTestSpecification {
             processors = getProcessors();
             if (processors.size() == 0) throw new IllegalStateException("The specification for test " + description +
                     " must specify at least one message processor to send messages");
-            predicates = getPredicates();
+
+            predicates = getPredicates(processors.size());
+            if (predicates.size() < processors.size()) throw new IllegalStateException("The specification for test " + description +
+                    " must specify fewer predicates than message processors");
+
             return new OrchestratedTestSpecification(this);
         }
 

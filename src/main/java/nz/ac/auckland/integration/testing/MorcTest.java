@@ -238,15 +238,17 @@ public class MorcTest extends CamelSpringTestSupport {
 
             publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
                     new MessagePublishDataSet(spec.getProcessors())))
-                    .routeId(MorcTest.class.getCanonicalName() + ".publish").handleFault()
-                    .onException(Throwable.class).continued(true).end()
+                    .routeId(MorcTest.class.getCanonicalName() + ".publish")
+                    .handleFault()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
-                    .to(targetEndpoint)
+                    .doTry() //for some reason onException().continued(true) doesn't work
+                        .to(targetEndpoint)
+                    .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
-                        .log(LoggingLevel.DEBUG, "Received exception response to endpoint " + spec.getEndpointUri()
+                        .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
                                 + " exception: ${exception}, headers: ${headers}")
                     .otherwise()
-                        .log(LoggingLevel.DEBUG, "Received response to endpoint " + spec.getEndpointUri()
+                        .log(LoggingLevel.INFO, "Received response to endpoint " + spec.getEndpointUri()
                                 + " body: ${body}, headers: ${headers}")
                     .end()
                     .to(sendingMockEndpoint);
