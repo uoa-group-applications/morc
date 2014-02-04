@@ -44,6 +44,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
         syncTest("Simple WS proxy failure test","jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponse(httpExceptionResponse(500))
+                .expectsException()
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
@@ -51,6 +52,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
         syncTest("Simple WS proxy failure test with body","jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponse(httpExceptionResponse(501,xml(classpath("/data/pingSoapFault.xml"))))
+                .expectsException()
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingSoapFault.xml")))
@@ -73,16 +75,18 @@ public class WebServiceProxyTest extends MorcTestBuilder {
 
         syncTest("CXF WS Fault Test","cxf:http://localhost:8092/testWSFault")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectsException()
                 .expectedResponse(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
 
         syncTest("CXF WS Fault Test with detail","cxf:http://localhost:8092/testWSFaultDetail")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectsException()
                 .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
                         xml("<detail><foo/></detail>")));
 
         syncTest("Simple test to show SOAP Fault expectation","cxf:http://localhost:8092/targetWS")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .addPredicates(0,new ExceptionPredicate())
+                .expectsException()
                 .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Fault",
                         xml("<detail><foo/></detail>")))
                 .addExpectation(soapFaultExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
@@ -102,9 +106,6 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));
-
-        //todo: jetty breaks without an inputstream: java.lang.IllegalStateException: SENDING => HEADERS
-
     }
 
 }
