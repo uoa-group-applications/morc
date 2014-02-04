@@ -54,8 +54,8 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     }
 
     @SafeVarargs
-    public final SyncOrchestratedTestBuilder requestHeaders(TestResource<Map<String,Object>>... resources) {
-        for (TestResource<Map<String,Object>> resource : resources) {
+    public final SyncOrchestratedTestBuilder requestHeaders(TestResource<Map<String, Object>>... resources) {
+        for (TestResource<Map<String, Object>> resource : resources) {
             try {
                 inputRequestHeaders.add(resource.getValue());
             } catch (Exception e) {

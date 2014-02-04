@@ -4,7 +4,6 @@ import nz.ac.auckland.integration.testing.endpointoverride.EndpointOverride;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.*;
-import org.apache.camel.builder.NoErrorHandlerBuilder;
 import org.apache.camel.component.dataset.DataSet;
 import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
@@ -13,7 +12,6 @@ import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.language.ConstantExpression;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
-import org.apache.camel.util.URISupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -21,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -160,7 +156,7 @@ public class MorcTest extends CamelSpringTestSupport {
                 //why do we need i+1??
                 mockEndpoint.setExpectedMessageCount(mockDefinition.getExpectedMessageCount());
                 for (int i = 0; i < mockDefinition.getProcessors().size(); i++)
-                    mockEndpoint.whenExchangeReceived(i+1, mockDefinition.getProcessors().get(i));
+                    mockEndpoint.whenExchangeReceived(i + 1, mockDefinition.getProcessors().get(i));
 
                 //todo clear this up - assert times
                 mockEndpoint.setSleepForEmptyTest(mockDefinition.getAssertionTime());
@@ -177,7 +173,7 @@ public class MorcTest extends CamelSpringTestSupport {
                             ArrayList<Predicate> predicatesCopy = new ArrayList<>(mockDefinition.getPredicates());
                             for (Exchange exchange : mockEndpoint.getExchanges())
                                 assertTrue("Message " + exchange + " was received but not matched against a predicate " +
-                                        "on endpoint " + mockDefinition.getEndpointUri(), remove(predicatesCopy,exchange));
+                                        "on endpoint " + mockDefinition.getEndpointUri(), remove(predicatesCopy, exchange));
                         }
 
                         private boolean remove(ArrayList<Predicate> predicates, Exchange exchange) {
@@ -203,9 +199,9 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 mockDefinition.getMockFeederRoute()
                         .routeId(MorcTest.class.getCanonicalName() + "." + mockDefinition.getEndpointUri())
-                        .setProperty("endpointUri",new ConstantExpression(mockDefinition.getEndpointUri()))
+                        .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()))
                         .wireTap(orderCheckMock.getEndpointUri())
-                        .log(LoggingLevel.INFO,"Endpoint ${property.endpointUri} received a message")
+                        .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message")
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
@@ -242,14 +238,14 @@ public class MorcTest extends CamelSpringTestSupport {
                     .handleFault()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
                     .doTry() //for some reason onException().continued(true) doesn't work
-                        .to(targetEndpoint)
+                    .to(targetEndpoint)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
-                        .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
-                                + " exception: ${exception}, headers: ${headers}")
+                    .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
+                            + " exception: ${exception}, headers: ${headers}")
                     .otherwise()
-                        .log(LoggingLevel.INFO, "Received response to endpoint " + spec.getEndpointUri()
-                                + " body: ${body}, headers: ${headers}")
+                    .log(LoggingLevel.INFO, "Received response to endpoint " + spec.getEndpointUri()
+                            + " body: ${body}, headers: ${headers}")
                     .end()
                     .to(sendingMockEndpoint);
 
@@ -271,7 +267,7 @@ public class MorcTest extends CamelSpringTestSupport {
                 OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes, e.getFromEndpoint());
 
                 //this means we don't expect to have seen the message at this point
-                assertNotNull("add useful exception message here",node);
+                assertNotNull("add useful exception message here", node);
 
                 //we've encountered a message to this endpoint and should remove it from the set
                 endpointNodes.remove(node);

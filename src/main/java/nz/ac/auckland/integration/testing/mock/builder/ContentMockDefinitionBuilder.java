@@ -1,17 +1,5 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
-import nz.ac.auckland.integration.testing.mock.MockDefinition;
-import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
-import nz.ac.auckland.integration.testing.resource.TestResource;
-import org.apache.camel.Predicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 /**
  * A class to set expectations for bodies and headers for
  * an incoming message

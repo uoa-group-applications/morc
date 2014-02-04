@@ -63,7 +63,7 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
     public final Builder responseHeaders(TestResource<Map<String, Object>>... resources) {
         for (TestResource<Map<String, Object>> resource : resources) {
             try {
-                this.responseHeadersProcessors.<Map<String,Object>>add(resource.getValue());
+                this.responseHeadersProcessors.<Map<String, Object>>add(resource.getValue());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

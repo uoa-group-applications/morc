@@ -137,14 +137,14 @@ public class OrchestratedTestSpecification {
                 addRepeatedPredicate(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
-                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class) == null;
+                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class) == null;
                     }
                 });
             else
                 addRepeatedPredicate(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
-                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT,Exception.class) != null;
+                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class) != null;
                     }
                 });
 
@@ -153,8 +153,9 @@ public class OrchestratedTestSpecification {
                     " must specify at least one message processor to send messages");
 
             predicates = getPredicates(processors.size());
-            if (predicates.size() < processors.size()) throw new IllegalStateException("The specification for test " + description +
-                    " must specify fewer predicates than message processors");
+            if (predicates.size() < processors.size())
+                throw new IllegalStateException("The specification for test " + description +
+                        " must specify fewer predicates than message processors");
 
             return new OrchestratedTestSpecification(this);
         }
@@ -255,7 +256,7 @@ public class OrchestratedTestSpecification {
 
         @SuppressWarnings("unchecked")
         public Builder addEndpoint(String endpointUri) {
-            return (Builder)addEndpoint(endpointUri, this.getClass());
+            return (Builder) addEndpoint(endpointUri, this.getClass());
         }
 
         public Builder expectsException() {
