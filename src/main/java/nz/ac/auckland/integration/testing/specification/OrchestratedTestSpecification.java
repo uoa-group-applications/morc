@@ -32,7 +32,8 @@ public class OrchestratedTestSpecification {
     private OrchestratedTestSpecification nextPart;
     private List<Processor> processors;
     private List<Predicate> predicates;
-    private int totalMessageCount;
+    private int totalPublishMessageCount;
+    private int totalMockMessageCount;
 
     /**
      * @return A description that explains what this tests is doing
@@ -97,8 +98,12 @@ public class OrchestratedTestSpecification {
         return Collections.unmodifiableCollection(endpointOverrides);
     }
 
-    public int getTotalMessageCount() {
-        return totalMessageCount;
+    public int getTotalMockMessageCount() {
+        return totalMockMessageCount;
+    }
+
+    public int getTotalPublishMessageCount() {
+        return totalPublishMessageCount;
     }
 
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
@@ -110,10 +115,10 @@ public class OrchestratedTestSpecification {
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
-        //todo: add time to wait for all requests to be sent
         private Collection<EndpointNode> endpointNodesOrdering = new ArrayList<>();
         private EndpointNode currentTotalOrderLeafEndpoint;
-        private int totalMessageCount = 0;
+        private int totalPublishMessageCount = 0;
+        private int totalMockMessageCount = 0;
         private boolean expectsException = false;
 
         //final list of single processors and predicates
@@ -157,7 +162,7 @@ public class OrchestratedTestSpecification {
                 throw new IllegalStateException("The specification for test " + description +
                         " must specify fewer predicates than message processors");
 
-            totalMessageCount += processors.size();
+            totalPublishMessageCount += processors.size();
 
             return new OrchestratedTestSpecification(this);
         }
@@ -185,6 +190,8 @@ public class OrchestratedTestSpecification {
 
             int mergedEndpointExpectationMessageCount =
                     mergedExpectation.getExpectedMessageCount() - currentEndpointExpectationMessageCount;
+
+            totalMockMessageCount += mergedEndpointExpectationMessageCount;
 
             //we need to build a tree based on ordering types which will be expanded to a set during validation
 
@@ -294,7 +301,8 @@ public class OrchestratedTestSpecification {
         this.endpointNodesOrdering = builder.endpointNodesOrdering;
         this.processors = builder.processors;
         this.predicates = builder.predicates;
-        this.totalMessageCount = builder.totalMessageCount;
+        this.totalMockMessageCount = builder.totalMockMessageCount;
+        this.totalPublishMessageCount = builder.totalPublishMessageCount;
     }
 
     public static class EndpointNode {

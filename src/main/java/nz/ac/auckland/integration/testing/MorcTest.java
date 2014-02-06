@@ -20,6 +20,8 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
@@ -142,7 +144,7 @@ public class MorcTest extends CamelSpringTestSupport {
         Set<MockEndpoint> mockEndpoints = new HashSet<>();
         Set<RouteDefinition> createdRoutes = new HashSet<>();
         MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
-        orderCheckMock.expectedMessageCount(spec.getTotalMessageCount());
+        orderCheckMock.expectedMessageCount(spec.getTotalMockMessageCount());
 
         try {
             Collection<MockDefinition> mockDefinitions = spec.getMockDefinitions();
@@ -232,13 +234,23 @@ public class MorcTest extends CamelSpringTestSupport {
             for (EndpointOverride override : spec.getEndpointOverrides())
                 override.overrideEndpoint(targetEndpoint);
 
+            final CountDownLatch processedMessageLatch = new CountDownLatch(spec.getTotalPublishMessageCount());
+
             publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
                     new MessagePublishDataSet(spec.getProcessors())))
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
                     .handleFault()
+                    .onCompletion()
+                        .process(new Processor() {
+                            @Override
+                            public void process(Exchange exchange) throws Exception {
+                                processedMessageLatch.countDown();
+                            }
+                        })
+                    .end()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
                     .doTry() //for some reason onException().continued(true) doesn't work
-                    .to(targetEndpoint)
+                        .to(targetEndpoint)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
                     .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
@@ -253,9 +265,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
             createdRoutes.add(publishRouteDefinition);
 
-            //consider using observer pattern here...
-            sendingMockEndpoint.setResultWaitTime(spec.getMessageAssertTime() * (spec.getTotalMessageCount()+1));
-            sendingMockEndpoint.assertIsSatisfied();
+            //extra 5s is to give some time for route to boot
+            sendingMockEndpoint.assertIsSatisfied(5000l + spec.getMessageAssertTime() * (spec.getTotalPublishMessageCount()+1));
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
                 mockEndpoint.assertIsSatisfied();
