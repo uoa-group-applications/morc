@@ -46,7 +46,7 @@ public class HttpExceptionValidatorTest extends Assert {
 
         HttpErrorPredicate validator = new HttpErrorPredicate.Builder()
                 .responseBody(responseBodyValidator)
-                .responseHeaders(new MockHeadersPredicate(null, true))
+                .responseHeaders(responseHeadersPredicate)
                 .statusCode(500)
                 .build();
 
@@ -58,7 +58,7 @@ public class HttpExceptionValidatorTest extends Assert {
     @Test
     public void testWrongException() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new IOException());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new IOException());
         assertFalse(new HttpErrorPredicate().matches(e));
     }
 
@@ -78,7 +78,7 @@ public class HttpExceptionValidatorTest extends Assert {
                 .build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new HttpOperationFailedException("uri", 123, "status", "location", null, null));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", null, null));
         assertFalse(validator.matches(e));
     }
 
@@ -97,7 +97,7 @@ public class HttpExceptionValidatorTest extends Assert {
                 .build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new HttpOperationFailedException("uri", 123, "status", "location", null, "foo"));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", null, "foo"));
         assertFalse(validator.matches(e));
     }
 
@@ -129,7 +129,7 @@ public class HttpExceptionValidatorTest extends Assert {
                 .build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new HttpOperationFailedException("uri", 123, "status", "location", map, "foo"));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", map, "foo"));
         assertFalse(validator.matches(e));
     }
 
@@ -141,7 +141,7 @@ public class HttpExceptionValidatorTest extends Assert {
                 .responseBody(resource).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new HttpOperationFailedException("uri", 123, "status", "location", null, "foo"));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", null, "foo"));
 
         assertTrue(validator.matches(e));
     }
@@ -154,7 +154,7 @@ public class HttpExceptionValidatorTest extends Assert {
                 .responseBody(resource).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new HttpOperationFailedException("uri", 123, "status", "location", null, "{\"foo\":\"baz\"}"));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", null, "{\"foo\":\"baz\"}"));
 
         assertTrue(validator.matches(e));
     }
@@ -180,7 +180,7 @@ public class HttpExceptionValidatorTest extends Assert {
                 .build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new HttpOperationFailedException("uri", 123, "status", "location", map, "foo"));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", map, "foo"));
         assertFalse(validator.matches(e));
     }
 }

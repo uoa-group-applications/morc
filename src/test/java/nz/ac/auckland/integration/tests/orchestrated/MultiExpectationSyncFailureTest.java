@@ -109,6 +109,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
     @Test
     public void testExpectationToTwoEndpointsSendTwoToOneFails() throws Exception {
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test no exchange available fails","vm:z")
+                .inputMessage(text("0"))
                 .addExpectation(asyncExpectation("vm:b"))
                 .addExpectation(asyncExpectation("vm:c"))
                 .build();

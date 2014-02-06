@@ -9,6 +9,7 @@ import org.apache.camel.Predicate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,6 +18,13 @@ import java.io.IOException;
 
 
 public class SOAPFaultValidatorTest extends Assert {
+
+    public SOAPFaultValidatorTest() {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setNormalizeWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
+    }
+
     @Test
     public void testNullExchange() throws Exception {
         assertFalse(new SoapFaultTestResource(new QName("foo", "baz"), "foo").matches(null));
@@ -31,7 +39,7 @@ public class SOAPFaultValidatorTest extends Assert {
     @Test
     public void testNonSoapFaultException() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setException(new IOException());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new IOException());
         assertFalse(new SoapFaultTestResource(new QName("foo", "baz"), "foo").matches(e));
     }
 
@@ -39,13 +47,13 @@ public class SOAPFaultValidatorTest extends Assert {
     public void testFaultMessageValidator() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         SoapFault fault = new SoapFault("message", MorcTestBuilder.SOAPFAULT_SERVER);
-        e.setException(fault);
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         Predicate predicate = new SoapFaultTestResource(MorcTestBuilder.SOAPFAULT_SERVER, "message");
 
         assertTrue(predicate.matches(e));
         fault = new SoapFault("message1", MorcTestBuilder.SOAPFAULT_SERVER);
-        e.setException(fault);
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         assertFalse(predicate.matches(e));
     }
@@ -55,13 +63,13 @@ public class SOAPFaultValidatorTest extends Assert {
     public void testQNameFaultCodeValidation() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         SoapFault fault = new SoapFault("message", MorcTestBuilder.SOAPFAULT_SERVER);
-        e.setException(fault);
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         Predicate predicate = new SoapFaultTestResource(MorcTestBuilder.SOAPFAULT_SERVER, "message");
 
         assertTrue(predicate.matches(e));
         fault = new SoapFault("message", MorcTestBuilder.SOAPFAULT_CLIENT);
-        e.setException(fault);
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         assertFalse(predicate.matches(e));
     }
@@ -75,8 +83,8 @@ public class SOAPFaultValidatorTest extends Assert {
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         SoapFault fault = new SoapFault("message", new QName("www.foo.com", "baz"));
-        fault.setDetail(xmlUtilities.getXmlAsDocument("<foo/>").getDocumentElement());
-        e.setException(fault);
+        fault.setDetail(xmlUtilities.getXmlAsDocument("<detail><foo/></detail>").getDocumentElement());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
         assertTrue(resource.matches(e));
     }
 
@@ -90,7 +98,7 @@ public class SOAPFaultValidatorTest extends Assert {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         SoapFault fault = new SoapFault("message", new QName("www.foo.com", "baz"));
         fault.setDetail(xmlUtilities.getXmlAsDocument("<foo1/>").getDocumentElement());
-        e.setException(fault);
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
         assertFalse(resource.matches(e));
     }
 

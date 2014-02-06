@@ -92,6 +92,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     @Test
     public void testInvalidResponseFails() throws Exception {
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid response","vm:syncInputNoCallouts")
+                .requestBody(text("0"))
                 .expectedResponseBody(xml("<foo/>"))
                 .build();
 
@@ -178,6 +179,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test unexpected response headers",
                 "vm:syncHeaderResponse")
+                .requestBody(text("0"))
                 .expectedResponseHeaders(new HeadersTestResource(headers))
                 .build();
 

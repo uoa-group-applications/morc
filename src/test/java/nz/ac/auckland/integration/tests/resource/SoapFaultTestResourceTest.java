@@ -4,12 +4,22 @@ import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks;
 
 import javax.xml.namespace.QName;
 
 public class SoapFaultTestResourceTest extends Assert {
+
+    @Before
+    public void setUp() throws Exception {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setNormalizeWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
+    }
 
     @Test
     public void testFaultCodeMessageValid() throws Exception {
@@ -29,7 +39,7 @@ public class SoapFaultTestResourceTest extends Assert {
         SoapFault fault = resource.getValue();
         assertEquals(fault.getMessage(), "foo");
         assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
-        assertTrue(detail.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
+        assertTrue(detail.validate(fault.getDetail().getOwnerDocument()));
     }
 
     @Test
@@ -41,6 +51,7 @@ public class SoapFaultTestResourceTest extends Assert {
         SoapFault fault = resource.getValue();
         assertEquals(fault.getMessage(), "foo");
         assertEquals(fault.getFaultCode(), new QName("foo", "baz"));
-        assertTrue(detail.validate(xmlUtilities.getDocumentAsString(fault.getDetail())));
+        XmlTestResource detailResource = new XmlTestResource(xmlUtilities.getXmlAsDocument("<detail><foo/></detail>"));
+        assertTrue(detailResource.validate(fault.getDetail().getOwnerDocument()));
     }
 }

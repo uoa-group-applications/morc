@@ -17,6 +17,8 @@ public class XmlTestResourceTest extends Assert {
 
     public XmlTestResourceTest() {
         XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setNormalizeWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
     }
 
     private static XmlUtilities xmlUtilities = new XmlUtilities();
@@ -115,9 +117,8 @@ public class XmlTestResourceTest extends Assert {
 
         Throwable e = null;
         try {
-            XmlTestResource resource = new XmlTestResource(new URL("http://nosuchfile.com"));
+            XmlTestResource resource = new XmlTestResource(new File("broken"));
         } catch (RuntimeException ex) {
-            assertTrue(ex.getMessage().contains("File Not Found"));
             e = ex;
         }
 
@@ -126,7 +127,7 @@ public class XmlTestResourceTest extends Assert {
 
     @Test
     public void testXmlUtilitiesGetterSetter() throws Exception {
-        XmlTestResource validator = new XmlTestResource(new File("broken"));
+        XmlTestResource validator = new XmlTestResource(inputUrl);
         assertNotNull(validator.getXmlUtilities());
         validator.setXmlUtilities(null);
         assertNull(validator.getXmlUtilities());
