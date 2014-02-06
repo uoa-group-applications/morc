@@ -265,8 +265,11 @@ public class MorcTest extends CamelSpringTestSupport {
 
             createdRoutes.add(publishRouteDefinition);
 
+            logger.trace("Starting sending mock endpoint assertion");
             //extra 5s is to give some time for route to boot
-            sendingMockEndpoint.assertIsSatisfied(5000l + spec.getMessageAssertTime() * (spec.getTotalPublishMessageCount()+1));
+            sendingMockEndpoint.setResultWaitTime(5000l + spec.getMessageAssertTime() * (spec.getTotalPublishMessageCount()+1));
+            sendingMockEndpoint.assertIsSatisfied();
+            logger.trace("Completed sending mock endpoint assertion");
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
                 mockEndpoint.assertIsSatisfied();
