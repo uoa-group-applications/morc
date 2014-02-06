@@ -24,7 +24,7 @@ public class OrchestratedTestSpecification {
     private String description;
     private String endpointUri;
     private Collection<MockDefinition> mockDefinitions;
-    private long assertTime;
+    private long messageAssertTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private Collection<EndpointNode> endpointNodesOrdering;
     private long sendInterval;
@@ -70,8 +70,8 @@ public class OrchestratedTestSpecification {
      * @return The amount of time in milliseconds that the test should wait before validating all expectations.
      *         Only applies with asynchronous/partially ordered/unreceived expectations
      */
-    public long getAssertTime() {
-        return assertTime;
+    public long getMessageAssertTime() {
+        return messageAssertTime;
     }
 
     /**
@@ -106,7 +106,7 @@ public class OrchestratedTestSpecification {
 
         private String description;
         private Map<String, MockDefinition> mockExpectations = new HashMap<>();
-        private long assertTime = 15000l;
+        private long messageAssertTime = 1000l;
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
@@ -234,13 +234,8 @@ public class OrchestratedTestSpecification {
             return self();
         }
 
-        /**
-         * @param sleepForTestCompletion The amount of time in milliseconds that the test should wait before
-         *                               validating all expectations. Only applies with asynchronous/partially
-         *                               ordered/unreceived expectations
-         */
-        public Builder sleepForTestCompletion(long sleepForTestCompletion) {
-            this.assertTime = sleepForTestCompletion;
+        public Builder messageAssertTime(long messageAssertTime) {
+            this.messageAssertTime = messageAssertTime;
             return self();
         }
 
@@ -291,7 +286,7 @@ public class OrchestratedTestSpecification {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.values();
-        this.assertTime = builder.assertTime;
+        this.messageAssertTime = builder.messageAssertTime;
         this.endpointOverrides = builder.getEndpointOverrides();
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;

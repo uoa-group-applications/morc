@@ -253,7 +253,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
             createdRoutes.add(publishRouteDefinition);
 
-            //todo assert times
+            //consider using observer pattern here...
+            sendingMockEndpoint.setResultWaitTime(spec.getMessageAssertTime() * (spec.getTotalMessageCount()+1));
             sendingMockEndpoint.assertIsSatisfied();
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
