@@ -106,7 +106,7 @@ public class OrchestratedTestSpecification {
 
         private String description;
         private Map<String, MockDefinition> mockExpectations = new HashMap<>();
-        private long messageAssertTime = 1000l;
+        private long messageAssertTime = 10000l;
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
@@ -157,6 +157,8 @@ public class OrchestratedTestSpecification {
                 throw new IllegalStateException("The specification for test " + description +
                         " must specify fewer predicates than message processors");
 
+            totalMessageCount += processors.size();
+
             return new OrchestratedTestSpecification(this);
         }
 
@@ -183,8 +185,6 @@ public class OrchestratedTestSpecification {
 
             int mergedEndpointExpectationMessageCount =
                     mergedExpectation.getExpectedMessageCount() - currentEndpointExpectationMessageCount;
-
-            totalMessageCount += mergedEndpointExpectationMessageCount;
 
             //we need to build a tree based on ordering types which will be expanded to a set during validation
 
