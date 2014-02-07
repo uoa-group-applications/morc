@@ -5,7 +5,6 @@ import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
 import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.test.junit4.CamelTestSupport;
@@ -91,7 +90,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testInvalidResponseFails() throws Exception {
-        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid response","vm:syncInputNoCallouts")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid response", "vm:syncInputNoCallouts")
                 .requestBody(text("0"))
                 .expectedResponseBody(xml("<foo/>"))
                 .build();
@@ -110,7 +109,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationBodyInvalid() throws Exception {
-        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation body","vm:syncInputAsyncOutput")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation body", "vm:syncInputAsyncOutput")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(asyncExpectation("vm:asyncTarget").expectedBody(xml("<baz/>")))
                 .build();
@@ -130,7 +129,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationHeadersInvalid() throws Exception {
-        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation headers","vm:syncInputAsyncOutput")
+        OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation headers", "vm:syncInputAsyncOutput")
                 .requestHeaders(headers(new HeaderValue("foo", "baz")))
                 .addExpectation(asyncExpectation("vm:asyncTarget")
                         .expectedHeaders(headers(new HeaderValue("foo", "baz"), new HeaderValue("abc", "def"))))

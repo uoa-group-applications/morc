@@ -1,11 +1,11 @@
 package nz.ac.auckland.integration.tests.validators;
 
+import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
+import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
 import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
-import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
-import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.component.http.HttpOperationFailedException;

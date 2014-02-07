@@ -8,7 +8,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks;
 
 import javax.xml.namespace.QName;
 

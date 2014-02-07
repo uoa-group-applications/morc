@@ -64,8 +64,8 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     /**
      * Add a set of processors to handle an outgoing exchange at a particular offset (n'th message)
      *
-     * @param index         The exchange offset that these processors should be applied to
-     * @param processors    The processors that will handle populating the exchange with an appropriate outgoing value
+     * @param index      The exchange offset that these processors should be applied to
+     * @param processors The processors that will handle populating the exchange with an appropriate outgoing value
      */
     public Builder addProcessors(int index, Processor... processors) {
         while (index >= this.processors.size()) {
@@ -96,8 +96,8 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     /**
      * Add a set of predicates to validate an exchange at a particular offset (n'th message)
      *
-     * @param index         The exchange offset that these predicates should be validated against
-     * @param predicates    The set of predicates that will do the validation of the exchange
+     * @param index      The exchange offset that these predicates should be validated against
+     * @param predicates The set of predicates that will do the validation of the exchange
      */
     public Builder addPredicates(int index, Predicate... predicates) {
         while (index >= this.predicates.size()) {
@@ -116,17 +116,17 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * @return  A list of processors that will be used to handle each exchange; note that a single Processor is returned
-     *          that effectively wraps all of the processors provided to the builder (including repeated processors)
+     * @return A list of processors that will be used to handle each exchange; note that a single Processor is returned
+     * that effectively wraps all of the processors provided to the builder (including repeated processors)
      */
     protected List<Processor> getProcessors() {
         return getProcessors(processors.size());
     }
 
     /**
-     * @param expectedSize  The number of processors that we expect to exist, and the collection will be padded to this size
-     * @return  A list of processors that will be used to handle each exchange; note that a single Processor is returned
-     *          that effectively wraps all of the processors provided to the builder (including repeated processors)
+     * @param expectedSize The number of processors that we expect to exist, and the collection will be padded to this size
+     * @return A list of processors that will be used to handle each exchange; note that a single Processor is returned
+     * that effectively wraps all of the processors provided to the builder (including repeated processors)
      */
     protected List<Processor> getProcessors(int expectedSize) {
         List<List<Processor>> localProcessors = new ArrayList<>(processors);
@@ -159,17 +159,17 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * @return  A list of predicates that will be used to validate each exchange; note that a single Predicate is returned
-     *          that effectively wraps all of the predicates provided to the builder (including repeated predicates)
+     * @return A list of predicates that will be used to validate each exchange; note that a single Predicate is returned
+     * that effectively wraps all of the predicates provided to the builder (including repeated predicates)
      */
     protected List<Predicate> getPredicates() {
         return getPredicates(predicates.size());
     }
 
     /**
-     * @param expectedSize  The number of predicates that we expect to exist, and the collection will be padded to this size
-     * @return  A list of predicates that will be used to validate each exchange; note that a Predicate is returned
-     *          that effectively wraps all of the predicates provided to the builder (including repeated predicates)
+     * @param expectedSize The number of predicates that we expect to exist, and the collection will be padded to this size
+     * @return A list of predicates that will be used to validate each exchange; note that a Predicate is returned
+     * that effectively wraps all of the predicates provided to the builder (including repeated predicates)
      */
     protected List<Predicate> getPredicates(int expectedSize) {
         List<List<Predicate>> localPredicates = new ArrayList<>(predicates);
@@ -218,9 +218,9 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * @return  The maximum amount of time in milliseconds per message that the test will wait for
-     *          a result to be provided (this will be multiplied by the expected number of messages
-     *          to give a maximum wait time for all messages to be handled)
+     * @return The maximum amount of time in milliseconds per message that the test will wait for
+     * a result to be provided (this will be multiplied by the expected number of messages
+     * to give a maximum wait time for all messages to be handled)
      */
     public long getMessageResultWaitTime() {
         return messageResultWaitTime;
@@ -238,9 +238,9 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * @return  The minimum time in milliseconds for forming a maximum time that a test will wait
-     *          for all messages to arrive/complete. This is usually used as a buffer time for
-     *          ensuring a route has started before the messageResultWaitTime values are accounted for
+     * @return The minimum time in milliseconds for forming a maximum time that a test will wait
+     * for all messages to arrive/complete. This is usually used as a buffer time for
+     * ensuring a route has started before the messageResultWaitTime values are accounted for
      */
     public long getMinimalResultWaitTime() {
         return minimalResultWaitTime;

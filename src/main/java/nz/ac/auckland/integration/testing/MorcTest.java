@@ -20,13 +20,11 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
  * ordering of the received exchanges is as expected
- *
+ * <p/>
  * This will be extended for actual tests and will use JUnit Parameterized to add parameters at runtime.
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
@@ -234,7 +232,7 @@ public class MorcTest extends CamelSpringTestSupport {
                 override.overrideEndpoint(targetEndpoint);
 
             DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
-                                new MessagePublishDataSet(spec.getProcessors()));
+                    new MessagePublishDataSet(spec.getProcessors()));
             dataSetEndpoint.setProduceDelay(spec.getSendInterval());
 
             publishRouteDefinition.from(dataSetEndpoint)
@@ -242,7 +240,7 @@ public class MorcTest extends CamelSpringTestSupport {
                     .handleFault()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
                     .doTry() //for some reason onException().continued(true) doesn't work
-                        .to(targetEndpoint)
+                    .to(targetEndpoint)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
                     .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()

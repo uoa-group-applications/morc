@@ -65,10 +65,10 @@ public class MockDefinition {
 
     /**
      * @return The ordering type this expectation requires to be satisfied; the default is TOTAL
-     *         which means it must arrive in the exact order it was specified. PARTIAL means it must
-     *         arrive after it was defined. NONE means that it can arrive at any time at all during the
-     *         test. The actual test execution will manage these differing ordering requirements between
-     *         the different endpoints
+     * which means it must arrive in the exact order it was specified. PARTIAL means it must
+     * arrive after it was defined. NONE means that it can arrive at any time at all during the
+     * test. The actual test execution will manage these differing ordering requirements between
+     * the different endpoints
      */
     public OrderingType getOrderingType() {
         return orderingType;

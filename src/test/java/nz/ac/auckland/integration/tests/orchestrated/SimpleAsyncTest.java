@@ -28,16 +28,16 @@ public class SimpleAsyncTest extends MorcTestBuilder {
     //declare the actual tests here...
     @Override
     public void configure() {
-        asyncTest("test async send body","seda:asyncTestInput")
+        asyncTest("test async send body", "seda:asyncTestInput")
                 .inputMessage(xml("<test/>"))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")));
 
-        asyncTest("test async send headers","seda:asyncTestInput")
+        asyncTest("test async send headers", "seda:asyncTestInput")
                 .inputHeaders(headers(header("foo", "baz"), header("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
                         .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
-        asyncTest("test async delayed","seda:asyncTestInputDelayed")
+        asyncTest("test async delayed", "seda:asyncTestInputDelayed")
                 .inputMessage(text("0"))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput"));
     }

@@ -1,10 +1,11 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.MorcTestBuilder;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
-import nz.ac.auckland.integration.testing.mock.MockDefinition;
+
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
  */
@@ -139,27 +140,27 @@ public class EachCaseMultiExpectationSyncTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Total Order Ordered Endpoint","direct:totalOrderOrderedEndpoint")
+        syncTest("Total Order Ordered Endpoint", "direct:totalOrderOrderedEndpoint")
                 .requestBody(text("0"))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("2")))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("3")));
 
-        syncTest("Total Order Unordered Endpoint","direct:totalOrderUnorderedEndpoint")
+        syncTest("Total Order Unordered Endpoint", "direct:totalOrderUnorderedEndpoint")
                 .requestBody(text("0"))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("2")));
 
-        syncTest("Partial Order Ordered Endpoint","direct:partialOrderOrderedEndpoint")
+        syncTest("Partial Order Ordered Endpoint", "direct:partialOrderOrderedEndpoint")
                 .requestBody(text("0"))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("2")))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")));
 
-        syncTest("Partial Order Unordered Endpoint","direct:partialOrderUnorderedEndpoint")
+        syncTest("Partial Order Unordered Endpoint", "direct:partialOrderUnorderedEndpoint")
                 .requestBody(text("0"))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")).endpointNotOrdered())
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")).endpointNotOrdered())
@@ -167,14 +168,14 @@ public class EachCaseMultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("4")).endpointNotOrdered());
 
-        syncTest("Partial Order Unordered Endpoint 2","direct:partialOrderUnorderedEndpoint2")
+        syncTest("Partial Order Unordered Endpoint 2", "direct:partialOrderUnorderedEndpoint2")
                 .requestBody(text("0"))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")).ordering(MockDefinition.OrderingType.PARTIAL).endpointNotOrdered())
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("2")).ordering(MockDefinition.OrderingType.PARTIAL).endpointNotOrdered())
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("3")).ordering(MockDefinition.OrderingType.PARTIAL).endpointNotOrdered())
                 .addExpectation(syncExpectation("seda:a").expectedBody(text("1")).ordering(MockDefinition.OrderingType.PARTIAL));
 
-        asyncTest("Partial Order Unordered Endpoint 3","vm:partialOrderUnorderedEndpoint3")
+        asyncTest("Partial Order Unordered Endpoint 3", "vm:partialOrderUnorderedEndpoint3")
                 .inputMessage(text("0"))
                 .addExpectation(syncExpectation("vm:s").expectedBody(text("1")))
                 .addExpectation(syncExpectation("vm:a").expectedBody(text("1")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
@@ -183,14 +184,14 @@ public class EachCaseMultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("vm:s").expectedBody(text("3")))
                 .addExpectation(syncExpectation("vm:a").expectedBody(text("3")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL));
 
-        syncTest("No Order Ordered Endpoint","direct:noOrderOrderedEndpoint")
+        syncTest("No Order Ordered Endpoint", "direct:noOrderOrderedEndpoint")
                 .requestBody(text("0"))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("2")))
                 .addExpectation(syncExpectation("seda:x").expectedBody(text("1")).ordering(MockDefinition.OrderingType.NONE))
                 .addExpectation(syncExpectation("seda:x").expectedBody(text("2")).ordering(MockDefinition.OrderingType.NONE));
 
-        syncTest("No Order Unordered Endpoint","direct:noOrderUnorderedEndpoint")
+        syncTest("No Order Unordered Endpoint", "direct:noOrderUnorderedEndpoint")
                 .requestBody(text("0"))
                 .addExpectation(syncExpectation("seda:s").expectedBody(text("1")))
                 .addExpectation(syncExpectation("seda:a").expectedBody(text("1")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())

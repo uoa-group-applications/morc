@@ -142,21 +142,21 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Simple send body to two destinations and get correct response","direct:syncInput")
+        syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
                         responseBody(xml("<foo/>")));
 
-        syncTest("Simple send body to two destinations with swapped order","direct:syncInput")
+        syncTest("Simple send body to two destinations with swapped order", "direct:syncInput")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
                         responseBody(xml("<foo/>")))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
 
-        syncTest("Sync and multiple Async - ensuring total order","direct:syncInputMultiAsync")
+        syncTest("Sync and multiple Async - ensuring total order", "direct:syncInputMultiAsync")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                         //this expectation will come in last
@@ -167,7 +167,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                         //this expectation will come in second to last
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
 
-        syncTest("Sync and multiple Async to same dest - ensuring total order","direct:syncInputMultiAsyncToSameDest")
+        syncTest("Sync and multiple Async to same dest - ensuring total order", "direct:syncInputMultiAsyncToSameDest")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget1").expectedBody(xml("<async/>")))
@@ -176,7 +176,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
                 .addExpectation(asyncExpectation("seda:asyncTarget1"));
 
-        syncTest("Send to two sync destinations without total ordering","direct:multiSend")
+        syncTest("Send to two sync destinations without total ordering", "direct:multiSend")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                         //this will receive the message last
@@ -184,7 +184,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                         //this will receive the message first
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").ordering(MockDefinition.OrderingType.PARTIAL));
 
-        syncTest("Send unordered messages to same sync endpoint without endpoint ordering","direct:multiSend1")
+        syncTest("Send unordered messages to same sync endpoint without endpoint ordering", "direct:multiSend1")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                         //we will receive this last
@@ -194,7 +194,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered()
                         .expectedBody(xml("<first/>")));
 
-        syncTest("Send unordered messages to two different sync destinations without total ordering or endpoint ordering","direct:multiSend2")
+        syncTest("Send unordered messages to two different sync destinations without total ordering or endpoint ordering", "direct:multiSend2")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
@@ -206,13 +206,13 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
                         .expectedBody(xml("<first/>")));
 
-        syncTest("Send async messages out of order such that sync arrives first","direct:syncAtEnd")
+        syncTest("Send async messages out of order such that sync arrives first", "direct:syncAtEnd")
                 .requestBody(text("0"))
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")).endpointNotOrdered())
                 .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")).endpointNotOrdered())
                 .addExpectation(syncExpectation(("seda:b")));
 
-        asyncTest("send mis-ordered","direct:endpointWithSyncOrdering")
+        asyncTest("send mis-ordered", "direct:endpointWithSyncOrdering")
                 .inputMessage(text("0"))
                 .addExpectation(asyncExpectation("seda:a"))
                 .addExpectation(asyncExpectation("seda:b"))
