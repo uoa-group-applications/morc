@@ -57,8 +57,6 @@ public abstract class MorcTestBuilder extends MorcTest {
         return builder;
     }
 
-    //todo: add delay processor
-
     /**
      * @return A way of specifying that the next endpoint in the specification list should be asynchronous
      */
