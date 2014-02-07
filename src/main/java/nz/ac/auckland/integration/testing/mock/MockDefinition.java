@@ -29,12 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * also possible to set endpoint ordering to false such that messages can arrive in any order
  * - this may be useful when you just care about a message arriving, and not providing a
  * meaningful/ordered response.
- * <p/>
- * By default, it is expected that each expectation will occur only
- * once on a given endpoint; by setting expectedMessageCount we can repeat
- * the same expectation multiple times following the ordering parameters above
- * (e.g. by default, an expectedMessageCount of 3 would expect 3 messages in
- * a row without messages arriving from any other endpoint).
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
