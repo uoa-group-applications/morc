@@ -234,20 +234,10 @@ public class MorcTest extends CamelSpringTestSupport {
             for (EndpointOverride override : spec.getEndpointOverrides())
                 override.overrideEndpoint(targetEndpoint);
 
-            final CountDownLatch processedMessageLatch = new CountDownLatch(spec.getTotalPublishMessageCount());
-
             publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
                     new MessagePublishDataSet(spec.getProcessors())))
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
                     .handleFault()
-                    .onCompletion()
-                        .process(new Processor() {
-                            @Override
-                            public void process(Exchange exchange) throws Exception {
-                                processedMessageLatch.countDown();
-                            }
-                        })
-                    .end()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
                     .doTry() //for some reason onException().continued(true) doesn't work
                         .to(targetEndpoint)
