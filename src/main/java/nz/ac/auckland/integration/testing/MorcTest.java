@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
  * ordering of the received exchanges is as expected
- * <p/>
+ *
  * This will be extended for actual tests and will use JUnit Parameterized to add parameters at runtime.
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
@@ -233,8 +233,11 @@ public class MorcTest extends CamelSpringTestSupport {
             for (EndpointOverride override : spec.getEndpointOverrides())
                 override.overrideEndpoint(targetEndpoint);
 
-            publishRouteDefinition.from(new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
-                    new MessagePublishDataSet(spec.getProcessors())))
+            DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
+                                new MessagePublishDataSet(spec.getProcessors()));
+            dataSetEndpoint.setProduceDelay(spec.getSendInterval());
+
+            publishRouteDefinition.from(dataSetEndpoint)
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
                     .handleFault()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")

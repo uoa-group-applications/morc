@@ -6,8 +6,9 @@ import org.apache.camel.Predicate;
 import java.util.List;
 
 /**
- * User: d.macdonald@auckland.ac.nz
- * Date: 20/01/14
+ * A class for aggregating multiple predicates to appear as one such that it's easier to use outside of the builder
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
 public class MultiPredicate implements Predicate {
     private List<Predicate> predicates;

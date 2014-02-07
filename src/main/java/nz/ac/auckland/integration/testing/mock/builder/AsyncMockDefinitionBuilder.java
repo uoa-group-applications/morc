@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An expectation that an asynchronous message will be received at some point
+ * Generates an expectation for ensuring asynchronous messages will be received at some point
  * in the future.
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
