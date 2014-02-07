@@ -26,6 +26,9 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     private List<Processor> repeatedProcessors = new ArrayList<>();
     private List<Predicate> repeatedPredicates = new ArrayList<>();
 
+    private long messageResultWaitTime = 1000l;
+    private long minimalResultWaitTime = 10000l;
+
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
     public MorcBuilder(String endpointUri) {
@@ -148,6 +151,24 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      */
     public Collection<EndpointOverride> getEndpointOverrides() {
         return Collections.unmodifiableCollection(this.endpointOverrides);
+    }
+
+    public Builder messageResultWaitTime(long messageResultWaitTime) {
+        this.messageResultWaitTime = messageResultWaitTime;
+        return self();
+    }
+
+    public long getMessageResultWaitTime() {
+        return messageResultWaitTime;
+    }
+
+    public Builder minimalResultWaitTime(long minimalResultWaitTime) {
+        this.minimalResultWaitTime = minimalResultWaitTime;
+        return self();
+    }
+
+    public long getMinimalResultWaitTime() {
+        return minimalResultWaitTime;
     }
 
     public String getEndpointUri() {

@@ -52,8 +52,10 @@ public class MockDefinition {
     private RouteDefinition mockFeederRoute;
     private Predicate lenientSelector;
     private LenientProcessor lenientProcessor;
-    private long assertionTime;
+    private long messageResultWaitTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
+    private long reassertionPeriod;
+    private long minimalResultWaitTime;
 
     public enum OrderingType {
         TOTAL,
@@ -110,12 +112,24 @@ public class MockDefinition {
         return lenientProcessor;
     }
 
-    public long getAssertionTime() {
-        return assertionTime;
+    protected long getMessageResultWaitTime() {
+        return messageResultWaitTime;
     }
 
     public Collection<EndpointOverride> getEndpointOverrides() {
         return endpointOverrides;
+    }
+
+    public long getResultWaitTime() {
+        //minimalResultWaitTime gives the route time to boot
+        return minimalResultWaitTime + (messageResultWaitTime * expectedMessageCount);
+    }
+
+    public long getReassertionPeriod() {
+        //if expected message count is 0 then wait time will fall straight through latch, we need to reassert for 10s to
+        //ensure no further messages arrive
+        if (expectedMessageCount == 0) return getResultWaitTime();
+        return reassertionPeriod;
     }
 
     public static class MockDefinitionBuilder extends MockDefinitionBuilderInit<MockDefinitionBuilder> {
@@ -137,12 +151,11 @@ public class MockDefinition {
         private RouteDefinition mockFeederRoute = null;
         private Class<? extends LenientProcessor> lenientProcessorClass = LenientProcessor.class;
         private LenientProcessor lenientProcessor;
+        private long reassertionPeriod = 0;
 
         //these will be populated during the build
         private List<Predicate> predicates;
         private List<Processor> processors;
-
-        private long assertionTime = 15000l;
 
         /**
          * @param endpointUri A Camel Endpoint URI to listen to for expected messages
@@ -196,8 +209,8 @@ public class MockDefinition {
             return self();
         }
 
-        public Builder assertionTime(long assertionTime) {
-            this.assertionTime = assertionTime;
+        public Builder reassertionPeriod(long reassertionPeriod) {
+            this.reassertionPeriod = reassertionPeriod;
             return self();
         }
 
@@ -257,10 +270,16 @@ public class MockDefinition {
                     throw new IllegalStateException("The mock feeder route for the endpoint " + getEndpointUri() +
                             " can only be specified in the first mock definition part");
 
-                if (previousDefinitionPart.getAssertionTime() != assertionTime) {
+                if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime()) {
                     logger.warn("The assertion time for a subsequent mock definition part on endpoint {} has a different " +
                             "assertion time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
-                    this.assertionTime = previousDefinitionPart.getAssertionTime();
+                    messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
+                }
+
+                if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime()) {
+                    logger.warn("The assertion time for a subsequent mock definition part on endpoint {} has a different " +
+                            "assertion time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+                    messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
                 }
 
                 if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)
@@ -324,8 +343,10 @@ public class MockDefinition {
         this.expectedMessageCount = builder.expectedMessageCount;
         this.lenientProcessor = builder.lenientProcessor;
         this.lenientSelector = builder.lenientSelector;
-        this.assertionTime = builder.assertionTime;
         this.endpointOverrides = builder.getEndpointOverrides();
         this.mockFeederRoute = builder.mockFeederRoute;
+        this.messageResultWaitTime = builder.getMessageResultWaitTime();
+        this.reassertionPeriod = builder.reassertionPeriod;
+        this.minimalResultWaitTime = builder.getMinimalResultWaitTime();
     }
 }

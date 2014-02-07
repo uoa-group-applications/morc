@@ -155,15 +155,14 @@ public class MorcTest extends CamelSpringTestSupport {
                 logger.debug("Obtained new mock: {}", mockEndpoint.getEndpointUri());
                 mockEndpoints.add(mockEndpoint);
 
-                //why do we need i+1??
                 mockEndpoint.setExpectedMessageCount(mockDefinition.getExpectedMessageCount());
                 for (int i = 0; i < mockDefinition.getProcessors().size(); i++)
                     mockEndpoint.whenExchangeReceived(i + 1, mockDefinition.getProcessors().get(i));
 
-                //todo clear this up - assert times
-                mockEndpoint.setSleepForEmptyTest(mockDefinition.getAssertionTime());
-                mockEndpoint.setResultWaitTime(mockDefinition.getAssertionTime());
-                mockEndpoint.setAssertPeriod(mockDefinition.getAssertionTime());
+                //result wait time is the *maximum* amount of time we'll wait for all messages
+                mockEndpoint.setResultWaitTime(mockDefinition.getResultWaitTime());
+                //assert period is the time we'll wait before rechecking everything is fine (i.e. no more messages)
+                mockEndpoint.setAssertPeriod(mockDefinition.getReassertionPeriod());
 
                 if (mockDefinition.isEndpointOrdered())
                     mockEndpoint.expectedMessagesMatches(mockDefinition.getPredicates()
@@ -256,14 +255,15 @@ public class MorcTest extends CamelSpringTestSupport {
             createdRoutes.add(publishRouteDefinition);
 
             logger.trace("Starting sending mock endpoint assertion");
-            //extra 10s is to give some time for route to boot
-            sendingMockEndpoint.setResultWaitTime(10000l + spec.getMessageAssertTime() * (spec.getTotalPublishMessageCount()+1));
+
+            sendingMockEndpoint.setResultWaitTime(spec.getResultWaitTime());
             sendingMockEndpoint.assertIsSatisfied();
             logger.trace("Completed sending mock endpoint assertion");
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
                 mockEndpoint.assertIsSatisfied();
 
+            //we know that all messages will have arrived by this point therefore we are unconcerned with wait/assertion times
             orderCheckMock.assertIsSatisfied();
 
             //We now need to check that messages have arrived in the correct order

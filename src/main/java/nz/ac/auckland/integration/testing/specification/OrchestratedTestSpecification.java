@@ -24,7 +24,7 @@ public class OrchestratedTestSpecification {
     private String description;
     private String endpointUri;
     private Collection<MockDefinition> mockDefinitions;
-    private long messageAssertTime;
+    private long messageResultWaitTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private Collection<EndpointNode> endpointNodesOrdering;
     private long sendInterval;
@@ -32,8 +32,8 @@ public class OrchestratedTestSpecification {
     private OrchestratedTestSpecification nextPart;
     private List<Processor> processors;
     private List<Predicate> predicates;
-    private int totalPublishMessageCount;
     private int totalMockMessageCount;
+    private long minimalResultWaitTime;
 
     /**
      * @return A description that explains what this tests is doing
@@ -67,12 +67,9 @@ public class OrchestratedTestSpecification {
         return Collections.unmodifiableCollection(mockDefinitions);
     }
 
-    /**
-     * @return The amount of time in milliseconds that the test should wait before validating all expectations.
-     *         Only applies with asynchronous/partially ordered/unreceived expectations
-     */
-    public long getMessageAssertTime() {
-        return messageAssertTime;
+    public long getResultWaitTime() {
+        //10s gives time for the route to get booted
+        return minimalResultWaitTime + (messageResultWaitTime * getTotalPublishMessageCount());
     }
 
     /**
@@ -103,7 +100,7 @@ public class OrchestratedTestSpecification {
     }
 
     public int getTotalPublishMessageCount() {
-        return totalPublishMessageCount;
+        return processors.size();
     }
 
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
@@ -111,13 +108,11 @@ public class OrchestratedTestSpecification {
 
         private String description;
         private Map<String, MockDefinition> mockExpectations = new HashMap<>();
-        private long messageAssertTime = 10000l;
         private long sendInterval = 1000l;
         private int partCount = 1;
         private OrchestratedTestSpecification nextPart = null;
         private Collection<EndpointNode> endpointNodesOrdering = new ArrayList<>();
         private EndpointNode currentTotalOrderLeafEndpoint;
-        private int totalPublishMessageCount = 0;
         private int totalMockMessageCount = 0;
         private boolean expectsException = false;
 
@@ -161,8 +156,6 @@ public class OrchestratedTestSpecification {
             if (predicates.size() < processors.size())
                 throw new IllegalStateException("The specification for test " + description +
                         " must specify fewer predicates than message processors");
-
-            totalPublishMessageCount += processors.size();
 
             return new OrchestratedTestSpecification(this);
         }
@@ -241,11 +234,6 @@ public class OrchestratedTestSpecification {
             return self();
         }
 
-        public Builder messageAssertTime(long messageAssertTime) {
-            this.messageAssertTime = messageAssertTime;
-            return self();
-        }
-
         /**
          * @param sendInterval The interval in milliseconds between sending multiple messages, defaults to 1000ms
          */
@@ -293,7 +281,7 @@ public class OrchestratedTestSpecification {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.values();
-        this.messageAssertTime = builder.messageAssertTime;
+        this.messageResultWaitTime = builder.getMessageResultWaitTime();
         this.endpointOverrides = builder.getEndpointOverrides();
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
@@ -302,7 +290,7 @@ public class OrchestratedTestSpecification {
         this.processors = builder.processors;
         this.predicates = builder.predicates;
         this.totalMockMessageCount = builder.totalMockMessageCount;
-        this.totalPublishMessageCount = builder.totalPublishMessageCount;
+        this.minimalResultWaitTime = builder.getMinimalResultWaitTime();
     }
 
     public static class EndpointNode {

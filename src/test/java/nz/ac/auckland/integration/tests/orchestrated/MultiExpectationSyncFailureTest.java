@@ -37,7 +37,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
                         .to("vm:b");
 
                 from("vm:outOfOrder")
-                        .to("vm:b")
+                        .to("vm:b?waitForTaskToComplete=Always")
                         .to("vm:c");
 
                 from("vm:endpointOutOfOrder")
