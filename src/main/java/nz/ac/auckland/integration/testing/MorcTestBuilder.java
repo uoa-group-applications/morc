@@ -17,7 +17,9 @@ import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecific
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.utility.XPathValidator;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
+import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
@@ -625,6 +627,19 @@ public abstract class MorcTestBuilder extends MorcTest {
         }
 
         return new XPathValidator(xpath, namespaceMap);
+    }
+
+    /**
+     * @param time The time in milliseconds to delay the processing of a message (either when publishing to a target or
+     *             replying to a system)
+     */
+    public static Processor delay(final long time) {
+        return new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                Thread.sleep(time);
+            }
+        };
     }
 
     //this is used by JUnit to initialize each instance of this specification
