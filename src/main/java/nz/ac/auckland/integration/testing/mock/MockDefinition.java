@@ -247,6 +247,9 @@ public class MockDefinition {
                 processors = new ArrayList<>();
             }
 
+            logger.debug("Creating mock definition part for endpoint {} with {} processors and {} predicates",new Object[] {
+                    getEndpointUri(), processors.size(), predicates.size() });
+
             if (previousDefinitionPart != null) {
                 if (!previousDefinitionPart.getEndpointUri().equals(getEndpointUri()))
                     throw new IllegalStateException("The endpoints do not match for merging mock definition endpoint " +
@@ -265,15 +268,15 @@ public class MockDefinition {
                             " can only be specified in the first mock definition part");
 
                 if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime()) {
-                    logger.warn("The assertion time for a subsequent mock definition part on endpoint {} has a different " +
-                            "assertion time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+                    logger.warn("The result waiting time for a subsequent mock definition part on endpoint {} has a different " +
+                            "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
                     messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
                 }
 
-                if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime()) {
-                    logger.warn("The assertion time for a subsequent mock definition part on endpoint {} has a different " +
-                            "assertion time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
-                    messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
+                if (previousDefinitionPart.minimalResultWaitTime != getMinimalResultWaitTime()) {
+                    logger.warn("The minimal result wait time for a subsequent mock definition part on endpoint {} has a different " +
+                            "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+                    minimalResultWaitTime(previousDefinitionPart.minimalResultWaitTime);
                 }
 
                 if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)

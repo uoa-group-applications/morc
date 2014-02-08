@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 
 public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefinitionBuilderInit<UnreceivedMockDefinitionBuilder> {
 
-    private static final Logger logger = LoggerFactory.getLogger(UnreceivedMockDefinitionBuilder.class);
-
     public UnreceivedMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }

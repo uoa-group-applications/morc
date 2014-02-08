@@ -121,6 +121,8 @@ public class OrchestratedTestSpecification {
         private List<Processor> processors;
         private List<Predicate> predicates;
 
+        private StringBuilder endpointOrderingStringBuilder = new StringBuilder();
+
         private OrchestratedTestSpecificationBuilder nextPartBuilder;
 
         public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
@@ -158,6 +160,12 @@ public class OrchestratedTestSpecification {
                 throw new IllegalStateException("The specification for test " + description +
                         " must specify fewer predicates than message processors");
 
+            logger.info("The test {} will be sending {} messages and validate {} responses to endpoint {}",
+                    new Object[] {description,processors.size(),predicates.size(),getEndpointUri()});
+
+            logger.debug("Test will have the following expectation ordering {}",endpointOrderingStringBuilder.toString());
+
+
             return new OrchestratedTestSpecification(this);
         }
 
@@ -185,6 +193,9 @@ public class OrchestratedTestSpecification {
             int mergedEndpointExpectationMessageCount =
                     mergedExpectation.getExpectedMessageCount() - currentEndpointExpectationMessageCount;
 
+            logger.trace("Adding {} expected messages to expectation URI {} on test {}", new Object[] {
+                    mergedEndpointExpectationMessageCount,mockDefinitionBuilder.getEndpointUri(),description});
+
             totalMockMessageCount += mergedEndpointExpectationMessageCount;
 
             //we need to build a tree based on ordering types which will be expanded to a set during validation
@@ -192,31 +203,55 @@ public class OrchestratedTestSpecification {
             //endpoints with no relative ordering are always in the base set
             if (mergedExpectation.getOrderingType() == MockDefinition.OrderingType.NONE) {
                 //these will always be in the accepted set
-                for (int i = 0; i < mergedEndpointExpectationMessageCount; i++)
+                StringBuilder noneStringBuilder = new StringBuilder("NONE: (");
+                for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
                     endpointNodesOrdering.add(new EndpointNode(mergedExpectation.getEndpointUri()));
+                    noneStringBuilder.append(mergedExpectation.getEndpointUri());
+                    if (i < mergedEndpointExpectationMessageCount - 1) noneStringBuilder.append(",");
+                }
+                //this should be at the start!
+                noneStringBuilder.append(") ");
+                endpointOrderingStringBuilder = new StringBuilder(noneStringBuilder.toString() + endpointOrderingStringBuilder.toString());
+
             }
 
             //endpoints partially ordered to other endpoints will be added to the set after they are encountered
             //by a totally ordered endpoint unless they occur at the start of an expectation builder
             if (mergedExpectation.getOrderingType() == MockDefinition.OrderingType.PARTIAL) {
+                if (endpointOrderingStringBuilder.length() != 0) endpointOrderingStringBuilder.append(" -> ");
+                endpointOrderingStringBuilder.append("PARTIAL: (");
+
                 for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
                     if (currentTotalOrderLeafEndpoint == null)
                         endpointNodesOrdering.add(new EndpointNode(mergedExpectation.getEndpointUri()));
                     else
                         currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(mergedExpectation.getEndpointUri()));
+
+                    endpointOrderingStringBuilder.append(mergedExpectation.getEndpointUri());
+                    if (i < mergedEndpointExpectationMessageCount -1) endpointOrderingStringBuilder.append(",");
                 }
+
+                endpointOrderingStringBuilder.append(")");
             }
 
             //only TOTAL ordered can have children and will create order (a tree structure) which is added to the set
             //on endpoint ordering matches
             if (mergedExpectation.getOrderingType() == MockDefinition.OrderingType.TOTAL) {
+                if (endpointOrderingStringBuilder.length() != 0) endpointOrderingStringBuilder.append(" -> ");
+                endpointOrderingStringBuilder.append("TOTAL: (");
+
                 for (int i = 0; i < mergedEndpointExpectationMessageCount; i++) {
                     EndpointNode nextTotalOrderedNode = new EndpointNode(mergedExpectation.getEndpointUri());
                     if (currentTotalOrderLeafEndpoint == null) endpointNodesOrdering.add(nextTotalOrderedNode);
                     else currentTotalOrderLeafEndpoint.childrenNodes.add(nextTotalOrderedNode);
 
                     currentTotalOrderLeafEndpoint = nextTotalOrderedNode;
+
+                    endpointOrderingStringBuilder.append(mergedExpectation.getEndpointUri());
+                    if (i < mergedEndpointExpectationMessageCount -1) endpointOrderingStringBuilder.append(",");
                 }
+
+                endpointOrderingStringBuilder.append(")");
             }
 
             mockExpectations.put(mockDefinitionBuilder.getEndpointUri(), mergedExpectation);

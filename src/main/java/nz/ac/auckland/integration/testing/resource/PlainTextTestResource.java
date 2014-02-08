@@ -65,11 +65,28 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
         try {
             String expectedInput = getValue();
 
-            logger.trace("Expected Plain Text Value: {},\nActual Plain Text Value: {}", expectedInput,
+            logger.debug("Expected Plain Text Value: {},\nActual Plain Text Value: {}", expectedInput,
                     value);
 
-            if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
-            return value.equals(expectedInput);
+            boolean match;
+
+            if (value.isEmpty() || expectedInput.isEmpty()) match = value.isEmpty() && expectedInput.isEmpty();
+            else match = value.equals(expectedInput);
+
+            if (!match) logger.warn("Differences exist between the expected plain text value and the encountered value");
+
+            return match;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            String value = "PlainTextTestResource:" + getValue();
+            if (value.length() < 50) return value;
+            else return value.substring(0,50);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

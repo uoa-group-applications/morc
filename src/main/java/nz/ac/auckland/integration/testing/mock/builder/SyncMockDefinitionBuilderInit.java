@@ -75,6 +75,9 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
     public MockDefinition build(MockDefinition previousDefinitionPart) {
         int responseProcessorCount = Math.max(responseBodyProcessors.size(), responseHeadersProcessors.size());
 
+        logger.debug("{} body processors, and {} header processors provided for mock definition endpoint {}",
+                new Object[]{responseBodyProcessors.size(), responseHeadersProcessors.size(), getEndpointUri()});
+
         for (int i = 0; i < responseProcessorCount; i++) {
             if (i < responseBodyProcessors.size())
                 addProcessors(i, new BodyProcessor(responseBodyProcessors.get(i)));

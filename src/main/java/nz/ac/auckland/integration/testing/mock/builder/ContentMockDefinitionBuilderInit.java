@@ -26,8 +26,8 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
 
     private static final Logger logger = LoggerFactory.getLogger(ContentMockDefinitionBuilderInit.class);
 
-    List<Predicate> expectedBodyPredicates = new ArrayList<>();
-    List<HeadersPredicate> expectedHeadersPredicates = new ArrayList<>();
+    private List<Predicate> expectedBodyPredicates = new ArrayList<>();
+    private List<HeadersPredicate> expectedHeadersPredicates = new ArrayList<>();
 
     @Override
     protected Builder self() {
@@ -75,7 +75,7 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
     public MockDefinition build(MockDefinition previousDefinitionPart) {
         int validatorSize = Math.max(expectedBodyPredicates.size(), expectedHeadersPredicates.size());
 
-        logger.info("{} body validators, and {} header validators provided for mock definition endpoint {}",
+        logger.debug("{} body validators, and {} header validators provided for mock definition endpoint {}",
                 new Object[]{expectedBodyPredicates.size(), expectedHeadersPredicates.size(), getEndpointUri()});
 
         for (int i = 0; i < validatorSize; i++) {

@@ -20,6 +20,8 @@ public class HeadersProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        logger.trace("Setting headers of exchange from endpoint {} to {}",exchange.getFromEndpoint().getEndpointUri()
+                ,responseHeaders);
         exchange.getOut().setHeaders(responseHeaders);
     }
 }

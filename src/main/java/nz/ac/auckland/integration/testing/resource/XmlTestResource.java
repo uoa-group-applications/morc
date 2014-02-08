@@ -104,7 +104,7 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
         try {
             Document expectedValue = getValue();
 
-            logger.trace("Expected XML Value: {},\nActual XML Value: {}", xmlUtilities.getDocumentAsString(expectedValue).trim()
+            logger.debug("Expected XML Value: {},\nActual XML Value: {}", xmlUtilities.getDocumentAsString(expectedValue).trim()
                     , xmlUtilities.getDocumentAsString(value).trim());
 
             DetailedDiff difference = new DetailedDiff(new Diff(expectedValue, value));
@@ -113,6 +113,17 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
             else
                 logger.debug("No differences exist for input");
             return difference.similar();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            String value = "XmlTestResource:" + xmlUtilities.getDocumentAsString(getValue());
+            if (value.length() < 50) return value;
+            else return value.substring(0,50);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

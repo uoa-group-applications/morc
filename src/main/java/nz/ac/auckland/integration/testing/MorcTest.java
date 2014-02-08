@@ -144,21 +144,28 @@ public class MorcTest extends CamelSpringTestSupport {
         MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
         orderCheckMock.expectedMessageCount(spec.getTotalMockMessageCount());
 
+        Map<MockEndpoint,MockDefinition> mockEndpointMap = new HashMap<>();
+
         try {
             Collection<MockDefinition> mockDefinitions = spec.getMockDefinitions();
+            logger.trace("Setting up {} mock definitions for the test {}",mockDefinitions.size(),spec.getDescription());
 
-            //set up the mocks
             for (final MockDefinition mockDefinition : mockDefinitions) {
                 final MockEndpoint mockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
-                logger.debug("Obtained new mock: {}", mockEndpoint.getEndpointUri());
+                logger.trace("Obtained new mock: {}", mockEndpoint.getEndpointUri());
                 mockEndpoints.add(mockEndpoint);
+                mockEndpointMap.put(mockEndpoint,mockDefinition);
 
                 mockEndpoint.setExpectedMessageCount(mockDefinition.getExpectedMessageCount());
+                logger.trace("Mock for endpoint {} has {} expected messages",
+                        mockDefinition.getEndpointUri(),mockDefinition.getExpectedMessageCount());
+
                 for (int i = 0; i < mockDefinition.getProcessors().size(); i++)
                     mockEndpoint.whenExchangeReceived(i + 1, mockDefinition.getProcessors().get(i));
 
                 //result wait time is the *maximum* amount of time we'll wait for all messages
                 mockEndpoint.setResultWaitTime(mockDefinition.getResultWaitTime());
+
                 //assert period is the time we'll wait before rechecking everything is fine (i.e. no more messages)
                 mockEndpoint.setAssertPeriod(mockDefinition.getReassertionPeriod());
 
@@ -186,25 +193,26 @@ public class MorcTest extends CamelSpringTestSupport {
                         }
                     });
 
+                //this will be used by both possible routing outcomes (lenient/mock)
+                mockDefinition.getMockFeederRoute()
+                        .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()));
 
-                if (mockDefinition.getLenientSelector() != null) {
+                if (mockDefinition.getLenientSelector() != null)
                     mockDefinition.getMockFeederRoute()
                             .choice()
                             .when(mockDefinition.getLenientSelector())
-                            .log(LoggingLevel.DEBUG, "Endpoint ${routeId} received message for lenient processing")
+                            .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received message for lenient processing")
                             .process(mockDefinition.getLenientProcessor())
                             .otherwise();
-                }
 
                 mockDefinition.getMockFeederRoute()
                         .routeId(MorcTest.class.getCanonicalName() + "." + mockDefinition.getEndpointUri())
-                        .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()))
                         .wireTap(orderCheckMock.getEndpointUri())
                         .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message")
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
-                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to client body: ${body}, headers: ${headers}");
+                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}");
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
                 for (EndpointOverride override : mockDefinition.getEndpointOverrides())
@@ -237,8 +245,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
             publishRouteDefinition.from(dataSetEndpoint)
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
-                    .handleFault()
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
+                    .handleFault()
                     .doTry() //for some reason onException().continued(true) doesn't work
                     .to(targetEndpoint)
                     .doCatch(Throwable.class).end()
@@ -246,7 +254,7 @@ public class MorcTest extends CamelSpringTestSupport {
                     .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
                             + " exception: ${exception}, headers: ${headers}")
                     .otherwise()
-                    .log(LoggingLevel.INFO, "Received response to endpoint " + spec.getEndpointUri()
+                    .log(LoggingLevel.INFO, "Received response from endpoint " + spec.getEndpointUri()
                             + " body: ${body}, headers: ${headers}")
                     .end()
                     .to(sendingMockEndpoint);
@@ -256,29 +264,57 @@ public class MorcTest extends CamelSpringTestSupport {
             createdRoutes.add(publishRouteDefinition);
 
             logger.trace("Starting sending mock endpoint assertion");
-
             sendingMockEndpoint.setResultWaitTime(spec.getResultWaitTime());
-            sendingMockEndpoint.assertIsSatisfied();
-            logger.trace("Completed sending mock endpoint assertion");
+            try {
+                sendingMockEndpoint.assertIsSatisfied();
+            } catch (AssertionError e) {
+                throw new AssertionError("The target endpoint " + spec.getEndpointUri() + " provided an " +
+                        "invalid response: " + e.getMessage(),e);
+            }
+            logger.debug("Completion of message publishing with response validation was successful");
 
-            for (MockEndpoint mockEndpoint : mockEndpoints)
-                mockEndpoint.assertIsSatisfied();
+            for (MockEndpoint mockEndpoint : mockEndpoints) {
+                logger.trace("Starting mock assertion for endpoint {}",mockEndpoint.getEndpointUri());
+                try {
+                    mockEndpoint.assertIsSatisfied();
+                } catch (AssertionError e) {
+                    throw new AssertionError("Mock expectation for endpoint: " + mockEndpointMap.get(mockEndpoint).getEndpointUri() +
+                            " failed validation: " + e.getMessage(),e);
+                }
+                logger.debug("Successfully completed mock assertion for endpoint {}",mockEndpoint.getEndpointUri());
+            }
 
             //we know that all messages will have arrived by this point therefore we are unconcerned with wait/assertion times
+            logger.trace("Starting assertion for ordering checking");
             orderCheckMock.assertIsSatisfied();
+            logger.debug("Successfully validated that all messages arrive to endpoints in the correct order");
 
             //We now need to check that messages have arrived in the correct order
             Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes = new ArrayList<>(spec.getEndpointNodesOrdering());
             for (Exchange e : orderCheckMock.getExchanges()) {
                 OrchestratedTestSpecification.EndpointNode node = findEndpointNodeMatch(endpointNodes, e.getFromEndpoint());
 
+                StringBuilder expectedNodeEndpoints = new StringBuilder();
+                for (OrchestratedTestSpecification.EndpointNode endpointNode : endpointNodes) {
+                    expectedNodeEndpoints.append(endpointNode.getEndpointUri()).append(",");
+                }
+
+                String expectedNodeEndpointsOutput = expectedNodeEndpoints.toString();
+                if (expectedNodeEndpointsOutput.length() > 0)
+                    expectedNodeEndpointsOutput = expectedNodeEndpointsOutput.substring(0,expectedNodeEndpointsOutput.length()-1);
+
+                logger.trace("Expected arrivals to endpoints {}",expectedNodeEndpointsOutput);
+
                 //this means we don't expect to have seen the message at this point
-                assertNotNull("add useful exception message here", node);
+                assertNotNull("A message to the endpoint " + e.getFromEndpoint().getEndpointUri() +
+                        " was unexpected - one of " + expectedNodeEndpointsOutput + " was expected", node);
 
                 //we've encountered a message to this endpoint and should remove it from the set
                 endpointNodes.remove(node);
                 endpointNodes.addAll(node.getChildrenNodes());
             }
+
+            logger.debug("Successfully validated that messages arrived to endpoints in the correct order");
 
         } finally {
             for (RouteDefinition routeDefinition : createdRoutes)
@@ -293,7 +329,10 @@ public class MorcTest extends CamelSpringTestSupport {
 
     private OrchestratedTestSpecification.EndpointNode findEndpointNodeMatch(Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes, Endpoint endpoint) {
         for (OrchestratedTestSpecification.EndpointNode node : endpointNodes) {
-            if (endpoint.equals(context.getEndpoint(node.getEndpointUri()))) return node;
+            if (endpoint.equals(context.getEndpoint(node.getEndpointUri()))) {
+                logger.debug("Message arrived in the correct order to endpoint {}",node.getEndpointUri());
+                return node;
+            }
         }
         //not found, which should cause an exception
         return null;

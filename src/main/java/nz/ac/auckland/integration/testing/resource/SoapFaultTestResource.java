@@ -125,7 +125,6 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate
     }
 
     private static class QNameValidator implements Predicate {
-
         private QName expectedCode;
 
         public QNameValidator(QName expectedCode) {
@@ -139,6 +138,12 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate
                     exchange.getIn().getBody(QName.class) != null &&
                     exchange.getIn().getBody(QName.class).equals(expectedCode);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "SoapFaultTestResource:FaultCode:" + faultCode + ",Message:" + message +
+                (xmlDetail != null ? ",XMLDetail:" + xmlDetail.toString() : "");
     }
 
 }

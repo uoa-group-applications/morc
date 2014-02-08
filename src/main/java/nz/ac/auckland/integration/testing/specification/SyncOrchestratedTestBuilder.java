@@ -89,7 +89,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
 
     @Override
     public OrchestratedTestSpecification build() {
-        logger.info("The endpoint {} will be sending {} request message bodies, {} request message headers, " +
+        logger.debug("The endpoint {} will receive {} request message bodies, {} request message headers, " +
                 "{} expected response body predicates, and {} expected response headers predicate",
                 new Object[]{getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
                         responseBodyPredicates.size(), responseHeadersPredicates.size()});

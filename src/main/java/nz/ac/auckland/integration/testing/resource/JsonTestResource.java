@@ -66,7 +66,7 @@ public class JsonTestResource extends StaticTestResource<String> implements Pred
         try {
             String expectedInput = getValue();
 
-            logger.trace("Expected JSON Input: {},\nActual JSON Input: {}", expectedInput,
+            logger.debug("Expected JSON Input: {},\nActual JSON Input: {}", expectedInput,
                     value);
 
             if (value.isEmpty() || expectedInput.isEmpty()) return value.isEmpty() && expectedInput.isEmpty();
@@ -77,6 +77,17 @@ public class JsonTestResource extends StaticTestResource<String> implements Pred
             boolean equal = expectedJson.equals(inputJson);
             if (!equal) logger.warn("Differences exist between the expected JSON value and the encountered value");
             return equal;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        try {
+            String value = "JsonTestResource:" + getValue();
+            if (value.length() < 50) return value;
+            else return value.substring(0,50);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

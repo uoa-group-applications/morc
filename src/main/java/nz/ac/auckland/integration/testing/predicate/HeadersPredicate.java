@@ -43,7 +43,7 @@ public class HeadersPredicate implements Predicate {
             throw new RuntimeException(e);
         }
 
-        logger.trace("Expected Headers: {}, Actual Headers: {}", HeadersTestResource.formatHeaders(expectedHeaders),
+        logger.debug("Expected Headers: {}, Actual Headers: {}", HeadersTestResource.formatHeaders(expectedHeaders),
                 HeadersTestResource.formatHeaders(value));
 
         //I'm not interested if the input has any additional headers
@@ -60,5 +60,27 @@ public class HeadersPredicate implements Predicate {
         }
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        Map<String, Object> headers;
+        try {
+            headers = resource.getValue();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        for (String key : headers.keySet()) {
+            builder.append(key).append(":").append(headers.get(key)).append(",");
+            if (++i == 3) break;
+        }
+
+        String output = builder.toString();
+        if (output.endsWith(",")) output = output.substring(0,output.length()-1);
+
+        return "HeadersPredicate:{" + output + (headers.keySet().size() > 3 ? "..." : "") + "}";
     }
 }

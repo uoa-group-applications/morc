@@ -3,6 +3,8 @@ package nz.ac.auckland.integration.testing.mock.builder;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This will cause a Jetty or CXF endpoint (message consumer) to throw an HTTP 500 (or other)
@@ -14,6 +16,7 @@ import org.apache.camel.Processor;
  */
 public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilderInit<HttpErrorMockDefinitionBuilder, Processor> {
 
+    private static final Logger logger = LoggerFactory.getLogger(HttpErrorMockDefinitionBuilder.class);
     private int statusCode = 500;
 
     public HttpErrorMockDefinitionBuilder(String endpointUri) {
@@ -33,6 +36,7 @@ public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilderIni
         this.addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
+                logger.trace("Setting response code to {} for endpoint {}",statusCode,exchange.getFromEndpoint().getEndpointUri());
                 exchange.getOut().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
             }
         });

@@ -2,6 +2,8 @@ package nz.ac.auckland.integration.testing.processor;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -13,6 +15,7 @@ import java.util.List;
 public class MultiProcessor implements Processor {
 
     protected List<Processor> processors;
+    private static final Logger logger = LoggerFactory.getLogger(MultiProcessor.class);
 
     public MultiProcessor(List<Processor> processors) {
         this.processors = processors;
@@ -20,8 +23,10 @@ public class MultiProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        //todo: add logging
+        logger.trace("Applying {} processors against exchange from endpoint {}", processors.size(),
+                exchange.getFromEndpoint().getEndpointUri());
         for (Processor processor : processors) {
+            logger.trace("Applying processor");
             processor.process(exchange);
         }
     }

@@ -33,14 +33,14 @@ public class MatchedResponseProcessor implements Processor {
         for (MatchedResponse matchedResponse : responses) {
             if (matchedResponse.inputPredicate.matches(exchange)) {
                 logger.debug("Matched input for predicate {} at endpoint {}",
-                        matchedResponse.inputPredicate, exchange.getFromEndpoint());
+                        matchedResponse.inputPredicate, exchange.getFromEndpoint().getEndpointUri());
                 matchedResponse.responseProcessor.process(exchange);
                 return;
             }
         }
 
         logger.warn("The exchange arriving at endpoint {} found no response match for body {}",
-                exchange.getFromEndpoint(), exchange.getIn().getBody(String.class));
+                exchange.getFromEndpoint().getEndpointUri(), exchange.getIn().getBody(String.class));
     }
 
     /**
