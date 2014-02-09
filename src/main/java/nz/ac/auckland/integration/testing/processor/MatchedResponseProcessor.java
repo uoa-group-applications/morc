@@ -25,8 +25,8 @@ public class MatchedResponseProcessor implements Processor {
     }
 
     /**
-     * @param exchange The exchange received by an expectation that will invoke a given response
-     *                 note that processors and predicates must be thread safe
+     * @param exchange The exchange received by an mock definition that will invoke a given response
+     *                 - note that processors and predicates must be thread safe
      */
     @Override
     public void process(Exchange exchange) throws Exception {

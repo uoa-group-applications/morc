@@ -12,6 +12,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A builder that generates a mock definition that will set the body or headers for a message response
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBuilderInit<Builder, T>, T>
         extends ContentMockDefinitionBuilderInit<Builder> {
 
@@ -20,10 +25,18 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
     private List<T> responseBodyProcessors = new ArrayList<>();
     private List<Map<String, Object>> responseHeadersProcessors = new ArrayList<>();
 
+    /**
+     * @param endpointUri A Camel Endpoint URI to listen to for expected messages
+     */
     public SyncMockDefinitionBuilderInit(String endpointUri) {
         super(endpointUri);
     }
 
+    /**
+     * @param providedResponseBodies    A collection of bodies that will be provided back to the caller in the body
+     *                                  in order they are specified in the method call. Bodies are tied to the corresponding response
+     *                                  headers (if available)
+     */
     @SafeVarargs
     public final Builder responseBody(T... providedResponseBodies) {
         Collections.addAll(responseBodyProcessors, providedResponseBodies);
@@ -32,7 +45,8 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
 
     /**
      * @param resources A collection of test resources that will be provided back to the caller in the body
-     *                  in order they are specified in the method call
+     *                  in order they are specified in the method call. Bodies are tied to the corresponding response
+     *                  headers (if available)
      */
     @SafeVarargs
     public final Builder responseBody(TestResource<T>... resources) {
@@ -47,7 +61,8 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
     }
 
     /**
-     * @param providedResponseHeaders The headers that should be returned back to the client
+     * @param providedResponseHeaders The headers that should be returned back to the client - headers are tied to the
+     *                                corresponding response body
      */
     @SafeVarargs
     public final Builder responseHeaders(Map<String, Object>... providedResponseHeaders) {
@@ -57,7 +72,8 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
 
     /**
      * @param resources A collection of test resources that will be provided back to the caller in the header
-     *                  in order they are specified in the method call
+     *                  in order they are specified in the method call - headers are tied to the corresponding response
+     *                  body
      */
     @SafeVarargs
     public final Builder responseHeaders(TestResource<Map<String, Object>>... resources) {

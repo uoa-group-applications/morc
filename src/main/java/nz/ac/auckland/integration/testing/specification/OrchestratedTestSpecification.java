@@ -16,7 +16,7 @@ import java.util.*;
  * An orchestrated test is a declarative way of specifying a target for a message with a number
  * of expectations related to call-outs required for the process that the original message triggered
  * is deemed to be correct. A DSL builder is used to generate an instate of an orchestrated test specification
- * which is executed as part of a MorcTest.
+ * which is executed as part of a MorcTest
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */

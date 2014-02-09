@@ -8,6 +8,11 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A processor for setting the headers of an exchange to the given set of values
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class HeadersProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(HeadersProcessor.class);

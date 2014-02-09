@@ -4,8 +4,17 @@ import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A builder to generate a mock definition that ensures no message is expected to be received at this point. This is useful
+ * for setting up an endpoint to ensure no message is sent here.
+ *
+ * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ */
 public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefinitionBuilderInit<UnreceivedMockDefinitionBuilder> {
 
+    /**
+     * @param endpointUri A Camel Endpoint URI to listen to for expected messages
+     */
     public UnreceivedMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }

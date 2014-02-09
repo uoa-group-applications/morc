@@ -13,11 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A class to set expectations for bodies and headers for
- * an incoming message
- * <p/>
- * This class carries out the message validation based on the test resource, expectations
- * will be returned in the order specified even if some relaxation of total ordering occurs
+ * A builder to generate a mock definition that validates the bodies and headers for an incoming message
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
@@ -42,8 +38,8 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
     }
 
     /**
-     * @param validators A list of validators that check the body is as expected; each validator should match
-     *                   to a headers validator, and an expectation will be generated for each pair
+     * @param validators A list of validators that check the body is as expected; each validator will match
+     *                   to a headers validator if available at a particular index
      */
     public Builder expectedBody(Predicate... validators) {
         Collections.addAll(expectedBodyPredicates, validators);
@@ -51,8 +47,8 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
     }
 
     /**
-     * @param validators An list of validators that check the headers are as expected; each validator should match
-     *                   to a body validator, and an expectation will be generated for each pair
+     * @param validators A list of validators that check the headers are as expected; each validator will match
+     *                   to a headers validator if available at a particular index
      */
     public Builder expectedHeaders(HeadersPredicate... validators) {
         Collections.addAll(expectedHeadersPredicates, validators);
@@ -60,8 +56,8 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
     }
 
     /**
-     * @param resources A list of resources will match the expected headers; each resource should match
-     *                  to a body validator, and an expectation will be generated for each pair
+     * @param resources A list of resources that will be used to check that the headers are as expected;
+     *                  each validator will match to a headers validator if available at a particular index
      */
     @SafeVarargs
     public final Builder expectedHeaders(TestResource<Map<String, Object>>... resources) {

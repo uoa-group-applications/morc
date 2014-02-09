@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A general class for specifying an expectation for a consumer of the
- * given endpoint URI. Each expectation can have a name (to distinguish
- * between expectations on the same endpoint).
+ * A general class for declaring a mock definition for a consumer of the
+ * given endpoint URI.
  * <p/>
  * By default messages are expected to be in strict order (they arrive in the
  * order that they are defined in the test). This can be relaxed by setting the
@@ -32,7 +31,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-
 public class MockDefinition {
 
     private static final Logger logger = LoggerFactory.getLogger(MockDefinition.class);
@@ -82,43 +80,76 @@ public class MockDefinition {
         return isEndpointOrdered;
     }
 
+    /**
+     * @return A list of processors that will be applied to incoming messages
+     */
     public List<Processor> getProcessors() {
         return Collections.unmodifiableList(processors);
     }
 
+    /**
+     * @return A list of validators for validating the messages arriving at the endpoint
+     */
     public List<Predicate> getPredicates() {
         return Collections.unmodifiableList(predicates);
     }
 
+    /**
+     * @return The number of messages that are expected to arrive at this endpoint
+     */
     public int getExpectedMessageCount() {
         return expectedMessageCount;
     }
 
+    /**
+     * @return The route that is used to provide the mock validator with messages
+     */
     public RouteDefinition getMockFeederRoute() {
         return mockFeederRoute;
     }
 
+    /**
+     * @return  a predicate that decides whether an incoming message should be validated against, or passed over
+     *          and simply processed with an appropriate response
+     */
     public Predicate getLenientSelector() {
         return lenientSelector;
     }
 
+    /**
+     * @return A processor that selects a processor to be used to generate a response for lenient/unvalidated messages
+     */
     public LenientProcessor getLenientProcessor() {
         return lenientProcessor;
     }
 
+    /**
+     * @return The maximum time per message that the mock will wait to receive and validate a message
+     */
     protected long getMessageResultWaitTime() {
         return messageResultWaitTime;
     }
 
+    /**
+     * @return The set of overrides that will modify the definition's endpoint
+     */
     public Collection<EndpointOverride> getEndpointOverrides() {
         return endpointOverrides;
     }
 
+    /**
+     * @return The maximum time in milliseconds the mock will wait to receive all messages
+     */
     public long getResultWaitTime() {
         //minimalResultWaitTime gives the route time to boot
         return minimalResultWaitTime + (messageResultWaitTime * expectedMessageCount);
     }
 
+    /**
+     * @return  The amount of time in milliseconds that the mock will wait after successfully asserting all messages
+     *          arrived correctly before asserting again that the endpoint is still correct - this is useful for
+     *          providing extra time to ensure no additional unexpected messages arrive at the endpoint
+     */
     public long getReassertionPeriod() {
         //if expected message count is 0 then wait time will fall straight through latch, we need to reassert for 10s to
         //ensure no further messages arrive
@@ -126,6 +157,9 @@ public class MockDefinition {
         return reassertionPeriod;
     }
 
+    /**
+     * A concrete implementation of MockDefinitionBuilderInit
+     */
     public static class MockDefinitionBuilder extends MockDefinitionBuilderInit<MockDefinitionBuilder> {
         /**
          * @param endpointUri A Camel Endpoint URI to listen to for expected messages
@@ -135,7 +169,6 @@ public class MockDefinition {
         }
     }
 
-    //public static class MockDefinitionBuilder<Builder extends MockDefinitionBuilder<Builder>> {
     public static class MockDefinitionBuilderInit<Builder extends MockDefinitionBuilderInit<Builder>> extends MorcBuilder<Builder> {
 
         private OrderingType orderingType = OrderingType.TOTAL;
@@ -158,6 +191,11 @@ public class MockDefinition {
             super(endpointUri);
         }
 
+        /**
+         * @param expectedMessageCount Specifies the number of messages this endpoint expects to receive - if this is
+         *                             greater than the number of predicates provided then any subsequent messages will
+         *                             be accepted without any validation
+         */
         public Builder expectedMessageCount(int expectedMessageCount) {
             this.expectedMessageCount = expectedMessageCount;
             return self();
@@ -179,6 +217,11 @@ public class MockDefinition {
             return self();
         }
 
+        /**
+         * Specifies that this endpoint mock definition is to be lenient - all messages in this part will not be validated
+         * and have processors applied in order to provide a response. Only one mock definition part for an endpoint URI
+         * can be specified as lenient
+         */
         public Builder lenient() {
             return lenient(new Predicate() {
                 @Override
@@ -193,21 +236,41 @@ public class MockDefinition {
             });
         }
 
+        /**
+         * @param lenientSelector A selector that decides whether an exchange should be processed leniently (without
+         *                        validation), and using the provided processors to generate a response. Only one mock
+         *                        definition part for an endpoint URI can be specified as lenient
+         */
         public Builder lenient(Predicate lenientSelector) {
             this.lenientSelector = lenientSelector;
             return self();
         }
 
+        /**
+         * @param lenientProcessorClass A processor that selects a processor for lenient (unvalidated) exchange processing
+         *                              - the default implementation takes a modulus approach
+         */
         public Builder lenientProcessor(Class<? extends LenientProcessor> lenientProcessorClass) {
             this.lenientProcessorClass = lenientProcessorClass;
             return self();
         }
 
+        /**
+         * @param mockFeederRoute A route definition that will be used as the intermediate between receiving a message
+         *                        from the mock definition endpoint, and passing it through to the mock endpoint. Useful
+         *                        for adding additional exchange operations on message arrival
+         */
         public Builder mockFeederRoute(RouteDefinition mockFeederRoute) {
             this.mockFeederRoute = mockFeederRoute;
             return self();
         }
 
+        /**
+         * @param reassertionPeriod The amount of time in milliseconds that the mock will wait after successfully
+         *                          asserting all messages arrived correctly before asserting again that the endpoint
+         *                          is still correct - this is useful for providing extra time to ensure no additional
+         *                          unexpected messages arrive at the endpoint
+         */
         public Builder reassertionPeriod(long reassertionPeriod) {
             this.reassertionPeriod = reassertionPeriod;
             return self();

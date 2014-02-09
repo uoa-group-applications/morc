@@ -19,6 +19,9 @@ public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilderIni
     private static final Logger logger = LoggerFactory.getLogger(HttpErrorMockDefinitionBuilder.class);
     private int statusCode = 500;
 
+    /**
+     * @param endpointUri A Camel Endpoint URI to listen to for expected messages
+     */
     public HttpErrorMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }

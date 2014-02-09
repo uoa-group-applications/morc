@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This endpoint will throw an exception of the specified type back to the
- * message consumer; this is likely to cause transaction rollback or some kind
- * of SOAP fault
+ * This builder will add a repeated processor that sets an exception response to calls -
+ * this is likely to cause transaction rollback or some kind of SOAP fault
  * <p/>
  * If no exception is specified then an empty Exception is thrown
  *
@@ -19,10 +18,16 @@ public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilder
     private static final Logger logger = LoggerFactory.getLogger(ExceptionMockDefinitionBuilder.class);
     private Exception exception;
 
+    /**
+     * @param endpointUri A Camel Endpoint URI to listen to for expected messages
+     */
     public ExceptionMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
     }
 
+    /**
+     * @param exception The exception that will be returned back to the caller
+     */
     public ExceptionMockDefinitionBuilder exception(Exception exception) {
         this.exception = exception;
         return self();

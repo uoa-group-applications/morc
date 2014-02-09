@@ -1,11 +1,7 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
 /**
- * A class to set expectations for bodies and headers for
- * an incoming message
- * <p/>
- * This class carries out the message validation based on the test resource, expectations
- * will be returned in the order specified even if some relaxation of total ordering occurs
+ * A concrete implementation of ContentMockDefinitionBuilderInit
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
