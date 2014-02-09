@@ -15,7 +15,6 @@ import nz.ac.auckland.integration.testing.resource.*;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
-import nz.ac.auckland.integration.testing.utility.XPathValidator;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -611,20 +610,6 @@ public abstract class MorcTestBuilder extends MorcTest {
      */
     public static NS namespace(String prefix, String uri) {
         return new NS(prefix, uri);
-    }
-
-    /**
-     * @param xpath      An xpath you want to evaluate to return a node for comparison
-     * @param namespaces a collection of namespace pairs used for evaluating the xpath
-     * @return an xpath selector to be used for the xml test resource
-     */
-    public static XPathValidator xpathSelector(String xpath, NS... namespaces) {
-        Map<String, String> namespaceMap = new HashMap<>();
-        for (NS namespace : namespaces) {
-            namespaceMap.put(namespace.prefix, namespace.uri);
-        }
-
-        return new XPathValidator(xpath, namespaceMap);
     }
 
     /**
