@@ -32,7 +32,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
+        /*syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
@@ -46,7 +46,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .expectsException()
                 .addExpectation(httpErrorExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingSoapFault.xml"))));
+                        .responseBody(xml(classpath("/data/pingSoapFault.xml"))));      */
 
         syncTest("Simple WS proxy failure test with body", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))

@@ -142,12 +142,22 @@ public class OrchestratedTestSpecification {
                     public boolean matches(Exchange exchange) {
                         return exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class) == null;
                     }
+
+                    @Override
+                    public String toString() {
+                        return "UnexpectedExceptionPredicate";
+                    }
                 });
             else
                 addRepeatedPredicate(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
                         return exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class) != null;
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "ExpectedExceptionPredicate";
                     }
                 });
 

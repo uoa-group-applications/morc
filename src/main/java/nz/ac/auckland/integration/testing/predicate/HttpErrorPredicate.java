@@ -37,9 +37,9 @@ public class HttpErrorPredicate implements Predicate {
 
     @Override
     public String toString() {
-        return "HttpErrorPredicate:StatusCode:" + statusCode + ",BodyPredicate:" +
-                (bodyPredicate != null ? bodyPredicate.toString() : "null") + ",HeadersPredicate:" +
-                (headersPredicate != null ? headersPredicate.toString() : "null");
+        return "HttpErrorPredicate:StatusCode:" + statusCode + ":BodyPredicate:" +
+                (bodyPredicate != null ? bodyPredicate.toString() : "")  +
+                (headersPredicate != null ? ":" + headersPredicate.toString() : "") + "";
     }
 
     @SuppressWarnings("unchecked")
@@ -52,7 +52,8 @@ public class HttpErrorPredicate implements Predicate {
         }
 
         HttpOperationFailedException httpException = (HttpOperationFailedException) t;
-        logger.debug("Validating exception {} on endpoint {}", httpException,e.getFromEndpoint().getEndpointUri());
+        logger.debug("Validating exception {} on endpoint {}", httpException, (e.getFromEndpoint() != null ?
+                e.getFromEndpoint().getEndpointUri() : "null"));
 
         String responseBody = httpException.getResponseBody();
         Map responseHeaders = httpException.getResponseHeaders();

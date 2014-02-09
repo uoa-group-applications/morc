@@ -22,6 +22,6 @@ public class HeadersProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         logger.trace("Setting headers of exchange from endpoint {} to {}",exchange.getFromEndpoint().getEndpointUri()
                 ,responseHeaders);
-        exchange.getOut().setHeaders(responseHeaders);
+        exchange.getIn().setHeaders(responseHeaders);
     }
 }

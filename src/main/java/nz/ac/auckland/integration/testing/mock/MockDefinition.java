@@ -185,6 +185,11 @@ public class MockDefinition {
                 public boolean matches(Exchange exchange) {
                     return true;
                 }
+
+                @Override
+                public String toString() {
+                    return "TrueLenientPredicate";
+                }
             });
         }
 

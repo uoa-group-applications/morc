@@ -122,8 +122,9 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
     public String toString() {
         try {
             String value = "XmlTestResource:" + xmlUtilities.getDocumentAsString(getValue());
-            if (value.length() < 50) return value;
-            else return value.substring(0,50);
+            value = value.replace("\n","").replace("\r","");
+            if (value.length() < 100) return value;
+            else return value.substring(0,100) + "...";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

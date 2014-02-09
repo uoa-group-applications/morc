@@ -212,7 +212,13 @@ public class MorcTest extends CamelSpringTestSupport {
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
                         .to(mockEndpoint)
                         .onCompletion()
-                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}");
+                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}")
+                        .process(new Processor() {
+                            @Override
+                            public void process(Exchange exchange) throws Exception {
+                                System.out.println();
+                            }
+                        });
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
                 for (EndpointOverride override : mockDefinition.getEndpointOverrides())
@@ -286,7 +292,11 @@ public class MorcTest extends CamelSpringTestSupport {
 
             //we know that all messages will have arrived by this point therefore we are unconcerned with wait/assertion times
             logger.trace("Starting assertion for ordering checking");
-            orderCheckMock.assertIsSatisfied();
+            try {
+                orderCheckMock.assertIsSatisfied();
+            } catch (AssertionError e) {
+                throw new AssertionError("The total number of expected messages did not arrive at the mock services",e);
+            }
             logger.debug("Successfully validated that all messages arrive to endpoints in the correct order");
 
             //We now need to check that messages have arrived in the correct order

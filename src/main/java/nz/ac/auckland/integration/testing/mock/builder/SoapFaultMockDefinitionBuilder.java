@@ -29,7 +29,7 @@ public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilderIni
             @Override
             public void process(Exchange exchange) throws Exception {
                 logger.trace("Setting fault for exchange arriving from endpoint {}", exchange.getFromEndpoint().getEndpointUri());
-                exchange.getOut().setFault(true);
+                exchange.getIn().setFault(true);
             }
         });
         return super.build(previousDefinitionPart);
