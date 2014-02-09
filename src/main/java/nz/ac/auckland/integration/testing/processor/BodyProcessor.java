@@ -22,7 +22,7 @@ public class BodyProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.trace("Setting body of exchange from endpoint {} to {}",exchange.getFromEndpoint().getEndpointUri(),responseBody);
+        logger.trace("Setting body of exchange from endpoint {} to {}", exchange.getFromEndpoint().getEndpointUri(), responseBody);
         exchange.getIn().setBody(responseBody);
     }
 }

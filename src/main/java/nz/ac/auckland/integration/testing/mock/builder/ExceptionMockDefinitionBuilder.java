@@ -44,7 +44,7 @@ public class ExceptionMockDefinitionBuilder extends ContentMockDefinitionBuilder
         addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                logger.trace("Setting exception for exchange arriving from endpoint {}",exchange.getFromEndpoint().getEndpointUri());
+                logger.trace("Setting exception for exchange arriving from endpoint {}", exchange.getFromEndpoint().getEndpointUri());
                 exchange.setException(exception);
             }
         });

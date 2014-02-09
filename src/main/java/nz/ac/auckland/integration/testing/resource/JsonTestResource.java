@@ -87,7 +87,7 @@ public class JsonTestResource extends StaticTestResource<String> implements Pred
         try {
             String value = "JsonTestResource:" + getValue();
             if (value.length() < 100) return value;
-            else return value.substring(0,100);
+            else return value.substring(0, 100);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

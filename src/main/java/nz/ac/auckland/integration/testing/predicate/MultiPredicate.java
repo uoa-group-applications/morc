@@ -23,18 +23,18 @@ public class MultiPredicate implements Predicate {
     @Override
     public boolean matches(Exchange exchange) {
         logger.trace("Starting validation of exchange from endpoint {} against {} predicates",
-                exchange.getFromEndpoint().getEndpointUri(),predicates.size());
+                exchange.getFromEndpoint().getEndpointUri(), predicates.size());
 
         for (Predicate predicate : predicates) {
             boolean matches = predicate.matches(exchange);
-            logger.trace("Result of predicate {}: {}",predicate,matches);
+            logger.trace("Result of predicate {}: {}", predicate, matches);
             if (!matches) {
-                logger.warn("The predicate {} did not validate successfully - check the logs for details",predicate);
+                logger.warn("The predicate {} did not validate successfully - check the logs for details", predicate);
                 return false;
             }
         }
 
-        logger.trace("Validation of {} predicates was successful for endpoint {}",predicates.size(),
+        logger.trace("Validation of {} predicates was successful for endpoint {}", predicates.size(),
                 exchange.getFromEndpoint().getEndpointUri());
         return true;
     }
@@ -47,7 +47,7 @@ public class MultiPredicate implements Predicate {
         }
 
         String result = builder.toString();
-        if (result.endsWith(",")) result = result.substring(0,result.length()-1);
+        if (result.endsWith(",")) result = result.substring(0, result.length() - 1);
 
         return result;
     }

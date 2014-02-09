@@ -73,7 +73,8 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
             if (value.isEmpty() || expectedInput.isEmpty()) match = value.isEmpty() && expectedInput.isEmpty();
             else match = value.equals(expectedInput);
 
-            if (!match) logger.warn("Differences exist between the expected plain text value and the encountered value");
+            if (!match)
+                logger.warn("Differences exist between the expected plain text value and the encountered value");
 
             return match;
         } catch (Exception e) {
@@ -86,7 +87,7 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
         try {
             String value = "PlainTextTestResource:" + getValue();
             if (value.length() < 100) return value;
-            else return value.substring(0,100);
+            else return value.substring(0, 100);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

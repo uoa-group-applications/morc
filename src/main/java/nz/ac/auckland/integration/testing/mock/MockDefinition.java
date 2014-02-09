@@ -57,10 +57,10 @@ public class MockDefinition {
 
     /**
      * @return The ordering type this expectation requires to be satisfied; the default is TOTAL
-     * which means it must arrive in the exact order it was specified. PARTIAL means it must
-     * arrive after it was defined. NONE means that it can arrive at any time at all during the
-     * test. The actual test execution will manage these differing ordering requirements between
-     * the different endpoints
+     *         which means it must arrive in the exact order it was specified. PARTIAL means it must
+     *         arrive after it was defined. NONE means that it can arrive at any time at all during the
+     *         test. The actual test execution will manage these differing ordering requirements between
+     *         the different endpoints
      */
     public OrderingType getOrderingType() {
         return orderingType;
@@ -109,8 +109,8 @@ public class MockDefinition {
     }
 
     /**
-     * @return  a predicate that decides whether an incoming message should be validated against, or passed over
-     *          and simply processed with an appropriate response
+     * @return a predicate that decides whether an incoming message should be validated against, or passed over
+     *         and simply processed with an appropriate response
      */
     public Predicate getLenientSelector() {
         return lenientSelector;
@@ -146,9 +146,9 @@ public class MockDefinition {
     }
 
     /**
-     * @return  The amount of time in milliseconds that the mock will wait after successfully asserting all messages
-     *          arrived correctly before asserting again that the endpoint is still correct - this is useful for
-     *          providing extra time to ensure no additional unexpected messages arrive at the endpoint
+     * @return The amount of time in milliseconds that the mock will wait after successfully asserting all messages
+     *         arrived correctly before asserting again that the endpoint is still correct - this is useful for
+     *         providing extra time to ensure no additional unexpected messages arrive at the endpoint
      */
     public long getReassertionPeriod() {
         //if expected message count is 0 then wait time will fall straight through latch, we need to reassert for 10s to
@@ -315,8 +315,8 @@ public class MockDefinition {
                 processors = new ArrayList<>();
             }
 
-            logger.debug("Creating mock definition part for endpoint {} with {} processors and {} predicates",new Object[] {
-                    getEndpointUri(), processors.size(), predicates.size() });
+            logger.debug("Creating mock definition part for endpoint {} with {} processors and {} predicates", new Object[]{
+                    getEndpointUri(), processors.size(), predicates.size()});
 
             if (previousDefinitionPart != null) {
                 if (!previousDefinitionPart.getEndpointUri().equals(getEndpointUri()))

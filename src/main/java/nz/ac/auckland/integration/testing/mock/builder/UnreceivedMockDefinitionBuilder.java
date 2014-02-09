@@ -1,8 +1,6 @@
 package nz.ac.auckland.integration.testing.mock.builder;
 
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A builder to generate a mock definition that ensures no message is expected to be received at this point. This is useful

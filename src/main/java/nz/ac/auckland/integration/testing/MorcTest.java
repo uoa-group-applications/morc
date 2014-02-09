@@ -144,21 +144,21 @@ public class MorcTest extends CamelSpringTestSupport {
         MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
         orderCheckMock.expectedMessageCount(spec.getTotalMockMessageCount());
 
-        Map<MockEndpoint,MockDefinition> mockEndpointMap = new HashMap<>();
+        Map<MockEndpoint, MockDefinition> mockEndpointMap = new HashMap<>();
 
         try {
             Collection<MockDefinition> mockDefinitions = spec.getMockDefinitions();
-            logger.trace("Setting up {} mock definitions for the test {}",mockDefinitions.size(),spec.getDescription());
+            logger.trace("Setting up {} mock definitions for the test {}", mockDefinitions.size(), spec.getDescription());
 
             for (final MockDefinition mockDefinition : mockDefinitions) {
                 final MockEndpoint mockEndpoint = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
                 logger.trace("Obtained new mock: {}", mockEndpoint.getEndpointUri());
                 mockEndpoints.add(mockEndpoint);
-                mockEndpointMap.put(mockEndpoint,mockDefinition);
+                mockEndpointMap.put(mockEndpoint, mockDefinition);
 
                 mockEndpoint.setExpectedMessageCount(mockDefinition.getExpectedMessageCount());
                 logger.trace("Mock for endpoint {} has {} expected messages",
-                        mockDefinition.getEndpointUri(),mockDefinition.getExpectedMessageCount());
+                        mockDefinition.getEndpointUri(), mockDefinition.getExpectedMessageCount());
 
                 for (int i = 0; i < mockDefinition.getProcessors().size(); i++)
                     mockEndpoint.whenExchangeReceived(i + 1, mockDefinition.getProcessors().get(i));
@@ -275,19 +275,19 @@ public class MorcTest extends CamelSpringTestSupport {
                 sendingMockEndpoint.assertIsSatisfied();
             } catch (AssertionError e) {
                 throw new AssertionError("The target endpoint " + spec.getEndpointUri() + " provided an " +
-                        "invalid response: " + e.getMessage(),e);
+                        "invalid response: " + e.getMessage(), e);
             }
             logger.debug("Completion of message publishing with response validation was successful");
 
             for (MockEndpoint mockEndpoint : mockEndpoints) {
-                logger.trace("Starting mock assertion for endpoint {}",mockEndpoint.getEndpointUri());
+                logger.trace("Starting mock assertion for endpoint {}", mockEndpoint.getEndpointUri());
                 try {
                     mockEndpoint.assertIsSatisfied();
                 } catch (AssertionError e) {
                     throw new AssertionError("Mock expectation for endpoint: " + mockEndpointMap.get(mockEndpoint).getEndpointUri() +
-                            " failed validation: " + e.getMessage(),e);
+                            " failed validation: " + e.getMessage(), e);
                 }
-                logger.debug("Successfully completed mock assertion for endpoint {}",mockEndpoint.getEndpointUri());
+                logger.debug("Successfully completed mock assertion for endpoint {}", mockEndpoint.getEndpointUri());
             }
 
             //we know that all messages will have arrived by this point therefore we are unconcerned with wait/assertion times
@@ -295,7 +295,7 @@ public class MorcTest extends CamelSpringTestSupport {
             try {
                 orderCheckMock.assertIsSatisfied();
             } catch (AssertionError e) {
-                throw new AssertionError("The total number of expected messages did not arrive at the mock services",e);
+                throw new AssertionError("The total number of expected messages did not arrive at the mock services", e);
             }
             logger.debug("Successfully validated that all messages arrive to endpoints in the correct order");
 
@@ -311,9 +311,9 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 String expectedNodeEndpointsOutput = expectedNodeEndpoints.toString();
                 if (expectedNodeEndpointsOutput.length() > 0)
-                    expectedNodeEndpointsOutput = expectedNodeEndpointsOutput.substring(0,expectedNodeEndpointsOutput.length()-1);
+                    expectedNodeEndpointsOutput = expectedNodeEndpointsOutput.substring(0, expectedNodeEndpointsOutput.length() - 1);
 
-                logger.trace("Expected arrivals to endpoints {}",expectedNodeEndpointsOutput);
+                logger.trace("Expected arrivals to endpoints {}", expectedNodeEndpointsOutput);
 
                 //this means we don't expect to have seen the message at this point
                 assertNotNull("A message to the endpoint " + e.getFromEndpoint().getEndpointUri() +
@@ -340,7 +340,7 @@ public class MorcTest extends CamelSpringTestSupport {
     private OrchestratedTestSpecification.EndpointNode findEndpointNodeMatch(Collection<OrchestratedTestSpecification.EndpointNode> endpointNodes, Endpoint endpoint) {
         for (OrchestratedTestSpecification.EndpointNode node : endpointNodes) {
             if (endpoint.equals(context.getEndpoint(node.getEndpointUri()))) {
-                logger.debug("Message arrived in the correct order to endpoint {}",node.getEndpointUri());
+                logger.debug("Message arrived in the correct order to endpoint {}", node.getEndpointUri());
                 return node;
             }
         }

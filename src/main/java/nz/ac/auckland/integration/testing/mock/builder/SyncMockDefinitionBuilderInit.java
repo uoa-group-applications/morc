@@ -33,9 +33,9 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
     }
 
     /**
-     * @param providedResponseBodies    A collection of bodies that will be provided back to the caller in the body
-     *                                  in order they are specified in the method call. Bodies are tied to the corresponding response
-     *                                  headers (if available)
+     * @param providedResponseBodies A collection of bodies that will be provided back to the caller in the body
+     *                               in order they are specified in the method call. Bodies are tied to the corresponding response
+     *                               headers (if available)
      */
     @SafeVarargs
     public final Builder responseBody(T... providedResponseBodies) {

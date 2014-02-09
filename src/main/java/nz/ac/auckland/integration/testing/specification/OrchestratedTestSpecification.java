@@ -171,9 +171,9 @@ public class OrchestratedTestSpecification {
                         " must specify fewer predicates than message processors");
 
             logger.info("The test {} will be sending {} messages and validate {} responses to endpoint {}",
-                    new Object[] {description,processors.size(),predicates.size(),getEndpointUri()});
+                    new Object[]{description, processors.size(), predicates.size(), getEndpointUri()});
 
-            logger.debug("Test will have the following expectation ordering {}",endpointOrderingStringBuilder.toString());
+            logger.debug("Test will have the following expectation ordering {}", endpointOrderingStringBuilder.toString());
 
 
             return new OrchestratedTestSpecification(this);
@@ -203,8 +203,8 @@ public class OrchestratedTestSpecification {
             int mergedEndpointExpectationMessageCount =
                     mergedExpectation.getExpectedMessageCount() - currentEndpointExpectationMessageCount;
 
-            logger.trace("Adding {} expected messages to expectation URI {} on test {}", new Object[] {
-                    mergedEndpointExpectationMessageCount,mockDefinitionBuilder.getEndpointUri(),description});
+            logger.trace("Adding {} expected messages to expectation URI {} on test {}", new Object[]{
+                    mergedEndpointExpectationMessageCount, mockDefinitionBuilder.getEndpointUri(), description});
 
             totalMockMessageCount += mergedEndpointExpectationMessageCount;
 
@@ -238,7 +238,7 @@ public class OrchestratedTestSpecification {
                         currentTotalOrderLeafEndpoint.childrenNodes.add(new EndpointNode(mergedExpectation.getEndpointUri()));
 
                     endpointOrderingStringBuilder.append(mergedExpectation.getEndpointUri());
-                    if (i < mergedEndpointExpectationMessageCount -1) endpointOrderingStringBuilder.append(",");
+                    if (i < mergedEndpointExpectationMessageCount - 1) endpointOrderingStringBuilder.append(",");
                 }
 
                 endpointOrderingStringBuilder.append(")");
@@ -258,7 +258,7 @@ public class OrchestratedTestSpecification {
                     currentTotalOrderLeafEndpoint = nextTotalOrderedNode;
 
                     endpointOrderingStringBuilder.append(mergedExpectation.getEndpointUri());
-                    if (i < mergedEndpointExpectationMessageCount -1) endpointOrderingStringBuilder.append(",");
+                    if (i < mergedEndpointExpectationMessageCount - 1) endpointOrderingStringBuilder.append(",");
                 }
 
                 endpointOrderingStringBuilder.append(")");

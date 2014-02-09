@@ -38,7 +38,7 @@ public class HttpErrorPredicate implements Predicate {
     @Override
     public String toString() {
         return "HttpErrorPredicate:StatusCode:" + statusCode + ":BodyPredicate:" +
-                (bodyPredicate != null ? bodyPredicate.toString() : "")  +
+                (bodyPredicate != null ? bodyPredicate.toString() : "") +
                 (headersPredicate != null ? ":" + headersPredicate.toString() : "") + "";
     }
 
