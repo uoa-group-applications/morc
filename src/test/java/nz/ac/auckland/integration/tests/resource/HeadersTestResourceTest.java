@@ -102,4 +102,19 @@ public class HeadersTestResourceTest extends Assert {
         assertTrue(predicate.matches(values2));
     }
 
+    @Test
+    public void testFormatNullHeaders() throws Exception {
+        assertTrue(HeadersTestResource.formatHeaders(null).equals(""));
+    }
+
+    @Test
+    public void testFormatWithNullHeader() throws Exception {
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("foo", "baz");
+        values.put("abc", null);
+
+        assertTrue(HeadersTestResource.formatHeaders(values).contains("null"));
+    }
+
+
 }

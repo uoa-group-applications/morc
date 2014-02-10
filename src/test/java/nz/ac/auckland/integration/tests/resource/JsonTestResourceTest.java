@@ -1,6 +1,10 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
+import nz.ac.auckland.integration.testing.resource.XmlTestResource;
+import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
@@ -74,5 +78,29 @@ public class JsonTestResourceTest extends Assert {
     public void testPassValueToConstructor() throws Exception {
         JsonTestResource validator = new JsonTestResource("{\"foo\":\"baz\"}");
         assertTrue(validator.validate("{\"foo\":\"baz\"}"));
+    }
+
+    @Test
+    public void testCorrectToStringSize() throws Exception {
+        assertEquals(100, new JsonTestResource(EXPECTED_VALUE).toString().length());
+    }
+
+    @Test
+    public void testEmptyExchange() throws Exception {
+        assertFalse(new JsonTestResource("{\"foo\":\"baz\"}").matches(new DefaultExchange(new DefaultCamelContext())));
+    }
+
+    @Test
+    public void testNoMatch() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("{\"baz\":\"foo\"}");
+        assertFalse(new JsonTestResource("{\"foo\":\"baz\"}").matches(e));
+    }
+
+    @Test
+    public void testEmptyExpectation() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("{\"baz\":\"foo\"}");
+        assertFalse(new JsonTestResource("").matches(e));
     }
 }
