@@ -30,7 +30,7 @@ public class HeadersPredicate implements Predicate {
      */
     public boolean matches(Exchange exchange) {
         Map<String, Object> value = exchange.getIn().getHeaders();
-        return value != null && matches(value);
+        return matches(value);
     }
 
     public boolean matches(Map<String, Object> value) {
@@ -81,6 +81,6 @@ public class HeadersPredicate implements Predicate {
         String output = builder.toString();
         if (output.endsWith(",")) output = output.substring(0, output.length() - 1);
 
-        return "HeadersPredicate:{" + output + (headers.keySet().size() > 3 ? "..." : "") + "}";
+        return "HeadersPredicate:{" + output + (headers.keySet().size() > 3 ? ",..." : "") + "}";
     }
 }
