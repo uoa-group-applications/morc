@@ -1,6 +1,9 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
+import org.apache.camel.Exchange;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -51,4 +54,22 @@ public class PlainTextTestResourceTest extends Assert {
         assertTrue(validator.validate("foo"));
     }
 
+    @Test
+    public void testEmptyExchange() throws Exception {
+        assertFalse(new PlainTextTestResource("foo").matches(new DefaultExchange(new DefaultCamelContext())));
+    }
+
+    @Test
+    public void testEmptyExpectationBlankExchange() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("");
+        assertTrue(new PlainTextTestResource("").matches(e));
+    }
+
+    @Test
+    public void testEmptyExpectationCompleteExchange() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("foo");
+        assertTrue(new PlainTextTestResource("").matches(e));
+    }
 }

@@ -1,4 +1,4 @@
-package nz.ac.auckland.integration.tests.validators;
+package nz.ac.auckland.integration.tests.predicate;
 
 import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import nz.ac.auckland.integration.testing.resource.SoapFaultTestResource;
@@ -17,9 +17,9 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 
 
-public class SOAPFaultValidatorTest extends Assert {
+public class SOAPFaultPredicateTest extends Assert {
 
-    public SOAPFaultValidatorTest() {
+    public SOAPFaultPredicateTest() {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setNormalizeWhitespace(true);
         XMLUnit.setIgnoreComments(true);

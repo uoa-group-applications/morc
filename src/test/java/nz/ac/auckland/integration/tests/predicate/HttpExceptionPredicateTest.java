@@ -1,4 +1,4 @@
-package nz.ac.auckland.integration.tests.validators;
+package nz.ac.auckland.integration.tests.predicate;
 
 import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpExceptionValidatorTest extends Assert {
+public class HttpExceptionPredicateTest extends Assert {
 
     @Test
     public void testNullExchange() throws Exception {
@@ -181,6 +181,25 @@ public class HttpExceptionValidatorTest extends Assert {
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", map, "foo"));
+        assertFalse(validator.matches(e));
+    }
+
+    @Test
+    public void testIncorrectBody() throws Exception {
+        Predicate responseBodyValidator = new Predicate() {
+            @Override
+            public boolean matches(Exchange exchange) {
+                return exchange.getIn().getBody(String.class).equals("foo");
+            }
+        };
+
+        HttpErrorPredicate validator = new HttpErrorPredicate.Builder()
+                .responseBody(responseBodyValidator)
+                .responseHeaders(new MockHeadersPredicate(null, false))
+                .build();
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", null, "foo"));
         assertFalse(validator.matches(e));
     }
 }

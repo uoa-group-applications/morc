@@ -2,6 +2,8 @@ package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import nz.ac.auckland.integration.testing.utility.XmlUtilities;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
@@ -29,12 +31,6 @@ public class XmlTestResourceTest extends Assert {
             "\t<v1:entity>HREmployee</v1:entity>\n" +
             "\t<v1:identifier name=\"uoaid\">2512472</v1:identifier>\n" +
             "</v1:isOfInterest>\n");
-
-    private static final Document EXPECTED_VALUE_NO_NS = xmlUtilities.getXmlAsDocument("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<isOfInterest>\n" +
-            "\t<entity>HREmployee</entity>\n" +
-            "\t<identifier name=\"uoaid\">2512472</identifier>\n" +
-            "</isOfInterest>\n");
 
     URL inputUrl = this.getClass().getResource("/data/xml-test1.xml");
     URL inputUrl2 = this.getClass().getResource("/data/xml-test2.xml");
@@ -131,6 +127,16 @@ public class XmlTestResourceTest extends Assert {
         assertNotNull(validator.getXmlUtilities());
         validator.setXmlUtilities(null);
         assertNull(validator.getXmlUtilities());
+    }
+
+    @Test
+    public void testEmptyExchange() throws Exception {
+        assertFalse(new XmlTestResource(inputUrl).matches(new DefaultExchange(new DefaultCamelContext())));
+    }
+
+    @Test
+    public void testTrimmedToString() throws Exception {
+        assertEquals(100,new XmlTestResource(EXPECTED_VALUE).toString().length());
     }
 
 }
