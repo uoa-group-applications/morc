@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A complete test specification including all expectations for asynchronously sending a message
+ * A builder that generates a complete test specification including all expectations for asynchronously sending a message
  * to a target destination.
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
@@ -24,21 +24,37 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
     private List<Map<String, Object>> inputMessageHeaders = new ArrayList<>();
     private List<TestResource> inputMessageBodies = new ArrayList<>();
 
+    /**
+     * @param description The description that identifies what the test is supposed to do
+     * @param endpointUri The endpoint URI of the target service under testing
+     */
     public AsyncOrchestratedTestBuilder(String description, String endpointUri) {
         super(description, endpointUri);
     }
 
+    /**
+     * @param resources The set of resources that should be sent in the body to the target endpoint URI - these will
+     *                  match to the corresponding inputHeaders if available
+     */
     public AsyncOrchestratedTestBuilder inputMessage(TestResource... resources) {
         Collections.addAll(inputMessageBodies, resources);
         return self();
     }
 
+    /**
+     * @param resources The set of resources that should be sent as headers to the target endpoint URI - these will
+     *                  match to the corresponding inputMessage if available
+     */
     @SafeVarargs
     public final AsyncOrchestratedTestBuilder inputHeaders(Map<String, Object>... resources) {
         Collections.addAll(inputMessageHeaders, resources);
         return self();
     }
 
+    /**
+     * @param resources The set of resources that should be sent as headers to the target endpoint URI - these will
+     *                  match to the corresponding inputMessage if available
+     */
     @SafeVarargs
     public final AsyncOrchestratedTestBuilder inputHeaders(TestResource<Map<String, Object>>... resources) {
         for (TestResource<Map<String, Object>> resource : resources) {

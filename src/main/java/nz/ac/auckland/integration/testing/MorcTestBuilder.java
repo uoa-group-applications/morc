@@ -205,6 +205,10 @@ public abstract class MorcTestBuilder extends MorcTest {
         return resources;
     }
 
+    /**
+     * A simple way of repeating the same input multiple times - useful for sending or expecting the same message
+     * multiple times
+     */
     @SuppressWarnings("unchecked")
     public static <T> T[] times(int count, T input) {
         ArrayList<T> list = new ArrayList<T>();

@@ -17,9 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A synchronous orchestrated test makes a call to a target endpoint which provides a response. During
- * the request process the target may make a number of call outs to expectations which need to be satisfied.
- * The response body from the target will also be validated against the expected response body.
+ * A builder that generates a synchronous orchestrated test specification that will call a target endpoint
+ * that provides a response(s). During the request process the target may make a number of call outs to expectations
+ * which need to be satisfied. The response bodies from the target will also be validated against the expected
+ * response bodies.
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
@@ -32,12 +33,17 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     private List<Predicate> responseBodyPredicates = new ArrayList<>();
     private List<HeadersPredicate> responseHeadersPredicates = new ArrayList<>();
 
+    /**
+     * @param description The description that identifies what the test is supposed to do
+     * @param endpointUri The endpoint URI of the target service under testing
+     */
     public SyncOrchestratedTestBuilder(String description, String endpointUri) {
         super(description, endpointUri);
     }
 
     /**
-     * @param resources A collection of test resources that can be used to send request bodies to a target endpoint
+     * @param resources A collection of test resources that can be used to send request bodies to a target endpoint -
+     *                  each body will be placed together with the corresponding requestHeader if available
      */
     public SyncOrchestratedTestBuilder requestBody(TestResource... resources) {
         Collections.addAll(inputRequestBodies, resources);
@@ -45,7 +51,8 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     }
 
     /**
-     * @param resources A collection of test header resources that can be used to send request headers to a target endpoint
+     * @param resources A collection of test header resources that can be used to send request headers to a target endpoint -
+     *                  headers will be placed together with the corresponding requestBody if available
      */
     @SafeVarargs
     public final SyncOrchestratedTestBuilder requestHeaders(Map<String, Object>... resources) {
@@ -53,6 +60,10 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         return self();
     }
 
+    /**
+     * @param resources A collection of test header resources that can be used to send request headers to a target endpoint -
+     *                  headers will be placed together with the corresponding requestBody if available
+     */
     @SafeVarargs
     public final SyncOrchestratedTestBuilder requestHeaders(TestResource<Map<String, Object>>... resources) {
         for (TestResource<Map<String, Object>> resource : resources) {
@@ -65,20 +76,36 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         return self();
     }
 
+    /**
+     * @param predicates The set of response validators/predicates that will be used to validate consecutive responses
+     */
     public SyncOrchestratedTestBuilder expectedResponse(Predicate... predicates) {
         return this.expectedResponseBody(predicates);
     }
 
+    /**
+     * @param predicates The set of response body predicates that will be used to validate consecutive responses - these
+     *                   will be paired with the corresponding header predicate
+     *
+     */
     public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
         Collections.addAll(this.responseBodyPredicates, predicates);
         return self();
     }
 
+    /**
+     * @param responseHeadersPredicates The set of response header predicates that will be used to validate consecutive
+     *                                  responses - these will be paired with the corresponding body predicate
+     */
     public SyncOrchestratedTestBuilder expectedResponseHeaders(HeadersPredicate... responseHeadersPredicates) {
         Collections.addAll(this.responseHeadersPredicates, responseHeadersPredicates);
         return self();
     }
 
+    /**
+     * @param resources The set of response header test resources that will be used to validate consecutive
+     *                  responses - these will be paired with the corresponding body predicate
+     */
     @SafeVarargs
     public final SyncOrchestratedTestBuilder expectedResponseHeaders(TestResource<Map<String, Object>>... resources) {
         for (TestResource<Map<String, Object>> resource : resources) {

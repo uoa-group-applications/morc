@@ -68,6 +68,10 @@ public class OrchestratedTestSpecification {
         return Collections.unmodifiableCollection(mockDefinitions);
     }
 
+    /**
+     * @return  The amount of time in milliseconds that the test will wait for all responses to be received back from
+     *          the target endpoint URI
+     */
     public long getResultWaitTime() {
         //10s gives time for the route to get booted
         return minimalResultWaitTime + (messageResultWaitTime * getTotalPublishMessageCount());
@@ -80,26 +84,44 @@ public class OrchestratedTestSpecification {
         return sendInterval;
     }
 
+    /**
+     * @return The endpoint URI of the target service under testing
+     */
     public String getEndpointUri() {
         return endpointUri;
     }
 
+    /**
+     * @return The list of predicates that will be used to validate any responses back from the call out
+     */
     public List<Predicate> getPredicates() {
         return predicates;
     }
 
+    /**
+     * @return The list of processors that will populate the message exchange before sending to the target endpoint
+     */
     public List<Processor> getProcessors() {
         return processors;
     }
 
+    /**
+     * @return The set of overrides that will modify the definition's endpoint
+     */
     public Collection<EndpointOverride> getEndpointOverrides() {
         return Collections.unmodifiableCollection(endpointOverrides);
     }
 
+    /**
+     * @return The total number of messages that the mock definitions/expectations expect to receive
+     */
     public int getTotalMockMessageCount() {
         return totalMockMessageCount;
     }
 
+    /**
+     * @return The total number of messages that will be sent to the target endpoint
+     */
     public int getTotalPublishMessageCount() {
         return processors.size();
     }
@@ -125,6 +147,10 @@ public class OrchestratedTestSpecification {
 
         private OrchestratedTestSpecificationBuilder nextPartBuilder;
 
+        /**
+         * @param description The description that identifies what the test is supposed to do
+         * @param endpointUri The endpoint URI of the target service under testing
+         */
         public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
             super(endpointUri);
             this.description = description;
@@ -180,12 +206,7 @@ public class OrchestratedTestSpecification {
         }
 
         /**
-         * We use an EndpointSubscriber Builder here as we have to do additional configuration before creation. This includes
-         * setting up the expected index that an expectation is received which means that previous calls to
-         * MockDefinition.receivedAt() will be ignored.
-         *
          * @param mockDefinitionBuilder The expectation builder used to seed the expectation
-         * @throws IllegalArgumentException if expectations to the same endpoint have different ordering requirements
          */
         public Builder addExpectation(MockDefinition.MockDefinitionBuilderInit mockDefinitionBuilder) {
 
@@ -290,16 +311,28 @@ public class OrchestratedTestSpecification {
             return self();
         }
 
+        /**
+         * @param endpointUri Specify an additional endpoint to call after this part of the test specification has
+         *                    completed successfully
+         */
         @SuppressWarnings("unchecked")
         public Builder addEndpoint(String endpointUri) {
             return (Builder) addEndpoint(endpointUri, this.getClass());
         }
 
+        /**
+         * Specifies that the request to the endpoint URI will result in an exception being returned
+         */
         public Builder expectsException() {
             this.expectsException = true;
             return self();
         }
 
+        /**
+         * @param endpointUri   Specify an additional endpoint to call after this part of the test specification has
+         *                      completed successfully
+         * @param clazz         The type of builder that will be used for the next part of the specification
+         */
         @SuppressWarnings("unchecked")
         public <T extends OrchestratedTestSpecificationBuilder<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
             try {
@@ -339,6 +372,9 @@ public class OrchestratedTestSpecification {
         this.minimalResultWaitTime = builder.getMinimalResultWaitTime();
     }
 
+    /**
+     * A convenience class that allows us to specify ordering between the expectations
+     */
     public static class EndpointNode {
         private String endpointUri;
         private Collection<EndpointNode> childrenNodes = new ArrayList<>();
