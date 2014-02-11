@@ -87,7 +87,7 @@ public class PlainTextTestResource extends StaticTestResource<String> implements
         try {
             String value = "PlainTextTestResource:" + getValue();
             if (value.length() < 100) return value;
-            else return value.substring(0, 100);
+            else return value.substring(0, 97) + "...";
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
