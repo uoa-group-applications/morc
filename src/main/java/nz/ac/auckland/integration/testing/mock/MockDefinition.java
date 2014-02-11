@@ -279,7 +279,7 @@ public class MockDefinition {
         public MockDefinition build(MockDefinition previousDefinitionPart) {
 
             if (expectedMessageCount < 0)
-                throw new IllegalStateException("The expected message count for the mock definition on endpoint "
+                throw new IllegalArgumentException("The expected message count for the mock definition on endpoint "
                         + getEndpointUri() + " must be at least 0");
 
             if (lenientSelector != null) {
@@ -320,19 +320,19 @@ public class MockDefinition {
 
             if (previousDefinitionPart != null) {
                 if (!previousDefinitionPart.getEndpointUri().equals(getEndpointUri()))
-                    throw new IllegalStateException("The endpoints do not match for merging mock definition endpoint " +
+                    throw new IllegalArgumentException("The endpoints do not match for merging mock definition endpoint " +
                             previousDefinitionPart.getEndpointUri() + " with endpoint " + getEndpointUri());
 
                 if (previousDefinitionPart.isEndpointOrdered() != isEndpointOrdered)
-                    throw new IllegalStateException("The endpoint ordering must be the same for all mock definition parts of " +
+                    throw new IllegalArgumentException("The endpoint ordering must be the same for all mock definition parts of " +
                             "endpoint " + getEndpointUri());
 
                 if (previousDefinitionPart.getOrderingType() != orderingType)
-                    throw new IllegalStateException("The ordering type must be same for all mock definition parts on the endpoint "
+                    throw new IllegalArgumentException("The ordering type must be same for all mock definition parts on the endpoint "
                             + getEndpointUri());
 
                 if (mockFeederRoute != null)
-                    throw new IllegalStateException("The mock feeder route for the endpoint " + getEndpointUri() +
+                    throw new IllegalArgumentException("The mock feeder route for the endpoint " + getEndpointUri() +
                             " can only be specified in the first mock definition part");
 
                 if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime()) {
@@ -348,7 +348,7 @@ public class MockDefinition {
                 }
 
                 if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)
-                    throw new IllegalStateException(getEndpointUri() + " can have only one part of a mock endpoint defined as lenient");
+                    throw new IllegalArgumentException(getEndpointUri() + " can have only one part of a mock endpoint defined as lenient");
 
                 //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
                 if (lenientSelector == null) {

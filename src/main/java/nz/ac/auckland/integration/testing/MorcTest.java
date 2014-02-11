@@ -118,7 +118,7 @@ public class MorcTest extends CamelSpringTestSupport {
     public void runOrchestratedTest() throws Exception {
 
         if (specification == null)
-            throw new IllegalStateException("A specification must be set in order to run an orchestrated test");
+            throw new IllegalArgumentException("A specification must be set in order to run an orchestrated test");
 
         logger.info("Starting the test for specification: {} which consists of {} parts", specification.getDescription(),
                 specification.getPartCount());
