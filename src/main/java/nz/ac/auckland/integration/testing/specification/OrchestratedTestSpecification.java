@@ -360,7 +360,7 @@ public class OrchestratedTestSpecification {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.values();
-        this.messageResultWaitTime = builder.getMessageResultWaitTime();
+        this.messageResultWaitTime = Math.max(builder.getMessageResultWaitTime(),builder.sendInterval);
         this.endpointOverrides = builder.getEndpointOverrides();
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
