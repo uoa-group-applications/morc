@@ -21,7 +21,7 @@ public class HttpErrorPredicate implements Predicate {
 
     private Predicate bodyPredicate;
     private Predicate headersPredicate;
-    private int statusCode = 500;
+    private int statusCode;
 
     public Predicate getBodyPredicate() {
         return bodyPredicate;
@@ -88,7 +88,7 @@ public class HttpErrorPredicate implements Predicate {
     public static class Builder {
         private Predicate bodyPredicate;
         private Predicate headersPredicate;
-        private int statusCode = 500;
+        private int statusCode;
 
         /**
          * @param bodyPredicate A validator for the expected error response body
