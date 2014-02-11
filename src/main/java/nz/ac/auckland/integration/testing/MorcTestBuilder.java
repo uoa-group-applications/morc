@@ -211,11 +211,12 @@ public abstract class MorcTestBuilder extends MorcTest {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] times(int count, T input) {
-        ArrayList<T> list = new ArrayList<T>();
+        T[] typeArray = (T[])java.lang.reflect.Array.newInstance(input.getClass(),count);
         for (int i = 0; i < count; i++) {
-            list.add(input);
+            typeArray[i] = input;
         }
-        return (T[]) list.toArray();
+
+        return typeArray;
     }
 
     /**
