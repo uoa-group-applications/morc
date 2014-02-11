@@ -111,11 +111,12 @@ public class SimpleSyncTest extends MorcTestBuilder {
                         .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
         syncTest("Test sync response", "direct:syncInputSyncOutput")
-                .requestBody(xml("<baz/>"))
+                .requestBody(times(3,xml("<baz/>")))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(xml("<baz/>"))
-                        .responseBody(xml("<foo/>")))
-                .expectedResponseBody(xml("<foo/>"));
+                        .expectedBody(times(3,xml("<baz/>")))
+                        .responseBody(times(3,xml("<foo/>"))))
+                .sendInterval(3000)
+                .expectedResponseBody(times(3,xml("<foo/>")));
 
         syncTest("Test Response Headers Validated", "direct:setHeaders")
                 .requestBody(text("1"))

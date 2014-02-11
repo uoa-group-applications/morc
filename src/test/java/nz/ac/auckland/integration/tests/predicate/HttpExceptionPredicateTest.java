@@ -202,6 +202,11 @@ public class HttpExceptionPredicateTest extends Assert {
         e.setProperty(Exchange.EXCEPTION_CAUGHT, new HttpOperationFailedException("uri", 123, "status", "location", null, "foo"));
         assertFalse(validator.matches(e));
     }
+
+    @Test
+    public void testNoBodyNoHeadersToString() throws Exception {
+        assertTrue(new HttpErrorPredicate().toString().contains("HttpErrorPredicate:"));
+    }
 }
 
 class MockHeadersPredicate extends HeadersPredicate {

@@ -216,16 +216,34 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
     @Test
     public void testNoSpecificationEntered() throws Exception {
 
-        IllegalStateException e = null;
+        IllegalArgumentException e = null;
         try {
             BadOrchestratedTest test = new BadOrchestratedTest();
             test.setUp();
             test.runOrchestratedTest();
-        } catch (IllegalStateException ex) {
+        } catch (IllegalArgumentException ex) {
             e = ex;
         }
         assertNotNull(e);
 
+    }
+
+    @Test
+    public void testNegativeSendIntervalError() throws Exception {
+
+        IllegalArgumentException e = null;
+
+        try {
+            OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test Exception Found but not expected",
+                    "vm:exceptionThrower")
+                    .requestBody(text("foo"))
+                    .sendInterval(-1000)
+                    .build();
+        } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+
+        assertNotNull(e);
     }
 
     class BadOrchestratedTest extends MorcTest {

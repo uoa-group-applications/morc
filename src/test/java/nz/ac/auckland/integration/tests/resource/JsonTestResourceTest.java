@@ -103,4 +103,11 @@ public class JsonTestResourceTest extends Assert {
         e.getIn().setBody("{\"baz\":\"foo\"}");
         assertFalse(new JsonTestResource("").matches(e));
     }
+
+    @Test
+    public void testEmptyStringExchange() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("");
+        assertFalse(new JsonTestResource("{\"foo\":\"baz\"}").matches(e));
+    }
 }

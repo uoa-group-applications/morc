@@ -70,6 +70,19 @@ public class PlainTextTestResourceTest extends Assert {
     public void testEmptyExpectationCompleteExchange() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody("foo");
-        assertTrue(new PlainTextTestResource("").matches(e));
+        assertFalse(new PlainTextTestResource("").matches(e));
     }
+
+    @Test
+    public void testEmptyStringExchangeCompleteBody() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("");
+        assertFalse(new PlainTextTestResource("foo").matches(e));
+    }
+
+    @Test
+    public void testLongString() throws Exception {
+        assertEquals(100,new PlainTextTestResource("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest").toString().length());
+    }
+
 }

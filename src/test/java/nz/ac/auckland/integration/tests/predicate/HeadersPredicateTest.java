@@ -19,8 +19,16 @@ public class HeadersPredicateTest extends Assert {
         values.put("moo", "baz");
         values.put("cow", "baz");
 
-        System.out.println(new HeadersPredicate(new HeadersTestResource(values)).toString());
-
         assertTrue(new HeadersPredicate(new HeadersTestResource(values)).toString().contains("..."));
     }
+
+    @Test
+    public void testSimpleToString() {
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("foo", "baz");
+        values.put("abc", "baz");
+
+        assertTrue(new HeadersPredicate(new HeadersTestResource(values)).toString().contains("foo:baz"));
+    }
+
 }
