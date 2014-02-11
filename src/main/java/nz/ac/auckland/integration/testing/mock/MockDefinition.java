@@ -309,6 +309,8 @@ public class MockDefinition {
 
             if (lenientSelector == null) {
                 predicates = getPredicates(expectedMessageCount);
+                expectedMessageCount = Math.max(predicates.size(),expectedMessageCount);
+
                 processors = getProcessors(expectedMessageCount);
             } else {
                 predicates = new ArrayList<>();
