@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.processor;
 
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -18,6 +19,14 @@ public class BodyProcessor implements Processor {
 
     public BodyProcessor(Object responseBody) {
         this.responseBody = responseBody;
+    }
+
+    public BodyProcessor(TestResource responseTestResource) {
+        try {
+            this.responseBody = responseTestResource.getValue();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
