@@ -174,7 +174,7 @@ public class MockDefinition {
         private OrderingType orderingType = OrderingType.TOTAL;
         private boolean isEndpointOrdered = true;
         private Predicate lenientSelector = null;
-        private int expectedMessageCount = 1;
+        private int expectedMessageCount = 0;
         private RouteDefinition mockFeederRoute = null;
         private Class<? extends LenientProcessor> lenientProcessorClass = LenientProcessor.class;
         private LenientProcessor lenientProcessor;
@@ -283,8 +283,8 @@ public class MockDefinition {
                         + getEndpointUri() + " must be at least 0");
 
             if (lenientSelector != null) {
-                if (expectedMessageCount > 0)
-                    logger.warn("Expectations for a lenient endpoint part {} will be ignored", getEndpointUri());
+                if (expectedMessageCount > 0 || getPredicates().size() > 0)
+                    logger.warn("Expectations and predicates for a lenient endpoint part {} will be ignored", getEndpointUri());
 
                 expectedMessageCount = 0;
 
@@ -303,16 +303,16 @@ public class MockDefinition {
                 mockFeederRoute.from(getEndpointUri());
             }
 
-            if (lenientSelector != null && getPredicates().size() > 0)
-                logger.warn("An endpoint uri {} mock definition part is marked as lenient but predicates have been " +
-                        "provided - these will be ignored", getEndpointUri());
-
             if (lenientSelector == null) {
+                if (!lenientProcessorClass.equals(LenientProcessor.class))
+                    throw new IllegalArgumentException("The mock definition for endpoint " + getEndpointUri() +
+                     " can only specify a lenient processor when a lenient selector is provided");
+
                 predicates = getPredicates(expectedMessageCount);
                 expectedMessageCount = Math.max(predicates.size(),expectedMessageCount);
-
                 processors = getProcessors(expectedMessageCount);
             } else {
+                //lenient processors and predicates won't be used for the expectations
                 predicates = new ArrayList<>();
                 processors = new ArrayList<>();
             }
@@ -349,6 +349,14 @@ public class MockDefinition {
                     minimalResultWaitTime(previousDefinitionPart.minimalResultWaitTime);
                 }
 
+                if (previousDefinitionPart.reassertionPeriod != reassertionPeriod) {
+                    logger.warn("The reassertion period for a subsequent mock definition part on endpoint {} has a different " +
+                            "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+                    reassertionPeriod(previousDefinitionPart.reassertionPeriod);
+                }
+
+                //todo: how can we clear this up to help with lenientSelector having to redeclare these things
+
                 if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)
                     throw new IllegalArgumentException(getEndpointUri() + " can have only one part of a mock endpoint defined as lenient");
 
@@ -364,6 +372,7 @@ public class MockDefinition {
                 this.expectedMessageCount += previousDefinitionPart.getExpectedMessageCount();
                 this.mockFeederRoute = previousDefinitionPart.getMockFeederRoute();
                 this.isEndpointOrdered = previousDefinitionPart.isEndpointOrdered;
+
                 //we know if this isn't null then we have checked this expectation hasn't set a selector/processor
                 if (previousDefinitionPart.lenientSelector != null) {
                     this.lenientSelector = previousDefinitionPart.lenientSelector;
@@ -376,6 +385,10 @@ public class MockDefinition {
 
         protected Builder self() {
             return (Builder) this;
+        }
+
+        protected int getExpectedMessageCount() {
+            return expectedMessageCount;
         }
 
         protected OrderingType getOrderingType() {

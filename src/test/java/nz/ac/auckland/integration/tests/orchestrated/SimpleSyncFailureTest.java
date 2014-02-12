@@ -43,6 +43,9 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                         .to("vm:asyncTarget?waitForTaskToComplete=Never")
                         .setBody(constant("<foo/>"));
 
+                from("vm:syncInputSyncOutput")
+                        .to("vm:syncTarget?waitForTaskToComplete=Always");
+
                 from("vm:syncMultiTestPublisher")
                         .process(new Processor() {
                             @Override
@@ -240,6 +243,30 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
                     .sendInterval(-1000)
                     .build();
         } catch (IllegalArgumentException ex) {
+            e = ex;
+        }
+
+        assertNotNull(e);
+    }
+
+    @Test
+    public void testNoExpectedMessageCountSetForExpectation() throws Exception {
+        AssertionError e = null;
+
+        try {
+            OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test response with no expectation predicates",
+                    "vm:syncInputSyncOutput")
+                    .requestBody(times(3,xml("<baz/>")))
+                    .addExpectation(syncExpectation("vm:syncTarget")
+                            .responseBody(times(3,xml("<foo/>"))))
+                    .sendInterval(3000)
+                    .expectedResponseBody(times(3,xml("<foo/>"))).build();
+
+            MorcTest test = new MorcTest(spec);
+            test.setUp();
+            test.runOrchestratedTest();
+        } catch (AssertionError ex) {
+            logger.info("Encountered exception: ",ex);
             e = ex;
         }
 

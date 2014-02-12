@@ -34,9 +34,9 @@ public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefiniti
     public MockDefinition build(MockDefinition previousDefinitionPart) {
         super.expectedMessageCount(0);
 
-        if (getPredicates().size() != 0)
-            throw new IllegalArgumentException("No validators should be specified for an unreceived mock definition on " +
-                    "endpoint " + getEndpointUri() + " as no messages are expected to be validated against");
+        if (getPredicates().size() != 0 || getProcessors().size() != 0)
+            throw new IllegalArgumentException("No processors or validators should be specified for an unreceived mock definition on " +
+                    "endpoint " + getEndpointUri() + " as no messages are expected to be processed or validated against");
 
         return super.build(previousDefinitionPart);
     }

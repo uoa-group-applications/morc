@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.testing.specification;
 import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import nz.ac.auckland.integration.testing.processor.BodyProcessor;
 import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -113,6 +114,19 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         }
         return self();
     }
+
+    /**
+     * @param headers   The set of response header maps that will be used to validate consecutive
+     *                  responses - these will be paired with the corresponding body predicate
+     */
+    @SafeVarargs
+    public final SyncOrchestratedTestBuilder expectedResponseHeaders(Map<String,Object>... headers) {
+        for (Map<String,Object> header : headers) {
+            expectedResponseHeaders(new HeadersTestResource(header));
+        }
+        return self();
+    }
+
 
     @Override
     public OrchestratedTestSpecification build() {

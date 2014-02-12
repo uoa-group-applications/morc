@@ -52,7 +52,8 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * Adds processors for populating a series of exchanges with an outgoing message
+     * Adds processors for populating a series of exchanges with an outgoing message - all processors in a single call
+     * apply ONLY to a single message, add consecutive calls to addProcessors in order to handle further messages
      *
      * @param processors A list of processors that will handle a separate exchange (in order)
      */
@@ -84,7 +85,8 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * Add a set of predicates to validate an incoming exchange
+     * Add a set of predicates to validate an incoming exchange - all predicates in a single call
+     * apply ONLY to a single message, add consecutive calls to addPredicates in order to handle further messages
      *
      * @param predicates A list of predicates that will validate a separate exchange (in order)
      */

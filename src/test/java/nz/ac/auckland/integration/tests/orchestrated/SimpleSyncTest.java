@@ -2,11 +2,15 @@ package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
+import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Simple 1 expectation synchronous tests for sending and receiving messages using the Camel infrastructure
@@ -140,7 +144,6 @@ public class SimpleSyncTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("seda:jsonExpectation")
                         .expectedBody(json("{\"foo\":\"baz\"}")));
 
-
         MockDefinition.MockDefinitionBuilderInit expectation1 = syncExpectation("seda:jsonExpectation")
                 .expectedBody(json("{\"foo\":\"baz\"}"));
         MockDefinition.MockDefinitionBuilderInit expectation2 = unreceivedExpectation("seda:nothingToSeeHere");
@@ -148,6 +151,39 @@ public class SimpleSyncTest extends MorcTestBuilder {
         syncTest("addExpectationsTest", "seda:jsonRequest")
                 .requestBody(json("{\"foo\":\"baz\"}"))
                 .addExpectations(expectation1, expectation2);
+
+        Map<String,Object> headers = new HashMap<>();
+        headers.put("foo","baz");
+        headers.put("abc","123");
+
+        Map<String,Object> headers1 = new HashMap<>();
+        headers.put("baz","foo");
+        headers.put("123","abc");
+
+        syncTest("Test Response Headers from Map Validated", "seda:headersFromMap")
+                .requestBody(text("1"))
+                .requestHeaders(headers)
+                .addExpectation(syncExpectation("seda:headersFromMap")
+                        .expectedHeaders(headers)
+                        .responseHeaders(headers1))
+                .expectedResponseHeaders(new HeadersPredicate(new HeadersTestResource(headers1)))
+                .expectedResponseBody(text("1"));
+
+        syncTest("Test Response Headers from Map Validated 2", "seda:headersFromMap")
+                .requestBody(text("1"))
+                .requestHeaders(headers)
+                .addExpectation(syncExpectation("seda:headersFromMap")
+                        .expectedHeaders(headers)
+                        .responseHeaders(headers1))
+                .expectedResponseHeaders(headers1)
+                .expectedResponseBody(text("1"));
+        
+        syncTest("Test response with no expectation predicates", "direct:syncInputSyncOutput")
+                .requestBody(times(3,xml("<baz/>")))
+                .addExpectation(syncExpectation("seda:syncTarget").expectedMessageCount(3)
+                        .responseBody(times(3,xml("<foo/>"))))
+                .sendInterval(3000)
+                .expectedResponseBody(times(3,xml("<foo/>")));
 
     }
 

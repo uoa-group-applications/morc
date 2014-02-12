@@ -51,4 +51,5 @@ public class MultiPredicate implements Predicate {
 
         return result;
     }
+
 }

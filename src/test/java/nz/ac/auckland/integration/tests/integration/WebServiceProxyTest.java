@@ -89,6 +89,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Fault",
                         xml("<detail><foo/></detail>")))
                 .addExpectation(soapFaultExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
+                        .expectedMessageCount(1)
                         .responseBody(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));
 
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")

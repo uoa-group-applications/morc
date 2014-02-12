@@ -39,7 +39,7 @@ public class HttpErrorMockDefinitionBuilder extends SyncMockDefinitionBuilderIni
         this.addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                logger.trace("Setting response code to {} for endpoint {}", statusCode, exchange.getFromEndpoint().getEndpointUri());
+                logger.trace("Setting response code to {} for endpoint {}", statusCode, getEndpointUri());
                 exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
             }
         });

@@ -28,7 +28,7 @@ public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilderIni
         addRepeatedProcessor(new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                logger.trace("Setting fault for exchange arriving from endpoint {}", exchange.getFromEndpoint().getEndpointUri());
+                logger.trace("Setting fault for exchange arriving from endpoint {}", getEndpointUri());
                 exchange.getIn().setFault(true);
             }
         });

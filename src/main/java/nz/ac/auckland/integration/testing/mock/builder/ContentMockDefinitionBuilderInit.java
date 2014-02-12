@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.testing.mock.builder;
 
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
+import nz.ac.auckland.integration.testing.resource.HeadersTestResource;
 import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Predicate;
 import org.slf4j.Logger;
@@ -52,6 +53,19 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
      */
     public Builder expectedHeaders(HeadersPredicate... validators) {
         Collections.addAll(expectedHeadersPredicates, validators);
+        return self();
+    }
+
+    /**
+     * @param headers   A list of maps that will be used to check that the headers are as expected;
+     *                  each validator will match to a headers validator if available at a particular index
+     */
+    @SafeVarargs
+    public final Builder expectedHeaders(Map<String,Object>... headers) {
+        for (Map<String,Object> header : headers) {
+            expectedHeaders(new HeadersTestResource(header));
+        }
+
         return self();
     }
 
