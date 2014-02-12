@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.resource;
 
 import nz.ac.auckland.integration.testing.resource.JsonTestResource;
-import nz.ac.auckland.integration.testing.resource.XmlTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;

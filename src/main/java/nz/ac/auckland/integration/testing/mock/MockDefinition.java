@@ -306,10 +306,10 @@ public class MockDefinition {
             if (lenientSelector == null) {
                 if (!lenientProcessorClass.equals(LenientProcessor.class))
                     throw new IllegalArgumentException("The mock definition for endpoint " + getEndpointUri() +
-                     " can only specify a lenient processor when a lenient selector is provided");
+                            " can only specify a lenient processor when a lenient selector is provided");
 
                 predicates = getPredicates(expectedMessageCount);
-                expectedMessageCount = Math.max(predicates.size(),expectedMessageCount);
+                expectedMessageCount = Math.max(predicates.size(), expectedMessageCount);
                 processors = getProcessors(expectedMessageCount);
             } else {
                 //lenient processors and predicates won't be used for the expectations

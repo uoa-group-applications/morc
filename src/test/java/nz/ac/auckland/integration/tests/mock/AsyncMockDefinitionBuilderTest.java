@@ -10,7 +10,7 @@ public class AsyncMockDefinitionBuilderTest extends Assert {
     @Test
     public void testReconfiguredToPartialOrdering() throws Exception {
         MockDefinition def = new AsyncMockDefinitionBuilder("foo").ordering(MockDefinition.OrderingType.TOTAL).build(null);
-        assertEquals(MockDefinition.OrderingType.PARTIAL,def.getOrderingType());
+        assertEquals(MockDefinition.OrderingType.PARTIAL, def.getOrderingType());
     }
 
 }

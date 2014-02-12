@@ -211,7 +211,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] times(int count, T input) {
-        T[] typeArray = (T[])java.lang.reflect.Array.newInstance(input.getClass(),count);
+        T[] typeArray = (T[]) java.lang.reflect.Array.newInstance(input.getClass(), count);
         for (int i = 0; i < count; i++) {
             typeArray[i] = input;
         }

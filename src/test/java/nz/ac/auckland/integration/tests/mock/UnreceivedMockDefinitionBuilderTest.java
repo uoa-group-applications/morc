@@ -4,7 +4,7 @@ import nz.ac.auckland.integration.testing.mock.builder.UnreceivedMockDefinitionB
 import org.junit.Assert;
 import org.junit.Test;
 
-import static nz.ac.auckland.integration.testing.MorcTestBuilder.*;
+import static nz.ac.auckland.integration.testing.MorcTestBuilder.text;
 
 public class UnreceivedMockDefinitionBuilderTest extends Assert {
 

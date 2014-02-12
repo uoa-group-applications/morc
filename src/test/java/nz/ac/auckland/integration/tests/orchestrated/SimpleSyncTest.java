@@ -115,12 +115,12 @@ public class SimpleSyncTest extends MorcTestBuilder {
                         .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
         syncTest("Test sync response", "direct:syncInputSyncOutput")
-                .requestBody(times(3,xml("<baz/>")))
+                .requestBody(times(3, xml("<baz/>")))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(times(3,xml("<baz/>")))
-                        .responseBody(times(3,xml("<foo/>"))))
+                        .expectedBody(times(3, xml("<baz/>")))
+                        .responseBody(times(3, xml("<foo/>"))))
                 .sendInterval(3000)
-                .expectedResponseBody(times(3,xml("<foo/>")));
+                .expectedResponseBody(times(3, xml("<foo/>")));
 
         syncTest("Test Response Headers Validated", "direct:setHeaders")
                 .requestBody(text("1"))
@@ -152,13 +152,13 @@ public class SimpleSyncTest extends MorcTestBuilder {
                 .requestBody(json("{\"foo\":\"baz\"}"))
                 .addExpectations(expectation1, expectation2);
 
-        Map<String,Object> headers = new HashMap<>();
-        headers.put("foo","baz");
-        headers.put("abc","123");
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("foo", "baz");
+        headers.put("abc", "123");
 
-        Map<String,Object> headers1 = new HashMap<>();
-        headers.put("baz","foo");
-        headers.put("123","abc");
+        Map<String, Object> headers1 = new HashMap<>();
+        headers.put("baz", "foo");
+        headers.put("123", "abc");
 
         syncTest("Test Response Headers from Map Validated", "seda:headersFromMap")
                 .requestBody(text("1"))
@@ -177,13 +177,13 @@ public class SimpleSyncTest extends MorcTestBuilder {
                         .responseHeaders(headers1))
                 .expectedResponseHeaders(headers1)
                 .expectedResponseBody(text("1"));
-        
+
         syncTest("Test response with no expectation predicates", "direct:syncInputSyncOutput")
-                .requestBody(times(3,xml("<baz/>")))
+                .requestBody(times(3, xml("<baz/>")))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedMessageCount(3)
-                        .responseBody(times(3,xml("<foo/>"))))
+                        .responseBody(times(3, xml("<foo/>"))))
                 .sendInterval(3000)
-                .expectedResponseBody(times(3,xml("<foo/>")));
+                .expectedResponseBody(times(3, xml("<foo/>")));
 
     }
 

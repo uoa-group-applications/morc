@@ -136,7 +136,7 @@ public class XmlTestResourceTest extends Assert {
 
     @Test
     public void testTrimmedToString() throws Exception {
-        assertEquals(100,new XmlTestResource(EXPECTED_VALUE).toString().length());
+        assertEquals(100, new XmlTestResource(EXPECTED_VALUE).toString().length());
     }
 
 }

@@ -82,7 +82,7 @@ public class PlainTextTestResourceTest extends Assert {
 
     @Test
     public void testLongString() throws Exception {
-        assertEquals(100,new PlainTextTestResource("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest").toString().length());
+        assertEquals(100, new PlainTextTestResource("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest").toString().length());
     }
 
 }

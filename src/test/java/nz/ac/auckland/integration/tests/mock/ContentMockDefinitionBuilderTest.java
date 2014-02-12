@@ -18,7 +18,7 @@ public class ContentMockDefinitionBuilderTest extends Assert {
     @Test
     public void testBodiesAndHeadersMatchedCorrect() throws Exception {
 
-        MockDefinition def = new ContentMockDefinitionBuilder("").expectedBody(text("foo"),text("baz"),text("moo"))
+        MockDefinition def = new ContentMockDefinitionBuilder("").expectedBody(text("foo"), text("baz"), text("moo"))
                 .expectedHeaders(headers(header("foo", "1")), headers(header("foo", "2")), headers(header("foo", "3")))
                 .addRepeatedPredicate(new HeadersPredicate(headers(header("aaa", "bbb")))).build(null);
 
@@ -44,7 +44,7 @@ public class ContentMockDefinitionBuilderTest extends Assert {
 
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
-        MockDefinition def = new ContentMockDefinitionBuilder("").expectedBody(text("foo"),text("baz"),text("moo"))
+        MockDefinition def = new ContentMockDefinitionBuilder("").expectedBody(text("foo"), text("baz"), text("moo"))
                 .expectedHeaders(headers(header("foo", "1")))
                 .addRepeatedPredicate(new HeadersPredicate(headers(header("aaa", "bbb")))).build(null);
 
@@ -52,7 +52,7 @@ public class ContentMockDefinitionBuilderTest extends Assert {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
 
-        e.getIn().setHeader("foo","1");
+        e.getIn().setHeader("foo", "1");
         e.getIn().setHeader("aaa", "bbb");
         e.getIn().setBody("foo");
         assertTrue(def.getPredicates().get(0).matches(e));
@@ -84,7 +84,7 @@ public class ContentMockDefinitionBuilderTest extends Assert {
         assertFalse(def.getPredicates().get(0).matches(e));
 
         e.getIn().setBody("foo");
-        e.getIn().setHeader("foo","2");
+        e.getIn().setHeader("foo", "2");
         assertTrue(def.getPredicates().get(1).matches(e));
         e.getIn().setBody("foo");
         e.getIn().setHeader("foo", "3");

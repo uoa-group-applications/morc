@@ -20,7 +20,7 @@ public class ExceptionMockDefinitionBuilderTest extends Assert {
             Exchange e = new DefaultExchange(new DefaultCamelContext());
             e.setFromEndpoint(new CxfEndpoint(""));
             def.getProcessors().get(i).process(e);
-            assertEquals(e.getException().getClass(),IOException.class);
+            assertEquals(e.getException().getClass(), IOException.class);
         }
     }
 
@@ -31,7 +31,7 @@ public class ExceptionMockDefinitionBuilderTest extends Assert {
             Exchange e = new DefaultExchange(new DefaultCamelContext());
             e.setFromEndpoint(new CxfEndpoint(""));
             def.getProcessors().get(i).process(e);
-            assertEquals(e.getException().getClass(),Exception.class);
+            assertEquals(e.getException().getClass(), Exception.class);
         }
     }
 

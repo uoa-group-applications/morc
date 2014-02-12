@@ -1,7 +1,6 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.MorcTestBuilder;
-import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.util.HashMap;
@@ -41,14 +40,14 @@ public class SimpleAsyncTest extends MorcTestBuilder {
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
                         .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
 
-        Map<String,Object> headers = new HashMap<>();
-        headers.put("foo","baz");
-        headers.put("abc","def");
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("foo", "baz");
+        headers.put("abc", "def");
 
         asyncTest("test async send headers from map", "seda:asyncTestInput")
-                        .inputHeaders(headers)
-                        .addExpectation(asyncExpectation("seda:asyncTestOutput")
-                                .expectedHeaders(headers));
+                .inputHeaders(headers)
+                .addExpectation(asyncExpectation("seda:asyncTestOutput")
+                        .expectedHeaders(headers));
 
         asyncTest("test async delayed", "seda:asyncTestInputDelayed")
                 .inputMessage(text("0"))

@@ -57,12 +57,12 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
     }
 
     /**
-     * @param headers   A list of maps that will be used to check that the headers are as expected;
-     *                  each validator will match to a headers validator if available at a particular index
+     * @param headers A list of maps that will be used to check that the headers are as expected;
+     *                each validator will match to a headers validator if available at a particular index
      */
     @SafeVarargs
-    public final Builder expectedHeaders(Map<String,Object>... headers) {
-        for (Map<String,Object> header : headers) {
+    public final Builder expectedHeaders(Map<String, Object>... headers) {
+        for (Map<String, Object> header : headers) {
             expectedHeaders(new HeadersTestResource(header));
         }
 

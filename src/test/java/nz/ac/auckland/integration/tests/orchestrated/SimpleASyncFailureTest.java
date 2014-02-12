@@ -4,10 +4,8 @@ import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestBui
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static nz.ac.auckland.integration.testing.MorcTestBuilder.*;
+import static nz.ac.auckland.integration.testing.MorcTestBuilder.text;
 
 public class SimpleAsyncFailureTest extends CamelTestSupport {
 
@@ -17,14 +15,14 @@ public class SimpleAsyncFailureTest extends CamelTestSupport {
 
         try {
             OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test no expectations configured",
-                "vm:async")
-                .inputMessage(text("foo"))
-                .build();
+                    "vm:async")
+                    .inputMessage(text("foo"))
+                    .build();
         } catch (Exception ex) {
             e = ex;
         }
 
         assertNotNull(e);
-        assertEquals(IllegalArgumentException.class,e.getClass());
+        assertEquals(IllegalArgumentException.class, e.getClass());
     }
 }

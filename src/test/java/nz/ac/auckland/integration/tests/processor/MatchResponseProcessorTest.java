@@ -5,9 +5,6 @@ import nz.ac.auckland.integration.testing.processor.MatchedResponseProcessor;
 import nz.ac.auckland.integration.testing.resource.PlainTextTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.CxfEndpoint;
-import org.apache.camel.component.direct.DirectEndpoint;
-import org.apache.camel.component.log.LogEndpoint;
-import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
@@ -21,9 +18,9 @@ public class MatchResponseProcessorTest extends Assert {
         MatchedResponseProcessor.MatchedResponse response = new MatchedResponseProcessor.MatchedResponse(
                 new PlainTextTestResource("foo"), new BodyProcessor("baz"));
         MatchedResponseProcessor.MatchedResponse response1 = new MatchedResponseProcessor.MatchedResponse(
-                        new PlainTextTestResource("baz"), new BodyProcessor("foo"));
+                new PlainTextTestResource("baz"), new BodyProcessor("foo"));
 
-        MatchedResponseProcessor processor = new MatchedResponseProcessor(response,response1);
+        MatchedResponseProcessor processor = new MatchedResponseProcessor(response, response1);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -36,13 +33,13 @@ public class MatchResponseProcessorTest extends Assert {
         e1.getIn().setBody("baz");
         processor.process(e1);
 
-        assertEquals("foo", e1.getIn().getBody(String.class)); 
+        assertEquals("foo", e1.getIn().getBody(String.class));
         Exchange e2 = new DefaultExchange(new DefaultCamelContext());
         e2.setFromEndpoint(new CxfEndpoint(""));
         e2.getIn().setBody("moo");
         processor.process(e2);
 
-        assertEquals("moo",e2.getIn().getBody(String.class));
+        assertEquals("moo", e2.getIn().getBody(String.class));
     }
 
 

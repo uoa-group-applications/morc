@@ -87,7 +87,6 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     /**
      * @param predicates The set of response body predicates that will be used to validate consecutive responses - these
      *                   will be paired with the corresponding header predicate
-     *
      */
     public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
         Collections.addAll(this.responseBodyPredicates, predicates);
@@ -116,12 +115,12 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     }
 
     /**
-     * @param headers   The set of response header maps that will be used to validate consecutive
-     *                  responses - these will be paired with the corresponding body predicate
+     * @param headers The set of response header maps that will be used to validate consecutive
+     *                responses - these will be paired with the corresponding body predicate
      */
     @SafeVarargs
-    public final SyncOrchestratedTestBuilder expectedResponseHeaders(Map<String,Object>... headers) {
-        for (Map<String,Object> header : headers) {
+    public final SyncOrchestratedTestBuilder expectedResponseHeaders(Map<String, Object>... headers) {
+        for (Map<String, Object> header : headers) {
             expectedResponseHeaders(new HeadersTestResource(header));
         }
         return self();

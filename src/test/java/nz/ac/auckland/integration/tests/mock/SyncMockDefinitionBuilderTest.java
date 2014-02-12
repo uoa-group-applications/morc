@@ -18,12 +18,12 @@ public class SyncMockDefinitionBuilderTest extends Assert {
     public void testMatchedBodyAndHeadersNoExpectatations() throws Exception {
 
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1"),text("2"),text("3"))
-                .responseHeaders(headers(header("1","1")),headers(header("2","2")),headers(header("3","3"))).build(null);
+                .responseBody(text("1"), text("2"), text("3"))
+                .responseHeaders(headers(header("1", "1")), headers(header("2", "2")), headers(header("3", "3"))).build(null);
 
-        assertEquals(0,def.getExpectedMessageCount());
-        assertEquals(0,def.getProcessors().size());
-        assertEquals(0,def.getPredicates().size());
+        assertEquals(0, def.getExpectedMessageCount());
+        assertEquals(0, def.getProcessors().size());
+        assertEquals(0, def.getPredicates().size());
     }
 
     @Test
@@ -33,26 +33,26 @@ public class SyncMockDefinitionBuilderTest extends Assert {
                 .responseBody(text("1"), text("2"), text("3")).expectedMessageCount(4)
                 .responseHeaders(headers(header("1", "1")), headers(header("2", "2")), headers(header("3", "3"))).build(null);
 
-        assertEquals(4,def.getExpectedMessageCount());
-        assertEquals(4,def.getPredicates().size());
-        assertEquals(4,def.getProcessors().size());
+        assertEquals(4, def.getExpectedMessageCount());
+        assertEquals(4, def.getPredicates().size());
+        assertEquals(4, def.getProcessors().size());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("");
-        e.getIn().setHeader("1","1");
+        e.getIn().setHeader("1", "1");
 
         def.getProcessors().get(0).process(e);
         assertEquals("1", e.getIn().getBody(String.class));
         assertEquals("1", e.getIn().getHeader("1"));
 
         def.getProcessors().get(1).process(e);
-        assertEquals("2",e.getIn().getBody(String.class));
-        assertEquals("2",e.getIn().getHeader("2"));
+        assertEquals("2", e.getIn().getBody(String.class));
+        assertEquals("2", e.getIn().getHeader("2"));
 
         def.getProcessors().get(2).process(e);
-        assertEquals("3",e.getIn().getBody(String.class));
-        assertEquals("3",e.getIn().getHeader("3"));
+        assertEquals("3", e.getIn().getBody(String.class));
+        assertEquals("3", e.getIn().getHeader("3"));
 
         e.getIn().setBody("");
         e.getIn().removeHeaders("*");
@@ -65,12 +65,12 @@ public class SyncMockDefinitionBuilderTest extends Assert {
     @Test
     public void testMoreBodiesThanExpectedMessages() throws Exception {
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1"),text("2"),text("3"))
+                .responseBody(text("1"), text("2"), text("3"))
                 .expectedMessageCount(1).build(null);
 
-        assertEquals(1,def.getExpectedMessageCount());
-        assertEquals(1,def.getProcessors().size());
-        assertEquals(1,def.getPredicates().size());
+        assertEquals(1, def.getExpectedMessageCount());
+        assertEquals(1, def.getProcessors().size());
+        assertEquals(1, def.getPredicates().size());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -97,13 +97,13 @@ public class SyncMockDefinitionBuilderTest extends Assert {
         e.getIn().removeHeader("1");
         e.getIn().setBody("");
         def.getProcessors().get(1).process(e);
-        assertEquals("2",e.getIn().getBody(String.class));
+        assertEquals("2", e.getIn().getBody(String.class));
         assertNull(e.getIn().getHeader("1"));
 
         e.getIn().removeHeader("1");
         e.getIn().setBody("");
         def.getProcessors().get(2).process(e);
-        assertEquals("3",e.getIn().getBody(String.class));
+        assertEquals("3", e.getIn().getBody(String.class));
         assertNull(e.getIn().getHeader("1"));
 
     }
@@ -125,14 +125,14 @@ public class SyncMockDefinitionBuilderTest extends Assert {
         e.getIn().removeHeaders("*");
         e.getIn().setBody("");
         def.getProcessors().get(1).process(e);
-        assertEquals("2",e.getIn().getHeader("2"));
-        assertEquals("",e.getIn().getBody(String.class));
+        assertEquals("2", e.getIn().getHeader("2"));
+        assertEquals("", e.getIn().getBody(String.class));
 
         e.getIn().removeHeaders("*");
         e.getIn().setBody("");
         def.getProcessors().get(2).process(e);
-        assertEquals("3",e.getIn().getHeader("3"));
-        assertEquals("",e.getIn().getBody(String.class));
+        assertEquals("3", e.getIn().getHeader("3"));
+        assertEquals("", e.getIn().getBody(String.class));
     }
 
 

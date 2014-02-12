@@ -69,8 +69,8 @@ public class OrchestratedTestSpecification {
     }
 
     /**
-     * @return  The amount of time in milliseconds that the test will wait for all responses to be received back from
-     *          the target endpoint URI
+     * @return The amount of time in milliseconds that the test will wait for all responses to be received back from
+     *         the target endpoint URI
      */
     public long getResultWaitTime() {
         //10s gives time for the route to get booted
@@ -329,9 +329,9 @@ public class OrchestratedTestSpecification {
         }
 
         /**
-         * @param endpointUri   Specify an additional endpoint to call after this part of the test specification has
-         *                      completed successfully
-         * @param clazz         The type of builder that will be used for the next part of the specification
+         * @param endpointUri Specify an additional endpoint to call after this part of the test specification has
+         *                    completed successfully
+         * @param clazz       The type of builder that will be used for the next part of the specification
          */
         @SuppressWarnings("unchecked")
         public <T extends OrchestratedTestSpecificationBuilder<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
@@ -360,7 +360,7 @@ public class OrchestratedTestSpecification {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.values();
-        this.messageResultWaitTime = Math.max(builder.getMessageResultWaitTime(),builder.sendInterval);
+        this.messageResultWaitTime = Math.max(builder.getMessageResultWaitTime(), builder.sendInterval);
         this.endpointOverrides = builder.getEndpointOverrides();
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
