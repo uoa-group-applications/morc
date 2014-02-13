@@ -381,10 +381,6 @@ public class MockDefinition {
             return (Builder) this;
         }
 
-        protected int getExpectedMessageCount() {
-            return expectedMessageCount;
-        }
-
         protected OrderingType getOrderingType() {
             return this.orderingType;
         }
