@@ -69,7 +69,8 @@ public class ContentMockDefinitionBuilderTest extends Assert {
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
         MockDefinition def = new ContentMockDefinitionBuilder("").expectedBody(text("foo"))
-                .expectedHeaders(headers(header("foo", "1")), headers(header("foo", "2")), headers(header("foo", "3")))
+                .expectedHeaders(new HeadersPredicate(headers(header("foo", "1")))).expectedHeaders(headers(header("foo", "2")).getValue(),
+                        headers(header("foo", "3")).getValue())
                 .addRepeatedPredicate(new HeadersPredicate(headers(header("aaa", "bbb")))).build(null);
 
         assertEquals(3, def.getPredicates().size());

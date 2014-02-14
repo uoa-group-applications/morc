@@ -17,7 +17,7 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<AsyncOrchestratedTestBuilder> {
+public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit<AsyncOrchestratedTestBuilder> {
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestBuilder.class);
 
@@ -72,10 +72,6 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
      * @throws IllegalArgumentException if no expectations are specified
      */
     public OrchestratedTestSpecification build() {
-        if (getMockExpectations().size() == 0)
-            throw new IllegalArgumentException("At least 1 mock expectation must be set for the " +
-                    "asynchronous test specification " + getDescription());
-
         logger.debug("The endpoint {} will receive {} input message bodies and {} input message headers",
                 new Object[]{getEndpointUri(), inputMessageBodies.size(), inputMessageHeaders.size()});
 

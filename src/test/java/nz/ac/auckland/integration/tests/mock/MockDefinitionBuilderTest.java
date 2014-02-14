@@ -144,6 +144,7 @@ public class MockDefinitionBuilderTest extends Assert {
                 .minimalResultWaitTime(5678).reassertionPeriod(314).expectedMessageCount(5).build(null);
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").messageResultWaitTime(1)
+
                         .expectedMessageCount(3).reassertionPeriod(413)
                         .minimalResultWaitTime(2).build(def);
 
@@ -375,8 +376,7 @@ public class MockDefinitionBuilderTest extends Assert {
 
     @Test
     public void testLenientExcludesExpectedMessages() throws Exception {
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").lenient().
-                expectedMessageCount(5).addPredicates(text("1")).addPredicates(text("1")).build(null);
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").lenient().build(null);
 
         assertNotNull(def.getLenientSelector());
         assertNotNull(def.getLenientProcessor());

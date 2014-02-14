@@ -122,7 +122,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test delayed delivery fails", "vm:syncInputAsyncOutputDelayed")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
-                .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
+                .addExpectation(unreceivedExpectation("vm:somethingToSeeHere").expectedMessageCount(0))
                 .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
                 .build();
 
