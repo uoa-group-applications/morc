@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder<SyncOrchestratedTestBuilder> {
+public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit<SyncOrchestratedTestBuilder> {
 
     private static final Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestBuilder.class);
 

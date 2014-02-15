@@ -126,8 +126,14 @@ public class OrchestratedTestSpecification {
         return processors.size();
     }
 
+    public static class OrchestratedTestSpecificationBuilder extends OrchestratedTestSpecificationBuilderInit<OrchestratedTestSpecificationBuilder> {
+        public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
+            super(description,endpointUri);
+        }
+    }
+
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
-    public static class OrchestratedTestSpecificationBuilder<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
+    public static class OrchestratedTestSpecificationBuilderInit<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
 
         private String description;
         private Map<String, MockDefinition> mockExpectations = new HashMap<>();
@@ -145,13 +151,13 @@ public class OrchestratedTestSpecification {
 
         private StringBuilder endpointOrderingStringBuilder = new StringBuilder();
 
-        private OrchestratedTestSpecificationBuilder nextPartBuilder;
+        private OrchestratedTestSpecificationBuilderInit nextPartBuilder;
 
         /**
          * @param description The description that identifies what the test is supposed to do
          * @param endpointUri The endpoint URI of the target service under testing
          */
-        public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
+        public OrchestratedTestSpecificationBuilderInit(String description, String endpointUri) {
             super(endpointUri);
             this.description = description;
         }
@@ -192,9 +198,6 @@ public class OrchestratedTestSpecification {
                     " must specify at least one message processor to send messages");
 
             predicates = getPredicates(processors.size());
-            if (predicates.size() < processors.size())
-                throw new IllegalArgumentException("The specification for test " + description +
-                        " must specify fewer predicates than message processors");
 
             logger.info("The test {} will be sending {} messages and validate {} responses to endpoint {}",
                     new Object[]{description, processors.size(), predicates.size(), getEndpointUri()});
@@ -334,7 +337,7 @@ public class OrchestratedTestSpecification {
          * @param clazz       The type of builder that will be used for the next part of the specification
          */
         @SuppressWarnings("unchecked")
-        public <T extends OrchestratedTestSpecificationBuilder<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
+        public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
             try {
                 this.nextPartBuilder = clazz.getDeclaredConstructor(String.class, String.class)
                         .newInstance(description, endpointUri);
@@ -356,7 +359,7 @@ public class OrchestratedTestSpecification {
     }
 
     @SuppressWarnings("unchecked")
-    private OrchestratedTestSpecification(OrchestratedTestSpecificationBuilder builder) {
+    private OrchestratedTestSpecification(OrchestratedTestSpecificationBuilderInit builder) {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.values();

@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.testing.processor;
 
+import nz.ac.auckland.integration.testing.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -21,6 +22,14 @@ public class HeadersProcessor implements Processor {
 
     public HeadersProcessor(Map<String, Object> responseHeaders) {
         this.responseHeaders = responseHeaders;
+    }
+
+    public HeadersProcessor(TestResource<Map<String,Object>> responseHeadersTestResource) {
+        try {
+            this.responseHeaders = responseHeadersTestResource.getValue();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

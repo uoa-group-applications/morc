@@ -37,7 +37,7 @@ import java.util.*;
 @RunWith(value = MorcParameterized.class)
 public abstract class MorcTestBuilder extends MorcTest {
 
-    private List<OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder> specificationBuilders = new ArrayList<>();
+    private List<OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit> specificationBuilders = new ArrayList<>();
     private static XmlUtilities xmlUtilities = new XmlUtilities();
 
     public static final QName SOAPFAULT_CLIENT = qname("http://schemas.xmlsoap.org/soap/envelope/", "Client");
@@ -636,7 +636,7 @@ public abstract class MorcTestBuilder extends MorcTest {
 
         List<OrchestratedTestSpecification> specifications = new ArrayList<>();
 
-        for (OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder builder : specificationBuilders) {
+        for (OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit builder : specificationBuilders) {
             OrchestratedTestSpecification spec = builder.build();
             specifications.add(spec);
         }

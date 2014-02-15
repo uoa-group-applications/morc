@@ -282,21 +282,6 @@ public class MockDefinition {
                 throw new IllegalArgumentException("The expected message count for the mock definition on endpoint "
                         + getEndpointUri() + " must be at least 0");
 
-            if (lenientSelector != null) {
-                if (expectedMessageCount > 0 || getPredicates().size() > 0)
-                    logger.warn("Expectations and predicates for a lenient endpoint part {} will be ignored", getEndpointUri());
-
-                expectedMessageCount = 0;
-
-                try {
-                    lenientProcessor = lenientProcessorClass.getDeclaredConstructor(List.class)
-                            .newInstance(Collections.unmodifiableList(getProcessors()));
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException
-                        | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
             if (previousDefinitionPart == null) {
                 //set up a default expectation feeder route (sending to a mock will be added later)
                 if (mockFeederRoute == null) mockFeederRoute = new RouteDefinition().convertBodyTo(String.class);
@@ -311,72 +296,81 @@ public class MockDefinition {
                 predicates = getPredicates(expectedMessageCount);
                 expectedMessageCount = Math.max(predicates.size(), expectedMessageCount);
                 processors = getProcessors(expectedMessageCount);
+
+                logger.debug("Creating mock definition part for endpoint {} with {} processors and {} predicates", new Object[]{
+                        getEndpointUri(), processors.size(), predicates.size()});
             } else {
-                //lenient processors and predicates won't be used for the expectations
+                if (expectedMessageCount > 0 || getPredicates().size() > 0)
+                    logger.warn("Expectations and predicates for a lenient endpoint part {} will be ignored", getEndpointUri());
+
+                expectedMessageCount = 0;
+
+                try {
+                    lenientProcessor = lenientProcessorClass.getDeclaredConstructor(List.class)
+                            .newInstance(Collections.unmodifiableList(getProcessors()));
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                        | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+
                 predicates = new ArrayList<>();
                 processors = new ArrayList<>();
-            }
 
-            logger.debug("Creating mock definition part for endpoint {} with {} processors and {} predicates", new Object[]{
-                    getEndpointUri(), processors.size(), predicates.size()});
+                logger.debug("Creating lenient mock definition part for endpoint {}",getEndpointUri());
+            }
 
             if (previousDefinitionPart != null) {
                 if (!previousDefinitionPart.getEndpointUri().equals(getEndpointUri()))
                     throw new IllegalArgumentException("The endpoints do not match for merging mock definition endpoint " +
                             previousDefinitionPart.getEndpointUri() + " with endpoint " + getEndpointUri());
 
-                if (previousDefinitionPart.isEndpointOrdered() != isEndpointOrdered)
-                    throw new IllegalArgumentException("The endpoint ordering must be the same for all mock definition parts of " +
-                            "endpoint " + getEndpointUri());
-
-                if (previousDefinitionPart.getOrderingType() != orderingType)
-                    throw new IllegalArgumentException("The ordering type must be same for all mock definition parts on the endpoint "
-                            + getEndpointUri());
-
                 if (mockFeederRoute != null)
                     throw new IllegalArgumentException("The mock feeder route for the endpoint " + getEndpointUri() +
                             " can only be specified in the first mock definition part");
 
-                if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime()) {
-                    logger.warn("The result waiting time for a subsequent mock definition part on endpoint {} has a different " +
-                            "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
-                    messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
-                }
-
-                if (previousDefinitionPart.minimalResultWaitTime != getMinimalResultWaitTime()) {
-                    logger.warn("The minimal result wait time for a subsequent mock definition part on endpoint {} has a different " +
-                            "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
-                    minimalResultWaitTime(previousDefinitionPart.minimalResultWaitTime);
-                }
-
-                if (previousDefinitionPart.reassertionPeriod != reassertionPeriod) {
-                    logger.warn("The reassertion period for a subsequent mock definition part on endpoint {} has a different " +
-                            "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
-                    reassertionPeriod(previousDefinitionPart.reassertionPeriod);
-                }
-
-                //todo: how can we clear this up to help with lenientSelector having to redeclare these things
-
                 if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)
                     throw new IllegalArgumentException(getEndpointUri() + " can have only one part of a mock endpoint defined as lenient");
 
-                //prepend the previous partPredicates/partProcessors onto this list ot make an updated expectation
                 if (lenientSelector == null) {
+                    if (previousDefinitionPart.isEndpointOrdered() != isEndpointOrdered)
+                        throw new IllegalArgumentException("The endpoint ordering must be the same for all mock definition parts of " +
+                                "endpoint " + getEndpointUri());
+
+                    if (previousDefinitionPart.getOrderingType() != orderingType)
+                        throw new IllegalArgumentException("The ordering type must be same for all mock definition parts on the endpoint "
+                                + getEndpointUri());
+
+                    if (previousDefinitionPart.getMessageResultWaitTime() != getMessageResultWaitTime())
+                        logger.warn("The result waiting time for a subsequent mock definition part on endpoint {} has a different " +
+                                "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+
+                    if (previousDefinitionPart.minimalResultWaitTime != getMinimalResultWaitTime())
+                        logger.warn("The minimal result wait time for a subsequent mock definition part on endpoint {} has a different " +
+                                "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+
+                    if (previousDefinitionPart.reassertionPeriod != reassertionPeriod)
+                        logger.warn("The reassertion period for a subsequent mock definition part on endpoint {} has a different " +
+                                "time - the first will be used and will apply to the endpoint as a whole", getEndpointUri());
+
                     predicates.addAll(0, previousDefinitionPart.getPredicates());
                     processors.addAll(0, previousDefinitionPart.getProcessors());
+
+                    this.lenientSelector = previousDefinitionPart.lenientSelector;
+                    this.lenientProcessor = previousDefinitionPart.lenientProcessor;
                 } else {
                     predicates = previousDefinitionPart.getPredicates();
                     processors = previousDefinitionPart.getProcessors();
                 }
 
+                this.orderingType = previousDefinitionPart.orderingType;
+                this.isEndpointOrdered = previousDefinitionPart.isEndpointOrdered;
+                reassertionPeriod(previousDefinitionPart.reassertionPeriod);
+                minimalResultWaitTime(previousDefinitionPart.minimalResultWaitTime);
+                messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
                 this.expectedMessageCount += previousDefinitionPart.getExpectedMessageCount();
                 this.mockFeederRoute = previousDefinitionPart.getMockFeederRoute();
-                this.isEndpointOrdered = previousDefinitionPart.isEndpointOrdered;
-
-                //we know if this isn't null then we have checked this expectation hasn't set a selector/processor
-                if (previousDefinitionPart.lenientSelector != null) {
-                    this.lenientSelector = previousDefinitionPart.lenientSelector;
-                    this.lenientProcessor = previousDefinitionPart.lenientProcessor;
+                for (EndpointOverride endpointOverride : previousDefinitionPart.getEndpointOverrides()) {
+                    this.addEndpointOverride(endpointOverride);
                 }
             }
 
@@ -385,10 +379,6 @@ public class MockDefinition {
 
         protected Builder self() {
             return (Builder) this;
-        }
-
-        protected int getExpectedMessageCount() {
-            return expectedMessageCount;
         }
 
         protected OrderingType getOrderingType() {

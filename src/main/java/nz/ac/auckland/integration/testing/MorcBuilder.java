@@ -198,6 +198,8 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      * @param override An override used for modifying an endpoint with sensible properties
      */
     public Builder addEndpointOverride(EndpointOverride override) {
+        //skip the ones we're already aware of
+        if (override instanceof CxfEndpointOverride || override instanceof UrlConnectionOverride) return self();
         endpointOverrides.add(override);
         return self();
     }
