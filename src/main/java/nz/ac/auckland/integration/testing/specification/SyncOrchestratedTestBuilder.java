@@ -42,6 +42,11 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         super(description, endpointUri);
     }
 
+    protected SyncOrchestratedTestBuilder(String description, String endpointUri,
+                                          OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
+        super(description,endpointUri,previousPartBuilder);
+    }
+
     /**
      * @param resources A collection of test resources that can be used to send request bodies to a target endpoint -
      *                  each body will be placed together with the corresponding requestHeader if available
@@ -128,7 +133,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
 
 
     @Override
-    public OrchestratedTestSpecification build() {
+    public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
         logger.debug("The endpoint {} will receive {} request message bodies, {} request message headers, " +
                 "{} expected response body predicates, and {} expected response headers predicate",
                 new Object[]{getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
@@ -164,7 +169,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
                 addPredicates(i, responseHeadersPredicates.get(i));
         }
 
-        return super.build();
+        return super.build(partCount, nextPart);
     }
 
 }

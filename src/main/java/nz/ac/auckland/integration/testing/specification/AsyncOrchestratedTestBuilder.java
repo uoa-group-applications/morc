@@ -32,6 +32,11 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
         super(description, endpointUri);
     }
 
+    protected AsyncOrchestratedTestBuilder(String description, String endpointUri,
+                                           OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
+        super(description,endpointUri,previousPartBuilder);
+    }
+
     /**
      * @param resources The set of resources that should be sent in the body to the target endpoint URI - these will
      *                  match to the corresponding inputHeaders if available
@@ -71,7 +76,7 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
     /**
      * @throws IllegalArgumentException if no expectations are specified
      */
-    public OrchestratedTestSpecification build() {
+    public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
         logger.debug("The endpoint {} will receive {} input message bodies and {} input message headers",
                 new Object[]{getEndpointUri(), inputMessageBodies.size(), inputMessageHeaders.size()});
 
@@ -90,7 +95,7 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
                 addProcessors(i, new HeadersProcessor(inputMessageHeaders.get(i)));
         }
 
-        return super.build();
+        return super.build(partCount, nextPart);
     }
 
 }

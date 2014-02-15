@@ -151,7 +151,7 @@ public class OrchestratedTestSpecification {
 
         private StringBuilder endpointOrderingStringBuilder = new StringBuilder();
 
-        private OrchestratedTestSpecificationBuilderInit nextPartBuilder;
+        private OrchestratedTestSpecificationBuilderInit previousPartBuilder;
 
         /**
          * @param description The description that identifies what the test is supposed to do
@@ -162,12 +162,16 @@ public class OrchestratedTestSpecification {
             this.description = description;
         }
 
-        public OrchestratedTestSpecification build() {
-            if (nextPartBuilder != null) {
-                nextPart = nextPartBuilder.build();
-                partCount = nextPart.getPartCount() + 1;
-            }
+        protected OrchestratedTestSpecificationBuilderInit(String description, String endpointUri, OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
+            this(description,endpointUri);
+            this.previousPartBuilder = previousPartBuilder;
+        }
 
+        public final OrchestratedTestSpecification build() {
+            return build(1,null);
+        }
+
+        protected OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
             if (!expectsException)
                 addRepeatedPredicate(new Predicate() {
                     @Override
@@ -204,8 +208,13 @@ public class OrchestratedTestSpecification {
 
             logger.debug("Test will have the following expectation ordering {}", endpointOrderingStringBuilder.toString());
 
+            this.partCount = partCount;
+            this.nextPart = nextPart;
 
-            return new OrchestratedTestSpecification(this);
+            if (previousPartBuilder != null) {
+                return previousPartBuilder.build(partCount+1,new OrchestratedTestSpecification(this));
+            } else
+                return new OrchestratedTestSpecification(this);
         }
 
         /**
@@ -336,16 +345,14 @@ public class OrchestratedTestSpecification {
          *                    completed successfully
          * @param clazz       The type of builder that will be used for the next part of the specification
          */
-        @SuppressWarnings("unchecked")
         public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
             try {
-                this.nextPartBuilder = clazz.getDeclaredConstructor(String.class, String.class)
-                        .newInstance(description, endpointUri);
+                return clazz.getDeclaredConstructor(String.class, String.class,OrchestratedTestSpecificationBuilderInit.class)
+                        .newInstance(description, endpointUri, this);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
-            return (T) this.nextPartBuilder;
         }
 
         protected Map<String, MockDefinition> getMockExpectations() {
