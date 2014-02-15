@@ -199,14 +199,15 @@ public class OrchestratedTestSpecification {
 
             processors = getProcessors();
             if (processors.size() == 0) throw new IllegalArgumentException("The specification for test " + description +
-                    " must specify at least one message processor to send messages");
+                    " on endpoint " + getEndpointUri() + " must specify at least one message processor to send messages");
 
             predicates = getPredicates(processors.size());
 
-            logger.info("The test {} will be sending {} messages and validate {} responses to endpoint {}",
-                    new Object[]{description, processors.size(), predicates.size(), getEndpointUri()});
+            logger.info("The test {} on endpoint {} will be sending {} messages and validate {} responses to endpoint {}",
+                    new Object[]{description, getEndpointUri(),processors.size(), predicates.size(), getEndpointUri()});
 
-            logger.debug("Test will have the following expectation ordering {}", endpointOrderingStringBuilder.toString());
+            logger.debug("The test {} on endpoint {} will have the following expectation ordering {}",
+                    new Object[] {description,getEndpointUri(),endpointOrderingStringBuilder.toString()});
 
             this.partCount = partCount;
             this.nextPart = nextPart;
