@@ -355,15 +355,6 @@ public class OrchestratedTestSpecification {
                 throw new RuntimeException(e);
             }
         }
-
-        protected Map<String, MockDefinition> getMockExpectations() {
-            return Collections.unmodifiableMap(mockExpectations);
-        }
-
-        protected String getDescription() {
-            return this.description;
-        }
-
     }
 
     @SuppressWarnings("unchecked")
