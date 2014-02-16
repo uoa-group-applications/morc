@@ -212,9 +212,9 @@ public class OrchestratedTestSpecification {
             this.partCount = partCount;
             this.nextPart = nextPart;
 
-            if (previousPartBuilder != null) {
+            if (previousPartBuilder != null)
                 return previousPartBuilder.build(partCount + 1, new OrchestratedTestSpecification(this));
-            } else
+            else
                 return new OrchestratedTestSpecification(this);
         }
 
