@@ -34,7 +34,7 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
 
     protected AsyncOrchestratedTestBuilder(String description, String endpointUri,
                                            OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
-        super(description,endpointUri,previousPartBuilder);
+        super(description, endpointUri, previousPartBuilder);
     }
 
     /**

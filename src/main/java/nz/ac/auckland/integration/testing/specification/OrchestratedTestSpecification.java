@@ -128,7 +128,7 @@ public class OrchestratedTestSpecification {
 
     public static class OrchestratedTestSpecificationBuilder extends OrchestratedTestSpecificationBuilderInit<OrchestratedTestSpecificationBuilder> {
         public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
-            super(description,endpointUri);
+            super(description, endpointUri);
         }
     }
 
@@ -163,12 +163,12 @@ public class OrchestratedTestSpecification {
         }
 
         protected OrchestratedTestSpecificationBuilderInit(String description, String endpointUri, OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
-            this(description,endpointUri);
+            this(description, endpointUri);
             this.previousPartBuilder = previousPartBuilder;
         }
 
         public final OrchestratedTestSpecification build() {
-            return build(1,null);
+            return build(1, null);
         }
 
         protected OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
@@ -204,16 +204,16 @@ public class OrchestratedTestSpecification {
             predicates = getPredicates(processors.size());
 
             logger.info("The test {} on endpoint {} will be sending {} messages and validate {} responses to endpoint {}",
-                    new Object[]{description, getEndpointUri(),processors.size(), predicates.size(), getEndpointUri()});
+                    new Object[]{description, getEndpointUri(), processors.size(), predicates.size(), getEndpointUri()});
 
             logger.debug("The test {} on endpoint {} will have the following expectation ordering {}",
-                    new Object[] {description,getEndpointUri(),endpointOrderingStringBuilder.toString()});
+                    new Object[]{description, getEndpointUri(), endpointOrderingStringBuilder.toString()});
 
             this.partCount = partCount;
             this.nextPart = nextPart;
 
             if (previousPartBuilder != null) {
-                return previousPartBuilder.build(partCount+1,new OrchestratedTestSpecification(this));
+                return previousPartBuilder.build(partCount + 1, new OrchestratedTestSpecification(this));
             } else
                 return new OrchestratedTestSpecification(this);
         }
@@ -348,7 +348,7 @@ public class OrchestratedTestSpecification {
          */
         public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
             try {
-                return clazz.getDeclaredConstructor(String.class, String.class,OrchestratedTestSpecificationBuilderInit.class)
+                return clazz.getDeclaredConstructor(String.class, String.class, OrchestratedTestSpecificationBuilderInit.class)
                         .newInstance(description, endpointUri, this);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | NoSuchMethodException e) {

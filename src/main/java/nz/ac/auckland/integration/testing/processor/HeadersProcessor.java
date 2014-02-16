@@ -24,7 +24,7 @@ public class HeadersProcessor implements Processor {
         this.responseHeaders = responseHeaders;
     }
 
-    public HeadersProcessor(TestResource<Map<String,Object>> responseHeadersTestResource) {
+    public HeadersProcessor(TestResource<Map<String, Object>> responseHeadersTestResource) {
         try {
             this.responseHeaders = responseHeadersTestResource.getValue();
         } catch (Exception e) {

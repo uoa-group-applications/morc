@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static nz.ac.auckland.integration.testing.MorcTestBuilder.*;
+import static nz.ac.auckland.integration.testing.MorcTestBuilder.text;
 
 public class MockDefinitionBuilderTest extends Assert {
 
@@ -37,10 +37,10 @@ public class MockDefinitionBuilderTest extends Assert {
         MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
                 new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient().build(null);
 
-        assertEquals(0,def.getPredicates().size());
-        assertEquals(0,def.getProcessors().size());
+        assertEquals(0, def.getPredicates().size());
+        assertEquals(0, def.getProcessors().size());
         assertNotNull(def.getLenientSelector());
-        assertEquals(def.getLenientProcessor().getClass(),MockDefinition.LenientProcessor.class);
+        assertEquals(def.getLenientProcessor().getClass(), MockDefinition.LenientProcessor.class);
     }
 
     @Test
@@ -54,13 +54,13 @@ public class MockDefinitionBuilderTest extends Assert {
 
         //todo improve processor implementation
         MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
-                new BodyProcessor(text("baz"))).addPredicates(text("foo"),text("baz")).lenient(predicate)
+                new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient(predicate)
                 .lenientProcessor(StubLenientProcessor.class).build(null);
 
-        assertEquals(0,def.getPredicates().size());
-        assertEquals(0,def.getProcessors().size());
+        assertEquals(0, def.getPredicates().size());
+        assertEquals(0, def.getProcessors().size());
         assertEquals(predicate, def.getLenientSelector());
-        assertEquals(def.getLenientProcessor().getClass(),StubLenientProcessor.class);
+        assertEquals(def.getLenientProcessor().getClass(), StubLenientProcessor.class);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class MockDefinitionBuilderTest extends Assert {
                 new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz"))
                 .mockFeederRoute(rd).build(null);
 
-        assertEquals("foo",def.getMockFeederRoute().getGroup());
+        assertEquals("foo", def.getMockFeederRoute().getGroup());
     }
 
     @Test
@@ -145,11 +145,11 @@ public class MockDefinitionBuilderTest extends Assert {
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").messageResultWaitTime(1)
 
-                        .expectedMessageCount(3).reassertionPeriod(413)
-                        .minimalResultWaitTime(2).build(def);
+                .expectedMessageCount(3).reassertionPeriod(413)
+                .minimalResultWaitTime(2).build(def);
 
-        assertEquals(5678 + (8*1234),def1.getResultWaitTime());
-        assertEquals(314,def1.getReassertionPeriod());
+        assertEquals(5678 + (8 * 1234), def1.getResultWaitTime());
+        assertEquals(314, def1.getReassertionPeriod());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class MockDefinitionBuilderTest extends Assert {
         MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").messageResultWaitTime(1234)
                 .minimalResultWaitTime(5678).reassertionPeriod(314).expectedMessageCount(0).build(null);
 
-        assertEquals(5678,def.getReassertionPeriod());
+        assertEquals(5678, def.getReassertionPeriod());
     }
 
     @Test
@@ -200,9 +200,9 @@ public class MockDefinitionBuilderTest extends Assert {
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
                 .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz")).lenient().build(def);
 
-        assertEquals(2,def1.getExpectedMessageCount());
-        assertEquals(2,def1.getProcessors().size());
-        assertEquals(2,def1.getPredicates().size());
+        assertEquals(2, def1.getExpectedMessageCount());
+        assertEquals(2, def1.getProcessors().size());
+        assertEquals(2, def1.getPredicates().size());
         assertNotNull(def1.getLenientProcessor());
         assertNotNull(def1.getLenientSelector());
 
@@ -237,12 +237,12 @@ public class MockDefinitionBuilderTest extends Assert {
         e.setFromEndpoint(new CxfEndpoint(""));
 
         assertEquals(4, def2.getExpectedMessageCount());
-        assertEquals(4,def2.getPredicates().size());
-        assertEquals(4,def2.getProcessors().size());
-        assertEquals(5678 + (4*1234),def2.getResultWaitTime());
-        assertEquals(314,def2.getReassertionPeriod());
-        assertEquals("foo",def2.getMockFeederRoute().getGroup());
-        assertEquals(MockDefinition.OrderingType.NONE,def2.getOrderingType());
+        assertEquals(4, def2.getPredicates().size());
+        assertEquals(4, def2.getProcessors().size());
+        assertEquals(5678 + (4 * 1234), def2.getResultWaitTime());
+        assertEquals(314, def2.getReassertionPeriod());
+        assertEquals("foo", def2.getMockFeederRoute().getGroup());
+        assertEquals(MockDefinition.OrderingType.NONE, def2.getOrderingType());
         assertFalse(def2.isEndpointOrdered());
         assertNotNull(def2.getLenientSelector());
         assertNotNull(def2.getLenientProcessor());
@@ -257,29 +257,29 @@ public class MockDefinitionBuilderTest extends Assert {
         assertTrue(def2.getPredicates().get(3).matches(e));
 
         def2.getProcessors().get(0).process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
+        assertEquals("foo", e.getIn().getBody(String.class));
         def2.getProcessors().get(1).process(e);
-        assertEquals("baz",e.getIn().getBody(String.class));
+        assertEquals("baz", e.getIn().getBody(String.class));
         def2.getProcessors().get(2).process(e);
-        assertEquals("moo",e.getIn().getBody(String.class));
+        assertEquals("moo", e.getIn().getBody(String.class));
         def2.getProcessors().get(3).process(e);
-        assertEquals("cow",e.getIn().getBody(String.class));
+        assertEquals("cow", e.getIn().getBody(String.class));
 
         assertTrue(def2.getLenientSelector().matches(e));
 
         //test it cycles through the responses
         def2.getLenientProcessor().process(e);
-        assertEquals("a",e.getIn().getBody(String.class));
+        assertEquals("a", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("b",e.getIn().getBody(String.class));
+        assertEquals("b", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("a",e.getIn().getBody(String.class));
+        assertEquals("a", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("b",e.getIn().getBody(String.class));
+        assertEquals("b", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("a",e.getIn().getBody(String.class));
+        assertEquals("a", e.getIn().getBody(String.class));
 
-        assertEquals(3,def2.getEndpointOverrides().size());
+        assertEquals(3, def2.getEndpointOverrides().size());
     }
 
     @Test
@@ -295,7 +295,7 @@ public class MockDefinitionBuilderTest extends Assert {
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("moo")))
                 .endpointNotOrdered().ordering(MockDefinition.OrderingType.NONE)
-                //these should be ignored
+                        //these should be ignored
                 .messageResultWaitTime(1234).minimalResultWaitTime(5678).reassertionPeriod(314)
                 .addProcessors(new BodyProcessor(text("cow"))).addPredicates(text("moo")).addPredicates(text("cow")).build(def);
 
@@ -312,12 +312,12 @@ public class MockDefinitionBuilderTest extends Assert {
         e.setFromEndpoint(new CxfEndpoint(""));
 
         assertEquals(4, def2.getExpectedMessageCount());
-        assertEquals(4,def2.getPredicates().size());
-        assertEquals(4,def2.getProcessors().size());
-        assertEquals(10000 + (4*1000),def2.getResultWaitTime());
-        assertEquals(0,def2.getReassertionPeriod());
-        assertEquals("foo",def2.getMockFeederRoute().getGroup());
-        assertEquals(MockDefinition.OrderingType.NONE,def2.getOrderingType());
+        assertEquals(4, def2.getPredicates().size());
+        assertEquals(4, def2.getProcessors().size());
+        assertEquals(10000 + (4 * 1000), def2.getResultWaitTime());
+        assertEquals(0, def2.getReassertionPeriod());
+        assertEquals("foo", def2.getMockFeederRoute().getGroup());
+        assertEquals(MockDefinition.OrderingType.NONE, def2.getOrderingType());
         assertFalse(def2.isEndpointOrdered());
         assertNotNull(def2.getLenientSelector());
         assertNotNull(def2.getLenientProcessor());
@@ -332,29 +332,29 @@ public class MockDefinitionBuilderTest extends Assert {
         assertTrue(def2.getPredicates().get(3).matches(e));
 
         def2.getProcessors().get(0).process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
+        assertEquals("foo", e.getIn().getBody(String.class));
         def2.getProcessors().get(1).process(e);
-        assertEquals("baz",e.getIn().getBody(String.class));
+        assertEquals("baz", e.getIn().getBody(String.class));
         def2.getProcessors().get(2).process(e);
-        assertEquals("moo",e.getIn().getBody(String.class));
+        assertEquals("moo", e.getIn().getBody(String.class));
         def2.getProcessors().get(3).process(e);
-        assertEquals("cow",e.getIn().getBody(String.class));
+        assertEquals("cow", e.getIn().getBody(String.class));
 
         assertTrue(def2.getLenientSelector().matches(e));
 
         //test it cycles through the responses
         def2.getLenientProcessor().process(e);
-        assertEquals("a",e.getIn().getBody(String.class));
+        assertEquals("a", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("b",e.getIn().getBody(String.class));
+        assertEquals("b", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("a",e.getIn().getBody(String.class));
+        assertEquals("a", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("b",e.getIn().getBody(String.class));
+        assertEquals("b", e.getIn().getBody(String.class));
         def2.getLenientProcessor().process(e);
-        assertEquals("a",e.getIn().getBody(String.class));
+        assertEquals("a", e.getIn().getBody(String.class));
 
-        assertEquals(3,def2.getEndpointOverrides().size());
+        assertEquals(3, def2.getEndpointOverrides().size());
     }
 
     @Test
@@ -370,8 +370,8 @@ public class MockDefinitionBuilderTest extends Assert {
         //ensure we can handle the case when no processors are available
         e.getIn().setBody("foo");
         def.getLenientProcessor().process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
-        assertEquals(0,def.getExpectedMessageCount());
+        assertEquals("foo", e.getIn().getBody(String.class));
+        assertEquals(0, def.getExpectedMessageCount());
     }
 
     @Test
@@ -381,7 +381,7 @@ public class MockDefinitionBuilderTest extends Assert {
         assertNotNull(def.getLenientSelector());
         assertNotNull(def.getLenientProcessor());
 
-        assertEquals(0,def.getExpectedMessageCount());
+        assertEquals(0, def.getExpectedMessageCount());
 
     }
 

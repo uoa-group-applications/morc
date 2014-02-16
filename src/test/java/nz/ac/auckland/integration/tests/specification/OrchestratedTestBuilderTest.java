@@ -22,8 +22,8 @@ public class OrchestratedTestBuilderTest extends Assert {
     public void testNoProcessorsSpecified() throws Exception {
         IllegalArgumentException e = null;
         try {
-            new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","uri")
-                .build();
+            new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "uri")
+                    .build();
         } catch (IllegalArgumentException ex) {
             e = ex;
         }
@@ -34,15 +34,15 @@ public class OrchestratedTestBuilderTest extends Assert {
     @Test
     public void testMoreProcessorsThanPredicates() throws Exception {
 
-        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","uri")
-            .addProcessors(new BodyProcessor(text("foo"))).addProcessors(new BodyProcessor(text("foo")))
-            .addPredicates(text("baz"))
-            .build();
+        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "uri")
+                .addProcessors(new BodyProcessor(text("foo"))).addProcessors(new BodyProcessor(text("foo")))
+                .addPredicates(text("baz"))
+                .build();
 
-        assertEquals(2,test.getProcessors().size());
-        assertEquals(2,test.getPredicates().size());
-        assertEquals(2,test.getTotalPublishMessageCount());
-        assertEquals(0,test.getTotalMockMessageCount());
+        assertEquals(2, test.getProcessors().size());
+        assertEquals(2, test.getPredicates().size());
+        assertEquals(2, test.getTotalPublishMessageCount());
+        assertEquals(0, test.getTotalMockMessageCount());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -51,23 +51,23 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertTrue(test.getPredicates().get(0).matches(e));
         assertTrue(test.getPredicates().get(1).matches(e));
 
-        e.setProperty(Exchange.EXCEPTION_CAUGHT,new Exception());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
         assertFalse(test.getPredicates().get(0).matches(e));
         assertFalse(test.getPredicates().get(1).matches(e));
 
-        assertEquals(10000+(1000*2),test.getResultWaitTime());
+        assertEquals(10000 + (1000 * 2), test.getResultWaitTime());
     }
 
     @Test
     public void testExpectedException() throws Exception {
-        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","uri")
-            .addProcessors(new BodyProcessor(text("foo"))).addProcessors(new BodyProcessor(text("foo")))
-            .expectsException()
-            .addPredicates(text("baz"))
-            .build();
+        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "uri")
+                .addProcessors(new BodyProcessor(text("foo"))).addProcessors(new BodyProcessor(text("foo")))
+                .expectsException()
+                .addPredicates(text("baz"))
+                .build();
 
-        assertEquals(2,test.getProcessors().size());
-        assertEquals(2,test.getPredicates().size());
+        assertEquals(2, test.getProcessors().size());
+        assertEquals(2, test.getPredicates().size());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -76,130 +76,130 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertFalse(test.getPredicates().get(0).matches(e));
         assertFalse(test.getPredicates().get(1).matches(e));
 
-        e.setProperty(Exchange.EXCEPTION_CAUGHT,new Exception());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
         assertTrue(test.getPredicates().get(0).matches(e));
         assertTrue(test.getPredicates().get(1).matches(e));
     }
 
     @Test
     public void testAddEndpointSameClass() throws Exception {
-        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo","url").requestBody(text("foo")).requestBody(text("baz"))
-                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2","2")))
+        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url").requestBody(text("foo")).requestBody(text("baz"))
+                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
                 .expectedResponseBody(text("1")).expectedResponseBody(text("2"))
-                .expectedResponseHeaders(headers(header("foo","baz"))).expectedResponseHeaders(headers(header("baz","foo")))
+                .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo")))
                 .addEndpoint("2")
-                    .requestBody(text("foo"))
-                    .requestHeaders(headers(header("1","1"))).requestHeaders(headers(header("2","2")))
-                    .expectedResponseBody(text("1"))
-                    .expectedResponseHeaders(headers(header("foo","baz"))).expectedResponseHeaders(headers(header("baz","foo"))).build();
+                .requestBody(text("foo"))
+                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
+                .expectedResponseBody(text("1"))
+                .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo"))).build();
 
-        assertEquals(2,test.getPartCount());
+        assertEquals(2, test.getPartCount());
         assertNotNull(test.getNextPart());
-        assertEquals(2,test.getProcessors().size());
-        assertEquals(2,test.getPredicates().size());
-        assertEquals("url",test.getEndpointUri());
+        assertEquals(2, test.getProcessors().size());
+        assertEquals(2, test.getPredicates().size());
+        assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
-        e.getIn().setHeader("foo","baz");
+        e.getIn().setHeader("foo", "baz");
         assertTrue(test.getPredicates().get(0).matches(e));
 
         e.getIn().setBody("2");
         assertFalse(test.getPredicates().get(1).matches(e));
-        e.getIn().setHeader("baz","foo");
+        e.getIn().setHeader("baz", "foo");
         assertTrue(test.getPredicates().get(1).matches(e));
 
         test.getProcessors().get(0).process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
-        assertEquals("1",e.getIn().getHeader("1"));
+        assertEquals("foo", e.getIn().getBody(String.class));
+        assertEquals("1", e.getIn().getHeader("1"));
 
         test.getProcessors().get(1).process(e);
-        assertEquals("baz",e.getIn().getBody(String.class));
-        assertEquals("2",e.getIn().getHeader("2"));
+        assertEquals("baz", e.getIn().getBody(String.class));
+        assertEquals("2", e.getIn().getHeader("2"));
 
         test = test.getNextPart();
 
-        assertEquals("2",test.getEndpointUri());
-        assertEquals(2,test.getProcessors().size());
-        assertEquals(2,test.getPredicates().size());
+        assertEquals("2", test.getEndpointUri());
+        assertEquals(2, test.getProcessors().size());
+        assertEquals(2, test.getPredicates().size());
 
         e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
-        e.getIn().setHeader("foo","baz");
+        e.getIn().setHeader("foo", "baz");
         assertTrue(test.getPredicates().get(0).matches(e));
 
-        e.getIn().setHeader("baz","foo");
+        e.getIn().setHeader("baz", "foo");
         assertTrue(test.getPredicates().get(1).matches(e));
 
         test.getProcessors().get(0).process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
-        assertEquals("1",e.getIn().getHeader("1"));
+        assertEquals("foo", e.getIn().getBody(String.class));
+        assertEquals("1", e.getIn().getHeader("1"));
 
         test.getProcessors().get(1).process(e);
-        assertEquals("2",e.getIn().getHeader("2"));
+        assertEquals("2", e.getIn().getHeader("2"));
     }
 
     @Test
     public void testAddEndpointDifferentClass() throws Exception {
-        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo","url").requestBody(text("foo")).requestBody(text("baz"))
-                .requestHeaders(headers(header("1","1"))).requestHeaders(headers(header("2","2")))
+        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url").requestBody(text("foo")).requestBody(text("baz"))
+                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
                 .expectedResponseBody(text("1")).expectedResponseBody(text("2"))
-                .expectedResponseHeaders(headers(header("foo","baz"))).expectedResponseHeaders(headers(header("baz","foo")))
+                .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo")))
                 .addEndpoint("2", AsyncOrchestratedTestBuilder.class).inputMessage(text("foo")).inputMessage(text("baz"))
-                                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
+                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
 
-        assertEquals(2,test.getPartCount());
+        assertEquals(2, test.getPartCount());
         assertNotNull(test.getNextPart());
-        assertEquals(2,test.getProcessors().size());
-        assertEquals(2,test.getPredicates().size());
-        assertEquals("url",test.getEndpointUri());
+        assertEquals(2, test.getProcessors().size());
+        assertEquals(2, test.getPredicates().size());
+        assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
-        e.getIn().setHeader("foo","baz");
+        e.getIn().setHeader("foo", "baz");
         assertTrue(test.getPredicates().get(0).matches(e));
 
         e.getIn().setBody("2");
         assertFalse(test.getPredicates().get(1).matches(e));
-        e.getIn().setHeader("baz","foo");
+        e.getIn().setHeader("baz", "foo");
         assertTrue(test.getPredicates().get(1).matches(e));
 
         test.getProcessors().get(0).process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
-        assertEquals("1",e.getIn().getHeader("1"));
+        assertEquals("foo", e.getIn().getBody(String.class));
+        assertEquals("1", e.getIn().getHeader("1"));
 
         test.getProcessors().get(1).process(e);
-        assertEquals("baz",e.getIn().getBody(String.class));
-        assertEquals("2",e.getIn().getHeader("2"));
+        assertEquals("baz", e.getIn().getBody(String.class));
+        assertEquals("2", e.getIn().getHeader("2"));
 
         test = test.getNextPart();
 
-        assertEquals(2,test.getProcessors().size());
-        assertEquals(2,test.getPredicates().size());
-        assertEquals("2",test.getEndpointUri());
+        assertEquals(2, test.getProcessors().size());
+        assertEquals(2, test.getPredicates().size());
+        assertEquals("2", test.getEndpointUri());
 
         e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
 
         test.getProcessors().get(0).process(e);
-        assertEquals("foo",e.getIn().getBody(String.class));
-        assertEquals("1",e.getIn().getHeader("1"));
+        assertEquals("foo", e.getIn().getBody(String.class));
+        assertEquals("1", e.getIn().getHeader("1"));
 
         test.getProcessors().get(1).process(e);
-        assertEquals("baz",e.getIn().getBody(String.class));
-        assertEquals("2",e.getIn().getHeader("2"));
+        assertEquals("baz", e.getIn().getBody(String.class));
+        assertEquals("2", e.getIn().getHeader("2"));
     }
 
     @Test
     public void testUnexpectedException() throws Exception {
 
-        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","baz")
+        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "baz")
                 .addProcessors(new BodyProcessor(text("1"))).addProcessors(new BodyProcessor(text("2")))
                 .addPredicates(text("1")).addPredicates(text("2")).build();
 
@@ -208,7 +208,7 @@ public class OrchestratedTestBuilderTest extends Assert {
         e.getIn().setBody("1");
 
         assertTrue(test.getPredicates().get(0).matches(e));
-        e.setProperty(Exchange.EXCEPTION_CAUGHT,new Exception());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
         assertFalse(test.getPredicates().get(0).matches(e));
 
         e.getIn().setBody("2");
@@ -220,7 +220,7 @@ public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testOrderingConfiguredCorrectly() throws Exception {
-        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","baz")
+        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "baz")
                 .addProcessors(new BodyProcessor(text("foo")))
                 .addExpectation(asyncExpectation("baz").expectedBody(text("1")).expectedBody(text("2")))
                 .addExpectation(syncExpectation("foo").expectedBody(text("1")).expectedBody(text("2")))
@@ -231,11 +231,11 @@ public class OrchestratedTestBuilderTest extends Assert {
                 .addExpectation(asyncExpectation("cow").expectedBody(text("1")).expectedBody(text("2")).ordering(MockDefinition.OrderingType.NONE))
                 .build();
 
-        assertEquals(7,test.getEndpointNodesOrdering().size());
+        assertEquals(7, test.getEndpointNodesOrdering().size());
         OrchestratedTestSpecification.EndpointNode nextNode = null;
         for (OrchestratedTestSpecification.EndpointNode node : test.getEndpointNodesOrdering()) {
             if (!node.getEndpointUri().equals("foo")) {
-                assertEquals(0,node.getChildrenNodes().size());
+                assertEquals(0, node.getChildrenNodes().size());
                 assertTrue(node.getEndpointUri().equals("moo") || node.getEndpointUri().equals("baz") || node.getEndpointUri().equals("cow"));
                 continue;
             }
@@ -244,28 +244,28 @@ public class OrchestratedTestBuilderTest extends Assert {
 
         assertNotNull(nextNode);
 
-        assertEquals(1,nextNode.getChildrenNodes().size());
-        assertEquals("foo",nextNode.getEndpointUri());
+        assertEquals(1, nextNode.getChildrenNodes().size());
+        assertEquals("foo", nextNode.getEndpointUri());
         nextNode = new ArrayList<>(nextNode.getChildrenNodes()).get(0);
         for (OrchestratedTestSpecification.EndpointNode node : nextNode.getChildrenNodes()) {
             if (node.getEndpointUri().equals("foo")) {
                 nextNode = node;
                 continue;
             }
-            assertEquals("baz",node.getEndpointUri());
-            assertEquals("baz",node.getEndpointUri());
+            assertEquals("baz", node.getEndpointUri());
+            assertEquals("baz", node.getEndpointUri());
         }
 
-        assertEquals(1,nextNode.getChildrenNodes().size());
+        assertEquals(1, nextNode.getChildrenNodes().size());
         for (OrchestratedTestSpecification.EndpointNode node : nextNode.getChildrenNodes()) {
-            assertEquals("foo",node.getEndpointUri());
+            assertEquals("foo", node.getEndpointUri());
             nextNode = node;
         }
 
-        assertEquals(2,nextNode.getChildrenNodes().size());
+        assertEquals(2, nextNode.getChildrenNodes().size());
         for (OrchestratedTestSpecification.EndpointNode node : nextNode.getChildrenNodes()) {
-            assertEquals("baz",node.getEndpointUri());
-            assertEquals(0,node.getChildrenNodes().size());
+            assertEquals("baz", node.getEndpointUri());
+            assertEquals(0, node.getChildrenNodes().size());
         }
 
 

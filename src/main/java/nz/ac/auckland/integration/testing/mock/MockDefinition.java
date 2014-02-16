@@ -316,7 +316,7 @@ public class MockDefinition {
                 predicates = new ArrayList<>();
                 processors = new ArrayList<>();
 
-                logger.debug("Creating lenient mock definition part for endpoint {}",getEndpointUri());
+                logger.debug("Creating lenient mock definition part for endpoint {}", getEndpointUri());
             }
 
             if (previousDefinitionPart != null) {

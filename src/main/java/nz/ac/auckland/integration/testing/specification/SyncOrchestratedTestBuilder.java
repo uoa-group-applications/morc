@@ -44,7 +44,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
 
     protected SyncOrchestratedTestBuilder(String description, String endpointUri,
                                           OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
-        super(description,endpointUri,previousPartBuilder);
+        super(description, endpointUri, previousPartBuilder);
     }
 
     /**
