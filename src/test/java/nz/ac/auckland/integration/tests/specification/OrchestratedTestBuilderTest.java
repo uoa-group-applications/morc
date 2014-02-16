@@ -1,5 +1,6 @@
 package nz.ac.auckland.integration.tests.specification;
 
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.processor.BodyProcessor;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
@@ -10,6 +11,9 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+
 import static nz.ac.auckland.integration.testing.MorcTestBuilder.*;
 
 public class OrchestratedTestBuilderTest extends Assert {
@@ -192,4 +196,78 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertEquals("2",e.getIn().getHeader("2"));
     }
 
+    @Test
+    public void testUnexpectedException() throws Exception {
+
+        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","baz")
+                .addProcessors(new BodyProcessor(text("1"))).addProcessors(new BodyProcessor(text("2")))
+                .addPredicates(text("1")).addPredicates(text("2")).build();
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setFromEndpoint(new CxfEndpoint(""));
+        e.getIn().setBody("1");
+
+        assertTrue(test.getPredicates().get(0).matches(e));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT,new Exception());
+        assertFalse(test.getPredicates().get(0).matches(e));
+
+        e.getIn().setBody("2");
+        e.removeProperty(Exchange.EXCEPTION_CAUGHT);
+        assertTrue(test.getPredicates().get(1).matches(e));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
+        assertFalse(test.getPredicates().get(1).matches(e));
+    }
+
+    @Test
+    public void testOrderingConfiguredCorrectly() throws Exception {
+        OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo","baz")
+                .addProcessors(new BodyProcessor(text("foo")))
+                .addExpectation(asyncExpectation("baz").expectedBody(text("1")).expectedBody(text("2")))
+                .addExpectation(syncExpectation("foo").expectedBody(text("1")).expectedBody(text("2")))
+                .addExpectation(asyncExpectation("moo").expectedBody(text("1")).expectedBody(text("2")).ordering(MockDefinition.OrderingType.NONE))
+                .addExpectation(asyncExpectation("baz").expectedBody(text("3")).expectedBody(text("4")))
+                .addExpectation(syncExpectation("foo").expectedBody(text("3")).expectedBody(text("4")))
+                .addExpectation(asyncExpectation("baz").expectedBody(text("4")).expectedBody(text("5")))
+                .addExpectation(asyncExpectation("cow").expectedBody(text("1")).expectedBody(text("2")).ordering(MockDefinition.OrderingType.NONE))
+                .build();
+
+        assertEquals(7,test.getEndpointNodesOrdering().size());
+        OrchestratedTestSpecification.EndpointNode nextNode = null;
+        for (OrchestratedTestSpecification.EndpointNode node : test.getEndpointNodesOrdering()) {
+            if (!node.getEndpointUri().equals("foo")) {
+                assertEquals(0,node.getChildrenNodes().size());
+                assertTrue(node.getEndpointUri().equals("moo") || node.getEndpointUri().equals("baz") || node.getEndpointUri().equals("cow"));
+                continue;
+            }
+            nextNode = node;
+        }
+
+        assertNotNull(nextNode);
+
+        assertEquals(1,nextNode.getChildrenNodes().size());
+        assertEquals("foo",nextNode.getEndpointUri());
+        nextNode = new ArrayList<>(nextNode.getChildrenNodes()).get(0);
+        for (OrchestratedTestSpecification.EndpointNode node : nextNode.getChildrenNodes()) {
+            if (node.getEndpointUri().equals("foo")) {
+                nextNode = node;
+                continue;
+            }
+            assertEquals("baz",node.getEndpointUri());
+            assertEquals("baz",node.getEndpointUri());
+        }
+
+        assertEquals(1,nextNode.getChildrenNodes().size());
+        for (OrchestratedTestSpecification.EndpointNode node : nextNode.getChildrenNodes()) {
+            assertEquals("foo",node.getEndpointUri());
+            nextNode = node;
+        }
+
+        assertEquals(2,nextNode.getChildrenNodes().size());
+        for (OrchestratedTestSpecification.EndpointNode node : nextNode.getChildrenNodes()) {
+            assertEquals("baz",node.getEndpointUri());
+            assertEquals(0,node.getChildrenNodes().size());
+        }
+
+
+    }
 }
