@@ -208,11 +208,11 @@ public class OrchestratedTestBuilderTest extends Assert {
                 .addEndpoint("2", AsyncOrchestratedTestBuilder.class).inputMessage(text("foo")).inputMessage(text("baz"))
                 .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2")))
                 .addEndpoint("3", AsyncOrchestratedTestBuilder.class).inputMessage(text("foo")).inputMessage(text("baz"))
-                                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
+                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
 
         OrchestratedTestSpecification spec = test.build();
 
-        assertEquals(3,spec.getPartCount());
+        assertEquals(3, spec.getPartCount());
     }
 
 

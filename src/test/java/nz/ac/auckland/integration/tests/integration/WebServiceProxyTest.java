@@ -108,8 +108,8 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .ordering(partialOrdering()));
 
         syncTest("Simple multiple request WS proxy test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")),xml(classpath("/data/pingRequest1.xml")),xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponseBody(times(3,xml(classpath("/data/pingResponse1.xml"))))
+                .requestBody(xml(classpath("/data/pingRequest1.xml")), xml(classpath("/data/pingRequest1.xml")), xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(times(3, xml(classpath("/data/pingRequest1.xml"))))
                         .responseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))

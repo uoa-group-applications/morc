@@ -222,23 +222,23 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(asyncExpectation("seda:b").expectedMessageCount(1))
                 .addExpectation(syncExpectation("seda:s").expectedMessageCount(1));
 
-        syncTest("Test Lenient Processor","seda:lenient?waitForTaskToComplete=Always")
-                .requestBody(text("1"),text("2"),text("3"),text("4"))
-                .expectedResponseBody(text("-1"),text("-2"),text("-3"),text("-1"))
-                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(text("-1"),text("-2"),text("-3")));
+        syncTest("Test Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
+                .requestBody(text("1"), text("2"), text("3"), text("4"))
+                .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-1"))
+                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(text("-1"), text("-2"), text("-3")));
 
-        syncTest("Test Partial Lenient Processor","seda:partialLenient?waitForTaskToComplete=Always")
-                .requestBody(text("1"),text("2"),text("3"),text("4"))
-                .expectedResponseBody(text("-1"),text("-2"),text("-3"),text("-4"))
+        syncTest("Test Partial Lenient Processor", "seda:partialLenient?waitForTaskToComplete=Always")
+                .requestBody(text("1"), text("2"), text("3"), text("4"))
+                .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-4"))
                 .addExpectation(syncExpectation("seda:partialLenient").lenient(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
                         return exchange.getIn().getBody(Integer.class) % 2 == 0;
                     }
-                }).responseBody(text("-2"),text("-4")))
+                }).responseBody(text("-2"), text("-4")))
                 .addExpectation(syncExpectation("seda:partialLenient")
-                    .expectedBody(text("1"),text("3"))
-                    .responseBody(text("-1"),text("-3")));
+                        .expectedBody(text("1"), text("3"))
+                        .responseBody(text("-1"), text("-3")));
     }
 
 }

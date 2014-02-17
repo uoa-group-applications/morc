@@ -171,7 +171,7 @@ public class OrchestratedTestSpecification {
 
         public final OrchestratedTestSpecification build() {
             if (nextPartBuilder != null) return nextPartBuilder.build();
-            else return build(1,null);
+            else return build(1, null);
         }
 
         protected OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
@@ -354,7 +354,7 @@ public class OrchestratedTestSpecification {
             try {
                 nextPartBuilder = clazz.getDeclaredConstructor(String.class, String.class, OrchestratedTestSpecificationBuilderInit.class)
                         .newInstance(description, endpointUri, this);
-                return (T)nextPartBuilder;
+                return (T) nextPartBuilder;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | NoSuchMethodException e) {
                 throw new RuntimeException(e);
