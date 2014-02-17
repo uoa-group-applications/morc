@@ -32,7 +32,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
+        /*syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
@@ -90,7 +90,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         xml("<detail><foo/></detail>")))
                 .addExpectation(soapFaultExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
                         .expectedMessageCount(1)
-                        .responseBody(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));
+                        .responseBody(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));          */
 
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
@@ -105,6 +105,14 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
                         .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                        .ordering(partialOrdering()));
+
+        syncTest("Simple multiple request WS proxy test", "jetty:http://localhost:8090/testWS")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")),xml(classpath("/data/pingRequest1.xml")),xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponseBody(times(3,xml(classpath("/data/pingResponse1.xml"))))
+                .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
+                        .expectedBody(times(3, xml(classpath("/data/pingRequest1.xml"))))
+                        .responseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))
                         .ordering(partialOrdering()));
     }
 

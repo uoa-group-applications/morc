@@ -3,6 +3,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -200,13 +201,13 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
         syncTest("Send unordered messages to two different sync destinations without total ordering or endpoint ordering", "direct:multiSend2")
                 .requestBody(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
                         .expectedBody(xml("<fourth/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
                         .expectedBody(xml("<third/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
                         .expectedBody(xml("<second/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL)
+                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
                         .expectedBody(xml("<first/>")));
 
         syncTest("Send async messages out of order such that sync arrives first", "direct:syncAtEnd")
@@ -220,6 +221,24 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(asyncExpectation("seda:a").expectedMessageCount(1))
                 .addExpectation(asyncExpectation("seda:b").expectedMessageCount(1))
                 .addExpectation(syncExpectation("seda:s").expectedMessageCount(1));
+
+        syncTest("Test Lenient Processor","seda:lenient?waitForTaskToComplete=Always")
+                .requestBody(text("1"),text("2"),text("3"),text("4"))
+                .expectedResponseBody(text("-1"),text("-2"),text("-3"),text("-1"))
+                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(text("-1"),text("-2"),text("-3")));
+
+        syncTest("Test Partial Lenient Processor","seda:partialLenient?waitForTaskToComplete=Always")
+                .requestBody(text("1"),text("2"),text("3"),text("4"))
+                .expectedResponseBody(text("-1"),text("-2"),text("-3"),text("-4"))
+                .addExpectation(syncExpectation("seda:partialLenient").lenient(new Predicate() {
+                    @Override
+                    public boolean matches(Exchange exchange) {
+                        return exchange.getIn().getBody(Integer.class) % 2 == 0;
+                    }
+                }).responseBody(text("-2"),text("-4")))
+                .addExpectation(syncExpectation("seda:partialLenient")
+                    .expectedBody(text("1"),text("3"))
+                    .responseBody(text("-1"),text("-3")));
     }
 
 }

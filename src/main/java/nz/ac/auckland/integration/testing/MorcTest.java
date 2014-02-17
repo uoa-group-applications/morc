@@ -9,6 +9,7 @@ import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.language.ConstantExpression;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
@@ -195,30 +196,29 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 //this will be used by both possible routing outcomes (lenient/mock)
                 mockDefinition.getMockFeederRoute()
-                        .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()));
-
-                if (mockDefinition.getLenientSelector() != null)
-                    mockDefinition.getMockFeederRoute()
-                            .choice()
-                            .when(mockDefinition.getLenientSelector())
-                            .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received message for lenient processing")
-                            .process(mockDefinition.getLenientProcessor())
-                            .otherwise();
-
-                mockDefinition.getMockFeederRoute()
                         .routeId(MorcTest.class.getCanonicalName() + "." + mockDefinition.getEndpointUri())
-                        .wireTap(orderCheckMock.getEndpointUri())
-                        .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message")
+                        .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()))
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
-                        .to(mockEndpoint)
                         .onCompletion()
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}")
-                        .process(new Processor() {
-                            @Override
-                            public void process(Exchange exchange) throws Exception {
-                                System.out.println();
-                            }
-                        });
+                        .end();
+
+                ProcessorDefinition pd;
+
+                if (mockDefinition.getLenientSelector() != null)
+                    pd = mockDefinition.getMockFeederRoute()
+                            .choice()
+                            .when(mockDefinition.getLenientSelector())
+                            .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message for lenient processing")
+                            .process(mockDefinition.getLenientProcessor())
+                            .endChoice()
+                            .otherwise();
+                else pd = mockDefinition.getMockFeederRoute();
+
+                pd.wireTap(orderCheckMock.getEndpointUri())
+                        .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message")
+                        .to(mockEndpoint)
+                        .end();
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
                 for (EndpointOverride override : mockDefinition.getEndpointOverrides())

@@ -1,6 +1,7 @@
 package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.MorcTest;
+import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.integration.testing.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.integration.testing.specification.SyncOrchestratedTestBuilder;
@@ -87,6 +88,20 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
                                 template.sendBody("vm:a", "4");
                                 Thread.sleep(1000);
                                 template.sendBody("vm:a", "4");
+                            }
+                        });
+
+                from("vm:noneOrdering")
+                        .process(new Processor() {
+                            @Override
+                            public void process(Exchange exchange) throws Exception {
+                                template.sendBody("vm:a","1");
+                                Thread.sleep(1000);
+                                template.sendBody("vm:s","1");
+                                for (int i = 0; i < 3; i++) {
+                                    template.sendBody("vm:n","1");
+                                    Thread.sleep(1000);
+                                }
                             }
                         });
             }
@@ -191,5 +206,16 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport {
         runTest(spec);
     }
 
+    @Test
+    public void testNoneOrderingFailure() throws Exception {
+        OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test none ordering handled first during order validation", "vm:noneOrdering")
+                .inputMessage(text("0"))
+                .addExpectation(syncExpectation("vm:s").expectedBody(text("1")))
+                .addExpectation(asyncExpectation("vm:a").expectedBody(text("1")))
+                .addExpectation(asyncExpectation("vm:n").expectedBody(times(3,text("1"))).ordering(noOrdering()))
+                .build();
+
+        runTest(spec);
+    }
 
 }

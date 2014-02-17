@@ -196,6 +196,22 @@ public class OrchestratedTestBuilderTest extends Assert {
         assertEquals("2", e.getIn().getHeader("2"));
     }
 
+
+    @Test
+    public void testAddEndpointBuildFirstClass() throws Exception {
+        SyncOrchestratedTestBuilder test = new SyncOrchestratedTestBuilder("foo", "url");
+
+        test.requestBody(text("foo")).requestBody(text("baz"))
+                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
+                .expectedResponseBody(text("1")).expectedResponseBody(text("2"))
+                .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo")))
+                .addEndpoint("2", AsyncOrchestratedTestBuilder.class).inputMessage(text("foo")).inputMessage(text("baz"))
+                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
+
+        assertEquals(2,test.build().getPartCount());
+    }
+
+
     @Test
     public void testUnexpectedException() throws Exception {
 

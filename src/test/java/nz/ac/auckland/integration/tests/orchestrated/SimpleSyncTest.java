@@ -118,7 +118,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
                 .requestBody(times(3, xml("<baz/>")))
                 .addExpectation(syncExpectation("seda:syncTarget")
                         .expectedBody(times(3, xml("<baz/>")))
-                        .responseBody(times(3, xml("<foo/>"))))
+                        .responseBody(times(3, xml("<foo/>"))).ordering(totalOrdering()))
                 .sendInterval(3000)
                 .expectedResponseBody(times(3, xml("<foo/>")));
 
