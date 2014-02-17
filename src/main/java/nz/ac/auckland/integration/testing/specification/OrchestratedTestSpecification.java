@@ -152,6 +152,7 @@ public class OrchestratedTestSpecification {
         private StringBuilder endpointOrderingStringBuilder = new StringBuilder();
 
         private OrchestratedTestSpecificationBuilderInit previousPartBuilder;
+        private OrchestratedTestSpecificationBuilderInit nextPartBuilder;
 
         /**
          * @param description The description that identifies what the test is supposed to do
@@ -162,13 +163,15 @@ public class OrchestratedTestSpecification {
             this.description = description;
         }
 
-        protected OrchestratedTestSpecificationBuilderInit(String description, String endpointUri, OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
+        protected OrchestratedTestSpecificationBuilderInit(String description, String endpointUri,
+                                                           OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
             this(description, endpointUri);
             this.previousPartBuilder = previousPartBuilder;
         }
 
         public final OrchestratedTestSpecification build() {
-            return build(1, null);
+            if (nextPartBuilder != null) return nextPartBuilder.build();
+            else return build(1,null);
         }
 
         protected OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
@@ -346,10 +349,12 @@ public class OrchestratedTestSpecification {
          *                    completed successfully
          * @param clazz       The type of builder that will be used for the next part of the specification
          */
+        @SuppressWarnings("unchecked")
         public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addEndpoint(String endpointUri, Class<T> clazz) {
             try {
-                return clazz.getDeclaredConstructor(String.class, String.class, OrchestratedTestSpecificationBuilderInit.class)
+                nextPartBuilder = clazz.getDeclaredConstructor(String.class, String.class, OrchestratedTestSpecificationBuilderInit.class)
                         .newInstance(description, endpointUri, this);
+                return (T)nextPartBuilder;
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | NoSuchMethodException e) {
                 throw new RuntimeException(e);
