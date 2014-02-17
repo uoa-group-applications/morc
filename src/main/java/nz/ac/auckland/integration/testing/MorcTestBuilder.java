@@ -59,7 +59,7 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * @return A way of specifying that the next endpoint in the specification list should be asynchronous
      */
-    protected Class<AsyncOrchestratedTestBuilder> asyncTest() {
+    public static Class<AsyncOrchestratedTestBuilder> asyncTest() {
         return AsyncOrchestratedTestBuilder.class;
     }
 
@@ -77,7 +77,7 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * @return A way of specifying that the next endpoint in the specification list should be synchronous
      */
-    protected Class<SyncOrchestratedTestBuilder> syncTest() {
+    public static Class<SyncOrchestratedTestBuilder> syncTest() {
         return SyncOrchestratedTestBuilder.class;
     }
 
