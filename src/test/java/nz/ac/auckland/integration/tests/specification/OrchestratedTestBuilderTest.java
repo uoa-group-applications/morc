@@ -205,10 +205,10 @@ public class OrchestratedTestBuilderTest extends Assert {
                 .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
                 .expectedResponseBody(text("1")).expectedResponseBody(text("2"))
                 .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo")))
-                .addEndpoint("2", AsyncOrchestratedTestBuilder.class).inputMessage(text("foo")).inputMessage(text("baz"))
+                .addEndpoint("2", asyncTest()).inputMessage(text("foo")).inputMessage(text("baz"))
                 .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2")))
-                .addEndpoint("3", AsyncOrchestratedTestBuilder.class).inputMessage(text("foo")).inputMessage(text("baz"))
-                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
+                .addEndpoint("3", syncTest()).requestBody(text("foo")).requestBody(text("baz"))
+                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2"))).build();
 
         OrchestratedTestSpecification spec = test.build();
 

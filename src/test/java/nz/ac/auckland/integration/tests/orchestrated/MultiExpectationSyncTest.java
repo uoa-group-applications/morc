@@ -2,6 +2,7 @@ package nz.ac.auckland.integration.tests.orchestrated;
 
 import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
+import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -143,7 +144,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
+        /*syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
@@ -225,7 +226,19 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
         syncTest("Test Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
                 .requestBody(text("1"), text("2"), text("3"), text("4"))
                 .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-1"))
-                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(text("-1"), text("-2"), text("-3")));
+                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(text("-1"), text("-2"), text("-3")));*/
+
+        syncTest("Match response Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
+                .requestBody(text("1"), text("2"), text("3"), text("4"))
+                .requestHeaders(headers(header("5","5")),headers(header("6","6")),headers(header("7","7")),headers(header("8","8")))
+                .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-4"))
+                .expectedResponseHeaders(headers(header("-5","-5")),headers(header("-6","-6")),headers(header("-7","-7")),headers(header("-8", "-8")))
+                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(matchedResponse(answer(text("4"), text("-4")),
+                        answer(text("3"), text("-3")), answer(text("2"), text("-2")), answer(text("1"), text("-1"))))
+                        .addProcessors(matchedResponse(headerAnswer(headers(header("8", "8")), headers(header("-8", "-8"))),
+                                headerAnswer(headers(header("7", "7")), headers(header("-7", "-7"))),
+                                headerAnswer(headers(header("6", "6")), headers(header("-6", "-6"))),
+                                headerAnswer(headers(header("5", "5")), headers(header("-5", "-5"))))));
 
         syncTest("Test Partial Lenient Processor", "seda:partialLenient?waitForTaskToComplete=Always")
                 .requestBody(text("1"), text("2"), text("3"), text("4"))

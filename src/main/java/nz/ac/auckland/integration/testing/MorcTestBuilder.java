@@ -7,6 +7,7 @@ import groovy.text.TemplateEngine;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.mock.builder.*;
 import nz.ac.auckland.integration.testing.predicate.ExceptionPredicate;
+import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import nz.ac.auckland.integration.testing.predicate.HttpErrorPredicate;
 import nz.ac.auckland.integration.testing.processor.BodyProcessor;
 import nz.ac.auckland.integration.testing.processor.HeadersProcessor;
@@ -360,6 +361,11 @@ public abstract class MorcTestBuilder extends MorcTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static MatchedResponseProcessor.MatchedResponse headerAnswer(HeadersTestResource expectedHeaders, TestResource<Map<String, Object>> resource) {
+        return headerAnswer(new HeadersPredicate(expectedHeaders),resource);
     }
 
     /**

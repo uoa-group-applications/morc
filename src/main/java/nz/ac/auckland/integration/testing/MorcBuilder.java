@@ -58,7 +58,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      * @param processors A list of processors that will handle a separate exchange (in order)
      */
     public Builder addProcessors(Processor... processors) {
-        this.processors.add(Arrays.asList(processors));
+        this.processors.add(new ArrayList<>(Arrays.asList(processors)));
         return self();
     }
 
@@ -72,7 +72,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
         while (index >= this.processors.size()) {
             this.processors.add(new ArrayList<Processor>());
         }
-        this.processors.get(index).addAll(Arrays.asList(processors));
+        this.processors.get(index).addAll(new ArrayList<>(Arrays.asList(processors)));
         return self();
     }
 
@@ -91,7 +91,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      * @param predicates A list of predicates that will validate a separate exchange (in order)
      */
     public Builder addPredicates(Predicate... predicates) {
-        this.predicates.add(Arrays.asList(predicates));
+        this.predicates.add(new ArrayList<>(Arrays.asList(predicates)));
         return self();
     }
 
@@ -105,7 +105,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
         while (index >= this.predicates.size()) {
             this.predicates.add(new ArrayList<Predicate>());
         }
-        this.predicates.get(index).addAll(Arrays.asList(predicates));
+        this.predicates.get(index).addAll(new ArrayList<>(Arrays.asList(predicates)));
         return self();
     }
 
