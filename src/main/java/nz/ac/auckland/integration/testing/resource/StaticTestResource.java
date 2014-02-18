@@ -43,7 +43,7 @@ public abstract class StaticTestResource<T> implements TestResource {
     }
 
     public StaticTestResource(InputStream inputStream) {
-        this.stream = stream;
+        this.stream = inputStream;
     }
 
     /**

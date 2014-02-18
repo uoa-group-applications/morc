@@ -4,9 +4,13 @@ import nz.ac.auckland.integration.testing.MorcTestBuilder;
 import nz.ac.auckland.integration.testing.mock.MockDefinition;
 import nz.ac.auckland.integration.testing.predicate.HeadersPredicate;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 /**
@@ -145,7 +149,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
-                .expectedResponseBody(xml("<foo/>"))
+        .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
@@ -250,8 +254,28 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                     }
                 }).responseBody(text("-2"), text("-4")))
                 .addExpectation(syncExpectation("seda:partialLenient")
+                        .addRepeatedPredicate(new Predicate() {
+                            @Override
+                            public boolean matches(Exchange exchange) {
+                                return exchange.getPattern().equals(ExchangePattern.InOut);
+                            }
+                        })
                         .expectedBody(text("1"), text("3"))
                         .responseBody(text("-1"), text("-3")));
+
+        syncTest("Test throw receive exceptions","seda:throwsException?waitForTaskToComplete=Always")
+                .requestBody(times(5,text("1")))
+                .expectedResponseBody(exception(),exception(IOException.class),exception(IOException.class,"foo")
+                    ,exception(FileNotFoundException.class),exception(FileNotFoundException.class,"baz"))
+                .expectsException()
+                .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
+                        .exception(new Exception()))
+                .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
+                        .exception(new IOException()))
+                .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
+                        .exception(new IOException("foo")))
+                .addExpectation(exceptionExpectation("seda:throwsException", FileNotFoundException.class).expectedMessageCount(1))
+                .addExpectation(exceptionExpectation("seda:throwsException", FileNotFoundException.class,"baz").expectedMessageCount(1));
     }
 
 }

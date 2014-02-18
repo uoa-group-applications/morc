@@ -470,7 +470,8 @@ public abstract class MorcTestBuilder extends MorcTest {
                 output.add(variableMap);
                 line++;
             }
-
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
