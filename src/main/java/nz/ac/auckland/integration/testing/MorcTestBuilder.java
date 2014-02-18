@@ -20,6 +20,7 @@ import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
+import org.apache.camel.builder.SimpleBuilder;
 import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
@@ -646,9 +647,16 @@ public abstract class MorcTestBuilder extends MorcTest {
     public static XPathBuilder xpath(String expression, NS... namespaces) {
         XPathBuilder builder = new XPathBuilder(expression);
         for (NS namespace : namespaces) {
-            builder.namespace(namespace.getPrefix(),namespace.getUri());
+            builder.namespace(namespace.getPrefix(), namespace.getUri());
         }
         return builder;
+    }
+
+    /**
+     * @param expression A regular expression to evaluate against the message body
+     */
+    public static Predicate regex(String expression) {
+        return new SimpleBuilder("${body} regex '" + expression + "'");
     }
 
     //this is used by JUnit to initialize each instance of this specification

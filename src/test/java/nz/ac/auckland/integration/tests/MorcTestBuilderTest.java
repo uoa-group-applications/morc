@@ -149,7 +149,23 @@ public class MorcTestBuilderTest extends Assert {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody("<ns0:foo xmlns:ns0='http://foo.com'><ns1:baz xmlns:ns1='http://baz.com'>moo</ns1:baz></ns0:foo>");
 
-        assertFalse(xpath("/ns0:foo/ns1:baz/text() = 'cow'",namespace("ns0","http://foo.com"),
-                namespace("ns1","http://baz.com")).matches(e));
+        assertFalse(xpath("/ns0:foo/ns1:baz/text() = 'cow'", namespace("ns0", "http://foo.com"),
+                namespace("ns1", "http://baz.com")).matches(e));
+    }
+
+    @Test
+    public void testRegexMatch() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("aaabbbccc");
+
+        assertTrue(regex("a{3}b{3}c{3}").matches(e));
+    }
+
+    @Test
+    public void testNoRegexMatch() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("aabbcc");
+
+        assertFalse(regex("a{3}b{3}c{3}").matches(e));
     }
 }
