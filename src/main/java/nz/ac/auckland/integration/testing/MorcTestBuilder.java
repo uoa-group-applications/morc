@@ -20,6 +20,7 @@ import nz.ac.auckland.integration.testing.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
+import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
@@ -635,6 +636,19 @@ public abstract class MorcTestBuilder extends MorcTest {
                 Thread.sleep(time);
             }
         };
+    }
+
+    /**
+     * Returns an XPathBuilder that can be used as a Predicate to evaluate a request or response is as expected
+     * @param expression An XPath expression that evaluates to a boolean value
+     * @param namespaces Namespace definitions used within the XPath expression
+     */
+    public static XPathBuilder xpath(String expression, NS... namespaces) {
+        XPathBuilder builder = new XPathBuilder(expression);
+        for (NS namespace : namespaces) {
+            builder.namespace(namespace.getPrefix(),namespace.getUri());
+        }
+        return builder;
     }
 
     //this is used by JUnit to initialize each instance of this specification

@@ -126,4 +126,30 @@ public class MorcTestBuilderTest extends Assert {
         assertTrue(text("value:3,value:4").validate(resources[1].getValue()));
         assertTrue(text("value:5,value:6").validate(resources[2].getValue()));
     }
+
+    @Test
+    public void testXPathNoNamespaces() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("<foo><baz>moo</baz></foo>");
+
+        assertTrue(xpath("/foo/baz/text() = 'moo'").matches(e));
+    }
+
+    @Test
+    public void testXPathWithNamespaces() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("<ns0:foo xmlns:ns0='http://foo.com'><ns1:baz xmlns:ns1='http://baz.com'>moo</ns1:baz></ns0:foo>");
+
+        assertTrue(xpath("/ns0:foo/ns1:baz/text() = 'moo'",namespace("ns0","http://foo.com"),
+                namespace("ns1","http://baz.com")).matches(e));
+    }
+
+    @Test
+    public void testNoMatchXPathWithNamespaces() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("<ns0:foo xmlns:ns0='http://foo.com'><ns1:baz xmlns:ns1='http://baz.com'>moo</ns1:baz></ns0:foo>");
+
+        assertFalse(xpath("/ns0:foo/ns1:baz/text() = 'cow'",namespace("ns0","http://foo.com"),
+                namespace("ns1","http://baz.com")).matches(e));
+    }
 }
