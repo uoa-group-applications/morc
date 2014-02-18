@@ -640,7 +640,7 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * Returns an XPathBuilder that can be used as a Predicate to evaluate a request or response is as expected
-     * @param expression An XPath expression that evaluates to a boolean value
+     * @param expression An XPath expression that evaluates the incoming exchange body to a boolean value
      * @param namespaces Namespace definitions used within the XPath expression
      */
     public static XPathBuilder xpath(String expression, NS... namespaces) {
