@@ -1,6 +1,6 @@
 morc
 ==================================================
-### Orchestrated Testing of SOA Artifacts 
+### Mock Orchestrated Testing of SOA Artifacts
 
 **[Javadoc](http://uoa-group-applications.github.io/morc/apidocs/)**
 
