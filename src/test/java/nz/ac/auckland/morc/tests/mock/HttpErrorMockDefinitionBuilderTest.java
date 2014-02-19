@@ -1,0 +1,24 @@
+package nz.ac.auckland.morc.tests.mock;
+
+import nz.ac.auckland.morc.mock.MockDefinition;
+import nz.ac.auckland.morc.mock.builder.HttpErrorMockDefinitionBuilder;
+import org.apache.camel.Exchange;
+import org.apache.camel.component.cxf.CxfEndpoint;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class HttpErrorMockDefinitionBuilderTest extends Assert {
+
+    @Test
+    public void testRepeatedSetHttpCode() throws Exception {
+        MockDefinition def = new HttpErrorMockDefinitionBuilder("").expectedMessageCount(5).statusCode(505).build(null);
+        for (int i = 0; i < 5; i++) {
+            Exchange e = new DefaultExchange(new DefaultCamelContext());
+            e.setFromEndpoint(new CxfEndpoint(""));
+            def.getProcessors().get(i).process(e);
+            assertEquals(e.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class), new Integer(505));
+        }
+    }
+}

@@ -9,13 +9,13 @@
         <version>1.2</version>
     </parent>
 
-    <groupId>nz.ac.auckland.integration.testing</groupId>
-    <artifactId>soaunit</artifactId>
+    <groupId>nz.ac.auckland.morc</groupId>
+    <artifactId>morc</artifactId>
     <packaging>jar</packaging>
     <version>1.2.1-SNAPSHOT</version>
-    <name>soaunit</name>
+    <name>morc</name>
     <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
-    <url>http://uoa-group-applications.github.io/soaunit/</url>
+    <url>http://uoa-group-applications.github.io/morc/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <camel-version>[2.12.0,)</camel-version>
@@ -174,11 +174,11 @@
         </plugins>
     </reporting>
     <scm>
-        <connection>scm:git:git@github.com:uoa-group-applications/soaunit.git</connection>
+        <connection>scm:git:git@github.com:uoa-group-applications/morc.git</connection>
         <developerConnection>
-            scm:git:git@github.com:uoa-group-applications/soaunit.git
+            scm:git:git@github.com:uoa-group-applications/morc.git
         </developerConnection>
-        <url>git@github.com:uoa-group-applications/soaunit.git</url>
+        <url>git@github.com:uoa-group-applications/morc.git</url>
         <tag>HEAD</tag>
     </scm>
 </project>
