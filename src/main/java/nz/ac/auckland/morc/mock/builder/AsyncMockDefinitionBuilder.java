@@ -18,6 +18,7 @@ public class AsyncMockDefinitionBuilder extends ContentMockDefinitionBuilderInit
      */
     public AsyncMockDefinitionBuilder(String endpointUri) {
         super(endpointUri);
+        ordering(MockDefinition.OrderingType.PARTIAL);
     }
 
     @Override
