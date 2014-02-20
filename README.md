@@ -149,7 +149,7 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
             .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                                 "<request>PONG</request>" +
                                              "</ns:pingRequest>"))
-            .expectsExceptionResponse()
+            .expectsException()
             .addExpectation(unreceivedExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"));
     }
 }
