@@ -41,7 +41,7 @@ public class MockDefinition {
     private List<Processor> processors;
     private List<Predicate> predicates;
     private int expectedMessageCount;
-    private RouteDefinition mockFeederRoute;
+    private Processor mockFeedPreprocessor;
     private Predicate lenientSelector;
     private LenientProcessor lenientProcessor;
     private long messageResultWaitTime;
@@ -104,8 +104,8 @@ public class MockDefinition {
     /**
      * @return The route that is used to provide the mock validator with messages
      */
-    public RouteDefinition getMockFeederRoute() {
-        return mockFeederRoute;
+    public Processor getMockFeedPreprocessor() {
+        return mockFeedPreprocessor;
     }
 
     /**
@@ -175,7 +175,6 @@ public class MockDefinition {
         private boolean isEndpointOrdered = true;
         private Predicate lenientSelector = null;
         private int expectedMessageCount = 0;
-        private RouteDefinition mockFeederRoute = null;
         private Class<? extends LenientProcessor> lenientProcessorClass = LenientProcessor.class;
         private LenientProcessor lenientProcessor;
         private long reassertionPeriod = 0;
@@ -256,16 +255,6 @@ public class MockDefinition {
         }
 
         /**
-         * @param mockFeederRoute A route definition that will be used as the intermediate between receiving a message
-         *                        from the mock definition endpoint, and passing it through to the mock endpoint. Useful
-         *                        for adding additional exchange operations on message arrival
-         */
-        public Builder mockFeederRoute(RouteDefinition mockFeederRoute) {
-            this.mockFeederRoute = mockFeederRoute;
-            return self();
-        }
-
-        /**
          * @param reassertionPeriod The amount of time in milliseconds that the mock will wait after successfully
          *                          asserting all messages arrived correctly before asserting again that the endpoint
          *                          is still correct - this is useful for providing extra time to ensure no additional
@@ -281,12 +270,6 @@ public class MockDefinition {
             if (expectedMessageCount < 0)
                 throw new IllegalArgumentException("The expected message count for the mock definition on endpoint "
                         + getEndpointUri() + " must be at least 0");
-
-            if (previousDefinitionPart == null) {
-                //set up a default expectation feeder route (sending to a mock will be added later)
-                if (mockFeederRoute == null) mockFeederRoute = new RouteDefinition().convertBodyTo(String.class);
-                mockFeederRoute.from(getEndpointUri());
-            }
 
             if (lenientSelector == null) {
                 if (!lenientProcessorClass.equals(LenientProcessor.class))
@@ -324,8 +307,8 @@ public class MockDefinition {
                     throw new IllegalArgumentException("The endpoints do not match for merging mock definition endpoint " +
                             previousDefinitionPart.getEndpointUri() + " with endpoint " + getEndpointUri());
 
-                if (mockFeederRoute != null)
-                    throw new IllegalArgumentException("The mock feeder route for the endpoint " + getEndpointUri() +
+                if (getMockFeedPreprocessor() != null)
+                    throw new IllegalArgumentException("The mock feed preprocessor for the endpoint " + getEndpointUri() +
                             " can only be specified in the first mock definition part");
 
                 if (lenientSelector != null && previousDefinitionPart.lenientSelector != null)
@@ -368,7 +351,7 @@ public class MockDefinition {
                 minimalResultWaitTime(previousDefinitionPart.minimalResultWaitTime);
                 messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
                 this.expectedMessageCount += previousDefinitionPart.getExpectedMessageCount();
-                this.mockFeederRoute = previousDefinitionPart.getMockFeederRoute();
+                mockFeedPreprocessor(previousDefinitionPart.getMockFeedPreprocessor());
                 for (EndpointOverride endpointOverride : previousDefinitionPart.getEndpointOverrides()) {
                     this.addEndpointOverride(endpointOverride);
                 }
@@ -414,7 +397,7 @@ public class MockDefinition {
         this.lenientProcessor = builder.lenientProcessor;
         this.lenientSelector = builder.lenientSelector;
         this.endpointOverrides = builder.getEndpointOverrides();
-        this.mockFeederRoute = builder.mockFeederRoute;
+        this.mockFeedPreprocessor = builder.getMockFeedPreprocessor();
         this.messageResultWaitTime = builder.getMessageResultWaitTime();
         this.reassertionPeriod = builder.reassertionPeriod;
         this.minimalResultWaitTime = builder.getMinimalResultWaitTime();

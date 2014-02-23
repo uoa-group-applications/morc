@@ -7,6 +7,7 @@ import nz.ac.auckland.morc.predicate.MultiPredicate;
 import nz.ac.auckland.morc.processor.MultiProcessor;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
     private long messageResultWaitTime = 1000l;
     private long minimalResultWaitTime = 10000l;
+    private Processor mockFeedPreprocessor;
 
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
@@ -255,6 +257,21 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      */
     public String getEndpointUri() {
         return this.endpointUri;
+    }
+
+    /**
+     * @return A processor that will be applied before the exchange is sent through to the mock endpoint
+     */
+    public Processor getMockFeedPreprocessor() {
+        return mockFeedPreprocessor;
+    }
+
+    /**
+     * @param mockFeedPreprocessor A processor that will be applied before the exchange is sent through to the mock endpoint
+     */
+    public Builder mockFeedPreprocessor(Processor mockFeedPreprocessor) {
+        this.mockFeedPreprocessor = mockFeedPreprocessor;
+        return self();
     }
 
     @SuppressWarnings("unchecked")

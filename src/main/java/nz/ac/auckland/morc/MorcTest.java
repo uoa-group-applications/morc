@@ -11,6 +11,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -144,6 +145,7 @@ public class MorcTest extends CamelSpringTestSupport {
         Set<RouteDefinition> createdRoutes = new HashSet<>();
         MockEndpoint orderCheckMock = context.getEndpoint("mock:" + UUID.randomUUID(), MockEndpoint.class);
         orderCheckMock.expectedMessageCount(spec.getTotalMockMessageCount());
+        final MockEndpoint sendingMockEndpoint = context.getEndpoint("mock:responses-" + UUID.randomUUID(), MockEndpoint.class);
 
         Map<MockEndpoint, MockDefinition> mockEndpointMap = new HashMap<>();
 
@@ -194,8 +196,10 @@ public class MorcTest extends CamelSpringTestSupport {
                         }
                     });
 
-                //this will be used by both possible routing outcomes (lenient/mock)
-                mockDefinition.getMockFeederRoute()
+                //this will be the route used to receive the message and validate/process the exchange
+                RouteDefinition mockRouteDefinition = new RouteDefinition();
+                mockRouteDefinition.from(mockDefinition.getEndpointUri())
+                        .streamCaching()
                         .routeId(MorcTest.class.getCanonicalName() + "." + mockDefinition.getEndpointUri())
                         .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()))
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
@@ -203,38 +207,35 @@ public class MorcTest extends CamelSpringTestSupport {
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}")
                         .end();
 
-                ProcessorDefinition pd;
-
                 if (mockDefinition.getLenientSelector() != null)
-                    pd = mockDefinition.getMockFeederRoute()
+                    mockRouteDefinition
                             .choice()
                             .when(mockDefinition.getLenientSelector())
                             .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message for lenient processing")
                             .process(mockDefinition.getLenientProcessor())
                             .endChoice()
                             .otherwise();
-                else pd = mockDefinition.getMockFeederRoute();
 
-                pd.wireTap(orderCheckMock.getEndpointUri())
-                        .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message")
-                        .to(mockEndpoint)
+                mockRouteDefinition.wireTap(orderCheckMock.getEndpointUri())
+                        .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message");
+
+                if (mockDefinition.getMockFeedPreprocessor() != null)
+                    mockRouteDefinition.process(mockDefinition.getMockFeedPreprocessor());
+
+                mockRouteDefinition.to(mockEndpoint)
                         .end();
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
                 for (EndpointOverride override : mockDefinition.getEndpointOverrides())
                     override.overrideEndpoint(targetEndpoint);
 
-                context.addRouteDefinition(mockDefinition.getMockFeederRoute());
-                createdRoutes.add(mockDefinition.getMockFeederRoute());
+                context.addRouteDefinition(mockRouteDefinition);
+                createdRoutes.add(mockRouteDefinition);
             }
 
             //set up sending messages to the target system under testing
-            final MockEndpoint sendingMockEndpoint = context.getEndpoint("mock:responses-" + UUID.randomUUID(), MockEndpoint.class);
-            mockEndpoints.add(sendingMockEndpoint);
             sendingMockEndpoint.expectedMessageCount(spec.getProcessors().size());
             sendingMockEndpoint.expectedMessagesMatches(spec.getPredicates().toArray(new Predicate[spec.getPredicates().size()]));
-
-            RouteDefinition publishRouteDefinition = new RouteDefinition();
 
             //setup the route for sending messages
             DataSetComponent component = new DataSetComponent();
@@ -249,12 +250,18 @@ public class MorcTest extends CamelSpringTestSupport {
                     new MessagePublishDataSet(spec.getProcessors()));
             dataSetEndpoint.setProduceDelay(spec.getSendInterval());
 
-            publishRouteDefinition.from(dataSetEndpoint)
+            RouteDefinition publishRouteDefinition = new RouteDefinition();
+
+            TryDefinition tryDefinition = publishRouteDefinition.from(dataSetEndpoint)
+                    .streamCaching()
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
                     .handleFault()
-                    .doTry() //for some reason onException().continued(true) doesn't work
-                    .to(targetEndpoint)
+                    .doTry(); //for some reason onException().continued(true) doesn't work
+
+            if (spec.getMockFeedPreprocessor() != null) tryDefinition.process(spec.getMockFeedPreprocessor());
+
+            tryDefinition.to(targetEndpoint)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
                     .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
@@ -329,6 +336,8 @@ public class MorcTest extends CamelSpringTestSupport {
         } finally {
             for (RouteDefinition routeDefinition : createdRoutes)
                 context.removeRouteDefinition(routeDefinition);
+
+            sendingMockEndpoint.reset();
 
             for (MockEndpoint mockEndpoint : mockEndpoints)
                 mockEndpoint.reset();

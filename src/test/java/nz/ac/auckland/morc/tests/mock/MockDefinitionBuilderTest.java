@@ -52,7 +52,6 @@ public class MockDefinitionBuilderTest extends Assert {
             }
         };
 
-        //todo improve processor implementation
         MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
                 new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient(predicate)
                 .lenientProcessor(StubLenientProcessor.class).build(null);
@@ -61,18 +60,6 @@ public class MockDefinitionBuilderTest extends Assert {
         assertEquals(0, def.getProcessors().size());
         assertEquals(predicate, def.getLenientSelector());
         assertEquals(def.getLenientProcessor().getClass(), StubLenientProcessor.class);
-    }
-
-    @Test
-    public void testMockFeedRoute() throws Exception {
-        RouteDefinition rd = new RouteDefinition();
-        rd.setGroup("foo");
-
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
-                new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz"))
-                .mockFeederRoute(rd).build(null);
-
-        assertEquals("foo", def.getMockFeederRoute().getGroup());
     }
 
     @Test
@@ -110,26 +97,6 @@ public class MockDefinitionBuilderTest extends Assert {
         IllegalArgumentException e = null;
         try {
             MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").build(def);
-        } catch (IllegalArgumentException ex) {
-            e = ex;
-        }
-
-        assertNotNull(e);
-    }
-
-    @Test
-    public void testMultipleMockEndpointFeeds() throws Exception {
-        RouteDefinition rd = new RouteDefinition();
-        rd.setGroup("foo");
-
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")),
-                new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz"))
-                .mockFeederRoute(rd).build(null);
-
-        IllegalArgumentException e = null;
-        try {
-            MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").mockFeederRoute(new RouteDefinition())
-                    .build(def);
         } catch (IllegalArgumentException ex) {
             e = ex;
         }
@@ -213,12 +180,19 @@ public class MockDefinitionBuilderTest extends Assert {
         RouteDefinition rd = new RouteDefinition();
         rd.setGroup("foo");
 
+        Processor pre = new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                exchange.setProperty("PreprocessorCalled",true);
+            }
+        };
+
         MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
                 .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz"))
                 .endpointNotOrdered()
                 .ordering(MockDefinition.OrderingType.NONE)
                 .messageResultWaitTime(1234).minimalResultWaitTime(5678).reassertionPeriod(314)
-                .mockFeederRoute(rd).build(null);
+                .mockFeedPreprocessor(pre).build(null);
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("a")))
                 .addProcessors(new BodyProcessor(text("b"))).addPredicates(text("a")).addPredicates(text("b")).lenient()
@@ -241,7 +215,7 @@ public class MockDefinitionBuilderTest extends Assert {
         assertEquals(4, def2.getProcessors().size());
         assertEquals(5678 + (4 * 1234), def2.getResultWaitTime());
         assertEquals(314, def2.getReassertionPeriod());
-        assertEquals("foo", def2.getMockFeederRoute().getGroup());
+        assertEquals(pre, def2.getMockFeedPreprocessor());
         assertEquals(MockDefinition.OrderingType.NONE, def2.getOrderingType());
         assertFalse(def2.isEndpointOrdered());
         assertNotNull(def2.getLenientSelector());
@@ -287,11 +261,18 @@ public class MockDefinitionBuilderTest extends Assert {
         RouteDefinition rd = new RouteDefinition();
         rd.setGroup("foo");
 
+        Processor pre = new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                exchange.setProperty("PreprocessorCalled",true);
+            }
+        };
+
         MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
                 .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz"))
                 .endpointNotOrdered()
                 .ordering(MockDefinition.OrderingType.NONE)
-                .mockFeederRoute(rd).build(null);
+                .mockFeedPreprocessor(pre).build(null);
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("moo")))
                 .endpointNotOrdered().ordering(MockDefinition.OrderingType.NONE)
@@ -316,7 +297,7 @@ public class MockDefinitionBuilderTest extends Assert {
         assertEquals(4, def2.getProcessors().size());
         assertEquals(10000 + (4 * 1000), def2.getResultWaitTime());
         assertEquals(0, def2.getReassertionPeriod());
-        assertEquals("foo", def2.getMockFeederRoute().getGroup());
+        assertEquals(pre, def2.getMockFeedPreprocessor());
         assertEquals(MockDefinition.OrderingType.NONE, def2.getOrderingType());
         assertFalse(def2.isEndpointOrdered());
         assertNotNull(def2.getLenientSelector());

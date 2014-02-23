@@ -6,6 +6,7 @@ import nz.ac.auckland.morc.mock.MockDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
+import org.apache.camel.model.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public class OrchestratedTestSpecification {
     private long messageResultWaitTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private Collection<EndpointNode> endpointNodesOrdering;
+    private Processor mockFeedPreprocessor;
     private long sendInterval;
     private int partCount;
     private OrchestratedTestSpecification nextPart;
@@ -117,6 +119,13 @@ public class OrchestratedTestSpecification {
      */
     public int getTotalMockMessageCount() {
         return totalMockMessageCount;
+    }
+
+    /**
+     * @return A processor that will be applied before the exchange is sent through to the mock endpoint
+     */
+    public Processor getMockFeedPreprocessor() {
+        return mockFeedPreprocessor;
     }
 
     /**
@@ -377,6 +386,7 @@ public class OrchestratedTestSpecification {
         this.predicates = builder.predicates;
         this.totalMockMessageCount = builder.totalMockMessageCount;
         this.minimalResultWaitTime = builder.getMinimalResultWaitTime();
+        this.mockFeedPreprocessor = builder.getMockFeedPreprocessor();
     }
 
     /**

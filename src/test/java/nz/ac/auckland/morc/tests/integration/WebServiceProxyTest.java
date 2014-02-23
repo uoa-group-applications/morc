@@ -26,6 +26,9 @@ public class WebServiceProxyTest extends MorcTestBuilder {
 
                 from("cxf:http://localhost:8092/testWSFaultDetail?wsdlURL=data/PingService.wsdl&dataFormat=PAYLOAD")
                         .setFaultBody(constant(detailedFault));
+
+                from("jetty:http://localhost:8093/jsonPingService")
+                                  .setBody(constant("{\"response\":\"PONG\"}"));
             }
         };
     }
@@ -114,6 +117,10 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .expectedBody(times(3, xml(classpath("/data/pingRequest1.xml"))))
                         .responseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))
                         .ordering(partialOrdering()));
+
+        syncTest("Simple JSON PING","http://localhost:8093/jsonPingService")
+                        .requestBody(json("{\"request\":\"PING\"}"))
+                        .expectedResponseBody(json("{\"response\":\"PONG\"}"));
     }
 
 }

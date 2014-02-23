@@ -5,6 +5,7 @@ import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.predicate.HeadersPredicate;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -72,7 +73,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Simple send body to async output with valid response", "direct:syncInputAsyncOutput")
+        /*syncTest("Simple send body to async output with valid response", "direct:syncInputAsyncOutput")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<baz/>")))
                 .expectedResponseBody(xml("<foo/>"));
@@ -184,6 +185,27 @@ public class SimpleSyncTest extends MorcTestBuilder {
                         .responseBody(times(3, xml("<foo/>"))))
                 .sendInterval(3000)
                 .expectedResponseBody(times(3, xml("<foo/>")));
+
+        //we don't normally expect the preprocessor to be applied in this way
+        syncTest("Test Mock preprocessor applied", "seda:preprocessorMock")
+                .requestBody(text("1"))
+                .expectedResponse(new Predicate() {
+                    @Override
+                    public boolean matches(Exchange exchange) {
+                        return exchange.getProperty("preprocessed",Boolean.class);
+                    }
+                }).addExpectation(syncExpectation("seda:preprocessorMock").expectedMessageCount(1)
+                    .mockFeedPreprocessor(new Processor() {
+                        @Override
+                        public void process(Exchange exchange) throws Exception {
+                            exchange.setProperty("preprocessed",true);
+                        }
+                    })).addPredicates(new Predicate() {
+                            @Override
+                            public boolean matches(Exchange exchange) {
+                                return exchange.getProperty("preprocessed",Boolean.class);
+                            }
+                        });*/
 
     }
 
