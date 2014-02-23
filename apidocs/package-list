@@ -1,7 +1,9 @@
-nz.ac.auckland.integration.testing
-nz.ac.auckland.integration.testing.endpointoverride
-nz.ac.auckland.integration.testing.expectation
-nz.ac.auckland.integration.testing.resource
-nz.ac.auckland.integration.testing.specification
-nz.ac.auckland.integration.testing.utility
-nz.ac.auckland.integration.testing.validator
+nz.ac.auckland.morc
+nz.ac.auckland.morc.endpointoverride
+nz.ac.auckland.morc.mock
+nz.ac.auckland.morc.mock.builder
+nz.ac.auckland.morc.predicate
+nz.ac.auckland.morc.processor
+nz.ac.auckland.morc.resource
+nz.ac.auckland.morc.specification
+nz.ac.auckland.morc.utility
