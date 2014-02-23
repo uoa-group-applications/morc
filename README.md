@@ -10,8 +10,8 @@ This framework was borne out of frustration with setting up automated testing of
 
 As a simple example, we can assume that a PING SOAP-style web-service is running on a mega-vendor's software stack (ESB) that responds with PONG for every PING request. We can create a test specification that sends a request to the service and gets the expected response back:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple WS PING test","cxf:http://localhost:8090/services/pingService")
@@ -28,8 +28,8 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and
 password properties:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple WS PING test with WS-Security","cxf://http://localhost:8090/services/securePingService?" +
@@ -49,8 +49,8 @@ Note that in this case we need to provide a reference to the WSDL because CXF ne
 
 Once the requests and responses become larger we will want to put the values into a file, which we can reference from the classpath by changing the xml function parameter:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple WS PING test with local resources","cxf:http://localhost:8090/services/pingService")
@@ -69,8 +69,8 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 
 If we change the PING service on the integration stack to pass the request onto another service then we can automatically mock up this service by adding an expectation:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("WS PING test with mock service expectation","cxf:http://localhost:8090/services/pingServiceProxy")
@@ -86,8 +86,8 @@ The framework (Camel) will set up a CXF/SOAP endpoint on localhost:9090 which ex
 
 The PING service may also test more than one service before providing a response; in this case we need only provide an additional expectation:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("WS PING test with multiple mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxy")
@@ -105,8 +105,8 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 ```
 Note that expectations should occur in the order specified; if each request happens concurrently (e.g. the scatter-gather EIP) then you can relax the ordering requirements:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("WS PING test with multiple unordered mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered")
@@ -126,8 +126,8 @@ public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
 
 We can also test asynchronous services (no response expected) by configuring expectations; for example if we have a message canonicalizer that takes a target-system message off a JMS destination and transforms it to a canonical format for broadcast onto another JMS destination then we can test it by sending a message to the destination and adding an expected message for the output destination:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         asyncTest("Simple Asynchronous Canonicalizer Comparison","vm:test.input")
@@ -141,8 +141,8 @@ Note that 'vm' is an in-memory destination queue that is effectively the same as
 
 Finally, we can also send requests that invoke an exception/fault ensuring that we not only do we receive an exception response but also that the target system never receives the invalid message:
 ```java
-import nz.ac.auckland.integration.testing.OrchestratedTestBuilder;
-public class OrchestratedTestSubclassTest extends OrchestratedTestBuilder {
+import nz.ac.auckland.morc.MorcTestBuilder;
+public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Test invalid message doesn't arrive at the endpoint and returns exception","cxf:http://localhost:8090/services/pingServiceProxy")
