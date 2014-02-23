@@ -183,7 +183,7 @@ public class MockDefinitionBuilderTest extends Assert {
         Processor pre = new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                exchange.setProperty("PreprocessorCalled",true);
+                exchange.setProperty("PreprocessorCalled", true);
             }
         };
 
@@ -264,7 +264,7 @@ public class MockDefinitionBuilderTest extends Assert {
         Processor pre = new Processor() {
             @Override
             public void process(Exchange exchange) throws Exception {
-                exchange.setProperty("PreprocessorCalled",true);
+                exchange.setProperty("PreprocessorCalled", true);
             }
         };
 

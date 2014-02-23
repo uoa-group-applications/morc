@@ -148,7 +148,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
-        .expectedResponseBody(xml("<foo/>"))
+                .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
                 .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
@@ -262,10 +262,10 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                         .expectedBody(text("1"), text("3"))
                         .responseBody(text("-1"), text("-3")));
 
-        syncTest("Test throw receive exceptions","seda:throwsException?waitForTaskToComplete=Always")
-                .requestBody(times(5,text("1")))
-                .expectedResponseBody(exception(),exception(IOException.class),exception(IOException.class,"foo")
-                    ,exception(FileNotFoundException.class),exception(FileNotFoundException.class,"baz"))
+        syncTest("Test throw receive exceptions", "seda:throwsException?waitForTaskToComplete=Always")
+                .requestBody(times(5, text("1")))
+                .expectedResponseBody(exception(), exception(IOException.class), exception(IOException.class, "foo")
+                        , exception(FileNotFoundException.class), exception(FileNotFoundException.class, "baz"))
                 .expectsException()
                 .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
                         .exception(new Exception()))

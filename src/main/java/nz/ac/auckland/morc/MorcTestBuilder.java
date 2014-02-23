@@ -367,7 +367,7 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     @SuppressWarnings("unchecked")
     public static MatchedResponseProcessor.MatchedResponse headerAnswer(HeadersTestResource expectedHeaders, TestResource<Map<String, Object>> resource) {
-        return headerAnswer(new HeadersPredicate(expectedHeaders),resource);
+        return headerAnswer(new HeadersPredicate(expectedHeaders), resource);
     }
 
     /**
@@ -641,6 +641,7 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * Returns an XPathBuilder that can be used as a Predicate to evaluate a request or response is as expected
+     *
      * @param expression An XPath expression that evaluates the incoming exchange body to a boolean value
      * @param namespaces Namespace definitions used within the XPath expression
      */

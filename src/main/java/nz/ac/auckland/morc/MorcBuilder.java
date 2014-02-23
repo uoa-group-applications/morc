@@ -7,7 +7,6 @@ import nz.ac.auckland.morc.predicate.MultiPredicate;
 import nz.ac.auckland.morc.processor.MultiProcessor;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
-import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

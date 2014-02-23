@@ -28,7 +28,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .setFaultBody(constant(detailedFault));
 
                 from("jetty:http://localhost:8093/jsonPingService")
-                                  .setBody(constant("{\"response\":\"PONG\"}"));
+                        .setBody(constant("{\"response\":\"PONG\"}"));
             }
         };
     }
@@ -118,9 +118,9 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .responseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))
                         .ordering(partialOrdering()));
 
-        syncTest("Simple JSON PING","http://localhost:8093/jsonPingService")
-                        .requestBody(json("{\"request\":\"PING\"}"))
-                        .expectedResponseBody(json("{\"response\":\"PONG\"}"));
+        syncTest("Simple JSON PING", "http://localhost:8093/jsonPingService")
+                .requestBody(json("{\"request\":\"PING\"}"))
+                .expectedResponseBody(json("{\"response\":\"PONG\"}"));
     }
 
 }

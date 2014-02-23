@@ -56,21 +56,21 @@ public class SimpleAsyncTest extends MorcTestBuilder {
                 .inputMessage(text("0"))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedMessageCount(1));
 
-        asyncTest("Test sender preprocessor applied","seda:preprocessorSender")
-            .inputMessage(text("1"))
+        asyncTest("Test sender preprocessor applied", "seda:preprocessorSender")
+                .inputMessage(text("1"))
                 .mockFeedPreprocessor(new Processor() {
-                                @Override
-                                public void process(Exchange exchange) throws Exception {
-                                    exchange.setProperty("preprocessed",true);
-                                }
-                            })
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        exchange.setProperty("preprocessed", true);
+                    }
+                })
                 .addExpectation(syncExpectation("seda:preprocessorSender").expectedMessageCount(1)
-                    ).addPredicates(new Predicate() {
-                            @Override
-                            public boolean matches(Exchange exchange) {
-                                return exchange.getProperty("preprocessed",Boolean.class);
-                            }
-                        });
+                ).addPredicates(new Predicate() {
+            @Override
+            public boolean matches(Exchange exchange) {
+                return exchange.getProperty("preprocessed", Boolean.class);
+            }
+        });
 
 
     }

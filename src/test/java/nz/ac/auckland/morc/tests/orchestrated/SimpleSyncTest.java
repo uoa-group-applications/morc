@@ -73,7 +73,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        /*syncTest("Simple send body to async output with valid response", "direct:syncInputAsyncOutput")
+        syncTest("Simple send body to async output with valid response", "direct:syncInputAsyncOutput")
                 .requestBody(xml("<baz/>"))
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<baz/>")))
                 .expectedResponseBody(xml("<foo/>"));
@@ -192,20 +192,20 @@ public class SimpleSyncTest extends MorcTestBuilder {
                 .expectedResponse(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
-                        return exchange.getProperty("preprocessed",Boolean.class);
+                        return exchange.getProperty("preprocessed", Boolean.class);
                     }
                 }).addExpectation(syncExpectation("seda:preprocessorMock").expectedMessageCount(1)
-                    .mockFeedPreprocessor(new Processor() {
-                        @Override
-                        public void process(Exchange exchange) throws Exception {
-                            exchange.setProperty("preprocessed",true);
-                        }
-                    })).addPredicates(new Predicate() {
-                            @Override
-                            public boolean matches(Exchange exchange) {
-                                return exchange.getProperty("preprocessed",Boolean.class);
-                            }
-                        });*/
+                .mockFeedPreprocessor(new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        exchange.setProperty("preprocessed", true);
+                    }
+                })).addPredicates(new Predicate() {
+            @Override
+            public boolean matches(Exchange exchange) {
+                return exchange.getProperty("preprocessed", Boolean.class);
+            }
+        });
 
     }
 

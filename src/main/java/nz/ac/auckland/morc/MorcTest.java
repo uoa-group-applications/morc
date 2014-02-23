@@ -9,7 +9,6 @@ import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
-import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
