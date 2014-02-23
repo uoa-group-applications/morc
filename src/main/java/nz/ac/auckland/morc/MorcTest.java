@@ -283,8 +283,8 @@ public class MorcTest extends CamelSpringTestSupport {
             try {
                 sendingMockEndpoint.assertIsSatisfied();
             } catch (AssertionError e) {
-                throw new AssertionError("The target endpoint " + spec.getEndpointUri() + " provided an " +
-                        "invalid response: " + e.getMessage(), e);
+                throw new AssertionError("The target endpoint " + spec.getEndpointUri() + " on test " +
+                        spec.getDescription() + " provided an " + "invalid response: " + e.getMessage(), e);
             }
             logger.debug("Completion of message publishing with response validation was successful");
 
@@ -294,7 +294,7 @@ public class MorcTest extends CamelSpringTestSupport {
                     mockEndpoint.assertIsSatisfied();
                 } catch (AssertionError e) {
                     throw new AssertionError("Mock expectation for endpoint: " + mockEndpointMap.get(mockEndpoint).getEndpointUri() +
-                            " failed validation: " + e.getMessage(), e);
+                            " failed validation: " + e.getMessage() + " for test " + spec.getDescription(), e);
                 }
                 logger.debug("Successfully completed mock assertion for endpoint {}", mockEndpoint.getEndpointUri());
             }
@@ -304,7 +304,8 @@ public class MorcTest extends CamelSpringTestSupport {
             try {
                 orderCheckMock.assertIsSatisfied();
             } catch (AssertionError e) {
-                throw new AssertionError("The total number of expected messages did not arrive at the mock services", e);
+                throw new AssertionError("The total number of expected messages did not arrive at the mock services for test " +
+                        spec.getDescription(), e);
             }
             logger.debug("Successfully validated that all messages arrive to endpoints in the correct order");
 
@@ -326,7 +327,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
                 //this means we don't expect to have seen the message at this point
                 assertNotNull("A message to the endpoint " + e.getFromEndpoint().getEndpointUri() +
-                        " was unexpected - one of " + expectedNodeEndpointsOutput + " was expected", node);
+                        " was unexpected - one of " + expectedNodeEndpointsOutput + " was expected for test " +
+                        spec.getDescription(), node);
 
                 //we've encountered a message to this endpoint and should remove it from the set
                 endpointNodes.remove(node);
