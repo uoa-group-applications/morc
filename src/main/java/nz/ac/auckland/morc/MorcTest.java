@@ -9,6 +9,7 @@ import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
@@ -206,8 +207,10 @@ public class MorcTest extends CamelSpringTestSupport {
                         .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}")
                         .end();
 
+                ProcessorDefinition pd = mockRouteDefinition;
+
                 if (mockDefinition.getLenientSelector() != null)
-                    mockRouteDefinition
+                    pd = mockRouteDefinition
                             .choice()
                             .when(mockDefinition.getLenientSelector())
                             .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message for lenient processing")
@@ -215,13 +218,13 @@ public class MorcTest extends CamelSpringTestSupport {
                             .endChoice()
                             .otherwise();
 
-                mockRouteDefinition.wireTap(orderCheckMock.getEndpointUri())
+                pd.wireTap(orderCheckMock.getEndpointUri())
                         .log(LoggingLevel.INFO, "Endpoint ${property.endpointUri} received a message");
 
                 if (mockDefinition.getMockFeedPreprocessor() != null)
-                    mockRouteDefinition.process(mockDefinition.getMockFeedPreprocessor());
+                    pd.process(mockDefinition.getMockFeedPreprocessor());
 
-                mockRouteDefinition.to(mockEndpoint)
+                pd.to(mockEndpoint)
                         .end();
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
