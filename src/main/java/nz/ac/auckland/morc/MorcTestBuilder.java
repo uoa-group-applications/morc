@@ -126,11 +126,41 @@ public abstract class MorcTestBuilder extends MorcTest {
         return new XmlTestResource(url);
     }
 
-    public static XmlTestResource[] xml(final List<InputStream> inputs) {
-        XmlTestResource[] resources = new XmlTestResource[inputs.size()];
+    public static TestResource[] xml(final List<TestResource<String>> dynamicInputs) {
+        TestResource[] resources = new TestResource[dynamicInputs.size()];
+        for (int i = 0; i < dynamicInputs.size(); i++) {
+            final int offset = i;
+            resources[i] = new TestResource() {
+                @Override
+                public Object getValue() throws Exception {
+                    return new XmlTestResource(xmlUtilities.getXmlAsDocument(dynamicInputs.get(offset).getValue())).getValue();
+                }
 
-        for (int i = 0; i < inputs.size(); i++) {
-            resources[i] = new XmlTestResource(inputs.get(i));
+                @Override
+                public String toString() {
+                    return "DynamicXMLTestResource";
+                }
+            };
+        }
+        return resources;
+    }
+
+    public static TestResource[] xml(final InputStream... inputs) {
+        TestResource[] resources = new TestResource[inputs.length];
+
+        for (int i = 0; i < inputs.length; i++) {
+            final int offset = i;
+            resources[i] = new TestResource() {
+                @Override
+                public Object getValue() throws Exception {
+                    return new XmlTestResource(inputs[offset]).getValue();
+                }
+
+                @Override
+                public String toString() {
+                    return "DynamicXMLTestResource";
+                }
+            };
         }
 
         return resources;
@@ -157,14 +187,41 @@ public abstract class MorcTestBuilder extends MorcTest {
         return new JsonTestResource(url);
     }
 
-    /**
-     * @param inputs An InputStream reference to a JSON resource
-     */
-    public static JsonTestResource[] json(final List<InputStream> inputs) {
-        JsonTestResource[] resources = new JsonTestResource[inputs.size()];
+    public static TestResource[] json(final List<TestResource<String>> dynamicInputs) {
+        TestResource[] resources = new TestResource[dynamicInputs.size()];
+        for (int i = 0; i < dynamicInputs.size(); i++) {
+            final int offset = i;
+            resources[i] = new TestResource() {
+                @Override
+                public Object getValue() throws Exception {
+                    return new JsonTestResource(dynamicInputs.get(offset).getValue()).getValue();
+                }
 
-        for (int i = 0; i < inputs.size(); i++) {
-            resources[i] = new JsonTestResource(inputs.get(i));
+                @Override
+                public String toString() {
+                    return "DynamicJSONTestResource";
+                }
+            };
+        }
+        return resources;
+    }
+
+    public static TestResource[] json(final InputStream... inputs) {
+        TestResource[] resources = new TestResource[inputs.length];
+
+        for (int i = 0; i < inputs.length; i++) {
+            final int offset = i;
+            resources[i] = new TestResource() {
+                @Override
+                public Object getValue() throws Exception {
+                    return new JsonTestResource(inputs[offset]).getValue();
+                }
+
+                @Override
+                public String toString() {
+                    return "DynamicJSONTestResource";
+                }
+            };
         }
 
         return resources;
@@ -194,15 +251,41 @@ public abstract class MorcTestBuilder extends MorcTest {
         return new PlainTextTestResource(url);
     }
 
-    /**
-     * @param inputs An InputStream reference to a plain text resource
-     */
-    @SuppressWarnings("unchecked")
-    public static PlainTextTestResource[] text(final List<InputStream> inputs) {
-        PlainTextTestResource[] resources = new PlainTextTestResource[inputs.size()];
+    public static TestResource[] text(final List<TestResource<String>> dynamicInputs) {
+        TestResource[] resources = new TestResource[dynamicInputs.size()];
+        for (int i = 0; i < dynamicInputs.size(); i++) {
+            final int offset = i;
+            resources[i] = new TestResource() {
+                @Override
+                public Object getValue() throws Exception {
+                    return new PlainTextTestResource(dynamicInputs.get(offset).getValue()).getValue();
+                }
 
-        for (int i = 0; i < inputs.size(); i++) {
-            resources[i] = new PlainTextTestResource(inputs.get(i));
+                @Override
+                public String toString() {
+                    return "DynamicPlainTextTestResource";
+                }
+            };
+        }
+        return resources;
+    }
+
+    public static TestResource[] text(final InputStream... inputs) {
+        TestResource[] resources = new TestResource[inputs.length];
+
+        for (int i = 0; i < inputs.length; i++) {
+            final int offset = i;
+            resources[i] = new TestResource() {
+                @Override
+                public Object getValue() throws Exception {
+                    return new PlainTextTestResource(inputs[offset]).getValue();
+                }
+
+                @Override
+                public String toString() {
+                    return "DynamicPlainTextTestResource";
+                }
+            };
         }
 
         return resources;
@@ -246,11 +329,11 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * @param inputs An InputStream reference to a headers (name=value pairs) resource
      */
-    public static HeadersTestResource[] headers(final List<InputStream> inputs) {
-        HeadersTestResource[] resources = new HeadersTestResource[inputs.size()];
+    public static HeadersTestResource[] headers(final InputStream[] inputs) {
+        HeadersTestResource[] resources = new HeadersTestResource[inputs.length];
 
-        for (int i = 0; i < inputs.size(); i++) {
-            resources[i] = new HeadersTestResource(inputs.get(i));
+        for (int i = 0; i < inputs.length; i++) {
+            resources[i] = new HeadersTestResource(inputs[i]);
         }
 
         return resources;
@@ -377,8 +460,20 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param dataSource A list of name=value pairs that will be used for variable substitution. Each entry in the
      *                   list will result in another resource being returned
      */
-    public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
+    public static List<TestResource<String>> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
         return groovy(template, dataSource, GStringTemplateEngine.class);
+    }
+
+    /**
+     * A way of paramaterizing resources so that values are updated according to Groovy GStrings
+     *
+     * @param template   A template of the string resource containing GString variables for substitution
+     * @param dataSource A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                   list will result in another resource being returned
+     */
+    @SuppressWarnings("unchecked")
+    public static List<TestResource<String>> groovy(String template, List<Map<String, String>> dataSource) {
+        return groovy(new PlainTextTestResource(template), dataSource, GStringTemplateEngine.class);
     }
 
     /**
@@ -387,15 +482,21 @@ public abstract class MorcTestBuilder extends MorcTest {
      *                       list will result in another resource being returned
      * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
-    public static List<InputStream> groovy(TestResource<String> template, List<Map<String, String>> dataSource,
+    public static List<TestResource<String>> groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
                                            Class<? extends TemplateEngine> templateEngine) {
-        List<InputStream> results = new ArrayList<>();
+        List<TestResource<String>> results = new ArrayList<>();
         try {
-            TemplateEngine engine = templateEngine.newInstance();
-            Template groovyTemplate = engine.createTemplate(template.getValue());
+            final TemplateEngine engine = templateEngine.newInstance();
 
-            for (Map<String, String> variables : dataSource) {
-                results.add(new ReaderInputStream(new StringReader(groovyTemplate.make(variables).toString())));
+            for (final Map<String, String> variables : dataSource) {
+                //this indirection ensures the Groovy isn't evaluated until the test is actually run
+                results.add(new TestResource<String>() {
+                    @Override
+                    public String getValue() throws Exception {
+                        Template groovyTemplate = engine.createTemplate(template.getValue());
+                        return groovyTemplate.make(variables).toString();
+                    }
+                });
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -406,9 +507,9 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * @param urlpath An Ant-style path to a directory containing test resources for (expected) input and output
-     * @return A list of InputStreams that can be used as test resources
+     * @return An array of InputStreams that can be used as test resources
      */
-    public static List<InputStream> dir(String urlpath) {
+    public static InputStream[] dir(String urlpath) {
         List<URL> resourceUrls = new ArrayList<>();
         List<InputStream> resourceStreams = new ArrayList<>();
 
@@ -434,7 +535,7 @@ public abstract class MorcTestBuilder extends MorcTest {
             throw new RuntimeException(e);
         }
 
-        return resourceStreams;
+        return resourceStreams.toArray(new InputStream[resourceStreams.size()]);
     }
 
     /**
