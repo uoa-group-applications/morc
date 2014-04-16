@@ -39,14 +39,16 @@
 
 <p><strong><a href="http://uoa-group-applications.github.io/morc/apidocs/">Javadoc</a></strong></p>
 
+<p><a href="http://travis-ci.org/uoa-group-applications/morc"><img src="https://travis-ci.org/uoa-group-applications/morc.png" alt="Build Status"></a></p>
+
 <p>morc provides a fluent Java Builder/DSL that allows developers and testers to construct specifications that dictate how an integration process/artifact under testing is expected to invoke a variety of different endpoints for a given input, where each endpoint has different ordering and message requirements. Given such a specification, the framework will first set up 'mock' endpoints as specified by the endpoint expectations that provide the canned responses before invoking the integration process/artifact to ensure all requirements are met. The requests/responses are compared semantically to the expectation based on the format required; for example, XML is compared using XMLUnit to allow for variations in XML request/response generation.</p>
 
 <p>This framework was borne out of frustration with setting up automated testing of integration artifacts produced by the mega vendors' integration stacks where we were unable to automatically set up (mock) endpoints to receive messages, ensure they are valid and provide a canned response to let the process continue on its way. This was especially problematic once we started introducing multi-step processes that were invoking other integration artifiacts using a variety of different transports. By using <a href="http://camel.apache.org/">Apache Camel</a> under the hood we were effectively able to to support a <a href="http://camel.apache.org/components.html">huge variety of technologies</a> for receiving and sending messages, although our major focus has been on JMS and (SOAP|REST|XML|JSON over HTTP)-style web-services. Our typical work-flow for testing (on a CI box) is to configure our integration stack to point to local host addresses/ports that morc (and Camel) will use to spin up a subscriber to receive a message, validate and return a canned response. The end result is that we are able to <strong>automatically and repeatedly test Oracle Service Bus (OSB) Artifacts using standard and well-understood tooling.</strong></p>
 
 <p>As a simple example, we can assume that a PING SOAP-style web-service is running on a mega-vendor's software stack (ESB) that responds with PONG for every PING request. We can create a test specification that sends a request to the service and gets the expected response back:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"Simple WS PING test"</span><span class="o">,</span><span class="s">"cxf:http://localhost:8090/services/pingService"</span><span class="o">)</span>
@@ -63,8 +65,8 @@
 <p>We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and
 password properties:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"Simple WS PING test with WS-Security"</span><span class="o">,</span><span class="s">"cxf://http://localhost:8090/services/securePingService?"</span> <span class="o">+</span>
@@ -85,8 +87,8 @@ password properties:</p>
 
 <p>Once the requests and responses become larger we will want to put the values into a file, which we can reference from the classpath by changing the xml function parameter:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"Simple WS PING test with local resources"</span><span class="o">,</span><span class="s">"cxf:http://localhost:8090/services/pingService"</span><span class="o">)</span>
@@ -104,8 +106,8 @@ password properties:</p>
 
 <p>If we change the PING service on the integration stack to pass the request onto another service then we can automatically mock up this service by adding an expectation:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"WS PING test with mock service expectation"</span><span class="o">,</span><span class="s">"cxf:http://localhost:8090/services/pingServiceProxy"</span><span class="o">)</span>
@@ -122,8 +124,8 @@ password properties:</p>
 
 <p>The PING service may also test more than one service before providing a response; in this case we need only provide an additional expectation:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"WS PING test with multiple mock service expectations"</span><span class="o">,</span><span class="s">"cxf:http://localhost:8090/services/pingServiceMultiProxy"</span><span class="o">)</span>
@@ -142,8 +144,8 @@ password properties:</p>
 
 <p>Note that expectations should occur in the order specified; if each request happens concurrently (e.g. the scatter-gather EIP) then you can relax the ordering requirements:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"WS PING test with multiple unordered mock service expectations"</span><span class="o">,</span><span class="s">"cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered"</span><span class="o">)</span>
@@ -163,8 +165,8 @@ password properties:</p>
 
 <p>We can also test asynchronous services (no response expected) by configuring expectations; for example if we have a message canonicalizer that takes a target-system message off a JMS destination and transforms it to a canonical format for broadcast onto another JMS destination then we can test it by sending a message to the destination and adding an expected message for the output destination:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">asyncTest</span><span class="o">(</span><span class="s">"Simple Asynchronous Canonicalizer Comparison"</span><span class="o">,</span><span class="s">"vm:test.input"</span><span class="o">)</span>
@@ -179,15 +181,15 @@ password properties:</p>
 
 <p>Finally, we can also send requests that invoke an exception/fault ensuring that we not only do we receive an exception response but also that the target system never receives the invalid message:</p>
 
-<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.integration.testing.OrchestratedTestBuilder</span><span class="o">;</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrchestratedTestSubclassTest</span> <span class="kd">extends</span> <span class="n">OrchestratedTestBuilder</span> <span class="o">{</span>
+<div class="highlight highlight-java"><pre><span class="kn">import</span> <span class="nn">nz.ac.auckland.morc.MorcTestBuilder</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MorcTest</span> <span class="kd">extends</span> <span class="n">MorcTestBuilder</span> <span class="o">{</span>
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
         <span class="n">syncTest</span><span class="o">(</span><span class="s">"Test invalid message doesn't arrive at the endpoint and returns exception"</span><span class="o">,</span><span class="s">"cxf:http://localhost:8090/services/pingServiceProxy"</span><span class="o">)</span>
             <span class="o">.</span><span class="na">requestBody</span><span class="o">(</span><span class="n">xml</span><span class="o">(</span><span class="s">"&lt;ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\"&gt;"</span> <span class="o">+</span>
                                                 <span class="s">"&lt;request&gt;PONG&lt;/request&gt;"</span> <span class="o">+</span>
                                              <span class="s">"&lt;/ns:pingRequest&gt;"</span><span class="o">))</span>
-            <span class="o">.</span><span class="na">expectsExceptionResponse</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">expectsException</span><span class="o">()</span>
             <span class="o">.</span><span class="na">addExpectation</span><span class="o">(</span><span class="n">unreceivedExpectation</span><span class="o">(</span><span class="s">"cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"</span><span class="o">));</span>
     <span class="o">}</span>
 <span class="o">}</span>
