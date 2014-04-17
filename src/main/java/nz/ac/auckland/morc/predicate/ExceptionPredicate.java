@@ -57,7 +57,7 @@ public class ExceptionPredicate implements Predicate {
 
     @Override
     public String toString() {
-        return "ExceptionPredicate: Class:" + expectedExceptionClass.toString() +
+        return "ExceptionPredicate: Class:" + expectedExceptionClass.getName() +
                 (message != null ? ",Message:" + message : "");
     }
 }
