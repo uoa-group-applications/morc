@@ -48,7 +48,7 @@ public class ExceptionPredicate implements Predicate {
         }
 
         logger.debug("An execution exception was encountered on endpoint {}", exchange.getFromEndpoint().getEndpointUri(), t);
-        boolean matches = t.getClass().equals(expectedExceptionClass) && (message == null || message.equals(t.getMessage()));
+        boolean matches = expectedExceptionClass.isAssignableFrom(t.getClass()) && (message == null || message.equals(t.getMessage()));
         if (!matches)
             logger.warn("The exception did not match the expected exception from endpoint {}", exchange.getFromEndpoint().getEndpointUri());
 

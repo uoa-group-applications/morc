@@ -5,9 +5,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 
 public class ExceptionPredicateTest extends Assert {
@@ -87,4 +89,29 @@ public class ExceptionPredicateTest extends Assert {
         ExceptionPredicate predicate = new ExceptionPredicate(IOException.class, "foo");
         assertTrue(predicate.toString().contains("foo"));
     }
+
+    @Test
+    public void testSubClassException() throws Exception {
+        SoapFault fault = new SoapFault("",new QName(""));
+
+        ExceptionPredicate predicate = new ExceptionPredicate(Exception.class);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setFromEndpoint(new CxfEndpoint(""));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
+
+        assertTrue(predicate.matches(e));
+    }
+
+    @Test
+    public void testSuperClassException() throws Exception {
+        ExceptionPredicate predicate = new ExceptionPredicate(SoapFault.class);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.setFromEndpoint(new CxfEndpoint(""));
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
+
+        assertFalse(predicate.matches(e));
+    }
+
 }
