@@ -23,6 +23,39 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
+            <xsd:element name="bigPingRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="request" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="bigPingResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="manyPings">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="ping" maxOccurs="unbounded">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="response" type="xsd:string"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!--
+               <ns:bigPingResponse xmlns:ns="urn:com:acme:integration:wsdl:pingservice">
+                   <manyPings>
+                       <ping>
+                           <response>PONG</response>
+                       </ping>
+            -->
         </xsd:schema>
     </wsdl:types>
 
@@ -33,10 +66,21 @@
         <wsdl:part element="tns:pingRequest" name="parameters"/>
     </wsdl:message>
 
+    <wsdl:message name="bigPingResponse">
+        <wsdl:part element="tns:bigPingResponse" name="parameters"/>
+    </wsdl:message>
+    <wsdl:message name="bigPingRequest">
+        <wsdl:part element="tns:bigPingRequest" name="parameters"/>
+    </wsdl:message>
+
     <wsdl:portType name="PingServicePortType">
         <wsdl:operation name="pingRequest">
             <wsdl:input message="tns:pingRequest" name="pingRequest"/>
             <wsdl:output message="tns:pingResponse" name="pingResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="bigPingRequest">
+            <wsdl:input message="tns:bigPingRequest" name="bigPingRequest"/>
+            <wsdl:output message="tns:bigPingResponse" name="bugPingResponse"/>
         </wsdl:operation>
     </wsdl:portType>
 
@@ -46,6 +90,15 @@
                       transport="http://schemas.xmlsoap.org/soap/http"/>
         <wsdl:operation name="pingRequest">
             <soap:operation soapAction="pingRequest"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="bigPingRequest">
+            <soap:operation soapAction="bigPingRequest"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>

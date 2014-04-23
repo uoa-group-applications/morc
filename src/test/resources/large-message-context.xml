@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+
+
+    <cxf:cxfEndpoint id="pingService"
+                     xmlns:ping_wsdl="urn:com:acme:integration:wsdl:pingservice"
+                     endpointName="ping_wsdl:PingServicePort"
+                     serviceName="ping_wsdl:PingService"
+                     wsdlURL="data/PingService.wsdl"
+                     address="http://localhost:8090/pingService">
+        <cxf:properties>
+            <entry key="dataFormat" value="PAYLOAD"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+</beans>
