@@ -11,7 +11,7 @@
                      endpointName="ping_wsdl:PingServicePort"
                      serviceName="ping_wsdl:PingService"
                      wsdlURL="data/PingService.wsdl"
-                     address="http://localhost:8090/pingService">
+                     address="http://localhost:9091/pingService">
         <cxf:properties>
             <entry key="dataFormat" value="PAYLOAD"/>
         </cxf:properties>
