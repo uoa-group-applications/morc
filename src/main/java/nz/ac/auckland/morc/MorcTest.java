@@ -9,10 +9,12 @@ import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.impl.DefaultStreamCachingStrategy;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
+import org.apache.camel.spi.StreamCachingStrategy;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -199,13 +201,10 @@ public class MorcTest extends CamelSpringTestSupport {
                 //this will be the route used to receive the message and validate/process the exchange
                 RouteDefinition mockRouteDefinition = new RouteDefinition();
                 mockRouteDefinition.from(mockDefinition.getEndpointUri())
-                        .streamCaching()
+                        .convertBodyTo(byte[].class)
                         .routeId(MorcTest.class.getCanonicalName() + "." + mockDefinition.getEndpointUri())
                         .setProperty("endpointUri", new ConstantExpression(mockDefinition.getEndpointUri()))
-                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}")
-                        .onCompletion()
-                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}")
-                        .end();
+                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} received body: ${body}, headers: ${headers}");
 
                 ProcessorDefinition pd = mockRouteDefinition;
 
@@ -225,6 +224,7 @@ public class MorcTest extends CamelSpringTestSupport {
                     pd.process(mockDefinition.getMockFeedPreprocessor());
 
                 pd.to(mockEndpoint)
+                        .log(LoggingLevel.DEBUG, "Endpoint ${property.endpointUri} returning back to the client body: ${body}, headers: ${headers}")
                         .end();
 
                 Endpoint targetEndpoint = getMandatoryEndpoint(mockDefinition.getEndpointUri());
@@ -255,7 +255,6 @@ public class MorcTest extends CamelSpringTestSupport {
             RouteDefinition publishRouteDefinition = new RouteDefinition();
 
             TryDefinition tryDefinition = publishRouteDefinition.from(dataSetEndpoint)
-                    .streamCaching()
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
                     .log(LoggingLevel.DEBUG, "Sending to endpoint " + spec.getEndpointUri() + " body: ${body}, headers: ${headers}")
                     .handleFault()
@@ -264,6 +263,7 @@ public class MorcTest extends CamelSpringTestSupport {
             if (spec.getMockFeedPreprocessor() != null) tryDefinition.process(spec.getMockFeedPreprocessor());
 
             tryDefinition.to(targetEndpoint)
+                    .convertBodyTo(byte[].class)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
                     .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()

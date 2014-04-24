@@ -249,7 +249,7 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("seda:partialLenient").lenient(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
-                        return exchange.getIn().getBody(Integer.class) % 2 == 0;
+                        return Integer.parseInt(exchange.getIn().getBody(String.class)) % 2 == 0;
                     }
                 }).responseBody(text("-2"), text("-4")))
                 .addExpectation(syncExpectation("seda:partialLenient")
