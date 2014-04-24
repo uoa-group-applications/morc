@@ -22,7 +22,6 @@ import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.SimpleBuilder;
 import org.apache.camel.builder.xml.XPathBuilder;
-import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -483,7 +482,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
     public static List<TestResource<String>> groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
-                                           Class<? extends TemplateEngine> templateEngine) {
+                                                    Class<? extends TemplateEngine> templateEngine) {
         List<TestResource<String>> results = new ArrayList<>();
         try {
             final TemplateEngine engine = templateEngine.newInstance();

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns:bigPingRequest xmlns:ns="urn:com:acme:integration:wsdl:pingservice">
-	<request>PING</request>
+    <request>PING</request>
 </ns:bigPingRequest>

@@ -92,7 +92,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testSubClassException() throws Exception {
-        SoapFault fault = new SoapFault("",new QName(""));
+        SoapFault fault = new SoapFault("", new QName(""));
 
         ExceptionPredicate predicate = new ExceptionPredicate(Exception.class);
 

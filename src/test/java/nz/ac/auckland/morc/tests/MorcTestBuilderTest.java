@@ -1,7 +1,6 @@
 package nz.ac.auckland.morc.tests;
 
 import nz.ac.auckland.morc.predicate.HttpErrorPredicate;
-import nz.ac.auckland.morc.resource.PlainTextTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -124,9 +123,9 @@ public class MorcTestBuilderTest extends Assert {
         TestResource[] resources = text(groovy(text("value:${foo},value:${baz}"), csv));
 
         assertEquals(3, resources.length);
-        assertTrue(text("value:1,value:2").validate((String)resources[0].getValue()));
-        assertTrue(text("value:3,value:4").validate((String)resources[1].getValue()));
-        assertTrue(text("value:5,value:6").validate((String)resources[2].getValue()));
+        assertTrue(text("value:1,value:2").validate((String) resources[0].getValue()));
+        assertTrue(text("value:3,value:4").validate((String) resources[1].getValue()));
+        assertTrue(text("value:5,value:6").validate((String) resources[2].getValue()));
     }
 
     @Test
@@ -134,9 +133,9 @@ public class MorcTestBuilderTest extends Assert {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
         TestResource[] resources = xml(groovy("<result><input>${foo}</input><output>${baz}</output></result>", csv));
 
-        assertTrue(xml("<result><input>1</input><output>2</output></result>").validate((Document)resources[0].getValue()));
-        assertTrue(xml("<result><input>3</input><output>4</output></result>").validate((Document)resources[1].getValue()));
-        assertTrue(xml("<result><input>5</input><output>6</output></result>").validate((Document)resources[2].getValue()));
+        assertTrue(xml("<result><input>1</input><output>2</output></result>").validate((Document) resources[0].getValue()));
+        assertTrue(xml("<result><input>3</input><output>4</output></result>").validate((Document) resources[1].getValue()));
+        assertTrue(xml("<result><input>5</input><output>6</output></result>").validate((Document) resources[2].getValue()));
     }
 
     @Test
@@ -144,9 +143,9 @@ public class MorcTestBuilderTest extends Assert {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
         TestResource[] resources = json(groovy("{ \"${foo}\":\"${baz}\" }", csv));
 
-        assertTrue(json("{ \"1\":\"2\" }").validate((String)resources[0].getValue()));
-        assertTrue(json("{ \"3\":\"4\" }").validate((String)resources[1].getValue()));
-        assertTrue(json("{ \"5\":\"6\" }").validate((String)resources[2].getValue()));
+        assertTrue(json("{ \"1\":\"2\" }").validate((String) resources[0].getValue()));
+        assertTrue(json("{ \"3\":\"4\" }").validate((String) resources[1].getValue()));
+        assertTrue(json("{ \"5\":\"6\" }").validate((String) resources[2].getValue()));
     }
 
     @Test
@@ -201,7 +200,7 @@ public class MorcTestBuilderTest extends Assert {
         long nextTime = Long.parseLong((String) resources[0].getValue());
         assertTrue(nextTime > startTime);
         Thread.sleep(2000);
-        long lastTime = Long.parseLong((String)resources[1].getValue());
+        long lastTime = Long.parseLong((String) resources[1].getValue());
         assertTrue(lastTime > nextTime);
     }
 

@@ -24,11 +24,11 @@ public class LargeMessageProxyTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
-        syncTest("Large Message Proxy Test","cxf:http://localhost:9091/pingService")
+        syncTest("Large Message Proxy Test", "cxf:http://localhost:9091/pingService")
                 .requestBody(xml(classpath("/data/bigPingRequest.xml")))
                 .expectedResponseBody(xml(classpath("/data/bigPingResponse.xml")))
                 .addExpectation(syncExpectation("cxf:http://localhost:9090/pingService?wsdlURL=data/PingService.wsdl")
-                    .expectedBody(xml(classpath("/data/bigPingRequest.xml")))
-                    .responseBody(xml(classpath("/data/bigPingResponse.xml"))));
+                        .expectedBody(xml(classpath("/data/bigPingRequest.xml")))
+                        .responseBody(xml(classpath("/data/bigPingResponse.xml"))));
     }
 }

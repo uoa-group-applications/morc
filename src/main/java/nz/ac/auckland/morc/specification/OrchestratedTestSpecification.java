@@ -71,7 +71,7 @@ public class OrchestratedTestSpecification {
 
     /**
      * @return The amount of time in milliseconds that the test will wait for all responses to be received back from
-     *         the target endpoint URI
+     * the target endpoint URI
      */
     public long getResultWaitTime() {
         //10s gives time for the route to get booted
