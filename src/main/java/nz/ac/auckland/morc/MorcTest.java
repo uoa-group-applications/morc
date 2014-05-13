@@ -264,10 +264,10 @@ public class MorcTest extends CamelSpringTestSupport {
                     .convertBodyTo(byte[].class)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())
-                    .log(LoggingLevel.INFO, "Received exception response to endpoint " + spec.getEndpointUri()
+                    .log(LoggingLevel.DEBUG, "Received exception response to endpoint " + spec.getEndpointUri()
                             + " exception: ${exception}, headers: ${headers}")
                     .otherwise()
-                    .log(LoggingLevel.INFO, "Received response from endpoint " + spec.getEndpointUri()
+                    .log(LoggingLevel.DEBUG, "Received response from endpoint " + spec.getEndpointUri()
                             + " body: ${body}, headers: ${headers}")
                     .end()
                     .to(sendingMockEndpoint);
