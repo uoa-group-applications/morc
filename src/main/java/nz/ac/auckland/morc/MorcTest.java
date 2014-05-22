@@ -22,6 +22,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
@@ -246,8 +247,8 @@ public class MorcTest extends CamelSpringTestSupport {
             for (EndpointOverride override : spec.getEndpointOverrides())
                 override.overrideEndpoint(targetEndpoint);
 
-            DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,
-                    new MessagePublishDataSet(spec.getProcessors()));
+            MessagePublishDataSet dataSet = new MessagePublishDataSet(spec.getProcessors());
+            DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,dataSet);
             dataSetEndpoint.setProduceDelay(spec.getSendInterval());
 
             RouteDefinition publishRouteDefinition = new RouteDefinition();
@@ -276,9 +277,15 @@ public class MorcTest extends CamelSpringTestSupport {
 
             createdRoutes.add(publishRouteDefinition);
 
-            logger.trace("Starting sending mock endpoint assertion");
-            sendingMockEndpoint.setResultWaitTime(spec.getResultWaitTime());
+            //wait until we have sent all messages
+            synchronized (dataSet) {
+                logger.trace("Starting wait for all messages to be published");
+                dataSet.wait();
+                logger.trace("Messages have all been published");
+            }
+
             try {
+                logger.trace("Starting sending mock endpoint assertion");
                 sendingMockEndpoint.assertIsSatisfied();
             } catch (AssertionError e) {
                 throw new AssertionError("The target endpoint " + spec.getEndpointUri() + " on test " +
@@ -362,6 +369,8 @@ public class MorcTest extends CamelSpringTestSupport {
 
 class MessagePublishDataSet implements DataSet {
 
+    private static final Logger logger = LoggerFactory.getLogger(MessagePublishDataSet.class);
+
     private List<Processor> processors;
 
     public MessagePublishDataSet(List<Processor> processors) {
@@ -370,7 +379,14 @@ class MessagePublishDataSet implements DataSet {
 
     @Override
     public void populateMessage(Exchange exchange, long messageIndex) throws Exception {
+        logger.trace("Sending message {}",messageIndex);
         processors.get((int) messageIndex).process(exchange);
+        if (messageIndex == processors.size()-1) {
+            synchronized (this) {
+                logger.trace("Notifying data set completion");
+                this.notify();
+            }
+        }
     }
 
     @Override
@@ -388,6 +404,3 @@ class MessagePublishDataSet implements DataSet {
         return processors.size();
     }
 }
-
-
-
