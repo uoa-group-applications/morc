@@ -25,7 +25,6 @@ public class OrchestratedTestSpecification {
     private String description;
     private String endpointUri;
     private Collection<MockDefinition> mockDefinitions;
-    private long messageResultWaitTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private Collection<EndpointNode> endpointNodesOrdering;
     private Processor mockFeedPreprocessor;
@@ -35,7 +34,6 @@ public class OrchestratedTestSpecification {
     private List<Processor> processors;
     private List<Predicate> predicates;
     private int totalMockMessageCount;
-    private long minimalResultWaitTime;
 
     /**
      * @return A description that explains what this tests is doing
@@ -67,15 +65,6 @@ public class OrchestratedTestSpecification {
      */
     public Collection<MockDefinition> getMockDefinitions() {
         return Collections.unmodifiableCollection(mockDefinitions);
-    }
-
-    /**
-     * @return The amount of time in milliseconds that the test will wait for all responses to be received back from
-     * the target endpoint URI
-     */
-    public long getResultWaitTime() {
-        //10s gives time for the route to get booted
-        return minimalResultWaitTime + (messageResultWaitTime * getTotalPublishMessageCount());
     }
 
     /**
@@ -375,7 +364,6 @@ public class OrchestratedTestSpecification {
         this.description = builder.description;
         this.endpointUri = builder.getEndpointUri();
         this.mockDefinitions = builder.mockExpectations.values();
-        this.messageResultWaitTime = Math.max(builder.getMessageResultWaitTime(), builder.sendInterval);
         this.endpointOverrides = builder.getEndpointOverrides();
         this.sendInterval = builder.sendInterval;
         this.partCount = builder.partCount;
@@ -384,7 +372,6 @@ public class OrchestratedTestSpecification {
         this.processors = builder.processors;
         this.predicates = builder.predicates;
         this.totalMockMessageCount = builder.totalMockMessageCount;
-        this.minimalResultWaitTime = builder.getMinimalResultWaitTime();
         this.mockFeedPreprocessor = builder.getMockFeedPreprocessor();
     }
 

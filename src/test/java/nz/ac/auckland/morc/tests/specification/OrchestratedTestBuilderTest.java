@@ -54,8 +54,6 @@ public class OrchestratedTestBuilderTest extends Assert {
         e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
         assertFalse(test.getPredicates().get(0).matches(e));
         assertFalse(test.getPredicates().get(1).matches(e));
-
-        assertEquals(10000 + (1000 * 2), test.getResultWaitTime());
     }
 
     @Test
