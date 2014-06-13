@@ -459,7 +459,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param dataSource A list of name=value pairs that will be used for variable substitution. Each entry in the
      *                   list will result in another resource being returned
      */
-    public static List<TestResource<String>> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
+    public static List<GroovyTemplateTestResource> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
         return groovy(template, dataSource, GStringTemplateEngine.class);
     }
 
@@ -471,7 +471,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      *                   list will result in another resource being returned
      */
     @SuppressWarnings("unchecked")
-    public static List<TestResource<String>> groovy(String template, List<Map<String, String>> dataSource) {
+    public static List<GroovyTemplateTestResource> groovy(String template, List<Map<String, String>> dataSource) {
         return groovy(new PlainTextTestResource(template), dataSource, GStringTemplateEngine.class);
     }
 
@@ -481,27 +481,80 @@ public abstract class MorcTestBuilder extends MorcTest {
      *                       list will result in another resource being returned
      * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
-    public static List<TestResource<String>> groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
+    public static List<GroovyTemplateTestResource> groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
                                                     Class<? extends TemplateEngine> templateEngine) {
-        List<TestResource<String>> results = new ArrayList<>();
+        List<GroovyTemplateTestResource> results = new ArrayList<>();
         try {
             final TemplateEngine engine = templateEngine.newInstance();
 
             for (final Map<String, String> variables : dataSource) {
                 //this indirection ensures the Groovy isn't evaluated until the test is actually run
-                results.add(new TestResource<String>() {
-                    @Override
-                    public String getValue() throws Exception {
-                        Template groovyTemplate = engine.createTemplate(template.getValue());
-                        return groovyTemplate.make(variables).toString();
-                    }
-                });
+                results.add(new GroovyTemplateTestResource(engine,template,variables));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         return results;
+    }
+
+    public static class VariablePair {
+        private String name;
+        private String value;
+
+        public VariablePair(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
+
+    public static VariablePair variable(String name, String value) {
+        return new VariablePair(name,value);
+    }
+
+    /**
+     * A way of paramaterizing resources so that values are updated according to Groovy GStrings
+     *
+     * @param template   A template of the string resource containing GString variables for substitution
+     * @param variables  A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                   list will result in another resource being returned
+     */
+    public static GroovyTemplateTestResource groovy(TestResource<String> template, VariablePair... variables) {
+         return groovy(template,GStringTemplateEngine.class,variables);
+    }
+
+    /**
+     * A way of paramaterizing resources so that values are updated according to Groovy GStrings
+     *
+     * @param template   A template of the string resource containing GString variables for substitution
+     * @param variables A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                   list will result in another resource being returned
+     */
+    @SuppressWarnings("unchecked")
+    public static GroovyTemplateTestResource groovy(String template, VariablePair... variables) {
+         return groovy(new PlainTextTestResource(template),GStringTemplateEngine.class,variables);
+    }
+
+    /**
+     * @param template       A template of the string resource containing template-appropriate variables for substitution
+     * @param variables     A list of name=value pairs that will be used for variable substitution. Each entry in the
+     *                       list will result in another resource being returned
+     * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     */
+    public static GroovyTemplateTestResource groovy(final TestResource<String> template,
+                                                    Class<? extends TemplateEngine> templateEngine,VariablePair... variables) {
+
+        Map<String,String> map = new HashMap<>();
+        for (VariablePair pair : variables) {
+            map.put(pair.name,pair.value);
+        }
+
+        try {
+            TemplateEngine engine = templateEngine.newInstance();
+            return new GroovyTemplateTestResource(engine,template,map);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

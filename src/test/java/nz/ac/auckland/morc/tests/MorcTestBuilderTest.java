@@ -120,7 +120,7 @@ public class MorcTestBuilderTest extends Assert {
     @Test
     public void testGroovyTemplateCompleted() throws Exception {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
-        TestResource[] resources = text(groovy(text("value:${foo},value:${baz}"), csv));
+        TestResource[] resources = text((List) groovy(text("value:${foo},value:${baz}"), csv));
 
         assertEquals(3, resources.length);
         assertTrue(text("value:1,value:2").validate((String) resources[0].getValue()));
@@ -131,7 +131,7 @@ public class MorcTestBuilderTest extends Assert {
     @Test
     public void testXmlGroovyTemplateCompleted() throws Exception {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
-        TestResource[] resources = xml(groovy("<result><input>${foo}</input><output>${baz}</output></result>", csv));
+        TestResource[] resources = xml((List)groovy("<result><input>${foo}</input><output>${baz}</output></result>", csv));
 
         assertTrue(xml("<result><input>1</input><output>2</output></result>").validate((Document) resources[0].getValue()));
         assertTrue(xml("<result><input>3</input><output>4</output></result>").validate((Document) resources[1].getValue()));
@@ -141,7 +141,7 @@ public class MorcTestBuilderTest extends Assert {
     @Test
     public void testJsonGroovyTemplateCompleted() throws Exception {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
-        TestResource[] resources = json(groovy("{ \"${foo}\":\"${baz}\" }", csv));
+        TestResource[] resources = json((List)groovy("{ \"${foo}\":\"${baz}\" }", csv));
 
         assertTrue(json("{ \"1\":\"2\" }").validate((String) resources[0].getValue()));
         assertTrue(json("{ \"3\":\"4\" }").validate((String) resources[1].getValue()));
@@ -196,12 +196,24 @@ public class MorcTestBuilderTest extends Assert {
 
         long startTime = new Date().getTime();
         Thread.sleep(2000);
-        TestResource[] resources = text(groovy(text("${new Date().getTime()}"), csv));
+        TestResource[] resources = text((List)groovy(text("${new Date().getTime()}"), csv));
         long nextTime = Long.parseLong((String) resources[0].getValue());
         assertTrue(nextTime > startTime);
         Thread.sleep(2000);
         long lastTime = Long.parseLong((String) resources[1].getValue());
         assertTrue(lastTime > nextTime);
+    }
+
+    @Test
+    public void testSingleGroovyResource() throws Exception {
+        TestResource<String> resource = groovy(text("$foo $baz $moo"),variable("foo","1"),variable("baz","2"),variable("moo","3"));
+        assertTrue(resource.getValue().equals("1 2 3"));
+    }
+
+    @Test
+    public void testSingleGroovyResourceStringTemplate() throws Exception {
+        TestResource<String> resource = groovy("$foo $baz $moo",variable("foo","1"),variable("baz","2"),variable("moo","3"));
+        assertTrue(resource.getValue().equals("1 2 3"));
     }
 
 }
