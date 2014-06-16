@@ -2,6 +2,7 @@ package nz.ac.auckland.morc.tests.resource;
 
 import nz.ac.auckland.morc.resource.XmlTestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
+import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.custommonkey.xmlunit.Diff;
@@ -137,6 +138,15 @@ public class XmlTestResourceTest extends Assert {
     @Test
     public void testTrimmedToString() throws Exception {
         assertEquals(100, new XmlTestResource(EXPECTED_VALUE).toString().length());
+    }
+
+    @Test
+    public void testDifferentNamespacePrefixes() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody(xmlUtilities.getXmlAsDocument("<ns1:foo xmlns:ns1=\"foo.com\">foo</ns1:foo>"));
+        XmlTestResource resource = new XmlTestResource(xmlUtilities.getXmlAsDocument("<ns0:foo xmlns:ns0=\"foo.com\">foo</ns0:foo>"));
+
+        assertTrue(resource.matches(e));
     }
 
 }
