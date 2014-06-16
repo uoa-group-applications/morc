@@ -606,7 +606,6 @@ public abstract class MorcTestBuilder extends MorcTest {
         @Override
         public String toString() {
             return "JsonGroovyTemplateTestResource:" + getResource().toString();
-
         }
 
         private JsonTestResource getResource() {
