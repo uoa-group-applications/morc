@@ -526,8 +526,9 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param groovyResources   An array of Groovy templates which result in an XML document
      * @return                  A list of XmlTestResources that will be evaluated (at runtime) from the Groovy resources
      */
-    public static XmlRuntimeTestResource[] xml(GroovyTemplateTestResource... groovyResources) {
-        XmlRuntimeTestResource[] resources = new XmlRuntimeTestResource[groovyResources.length];
+    @SuppressWarnings("unchecked")
+    public static XmlRuntimeTestResource<GroovyTemplateTestResource>[] xml(GroovyTemplateTestResource... groovyResources) {
+        XmlRuntimeTestResource<GroovyTemplateTestResource>[] resources = new XmlRuntimeTestResource[groovyResources.length];
 
         int i = 0;
         for (GroovyTemplateTestResource resource : groovyResources) {
@@ -573,8 +574,9 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * @param groovyResources A list of Groovy resources that will be evaluated as JSON documents
      */
-    public static JsonRuntimeTestResource[] json(GroovyTemplateTestResource... groovyResources) {
-        JsonRuntimeTestResource[] resources = new JsonRuntimeTestResource[groovyResources.length];
+    @SuppressWarnings("unchecked")
+    public static JsonRuntimeTestResource<GroovyTemplateTestResource>[] json(GroovyTemplateTestResource... groovyResources) {
+        JsonRuntimeTestResource<GroovyTemplateTestResource>[] resources = new JsonRuntimeTestResource[groovyResources.length];
 
         int i = 0;
         for (GroovyTemplateTestResource resource : groovyResources) {
