@@ -527,22 +527,22 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @return                  A list of XmlTestResources that will be evaluated (at runtime) from the Groovy resources
      */
     @SuppressWarnings("unchecked")
-    public static XmlRuntimeTestResource<GroovyTemplateTestResource>[] xml(GroovyTemplateTestResource... groovyResources) {
-        XmlRuntimeTestResource<GroovyTemplateTestResource>[] resources = new XmlRuntimeTestResource[groovyResources.length];
+    public static XmlRuntimeTestResource[] xml(GroovyTemplateTestResource... groovyResources) {
+        XmlRuntimeTestResource[] resources = new XmlRuntimeTestResource[groovyResources.length];
 
         int i = 0;
         for (GroovyTemplateTestResource resource : groovyResources) {
-            resources[i++] = new XmlRuntimeTestResource<>(resource);
+            resources[i++] = new XmlRuntimeTestResource(resource);
         }
 
         return resources;
     }
 
-    public static class XmlRuntimeTestResource<T extends TestResource<String>> implements TestResource<Document>, Predicate {
+    public static class XmlRuntimeTestResource implements TestResource<Document>, Predicate {
 
-        private T resource;
+        private TestResource<String> resource;
 
-        public XmlRuntimeTestResource(T resource) {
+        public XmlRuntimeTestResource(TestResource<String> resource) {
             this.resource = resource;
         }
 
@@ -575,22 +575,22 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param groovyResources A list of Groovy resources that will be evaluated as JSON documents
      */
     @SuppressWarnings("unchecked")
-    public static JsonRuntimeTestResource<GroovyTemplateTestResource>[] json(GroovyTemplateTestResource... groovyResources) {
-        JsonRuntimeTestResource<GroovyTemplateTestResource>[] resources = new JsonRuntimeTestResource[groovyResources.length];
+    public static JsonRuntimeTestResource[] json(GroovyTemplateTestResource... groovyResources) {
+        JsonRuntimeTestResource[] resources = new JsonRuntimeTestResource[groovyResources.length];
 
         int i = 0;
         for (GroovyTemplateTestResource resource : groovyResources) {
-            resources[i++] = new JsonRuntimeTestResource<>(resource);
+            resources[i++] = new JsonRuntimeTestResource(resource);
         }
 
         return resources;
     }
 
-    public static class JsonRuntimeTestResource<T extends TestResource<String>> implements TestResource<String>, Predicate {
+    public static class JsonRuntimeTestResource implements TestResource<String>, Predicate {
 
-        private T resource;
+        private TestResource<String> resource;
 
-        public JsonRuntimeTestResource(T resource) {
+        public JsonRuntimeTestResource(TestResource<String> resource) {
             this.resource = resource;
         }
 
