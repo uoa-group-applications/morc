@@ -2,7 +2,6 @@ package nz.ac.auckland.morc;
 
 import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
-import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.mock.builder.*;
@@ -426,14 +425,14 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
     public static GroovyTemplateTestResource[] groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
-                                                    Class<? extends TemplateEngine> templateEngine) {
+                                                      Class<? extends TemplateEngine> templateEngine) {
         GroovyTemplateTestResource[] results = new GroovyTemplateTestResource[dataSource.size()];
         try {
             final TemplateEngine engine = templateEngine.newInstance();
 
             int index = 0;
             for (Map<String, String> variables : dataSource) {
-                results[index++] = new GroovyTemplateTestResource(engine,template,variables);
+                results[index++] = new GroovyTemplateTestResource(engine, template, variables);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -453,48 +452,48 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     public static VariablePair var(String name, String value) {
-        return new VariablePair(name,value);
+        return new VariablePair(name, value);
     }
 
     /**
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
      *
-     * @param template   A template of the string resource containing GString variables for substitution
-     * @param variables  A list of name=value pairs that will be used for var substitution. Each entry in the
-     *                   list will result in another resource being returned
+     * @param template  A template of the string resource containing GString variables for substitution
+     * @param variables A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                  list will result in another resource being returned
      */
     public static GroovyTemplateTestResource groovy(TestResource<String> template, VariablePair... variables) {
-         return groovy(template,GStringTemplateEngine.class,variables);
+        return groovy(template, GStringTemplateEngine.class, variables);
     }
 
     /**
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
      *
-     * @param template      A template of the string resource containing GString variables for substitution
-     * @param variables     A list of name=value pairs that will be used for var substitution. Each entry in the
-     *                      list will result in another resource being returned
+     * @param template  A template of the string resource containing GString variables for substitution
+     * @param variables A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                  list will result in another resource being returned
      */
     @SuppressWarnings("unchecked")
     public static GroovyTemplateTestResource groovy(String template, VariablePair... variables) {
-         return groovy(new PlainTextTestResource(template),GStringTemplateEngine.class,variables);
+        return groovy(new PlainTextTestResource(template), GStringTemplateEngine.class, variables);
     }
 
     /**
-     * @param template          A template of the string resource containing template-appropriate variables for substitution
-     * @param variables         A list of name=value pairs that will be used for var substitution. Each entry in the
-     *                          list will result in another resource being returned
-     * @param templateEngine    The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     * @param template       A template of the string resource containing template-appropriate variables for substitution
+     * @param variables      A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                       list will result in another resource being returned
+     * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
     public static GroovyTemplateTestResource groovy(TestResource<String> template,
-                                                    Class<? extends TemplateEngine> templateEngine,VariablePair... variables) {
-        Map<String,String> map = new HashMap<>();
+                                                    Class<? extends TemplateEngine> templateEngine, VariablePair... variables) {
+        Map<String, String> map = new HashMap<>();
         for (VariablePair pair : variables) {
-            map.put(pair.name,pair.value);
+            map.put(pair.name, pair.value);
         }
 
         try {
             TemplateEngine engine = templateEngine.newInstance();
-            return new GroovyTemplateTestResource(engine,template,map);
+            return new GroovyTemplateTestResource(engine, template, map);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -502,29 +501,29 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * @param templateUrl A URL for a Groovy template that will be evaluated as a plain text document
-     * @param variables         A list of name=value pairs that will be used for var substitution. Each entry in the
-     *                          list will result in another resource being returned
+     * @param variables   A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                    list will result in another resource being returned
      */
     @SuppressWarnings("unchecked")
     public static GroovyTemplateTestResource groovy(URL templateUrl, VariablePair... variables) {
-        return groovy(text(templateUrl),variables);
+        return groovy(text(templateUrl), variables);
     }
 
     /**
-     * @param templateUrl A URL for a Groovy template that will be evaluated as a plain text document
-     * @param variables         A list of name=value pairs that will be used for var substitution. Each entry in the
-     *                          list will result in another resource being returned
-     * @param templateEngine    The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     * @param templateUrl    A URL for a Groovy template that will be evaluated as a plain text document
+     * @param variables      A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                       list will result in another resource being returned
+     * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
     @SuppressWarnings("unchecked")
     public static GroovyTemplateTestResource groovy(URL templateUrl,
-                                                    Class<? extends TemplateEngine> templateEngine,VariablePair... variables) {
-        return groovy(text(templateUrl),templateEngine,variables);
+                                                    Class<? extends TemplateEngine> templateEngine, VariablePair... variables) {
+        return groovy(text(templateUrl), templateEngine, variables);
     }
 
     /**
-     * @param groovyResources   An array of Groovy templates which result in an XML document
-     * @return                  A list of XmlTestResources that will be evaluated (at runtime) from the Groovy resources
+     * @param groovyResources An array of Groovy templates which result in an XML document
+     * @return A list of XmlTestResources that will be evaluated (at runtime) from the Groovy resources
      */
     @SuppressWarnings("unchecked")
     public static XmlRuntimeTestResource[] xml(GroovyTemplateTestResource... groovyResources) {
@@ -627,8 +626,8 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
-     * @param urlpath   An Ant-style path to a directory containing test resources for (expected) input and output
-     * @return          An array of InputStreams that can be used as test resources
+     * @param urlpath An Ant-style path to a directory containing test resources for (expected) input and output
+     * @return An array of InputStreams that can be used as test resources
      */
     public static InputStream[] dir(String urlpath) {
         List<URL> resourceUrls = new ArrayList<>();
@@ -662,8 +661,8 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * This method can be used as a datasource for the groovy template
      *
-     * @param   csvResource A reference to a CSV file that contains var values. A header line sets the name of the variables
-     * @return  A list of variablename-value pairs
+     * @param csvResource A reference to a CSV file that contains var values. A header line sets the name of the variables
+     * @return A list of variablename-value pairs
      */
     public static List<Map<String, String>> csv(TestResource<String> csvResource) {
         CSVReader reader;

@@ -21,14 +21,14 @@ public class GroovyTemplateTestResourceTest extends Assert {
         String templateValue = "$foo $baz $moo";
         PlainTextTestResource resource = new PlainTextTestResource(templateValue);
 
-        Map<String,String> variables = new HashMap<>();
-        variables.put("foo","1");
-        variables.put("baz","2");
-        variables.put("moo","3");
+        Map<String, String> variables = new HashMap<>();
+        variables.put("foo", "1");
+        variables.put("baz", "2");
+        variables.put("moo", "3");
 
-        TestResource testResource = new GroovyTemplateTestResource(resource,variables);
+        TestResource testResource = new GroovyTemplateTestResource(resource, variables);
         assertTrue(testResource.toString().endsWith(templateValue));
-        assertEquals("1 2 3",testResource.getValue());
+        assertEquals("1 2 3", testResource.getValue());
     }
 
     @Test
@@ -39,12 +39,12 @@ public class GroovyTemplateTestResourceTest extends Assert {
         String templateValue = "$foo $baz $moo";
         PlainTextTestResource resource = new PlainTextTestResource(templateValue);
 
-        Map<String,String> variables = new HashMap<>();
-        variables.put("foo","1");
-        variables.put("baz","2");
-        variables.put("moo","3");
+        Map<String, String> variables = new HashMap<>();
+        variables.put("foo", "1");
+        variables.put("baz", "2");
+        variables.put("moo", "3");
 
-        GroovyTemplateTestResource testResource = new GroovyTemplateTestResource(resource,variables);
+        GroovyTemplateTestResource testResource = new GroovyTemplateTestResource(resource, variables);
         assertTrue(testResource.matches(e));
         e.getIn().setBody("3 2 1");
         assertFalse(testResource.matches(e));
@@ -55,31 +55,31 @@ public class GroovyTemplateTestResourceTest extends Assert {
         String templateValue = "<% import static org.apache.commons.lang3.text.WordUtils.capitalize %>${capitalize(foo)} ${capitalize(baz)} ${capitalize(moo)}";
         PlainTextTestResource resource = new PlainTextTestResource(templateValue);
 
-        Map<String,String> variables = new HashMap<>();
-        variables.put("foo","a");
-        variables.put("baz","b");
-        variables.put("moo","c");
+        Map<String, String> variables = new HashMap<>();
+        variables.put("foo", "a");
+        variables.put("baz", "b");
+        variables.put("moo", "c");
 
         GroovyTemplateTestResource testResource = new GroovyTemplateTestResource(new SimpleTemplateEngine(),
-                resource,variables);
+                resource, variables);
 
-        assertEquals("A B C",testResource.getValue());
+        assertEquals("A B C", testResource.getValue());
     }
 
     @Test
     public void testDelayedEvaluation() throws Exception {
-        Map<String,String> variables = new HashMap<>();
+        Map<String, String> variables = new HashMap<>();
 
         String templateValue = "${new Date().getTime()}";
         PlainTextTestResource resource = new PlainTextTestResource(templateValue);
 
         long startTime = new Date().getTime();
-        GroovyTemplateTestResource testResource = new GroovyTemplateTestResource(resource,variables);
+        GroovyTemplateTestResource testResource = new GroovyTemplateTestResource(resource, variables);
         Thread.sleep(2000);
         long endTime = Long.parseLong(testResource.getValue());
-        assertTrue(endTime-2000 >= startTime);
+        assertTrue(endTime - 2000 >= startTime);
         Thread.sleep(2000);
         long nextEndTime = Long.parseLong(testResource.getValue());
-        assertTrue(nextEndTime-2000>=endTime);
+        assertTrue(nextEndTime - 2000 >= endTime);
     }
 }

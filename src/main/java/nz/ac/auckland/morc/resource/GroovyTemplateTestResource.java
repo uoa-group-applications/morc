@@ -15,17 +15,17 @@ import java.util.Map;
  */
 public class GroovyTemplateTestResource implements TestResource<String>, Predicate {
     private TemplateEngine templateEngine;
-    private Map<String,String> variables;
+    private Map<String, String> variables;
     private TestResource<String> template;
 
-    public GroovyTemplateTestResource(TemplateEngine templateEngine, TestResource<String> template, Map<String,String> variables) {
+    public GroovyTemplateTestResource(TemplateEngine templateEngine, TestResource<String> template, Map<String, String> variables) {
         this.templateEngine = templateEngine;
         this.variables = variables;
         this.template = template;
     }
 
-    public GroovyTemplateTestResource(TestResource<String> template, Map<String,String> variables) {
-        this(new GStringTemplateEngine(),template,variables);
+    public GroovyTemplateTestResource(TestResource<String> template, Map<String, String> variables) {
+        this(new GStringTemplateEngine(), template, variables);
     }
 
     @Override

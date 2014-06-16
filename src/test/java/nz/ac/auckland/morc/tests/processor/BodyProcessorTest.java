@@ -3,15 +3,12 @@ package nz.ac.auckland.morc.tests.processor;
 import nz.ac.auckland.morc.MorcTestBuilder;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.resource.PlainTextTestResource;
-import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.CxfEndpoint;
-import org.apache.camel.component.cxf.cxfbean.CxfBeanEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class BodyProcessorTest extends Assert {
 
@@ -25,6 +22,6 @@ public class BodyProcessorTest extends Assert {
         BodyProcessor processor = new BodyProcessor(resource);
 
         processor.process(e);
-        assertEquals("<foo/>",e.getIn().getBody(String.class));
+        assertEquals("<foo/>", e.getIn().getBody(String.class));
     }
 }

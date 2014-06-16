@@ -30,7 +30,7 @@ public class SlowTest extends MorcTestBuilder {
             A quick test to see what happens when we have a publisher that takes awhile to publish
             (we currently assume publishing time is close to 0)
          */
-        AsyncOrchestratedTestBuilder slowProducerAsyncTestBuilder = asyncTest("Slow Producer Async Publisher Test","vm:asyncConsumer");
+        AsyncOrchestratedTestBuilder slowProducerAsyncTestBuilder = asyncTest("Slow Producer Async Publisher Test", "vm:asyncConsumer");
 
         for (int i = 0; i < 10; i++) {
             slowProducerAsyncTestBuilder.addProcessors(new Processor() {
@@ -46,10 +46,10 @@ public class SlowTest extends MorcTestBuilder {
             Another test illustrating what happens with long send interval and many messages that are slowly
             consumed, specifying a sensible result wait time
          */
-        syncTest("Slow Consumer Test","direct:syncConsumer")
-                .requestBody(times(10,text("foo")))
+        syncTest("Slow Consumer Test", "direct:syncConsumer")
+                .requestBody(times(10, text("foo")))
                 .sendInterval(5000l)
-                .expectedResponse(times(10,text("baz")));
+                .expectedResponse(times(10, text("baz")));
     }
 
 }

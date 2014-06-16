@@ -22,7 +22,6 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
@@ -248,7 +247,7 @@ public class MorcTest extends CamelSpringTestSupport {
                 override.overrideEndpoint(targetEndpoint);
 
             MessagePublishDataSet dataSet = new MessagePublishDataSet(spec.getProcessors());
-            DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component,dataSet);
+            DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component, dataSet);
             dataSetEndpoint.setProduceDelay(spec.getSendInterval());
 
             RouteDefinition publishRouteDefinition = new RouteDefinition();
@@ -379,9 +378,9 @@ class MessagePublishDataSet implements DataSet {
 
     @Override
     public void populateMessage(Exchange exchange, long messageIndex) throws Exception {
-        logger.trace("Sending message {}",messageIndex);
+        logger.trace("Sending message {}", messageIndex);
         processors.get((int) messageIndex).process(exchange);
-        if (messageIndex == processors.size()-1) {
+        if (messageIndex == processors.size() - 1) {
             synchronized (this) {
                 logger.trace("Notifying data set completion");
                 this.notify();
