@@ -25,6 +25,7 @@ import org.apache.camel.builder.xml.XPathBuilder;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
 import java.io.File;
@@ -125,25 +126,6 @@ public abstract class MorcTestBuilder extends MorcTest {
         return new XmlTestResource(url);
     }
 
-    public static TestResource[] xml(final List<TestResource<String>> dynamicInputs) {
-        TestResource[] resources = new TestResource[dynamicInputs.size()];
-        for (int i = 0; i < dynamicInputs.size(); i++) {
-            final int offset = i;
-            resources[i] = new TestResource() {
-                @Override
-                public Object getValue() throws Exception {
-                    return new XmlTestResource(xmlUtilities.getXmlAsDocument(dynamicInputs.get(offset).getValue())).getValue();
-                }
-
-                @Override
-                public String toString() {
-                    return "DynamicXMLTestResource";
-                }
-            };
-        }
-        return resources;
-    }
-
     public static TestResource[] xml(final InputStream... inputs) {
         TestResource[] resources = new TestResource[inputs.length];
 
@@ -184,25 +166,6 @@ public abstract class MorcTestBuilder extends MorcTest {
      */
     public static JsonTestResource json(URL url) {
         return new JsonTestResource(url);
-    }
-
-    public static TestResource[] json(final List<TestResource<String>> dynamicInputs) {
-        TestResource[] resources = new TestResource[dynamicInputs.size()];
-        for (int i = 0; i < dynamicInputs.size(); i++) {
-            final int offset = i;
-            resources[i] = new TestResource() {
-                @Override
-                public Object getValue() throws Exception {
-                    return new JsonTestResource(dynamicInputs.get(offset).getValue()).getValue();
-                }
-
-                @Override
-                public String toString() {
-                    return "DynamicJSONTestResource";
-                }
-            };
-        }
-        return resources;
     }
 
     public static TestResource[] json(final InputStream... inputs) {
@@ -248,25 +211,6 @@ public abstract class MorcTestBuilder extends MorcTest {
     @SuppressWarnings("unchecked")
     public static PlainTextTestResource text(URL url) {
         return new PlainTextTestResource(url);
-    }
-
-    public static TestResource[] text(final List<TestResource<String>> dynamicInputs) {
-        TestResource[] resources = new TestResource[dynamicInputs.size()];
-        for (int i = 0; i < dynamicInputs.size(); i++) {
-            final int offset = i;
-            resources[i] = new TestResource() {
-                @Override
-                public Object getValue() throws Exception {
-                    return new PlainTextTestResource(dynamicInputs.get(offset).getValue()).getValue();
-                }
-
-                @Override
-                public String toString() {
-                    return "DynamicPlainTextTestResource";
-                }
-            };
-        }
-        return resources;
     }
 
     public static TestResource[] text(final InputStream... inputs) {
@@ -456,10 +400,10 @@ public abstract class MorcTestBuilder extends MorcTest {
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
      *
      * @param template   A template of the string resource containing GString variables for substitution
-     * @param dataSource A list of name=value pairs that will be used for variable substitution. Each entry in the
+     * @param dataSource A list of name=value pairs that will be used for var substitution. Each entry in the
      *                   list will result in another resource being returned
      */
-    public static List<GroovyTemplateTestResource> groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
+    public static GroovyTemplateTestResource[] groovy(TestResource<String> template, List<Map<String, String>> dataSource) {
         return groovy(template, dataSource, GStringTemplateEngine.class);
     }
 
@@ -467,29 +411,29 @@ public abstract class MorcTestBuilder extends MorcTest {
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
      *
      * @param template   A template of the string resource containing GString variables for substitution
-     * @param dataSource A list of name=value pairs that will be used for variable substitution. Each entry in the
+     * @param dataSource A list of name=value pairs that will be used for var substitution. Each entry in the
      *                   list will result in another resource being returned
      */
     @SuppressWarnings("unchecked")
-    public static List<GroovyTemplateTestResource> groovy(String template, List<Map<String, String>> dataSource) {
+    public static GroovyTemplateTestResource[] groovy(String template, List<Map<String, String>> dataSource) {
         return groovy(new PlainTextTestResource(template), dataSource, GStringTemplateEngine.class);
     }
 
     /**
      * @param template       A template of the string resource containing template-appropriate variables for substitution
-     * @param dataSource     A list of name=value pairs that will be used for variable substitution. Each entry in the
+     * @param dataSource     A list of name=value pairs that will be used for var substitution. Each entry in the
      *                       list will result in another resource being returned
      * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
-    public static List<GroovyTemplateTestResource> groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
+    public static GroovyTemplateTestResource[] groovy(final TestResource<String> template, List<Map<String, String>> dataSource,
                                                     Class<? extends TemplateEngine> templateEngine) {
-        List<GroovyTemplateTestResource> results = new ArrayList<>();
+        GroovyTemplateTestResource[] results = new GroovyTemplateTestResource[dataSource.size()];
         try {
             final TemplateEngine engine = templateEngine.newInstance();
 
-            for (final Map<String, String> variables : dataSource) {
-                //this indirection ensures the Groovy isn't evaluated until the test is actually run
-                results.add(new GroovyTemplateTestResource(engine,template,variables));
+            int index = 0;
+            for (Map<String, String> variables : dataSource) {
+                results[index++] = new GroovyTemplateTestResource(engine,template,variables);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -508,7 +452,7 @@ public abstract class MorcTestBuilder extends MorcTest {
         }
     }
 
-    public static VariablePair variable(String name, String value) {
+    public static VariablePair var(String name, String value) {
         return new VariablePair(name,value);
     }
 
@@ -516,7 +460,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
      *
      * @param template   A template of the string resource containing GString variables for substitution
-     * @param variables  A list of name=value pairs that will be used for variable substitution. Each entry in the
+     * @param variables  A list of name=value pairs that will be used for var substitution. Each entry in the
      *                   list will result in another resource being returned
      */
     public static GroovyTemplateTestResource groovy(TestResource<String> template, VariablePair... variables) {
@@ -526,9 +470,9 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * A way of paramaterizing resources so that values are updated according to Groovy GStrings
      *
-     * @param template   A template of the string resource containing GString variables for substitution
-     * @param variables A list of name=value pairs that will be used for variable substitution. Each entry in the
-     *                   list will result in another resource being returned
+     * @param template      A template of the string resource containing GString variables for substitution
+     * @param variables     A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                      list will result in another resource being returned
      */
     @SuppressWarnings("unchecked")
     public static GroovyTemplateTestResource groovy(String template, VariablePair... variables) {
@@ -536,14 +480,13 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
-     * @param template       A template of the string resource containing template-appropriate variables for substitution
-     * @param variables     A list of name=value pairs that will be used for variable substitution. Each entry in the
-     *                       list will result in another resource being returned
-     * @param templateEngine The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     * @param template          A template of the string resource containing template-appropriate variables for substitution
+     * @param variables         A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                          list will result in another resource being returned
+     * @param templateEngine    The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
      */
-    public static GroovyTemplateTestResource groovy(final TestResource<String> template,
+    public static GroovyTemplateTestResource groovy(TestResource<String> template,
                                                     Class<? extends TemplateEngine> templateEngine,VariablePair... variables) {
-
         Map<String,String> map = new HashMap<>();
         for (VariablePair pair : variables) {
             map.put(pair.name,pair.value);
@@ -558,8 +501,132 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
-     * @param urlpath An Ant-style path to a directory containing test resources for (expected) input and output
-     * @return An array of InputStreams that can be used as test resources
+     * @param templateUrl A URL for a Groovy template that will be evaluated as a plain text document
+     * @param variables         A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                          list will result in another resource being returned
+     */
+    @SuppressWarnings("unchecked")
+    public static GroovyTemplateTestResource groovy(URL templateUrl, VariablePair... variables) {
+        return groovy(text(templateUrl),variables);
+    }
+
+    /**
+     * @param templateUrl A URL for a Groovy template that will be evaluated as a plain text document
+     * @param variables         A list of name=value pairs that will be used for var substitution. Each entry in the
+     *                          list will result in another resource being returned
+     * @param templateEngine    The template engine, more can be found here: http://groovy.codehaus.org/Groovy+Templates
+     */
+    @SuppressWarnings("unchecked")
+    public static GroovyTemplateTestResource groovy(URL templateUrl,
+                                                    Class<? extends TemplateEngine> templateEngine,VariablePair... variables) {
+        return groovy(text(templateUrl),templateEngine,variables);
+    }
+
+    /**
+     * @param groovyResources   An array of Groovy templates which result in an XML document
+     * @return                  A list of XmlTestResources that will be evaluated (at runtime) from the Groovy resources
+     */
+    public static XmlRuntimeTestResource[] xml(GroovyTemplateTestResource... groovyResources) {
+        XmlRuntimeTestResource[] resources = new XmlRuntimeTestResource[groovyResources.length];
+
+        int i = 0;
+        for (GroovyTemplateTestResource resource : groovyResources) {
+            resources[i++] = new XmlRuntimeTestResource<>(resource);
+        }
+
+        return resources;
+    }
+
+    public static class XmlRuntimeTestResource<T extends TestResource<String>> implements TestResource<Document>, Predicate {
+
+        private T resource;
+
+        public XmlRuntimeTestResource(T resource) {
+            this.resource = resource;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            return getResource().matches(exchange);
+        }
+
+        @Override
+        public Document getValue() throws Exception {
+            return getResource().getValue();
+        }
+
+        @Override
+        public String toString() {
+            return "XmlGroovyTemplateTestResource:" + getResource().toString();
+
+        }
+
+        private XmlTestResource getResource() {
+            try {
+                return new XmlTestResource(xmlUtilities.getXmlAsDocument(resource.getValue()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * @param groovyResources A list of Groovy resources that will be evaluated as JSON documents
+     */
+    public static JsonRuntimeTestResource[] json(GroovyTemplateTestResource... groovyResources) {
+        JsonRuntimeTestResource[] resources = new JsonRuntimeTestResource[groovyResources.length];
+
+        int i = 0;
+        for (GroovyTemplateTestResource resource : groovyResources) {
+            resources[i++] = new JsonRuntimeTestResource<>(resource);
+        }
+
+        return resources;
+    }
+
+    public static class JsonRuntimeTestResource<T extends TestResource<String>> implements TestResource<String>, Predicate {
+
+        private T resource;
+
+        public JsonRuntimeTestResource(T resource) {
+            this.resource = resource;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            return getResource().matches(exchange);
+        }
+
+        @Override
+        public String getValue() throws Exception {
+            return getResource().getValue();
+        }
+
+        @Override
+        public String toString() {
+            return "JsonGroovyTemplateTestResource:" + getResource().toString();
+
+        }
+
+        private JsonTestResource getResource() {
+            try {
+                return new JsonTestResource(resource.getValue());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * @param groovyResource A list of Groovy resources that will be evaluated as plain text
+     */
+    public static GroovyTemplateTestResource[] text(GroovyTemplateTestResource... groovyResource) {
+        return groovyResource;
+    }
+
+    /**
+     * @param urlpath   An Ant-style path to a directory containing test resources for (expected) input and output
+     * @return          An array of InputStreams that can be used as test resources
      */
     public static InputStream[] dir(String urlpath) {
         List<URL> resourceUrls = new ArrayList<>();
@@ -593,8 +660,8 @@ public abstract class MorcTestBuilder extends MorcTest {
     /**
      * This method can be used as a datasource for the groovy template
      *
-     * @param csvResource A reference to a CSV file that contains variable values. A header line sets the name of the variables
-     * @return A list of variablename-value pairs
+     * @param   csvResource A reference to a CSV file that contains var values. A header line sets the name of the variables
+     * @return  A list of variablename-value pairs
      */
     public static List<Map<String, String>> csv(TestResource<String> csvResource) {
         CSVReader reader;
