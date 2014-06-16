@@ -121,6 +121,13 @@ public class WebServiceProxyTest extends MorcTestBuilder {
         syncTest("Simple JSON PING", "http://localhost:8093/jsonPingService")
                 .requestBody(json("{\"request\":\"PING\"}"))
                 .expectedResponseBody(json("{\"response\":\"PONG\"}"));
+
+        syncTest("Simple XML Groovy Test","jetty:http://localhost:8090/testWS")
+                .requestBody(xml(groovy("<foo>$baz</foo>",var("baz","123"))))
+                .expectedResponseBody(xml(groovy("<baz>$foo</baz>",var("foo","321"))))
+                .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
+                    .expectedBody(xml(groovy("<foo>$x</foo>",var("x","123"))))
+                    .responseBody(xml(groovy("<baz>$y</baz>",var("y","321")))));
     }
 
 }

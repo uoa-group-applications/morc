@@ -20,6 +20,15 @@ public class SlowTest extends MorcTestBuilder {
                 from("direct:syncConsumer")
                         .delay(5000l)
                         .setBody(constant("baz"));
+
+                from("direct:verySlowSyncConsumer")
+                        .delay(15000l)
+                        .setBody(constant("baz"));
+
+                //to simulate the time to put messages on a JMS destination
+                from("direct:verySlowAsyncConsumer")
+                        .delay(15000l)
+                        .to("vm:asyncConsumer");
             }
         };
     }
@@ -47,9 +56,18 @@ public class SlowTest extends MorcTestBuilder {
             consumed, specifying a sensible result wait time
          */
         syncTest("Slow Consumer Test", "direct:syncConsumer")
+                .messageResultWaitTime(500)
                 .requestBody(times(10, text("foo")))
-                .sendInterval(5000l)
+                //.sendInterval(5000l)
                 .expectedResponse(times(10, text("baz")));
+
+        syncTest("Very Slow Consumer Test with limited timeframes","direct:verySlowSyncConsumer")
+                .requestBody(text("foo"))
+                .expectedResponse(text("baz"));
+
+
+        asyncTest("Very Slow Async Consumer Test with limited timeframes","direct:verySlowAsyncConsumer")
+                .inputMessage(text("foo"));
     }
 
 }

@@ -207,6 +207,11 @@ public class SimpleSyncTest extends MorcTestBuilder {
             }
         });
 
+        syncTest("Simple Groovy JSON Test", "direct:jsonResponse")
+                .requestBody(xml(groovy("<foo>$baz</foo>", var("baz", "123"))))
+                .expectedResponseBody(json(groovy("{\"foo\":\"$x\"}", var("x", "baz"))));
+
+
     }
 
     @Override
