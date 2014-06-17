@@ -1,6 +1,7 @@
 package nz.ac.auckland.morc.tests.orchestrated;
 
 import nz.ac.auckland.morc.MorcTestBuilder;
+import nz.ac.auckland.morc.resource.HeadersTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -48,7 +49,7 @@ public class SimpleAsyncTest extends MorcTestBuilder {
         headers.put("abc", "def");
 
         asyncTest("test async send headers from map", "seda:asyncTestInput")
-                .inputHeaders(headers)
+                .inputHeaders(new HeadersTestResource(headers))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
                         .expectedHeaders(headers));
 

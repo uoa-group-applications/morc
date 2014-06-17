@@ -163,19 +163,19 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
         syncTest("Test Response Headers from Map Validated", "seda:headersFromMap")
                 .requestBody(text("1"))
-                .requestHeaders(headers)
+                .requestHeaders(new HeadersTestResource(headers))
                 .addExpectation(syncExpectation("seda:headersFromMap")
                         .expectedHeaders(headers)
-                        .responseHeaders(headers1))
+                        .responseHeaders(new HeadersTestResource(headers1)))
                 .expectedResponseHeaders(new HeadersPredicate(new HeadersTestResource(headers1)))
                 .expectedResponseBody(text("1"));
 
         syncTest("Test Response Headers from Map Validated 2", "seda:headersFromMap")
                 .requestBody(text("1"))
-                .requestHeaders(headers)
+                .requestHeaders(new HeadersTestResource(headers))
                 .addExpectation(syncExpectation("seda:headersFromMap")
                         .expectedHeaders(headers)
-                        .responseHeaders(headers1))
+                        .responseHeaders(new HeadersTestResource(headers1)))
                 .expectedResponseHeaders(headers1)
                 .expectedResponseBody(text("1"));
 

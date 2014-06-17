@@ -173,6 +173,10 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                         //this expectation will come in second to last
                 .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
 
+        /*
+            Note we expect to see an exception at the end of this as the last asyncExpectation("seda:asyncTarget1") has
+            no expected messages and the delay will mean the message never arrives on time.
+         */
         syncTest("Sync and multiple Async to same dest - ensuring total order", "direct:syncInputMultiAsyncToSameDest")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
