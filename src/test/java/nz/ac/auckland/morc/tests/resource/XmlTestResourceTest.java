@@ -77,8 +77,8 @@ public class XmlTestResourceTest extends Assert {
 
     @Test
     public void testPassValueToConstructor() throws Exception {
-        XmlTestResource validator = new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo/>"));
-        assertTrue(validator.validate("<foo/>"));
+        XmlTestResource validator = new XmlTestResource(xmlUtilities.getXmlAsDocument("<foo>baz</foo>"));
+        assertTrue(validator.validate("<foo>baz</foo>"));
     }
 
     @Test
