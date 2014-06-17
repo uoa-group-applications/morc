@@ -3,6 +3,8 @@ package nz.ac.auckland.morc.tests.processor;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
 import nz.ac.auckland.morc.resource.PlainTextTestResource;
+import nz.ac.auckland.morc.resource.XmlTestResource;
+import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -16,9 +18,9 @@ public class MatchResponseProcessorTest extends Assert {
     public void testMatchedResponse() throws Exception {
 
         MatchedResponseProcessor.MatchedResponse response = new MatchedResponseProcessor.MatchedResponse(
-                new PlainTextTestResource("foo"), new BodyProcessor("baz"));
+                new PlainTextTestResource("foo"), new BodyProcessor(new PlainTextTestResource("baz")));
         MatchedResponseProcessor.MatchedResponse response1 = new MatchedResponseProcessor.MatchedResponse(
-                new PlainTextTestResource("baz"), new BodyProcessor("foo"));
+                new PlainTextTestResource("baz"), new BodyProcessor(new PlainTextTestResource("foo")));
 
         MatchedResponseProcessor processor = new MatchedResponseProcessor(response, response1);
 
