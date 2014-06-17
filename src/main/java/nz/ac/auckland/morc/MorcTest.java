@@ -13,6 +13,7 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
+import org.apache.camel.spi.Synchronization;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
@@ -246,11 +248,22 @@ public class MorcTest extends CamelSpringTestSupport {
             for (EndpointOverride override : spec.getEndpointOverrides())
                 override.overrideEndpoint(targetEndpoint);
 
+            //a latch to check whether message publishing has completed
+            final CountDownLatch latch = new CountDownLatch(spec.getProcessors().size());
+
             MessagePublishDataSet dataSet = new MessagePublishDataSet(spec.getProcessors());
             DataSetEndpoint dataSetEndpoint = new DataSetEndpoint("dataset:" + UUID.randomUUID(), component, dataSet);
             dataSetEndpoint.setProduceDelay(spec.getSendInterval());
 
             RouteDefinition publishRouteDefinition = new RouteDefinition();
+
+            //ensure we have completed sending each exchange
+            sendingMockEndpoint.whenAnyExchangeReceived(new Processor() {
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    latch.countDown();
+                }
+            });
 
             TryDefinition tryDefinition = publishRouteDefinition.from(dataSetEndpoint)
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")
@@ -277,11 +290,9 @@ public class MorcTest extends CamelSpringTestSupport {
             createdRoutes.add(publishRouteDefinition);
 
             //wait until we have sent all messages
-            synchronized (dataSet) {
-                logger.trace("Starting wait for all messages to be published");
-                dataSet.wait();
-                logger.trace("Messages have all been published");
-            }
+            logger.trace("Starting wait for all messages to be published");
+            latch.await();
+            logger.trace("Messages have all been published");
 
             try {
                 logger.trace("Starting sending mock endpoint assertion");
@@ -380,12 +391,6 @@ class MessagePublishDataSet implements DataSet {
     public void populateMessage(Exchange exchange, long messageIndex) throws Exception {
         logger.trace("Sending message {}", messageIndex);
         processors.get((int) messageIndex).process(exchange);
-        if (messageIndex == processors.size() - 1) {
-            synchronized (this) {
-                logger.trace("Notifying data set completion");
-                this.notify();
-            }
-        }
     }
 
     @Override
