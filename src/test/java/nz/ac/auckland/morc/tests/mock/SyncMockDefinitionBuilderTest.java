@@ -30,7 +30,7 @@ public class SyncMockDefinitionBuilderTest extends Assert {
     public void testMatchedBodyAndHeaders() throws Exception {
 
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1")).responseBody(text("2").getValue(), text("3").getValue()).expectedMessageCount(4)
+                .responseBody(text("1")).responseBody(text("2"), text("3")).expectedMessageCount(4)
                 .responseHeaders(headers(header("1", "1")), headers(header("2", "2")), headers(header("3", "3"))).build(null);
 
         assertEquals(4, def.getExpectedMessageCount());
