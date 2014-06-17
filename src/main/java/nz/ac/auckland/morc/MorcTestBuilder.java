@@ -384,7 +384,7 @@ public abstract class MorcTestBuilder extends MorcTest {
      */
     public static MatchedResponseProcessor.MatchedResponse headerAnswer(Predicate predicate, TestResource<Map<String, Object>> resource) {
         try {
-            return new MatchedResponseProcessor.MatchedResponse(predicate, new HeadersProcessor(resource.getValue()));
+            return new MatchedResponseProcessor.MatchedResponse(predicate, new HeadersProcessor(resource));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

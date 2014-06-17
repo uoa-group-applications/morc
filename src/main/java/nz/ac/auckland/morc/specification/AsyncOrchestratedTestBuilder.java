@@ -21,7 +21,7 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
 
     private static final Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestBuilder.class);
 
-    private List<Map<String, Object>> inputMessageHeaders = new ArrayList<>();
+    private List<TestResource<Map<String, Object>>> inputMessageHeaders = new ArrayList<>();
     private List<TestResource> inputMessageBodies = new ArrayList<>();
 
     /**
@@ -51,25 +51,8 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
      *                  match to the corresponding inputMessage if available
      */
     @SafeVarargs
-    public final AsyncOrchestratedTestBuilder inputHeaders(Map<String, Object>... resources) {
-        Collections.addAll(inputMessageHeaders, resources);
-        return self();
-    }
-
-    /**
-     * @param resources The set of resources that should be sent as headers to the target endpoint URI - these will
-     *                  match to the corresponding inputMessage if available
-     */
-    @SafeVarargs
     public final AsyncOrchestratedTestBuilder inputHeaders(TestResource<Map<String, Object>>... resources) {
-        for (TestResource<Map<String, Object>> resource : resources) {
-            try {
-                inputMessageHeaders.add(resource.getValue());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+        Collections.addAll(inputMessageHeaders,resources);
         return self();
     }
 
@@ -85,7 +68,7 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
         for (int i = 0; i < messageCount; i++) {
             if (i < inputMessageBodies.size()) {
                 try {
-                    addProcessors(i, new BodyProcessor(inputMessageBodies.get(i).getValue()));
+                    addProcessors(i, new BodyProcessor(inputMessageBodies.get(i)));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

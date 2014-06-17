@@ -15,23 +15,15 @@ public class BodyProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(BodyProcessor.class);
 
-    private Object responseBody;
-
-    public BodyProcessor(Object responseBody) {
-        this.responseBody = responseBody;
-    }
+    private TestResource responseBody;
 
     public BodyProcessor(TestResource responseTestResource) {
-        try {
-            this.responseBody = responseTestResource.getValue();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        this.responseBody = responseTestResource;
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.trace("Setting body of exchange from endpoint {} to {}", exchange.getFromEndpoint().getEndpointUri(), responseBody);
-        exchange.getIn().setBody(responseBody);
+        logger.trace("Setting body of exchange from endpoint {} to {}", exchange.getFromEndpoint().getEndpointUri(), responseBody.getValue());
+        exchange.getIn().setBody(responseBody.getValue());
     }
 }

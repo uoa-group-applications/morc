@@ -1,6 +1,7 @@
 package nz.ac.auckland.morc.mock.builder;
 
 import nz.ac.auckland.morc.mock.MockDefinition;
+import nz.ac.auckland.morc.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilderInit<SoapFaultMockDefinitionBuilder, SoapFault> {
+public class SoapFaultMockDefinitionBuilder extends SyncMockDefinitionBuilderInit<SoapFaultMockDefinitionBuilder, TestResource<SoapFault>> {
 
     private static final Logger logger = LoggerFactory.getLogger(SoapFaultMockDefinitionBuilder.class);
 

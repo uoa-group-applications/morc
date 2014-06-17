@@ -17,13 +17,13 @@ import java.util.Map;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBuilderInit<Builder, T>, T>
+public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBuilderInit<Builder, T>, T extends TestResource>
         extends ContentMockDefinitionBuilderInit<Builder> {
 
     private static final Logger logger = LoggerFactory.getLogger(SyncMockDefinitionBuilderInit.class);
 
     private List<T> responseBodyProcessors = new ArrayList<>();
-    private List<Map<String, Object>> responseHeadersProcessors = new ArrayList<>();
+    private List<TestResource<Map<String, Object>>> responseHeadersProcessors = new ArrayList<>();
 
     /**
      * @param endpointUri A Camel Endpoint URI to listen to for expected messages
@@ -33,40 +33,13 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
     }
 
     /**
-     * @param providedResponseBodies A collection of bodies that will be provided back to the caller in the body
-     *                               in order they are specified in the method call. Bodies are tied to the corresponding response
-     *                               headers (if available)
-     */
-    @SafeVarargs
-    public final Builder responseBody(T... providedResponseBodies) {
-        Collections.addAll(responseBodyProcessors, providedResponseBodies);
-        return self();
-    }
-
-    /**
      * @param resources A collection of test resources that will be provided back to the caller in the body
      *                  in order they are specified in the method call. Bodies are tied to the corresponding response
      *                  headers (if available)
      */
     @SafeVarargs
-    public final Builder responseBody(TestResource<T>... resources) {
-        for (TestResource<T> resource : resources) {
-            try {
-                this.responseBodyProcessors.<T>add(resource.getValue());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return self();
-    }
-
-    /**
-     * @param providedResponseHeaders The headers that should be returned back to the client - headers are tied to the
-     *                                corresponding response body
-     */
-    @SafeVarargs
-    public final Builder responseHeaders(Map<String, Object>... providedResponseHeaders) {
-        Collections.addAll(responseHeadersProcessors, providedResponseHeaders);
+    public final Builder responseBody(T... resources) {
+        Collections.addAll(responseBodyProcessors,resources);
         return self();
     }
 
@@ -77,13 +50,7 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
      */
     @SafeVarargs
     public final Builder responseHeaders(TestResource<Map<String, Object>>... resources) {
-        for (TestResource<Map<String, Object>> resource : resources) {
-            try {
-                this.responseHeadersProcessors.<Map<String, Object>>add(resource.getValue());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+        Collections.addAll(responseHeadersProcessors,resources);
         return self();
     }
 

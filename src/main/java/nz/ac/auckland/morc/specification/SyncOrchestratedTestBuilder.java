@@ -30,7 +30,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     private static final Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestBuilder.class);
 
     private List<TestResource> inputRequestBodies = new ArrayList<>();
-    private List<Map<String, Object>> inputRequestHeaders = new ArrayList<>();
+    private List<TestResource<Map<String, Object>>> inputRequestHeaders = new ArrayList<>();
     private List<Predicate> responseBodyPredicates = new ArrayList<>();
     private List<HeadersPredicate> responseHeadersPredicates = new ArrayList<>();
 
@@ -61,24 +61,8 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
      *                  headers will be placed together with the corresponding requestBody if available
      */
     @SafeVarargs
-    public final SyncOrchestratedTestBuilder requestHeaders(Map<String, Object>... resources) {
-        Collections.addAll(inputRequestHeaders, resources);
-        return self();
-    }
-
-    /**
-     * @param resources A collection of test header resources that can be used to send request headers to a target endpoint -
-     *                  headers will be placed together with the corresponding requestBody if available
-     */
-    @SafeVarargs
     public final SyncOrchestratedTestBuilder requestHeaders(TestResource<Map<String, Object>>... resources) {
-        for (TestResource<Map<String, Object>> resource : resources) {
-            try {
-                inputRequestHeaders.add(resource.getValue());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+        Collections.addAll(inputRequestHeaders, resources);
         return self();
     }
 
@@ -150,7 +134,7 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
         for (int i = 0; i < messageCount; i++) {
             if (i < inputRequestBodies.size()) {
                 try {
-                    addProcessors(i, new BodyProcessor(inputRequestBodies.get(i).getValue()));
+                    addProcessors(i, new BodyProcessor(inputRequestBodies.get(i)));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

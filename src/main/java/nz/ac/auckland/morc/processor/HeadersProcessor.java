@@ -18,24 +18,16 @@ public class HeadersProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(HeadersProcessor.class);
 
-    private Map<String, Object> responseHeaders = new HashMap<>();
+    private TestResource<Map<String, Object>> responseHeaders;
 
-    public HeadersProcessor(Map<String, Object> responseHeaders) {
+    public HeadersProcessor(TestResource<Map<String, Object>> responseHeaders) {
         this.responseHeaders = responseHeaders;
-    }
-
-    public HeadersProcessor(TestResource<Map<String, Object>> responseHeadersTestResource) {
-        try {
-            this.responseHeaders = responseHeadersTestResource.getValue();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
     public void process(Exchange exchange) throws Exception {
         logger.trace("Setting headers of exchange from endpoint {} to {}", exchange.getFromEndpoint().getEndpointUri()
-                , responseHeaders);
-        exchange.getIn().setHeaders(responseHeaders);
+                , responseHeaders.getValue());
+        exchange.getIn().setHeaders(responseHeaders.getValue());
     }
 }
