@@ -6,7 +6,7 @@
     <parent>
         <groupId>nz.ac.auckland.groupapps.parent</groupId>
         <artifactId>parent-java-groupapps-central</artifactId>
-        <version>1.2</version>
+        <version>1.3</version>
     </parent>
 
     <groupId>nz.ac.auckland.morc</groupId>
