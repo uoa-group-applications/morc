@@ -52,7 +52,7 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
      */
     @SafeVarargs
     public final AsyncOrchestratedTestBuilder inputHeaders(TestResource<Map<String, Object>>... resources) {
-        Collections.addAll(inputMessageHeaders,resources);
+        Collections.addAll(inputMessageHeaders, resources);
         return self();
     }
 

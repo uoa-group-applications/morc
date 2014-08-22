@@ -373,7 +373,7 @@ public class OrchestratedTestSpecification {
          */
         @SuppressWarnings("unchecked")
         public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addPart(String endpointUri, Class<T> clazz) {
-            return addEndpoint(endpointUri,clazz);
+            return addEndpoint(endpointUri, clazz);
         }
     }
 

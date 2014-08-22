@@ -39,7 +39,7 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
      */
     @SafeVarargs
     public final Builder responseBody(T... resources) {
-        Collections.addAll(responseBodyProcessors,resources);
+        Collections.addAll(responseBodyProcessors, resources);
         return self();
     }
 
@@ -50,7 +50,7 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
      */
     @SafeVarargs
     public final Builder responseHeaders(TestResource<Map<String, Object>>... resources) {
-        Collections.addAll(responseHeadersProcessors,resources);
+        Collections.addAll(responseHeadersProcessors, resources);
         return self();
     }
 

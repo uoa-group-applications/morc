@@ -122,12 +122,12 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .requestBody(json("{\"request\":\"PING\"}"))
                 .expectedResponseBody(json("{\"response\":\"PONG\"}"));
 
-        syncTest("Simple XML Groovy Test","jetty:http://localhost:8090/testWS")
-                .requestBody(xml(groovy("<foo>$baz</foo>",var("baz","123"))))
-                .expectedResponseBody(xml(groovy("<baz>$foo</baz>",var("foo","321"))))
+        syncTest("Simple XML Groovy Test", "jetty:http://localhost:8090/testWS")
+                .requestBody(xml(groovy("<foo>$baz</foo>", var("baz", "123"))))
+                .expectedResponseBody(xml(groovy("<baz>$foo</baz>", var("foo", "321"))))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                    .expectedBody(xml(groovy("<foo>$x</foo>",var("x","123"))))
-                    .responseBody(xml(groovy("<baz>$y</baz>",var("y","321")))));
+                        .expectedBody(xml(groovy("<foo>$x</foo>", var("x", "123"))))
+                        .responseBody(xml(groovy("<baz>$y</baz>", var("y", "321")))));
     }
 
 }

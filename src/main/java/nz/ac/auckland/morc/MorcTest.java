@@ -13,7 +13,6 @@ import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
-import org.apache.camel.spi.Synchronization;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
