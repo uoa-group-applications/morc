@@ -334,6 +334,14 @@ public class OrchestratedTestSpecification {
         }
 
         /**
+         * @param endpointUri Specify an additional endpoint to call after this part of the test specification has
+         *                    completed successfully
+         */
+        public Builder addPart(String endpointUri) {
+            return addEndpoint(endpointUri);
+        }
+
+        /**
          * Specifies that the request to the endpoint URI will result in an exception being returned
          */
         public Builder expectsException() {
@@ -356,6 +364,16 @@ public class OrchestratedTestSpecification {
                     | NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        /**
+         * @param endpointUri Specify an additional endpoint to call after this part of the test specification has
+         *                    completed successfully
+         * @param clazz       The type of builder that will be used for the next part of the specification
+         */
+        @SuppressWarnings("unchecked")
+        public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addPart(String endpointUri, Class<T> clazz) {
+            return addEndpoint(endpointUri,clazz);
         }
     }
 
