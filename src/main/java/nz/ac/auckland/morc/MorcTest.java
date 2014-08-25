@@ -129,6 +129,8 @@ public class MorcTest extends CamelSpringTestSupport {
         OrchestratedTestSpecification currentPart = specification;
         int partCount = 1;
         do {
+            //there are some instances where we want to delay running parts of the test
+            Thread.sleep(currentPart.getExecuteDelay().delay());
             logger.debug("Starting test specification {} part {}", specification.getDescription(), partCount);
             runSpecificationPart(currentPart);
             logger.info("Successfully completed test specification {} part {}", specification.getDescription(), partCount);

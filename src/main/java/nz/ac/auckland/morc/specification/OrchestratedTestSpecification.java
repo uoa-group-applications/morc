@@ -34,6 +34,7 @@ public class OrchestratedTestSpecification {
     private List<Processor> processors;
     private List<Predicate> predicates;
     private int totalMockMessageCount;
+    private PartExecuteDelay executeDelay;
 
     /**
      * @return A description that explains what this tests is doing
@@ -123,6 +124,10 @@ public class OrchestratedTestSpecification {
         return processors.size();
     }
 
+    public PartExecuteDelay getExecuteDelay() {
+        return executeDelay;
+    }
+
     public static class OrchestratedTestSpecificationBuilder extends OrchestratedTestSpecificationBuilderInit<OrchestratedTestSpecificationBuilder> {
         public OrchestratedTestSpecificationBuilder(String description, String endpointUri) {
             super(description, endpointUri);
@@ -150,6 +155,7 @@ public class OrchestratedTestSpecification {
 
         private OrchestratedTestSpecificationBuilderInit previousPartBuilder;
         private OrchestratedTestSpecificationBuilderInit nextPartBuilder;
+        private PartExecuteDelay executeDelay = new NoDelayPart();
 
         /**
          * @param description The description that identifies what the test is supposed to do
@@ -375,6 +381,33 @@ public class OrchestratedTestSpecification {
         public <T extends OrchestratedTestSpecificationBuilderInit<?>> T addPart(String endpointUri, Class<T> clazz) {
             return addEndpoint(endpointUri, clazz);
         }
+
+        /**
+         * @param partExecuteDelay The delay before *this* part of the specification is run
+         */
+        public Builder executeDelay(PartExecuteDelay partExecuteDelay) {
+            this.executeDelay = partExecuteDelay;
+            return self();
+        }
+
+        /**
+         * @param delay The time in milliseconds to delay the execution of *this* part of the specification
+         */
+        public Builder executeDelay(final long delay) {
+            this.executeDelay = new PartExecuteDelay() {
+                @Override
+                public long delay() {
+                    return delay;
+                }
+            };
+            return self();
+        }
+
+        private class NoDelayPart implements PartExecuteDelay {
+            public long delay() {
+                return 0;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -391,6 +424,7 @@ public class OrchestratedTestSpecification {
         this.predicates = builder.predicates;
         this.totalMockMessageCount = builder.totalMockMessageCount;
         this.mockFeedPreprocessor = builder.getMockFeedPreprocessor();
+        this.executeDelay = builder.executeDelay;
     }
 
     /**
@@ -412,5 +446,13 @@ public class OrchestratedTestSpecification {
             return this.endpointUri;
         }
     }
+
+    /**
+     * A class used to evaluate the delay *before* running this part of the specification
+     */
+    public interface PartExecuteDelay {
+        public long delay();
+    }
+
 }
 
