@@ -296,8 +296,8 @@ public class OrchestratedTestBuilderTest extends Assert {
                 .executeDelay(1000l).addPart("baz").inputMessage(text("foo")).executeDelay(2000l).addPart("moo")
                 .inputMessage(text("foo")).build();
 
-        assertEquals(1000l,test.getExecuteDelay().delay());
-        assertEquals(2000l,test.getNextPart().getExecuteDelay().delay());
-        assertEquals(0,test.getNextPart().getNextPart().getExecuteDelay().delay());
+        assertEquals(1000l, test.getExecuteDelay().delay());
+        assertEquals(2000l, test.getNextPart().getExecuteDelay().delay());
+        assertEquals(0, test.getNextPart().getNextPart().getExecuteDelay().delay());
     }
 }
