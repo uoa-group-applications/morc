@@ -17,7 +17,7 @@
     <url>http://uoa-group-applications.github.io/morc/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <camel-version>2.13.1</camel-version>
+        <camel-version>2.13.2</camel-version>
         <groovy-version>2.2.1</groovy-version>
         <xmlunit-version>1.5</xmlunit-version>
         <junit-version>4.11</junit-version>
