@@ -1,11 +1,11 @@
 package nz.ac.auckland.morc.tests.predicate;
 
+import nz.ac.auckland.morc.MorcTestBuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
-import nz.ac.auckland.morc.MorcTestBuilder;
 
 public class JsonPathPredicateTest extends Assert {
 

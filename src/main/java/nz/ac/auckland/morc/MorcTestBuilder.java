@@ -876,7 +876,7 @@ public abstract class MorcTestBuilder extends MorcTest {
 
     /**
      * @param expression A JSONPath Expression that evaluates to true or false
-     * @return           A predicate that evaluates the JSON Path expression
+     * @return A predicate that evaluates the JSON Path expression
      */
     public static Predicate jsonpath(String expression) {
         return new JsonPathExpression(expression);
