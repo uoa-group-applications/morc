@@ -21,6 +21,7 @@ import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.SimpleBuilder;
 import org.apache.camel.builder.xml.XPathBuilder;
+import org.apache.camel.jsonpath.JsonPathExpression;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -871,6 +872,14 @@ public abstract class MorcTestBuilder extends MorcTest {
             builder.namespace(namespace.getPrefix(), namespace.getUri());
         }
         return builder;
+    }
+
+    /**
+     * @param expression A JSONPath Expression that evaluates to true or false
+     * @return A predicate that evaluates the JSON Path expression
+     */
+    public static Predicate jsonpath(String expression) {
+        return new JsonPathExpression(expression);
     }
 
     /**

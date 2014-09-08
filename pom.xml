@@ -11,13 +11,13 @@
     <groupId>nz.ac.auckland.morc</groupId>
     <artifactId>morc</artifactId>
     <packaging>jar</packaging>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.6.1-SNAPSHOT</version>
     <name>morc</name>
     <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
     <url>http://uoa-group-applications.github.io/morc/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <camel-version>2.13.1</camel-version>
+        <camel-version>2.13.2</camel-version>
         <groovy-version>2.2.1</groovy-version>
         <xmlunit-version>1.5</xmlunit-version>
         <junit-version>4.11</junit-version>
@@ -92,6 +92,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test</artifactId>
+            <version>${camel-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jsonpath</artifactId>
             <version>${camel-version}</version>
         </dependency>
         <dependency>
