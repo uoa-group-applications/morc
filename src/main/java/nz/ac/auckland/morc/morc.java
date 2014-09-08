@@ -3,13 +3,8 @@ package nz.ac.auckland.morc;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
-import junit.framework.Test;
-import junit.textui.ResultPrinter;
-import junit.textui.TestRunner;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.Suite;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -28,7 +23,7 @@ public class morc {
     public static void run(MorcTestBuilder builder) {
 
         JoranConfigurator configurator = new JoranConfigurator();
-        LoggerContext context = (LoggerContext)LoggerFactory.getILoggerFactory();
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         try {
             configurator.setContext(context);
             context.reset();

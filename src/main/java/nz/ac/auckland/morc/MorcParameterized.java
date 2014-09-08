@@ -89,7 +89,7 @@ public class MorcParameterized extends Suite {
     }
 
     public MorcParameterized(MorcTestBuilder builder) throws Throwable {
-        super(AnonymousMorc.class,Collections.<Runner>emptyList());
+        super(AnonymousMorc.class, Collections.<Runner>emptyList());
         createRunnersForParameters(builder.getSpecifications());
     }
 

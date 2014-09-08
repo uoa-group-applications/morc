@@ -150,7 +150,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
         for (List<Processor> localProcessor : localProcessors) {
             List<Processor> orderedProcessors = new ArrayList<>(localProcessor);
-            orderedProcessors.addAll(0,repeatedProcessors);
+            orderedProcessors.addAll(0, repeatedProcessors);
             finalProcessors.add(new MultiProcessor(orderedProcessors));
         }
 
@@ -175,7 +175,6 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      * @return A list of predicates that will be used to validate each exchange; note that a Predicate is returned
      *         that effectively wraps all of the predicates provided to the builder (including repeated predicates).
      *         Repeated predicates are evaluated first.
-     *
      */
     protected List<Predicate> getPredicates(int expectedSize) {
         List<List<Predicate>> localPredicates = new ArrayList<>(predicates);
@@ -187,7 +186,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
         for (List<Predicate> localPredicate : localPredicates) {
             List<Predicate> orderedPredicates = new ArrayList<>(localPredicate);
-            orderedPredicates.addAll(0,repeatedPredicates);
+            orderedPredicates.addAll(0, repeatedPredicates);
             finalPredicates.add(new MultiPredicate(orderedPredicates));
         }
 

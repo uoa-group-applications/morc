@@ -185,7 +185,7 @@ public class OrchestratedTestSpecification {
                         Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
                         boolean exceptionCaught = e != null;
 
-                        if (exceptionCaught) logger.warn("Unexpected exception received: ",e);
+                        if (exceptionCaught) logger.warn("Unexpected exception received: ", e);
                         return !exceptionCaught;
                     }
 

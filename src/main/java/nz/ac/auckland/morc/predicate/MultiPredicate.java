@@ -38,7 +38,7 @@ public class MultiPredicate implements Predicate {
         }
 
         logger.trace("Validation of {} predicates was " + (result ? "successful" : "unsuccessful") + " for endpoint {}",
-                predicates.size(),exchange.getFromEndpoint().getEndpointUri());
+                predicates.size(), exchange.getFromEndpoint().getEndpointUri());
 
         return result;
     }
