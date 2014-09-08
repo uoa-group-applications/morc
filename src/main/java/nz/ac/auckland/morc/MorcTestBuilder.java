@@ -881,7 +881,7 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     //this is used by JUnit to initialize each instance of this specification
-    private List<OrchestratedTestSpecification> getSpecifications() {
+    protected List<OrchestratedTestSpecification> getSpecifications() {
         configure();
 
         List<OrchestratedTestSpecification> specifications = new ArrayList<>();

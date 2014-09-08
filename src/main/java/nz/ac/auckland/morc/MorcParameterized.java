@@ -75,7 +75,7 @@ public class MorcParameterized extends Suite {
         }
     }
 
-    private final ArrayList<Runner> runners = new ArrayList<Runner>();
+    private final ArrayList<Runner> runners = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     public MorcParameterized(Class<? extends MorcTestBuilder> klass) throws Throwable {
@@ -86,6 +86,11 @@ public class MorcParameterized extends Suite {
         List<OrchestratedTestSpecification> specifications = (List) getSpecifications.invoke(klass.newInstance());
 
         createRunnersForParameters(specifications);
+    }
+
+    public MorcParameterized(MorcTestBuilder builder) throws Throwable {
+        super(AnonymousMorc.class,Collections.<Runner>emptyList());
+        createRunnersForParameters(builder.getSpecifications());
     }
 
     @Override
@@ -103,5 +108,18 @@ public class MorcParameterized extends Suite {
             runners.add(runner);
             i++;
         }
+    }
+}
+
+/*
+JUnit sigh...
+ */
+class AnonymousMorc extends MorcTestBuilder {
+    public AnonymousMorc() {
+
+    }
+
+    public void configure() {
+
     }
 }

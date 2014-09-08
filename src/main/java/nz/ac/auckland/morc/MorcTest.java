@@ -40,7 +40,7 @@ public class MorcTest extends CamelSpringTestSupport {
     private OrchestratedTestSpecification specification;
     private static final Logger logger = LoggerFactory.getLogger(MorcTest.class);
 
-    protected MorcTest() {
+    public MorcTest() {
         configureXmlUnit();
     }
 
