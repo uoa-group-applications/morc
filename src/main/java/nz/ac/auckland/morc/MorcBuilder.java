@@ -129,7 +129,8 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     /**
      * @param expectedSize The number of processors that we expect to exist, and the collection will be padded to this size
      * @return A list of processors that will be used to handle each exchange; note that a single Processor is returned
-     *         that effectively wraps all of the processors provided to the builder (including repeated processors)
+     *         that effectively wraps all of the processors provided to the builder (including repeated processors).
+     *         Repeated processors are evaluated first.
      */
     protected List<Processor> getProcessors(int expectedSize) {
         List<List<Processor>> localProcessors = new ArrayList<>(processors);
@@ -149,7 +150,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
         for (List<Processor> localProcessor : localProcessors) {
             List<Processor> orderedProcessors = new ArrayList<>(localProcessor);
-            orderedProcessors.addAll(repeatedProcessors);
+            orderedProcessors.addAll(0,repeatedProcessors);
             finalProcessors.add(new MultiProcessor(orderedProcessors));
         }
 
@@ -172,7 +173,9 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     /**
      * @param expectedSize The number of predicates that we expect to exist, and the collection will be padded to this size
      * @return A list of predicates that will be used to validate each exchange; note that a Predicate is returned
-     *         that effectively wraps all of the predicates provided to the builder (including repeated predicates)
+     *         that effectively wraps all of the predicates provided to the builder (including repeated predicates).
+     *         Repeated predicates are evaluated first.
+     *
      */
     protected List<Predicate> getPredicates(int expectedSize) {
         List<List<Predicate>> localPredicates = new ArrayList<>(predicates);
@@ -184,7 +187,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
         for (List<Predicate> localPredicate : localPredicates) {
             List<Predicate> orderedPredicates = new ArrayList<>(localPredicate);
-            orderedPredicates.addAll(repeatedPredicates);
+            orderedPredicates.addAll(0,repeatedPredicates);
             finalPredicates.add(new MultiPredicate(orderedPredicates));
         }
 

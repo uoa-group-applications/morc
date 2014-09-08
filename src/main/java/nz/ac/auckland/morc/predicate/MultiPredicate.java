@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * A class for aggregating multiple predicates to appear as one such that it's easier to use outside of the builder
+ * A class for aggregating multiple predicates to appear as one such that it's easier to use outside of the builder.
+ * All predicates will be evaluated, even if one fails.
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
@@ -25,18 +26,21 @@ public class MultiPredicate implements Predicate {
         logger.trace("Starting validation of exchange from endpoint {} against {} predicates",
                 exchange.getFromEndpoint().getEndpointUri(), predicates.size());
 
+        boolean result = true;
+
         for (Predicate predicate : predicates) {
             boolean matches = predicate.matches(exchange);
             logger.trace("Result of predicate {}: {}", predicate, matches);
             if (!matches) {
                 logger.warn("The predicate {} did not validate successfully - check the logs for details", predicate);
-                return false;
+                result = false;
             }
         }
 
-        logger.trace("Validation of {} predicates was successful for endpoint {}", predicates.size(),
-                exchange.getFromEndpoint().getEndpointUri());
-        return true;
+        logger.trace("Validation of {} predicates was " + (result ? "successful" : "unsuccessful") + " for endpoint {}",
+                predicates.size(),exchange.getFromEndpoint().getEndpointUri());
+
+        return result;
     }
 
     @Override

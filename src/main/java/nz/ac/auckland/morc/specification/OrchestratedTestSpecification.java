@@ -182,7 +182,11 @@ public class OrchestratedTestSpecification {
                 addRepeatedPredicate(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
-                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class) == null;
+                        Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                        boolean exceptionCaught = e != null;
+
+                        if (exceptionCaught) logger.warn("Unexpected exception received: ",e);
+                        return !exceptionCaught;
                     }
 
                     @Override
@@ -194,7 +198,11 @@ public class OrchestratedTestSpecification {
                 addRepeatedPredicate(new Predicate() {
                     @Override
                     public boolean matches(Exchange exchange) {
-                        return exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class) != null;
+                        Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                        boolean exceptionCaught = e != null;
+
+                        if (!exceptionCaught) logger.warn("Exception was expected but unreceived");
+                        return exceptionCaught;
                     }
 
                     @Override
