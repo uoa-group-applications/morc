@@ -8,6 +8,3 @@ morc.run(new MorcTestBuilder() {
                 .expectedResponseBody(text("pong"))
     }
 })
-
-
-
