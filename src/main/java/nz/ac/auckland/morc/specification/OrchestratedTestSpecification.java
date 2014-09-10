@@ -199,8 +199,11 @@ public class OrchestratedTestSpecification {
                 addRepeatedPredicate(new ExceptionPredicate());
 
             processors = getProcessors();
-            if (processors.size() == 0) throw new IllegalArgumentException("The specification for test " + description +
-                    " on endpoint " + getEndpointUri() + " must specify at least one message processor to send messages");
+            if (processors.size() == 0) {
+                logger.debug("The specification for test " + description + " on endpoint " + getEndpointUri() +
+                        " specified no processors");
+                processors = getProcessors(1);
+            }
 
             predicates = getPredicates(processors.size());
 

@@ -19,19 +19,6 @@ import static nz.ac.auckland.morc.MorcTestBuilder.*;
 public class OrchestratedTestBuilderTest extends Assert {
 
     @Test
-    public void testNoProcessorsSpecified() throws Exception {
-        IllegalArgumentException e = null;
-        try {
-            new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "uri")
-                    .build();
-        } catch (IllegalArgumentException ex) {
-            e = ex;
-        }
-
-        assertNotNull(e);
-    }
-
-    @Test
     public void testMoreProcessorsThanPredicates() throws Exception {
 
         OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "uri")
