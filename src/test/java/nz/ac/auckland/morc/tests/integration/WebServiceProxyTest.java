@@ -122,7 +122,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .requestBody(json("{\"request\":\"PING\"}"))
                 .expectedResponseBody(json("{\"response\":\"PONG\"}"));
 
-        syncTest("Simple JSON PING no message","http://localhost:8093/jsonPingService")
+        syncTest("Simple JSON PING no message", "http://localhost:8093/jsonPingService")
                 .expectedResponseBody(json("{\"response\":\"PONG\"}"));
 
         syncTest("Simple XML Groovy Test", "jetty:http://localhost:8090/testWS")
