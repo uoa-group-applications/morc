@@ -3,6 +3,7 @@ package nz.ac.auckland.morc.specification;
 import nz.ac.auckland.morc.MorcBuilder;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
 import nz.ac.auckland.morc.mock.MockDefinition;
+import nz.ac.auckland.morc.predicate.ExceptionPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -195,21 +196,7 @@ public class OrchestratedTestSpecification {
                     }
                 });
             else
-                addRepeatedPredicate(new Predicate() {
-                    @Override
-                    public boolean matches(Exchange exchange) {
-                        Exception e = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
-                        boolean exceptionCaught = e != null;
-
-                        if (!exceptionCaught) logger.warn("Exception was expected but unreceived");
-                        return exceptionCaught;
-                    }
-
-                    @Override
-                    public String toString() {
-                        return "ExpectedExceptionPredicate";
-                    }
-                });
+                addRepeatedPredicate(new ExceptionPredicate());
 
             processors = getProcessors();
             if (processors.size() == 0) throw new IllegalArgumentException("The specification for test " + description +
@@ -356,7 +343,9 @@ public class OrchestratedTestSpecification {
         }
 
         /**
-         * Specifies that the request to the endpoint URI will result in an exception being returned
+         * Specifies that *all* requests to the endpoint URI will result in an exception being returned,
+         * if you want to specify that only particular responses are exceptions then consider using an
+         * ExceptionPredicate instead
          */
         public Builder expectsException() {
             this.expectsException = true;
