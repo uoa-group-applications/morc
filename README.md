@@ -29,6 +29,25 @@ public class MorcTest extends MorcTestBuilder {
 }
 ```
 
+This can be expressed as an equivalent Groovy script that evaluates as a single JUnit test:
+```java
+@Grab(group='nz.ac.auckland.morc',module='morc',version='1.8.0')
+import nz.ac.auckland.morc.MorcTestBuilder
+import nz.ac.auckland.morc.morc
+
+morc.run(new MorcTestBuilder() {
+    public void configure() {
+        syncTest("Simple WS PING test","cxf:http://localhost:8090/services/pingService")
+            .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                                "<request>PING</request>" +
+                             "</ns:pingRequest>"))
+            .expectedResponseBody(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+                    "<response>PONG</response>" +
+                    "</ns:pingResponse>"))
+    }
+})
+```
+
 We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and
 password properties:
 ```java
