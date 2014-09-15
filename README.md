@@ -31,7 +31,7 @@ public class MorcTest extends MorcTestBuilder {
 
 This can be expressed as an equivalent Groovy script that evaluates as a single JUnit test:
 ```java
-@Grab(group='nz.ac.auckland.morc',module='morc',version='1.8.0')
+@Grab(group="nz.ac.auckland.morc",module="morc",version="1.8.0")
 import nz.ac.auckland.morc.MorcTestBuilder
 import nz.ac.auckland.morc.morc
 
