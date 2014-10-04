@@ -5,6 +5,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -18,9 +19,10 @@ public class morc {
     /**
      * A method that will run the builder as a suite of JUnit tests
      *
-     * @param builder A set of test specifications that need to be built
+     * @param builder   A set of test specifications that need to be built
+     * @return          The number of failed tests
      */
-    public static void run(MorcTestBuilder builder) {
+    public static int run(MorcTestBuilder builder) {
 
         JoranConfigurator configurator = new JoranConfigurator();
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -35,7 +37,8 @@ public class morc {
         JUnitCore core = new JUnitCore();
         core.addListener(new TextListener(System.out));
         try {
-            core.run(new MorcParameterized(builder));
+            Result r = core.run(new MorcParameterized(builder));
+            return r.getFailureCount();
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
