@@ -29,6 +29,21 @@ public class MorcTest extends MorcTestBuilder {
 }
 ```
 
+While these tests conform with standard JUnit requirements, it requires a lot of boiler plate configuration to get started. A simple way to create and run tests is with a Groovy script like:
+```java
+@Grab(group="nz.ac.auckland.morc",module="morc",version="1.8.0")
+import nz.ac.auckland.morc.MorcTestBuilder
+import nz.ac.auckland.morc.morc
+
+morc.run(new MorcTestBuilder() {
+    public void configure() {
+        syncTest("Simple Echo Test", "http://echo.jsontest.com/foo/baz")
+                .expectedResponseBody(json('{ "foo":"baz" }'))
+    }
+})
+```
+Refer to the example project link at the end of the page for further details on getting setup with Maven to manage tests and dependencies.
+
 We can exploit the Camel URI format to use WS-Security username/password credentials by setting the username and
 password properties:
 ```java
