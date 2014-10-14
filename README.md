@@ -6,7 +6,7 @@ morc
 
 **[Documentation](https://github.com/uoa-group-applications/morc/wiki)**
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/nz.ac.auckland.morc/morc/badge.svg)](https://maven-badges.herokuapp.com/maven-central/nz.ac.auckland.morc/morc) [![Build Status](https://travis-ci.org/uoa-group-applications/morc.png)](http://travis-ci.org/uoa-group-applications/morc)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/nz.ac.auckland.morc/morc/badge.svg)](https://maven-badges.herokuapp.com/maven-central/nz.ac.auckland.morc/morc) [![Build Status](https://travis-ci.org/uoa-group-applications/morc.png)](http://travis-ci.org/uoa-group-applications/morc) [![Coverage Status](https://coveralls.io/repos/uoa-group-applications/morc/badge.png?branch=master)](https://coveralls.io/r/uoa-group-applications/morc?branch=master)
 
 morc provides a fluent Java Builder/DSL that allows developers and testers to construct specifications that dictate how an integration process/artifact under testing is expected to invoke a variety of different endpoints for a given input, where each endpoint has different ordering and message requirements. Given such a specification, the framework will first set up 'mock' endpoints as specified by the endpoint expectations that provide the canned responses before invoking the integration process/artifact to ensure all requirements are met. The requests/responses are compared semantically to the expectation based on the format required; for example, XML is compared using XMLUnit to allow for variations in XML request/response generation.
 
