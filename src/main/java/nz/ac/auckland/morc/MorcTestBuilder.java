@@ -906,6 +906,11 @@ public abstract class MorcTestBuilder extends MorcTest {
         return specifications;
     }
 
+    /**
+     * A method to allow tests to be run from simple scripts without all the JUnit infrastructure
+     *
+     * @return The number of failed tests
+     */
     public int run() {
         JUnitCore core = new JUnitCore();
         core.addListener(new TextListener(System.out));
