@@ -22,6 +22,9 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.SimpleBuilder;
 import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.camel.jsonpath.JsonPathExpression;
+import org.junit.internal.TextListener;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -901,5 +904,16 @@ public abstract class MorcTestBuilder extends MorcTest {
         }
 
         return specifications;
+    }
+
+    public int run() {
+        JUnitCore core = new JUnitCore();
+        core.addListener(new TextListener(System.out));
+        try {
+            Result r = core.run(new MorcParameterized(this));
+            return r.getFailureCount();
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
 }
