@@ -1,6 +1,9 @@
 package nz.ac.auckland.morc;
 
 import au.com.bytecode.opencsv.CSVReader;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
 import nz.ac.auckland.morc.mock.MockDefinition;
@@ -26,6 +29,7 @@ import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.w3c.dom.Document;
@@ -912,6 +916,16 @@ public abstract class MorcTestBuilder extends MorcTest {
      * @return The number of failed tests
      */
     public int run() {
+        JoranConfigurator configurator = new JoranConfigurator();
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        try {
+            configurator.setContext(context);
+            context.reset();
+            configurator.doConfigure(MorcTestBuilder.classpath("/logback-morc.xml"));
+        } catch (JoranException e) {
+            throw new RuntimeException(e);
+        }
+
         JUnitCore core = new JUnitCore();
         core.addListener(new TextListener(System.out));
         try {
