@@ -9,6 +9,7 @@ import org.apache.camel.component.dataset.DataSetComponent;
 import org.apache.camel.component.dataset.DataSetEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.properties.PropertiesComponent;
+import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.TryDefinition;
@@ -274,7 +275,10 @@ public class MorcTest extends CamelSpringTestSupport {
 
             if (spec.getMockFeedPreprocessor() != null) tryDefinition.process(spec.getMockFeedPreprocessor());
 
-            tryDefinition.to(targetEndpoint)
+            if (spec.getTestBean() == null) tryDefinition.to(targetEndpoint);
+            else tryDefinition.process(spec.getTestBean());
+
+            tryDefinition
                     .convertBodyTo(byte[].class)
                     .doCatch(Throwable.class).end()
                     .choice().when(property(Exchange.EXCEPTION_CAUGHT).isNotNull())

@@ -1,12 +1,14 @@
 package nz.ac.auckland.morc.specification;
 
 import nz.ac.auckland.morc.MorcBuilder;
+import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.predicate.ExceptionPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ public class OrchestratedTestSpecification {
     private List<Predicate> predicates;
     private int totalMockMessageCount;
     private PartExecuteDelay executeDelay;
+    private TestBean testBean;
 
     /**
      * @return A description that explains what this tests is doing
@@ -135,6 +138,10 @@ public class OrchestratedTestSpecification {
         }
     }
 
+    public TestBean getTestBean() {
+        return testBean;
+    }
+
     //Builder/DSL/Fluent API inheritance has been inspired by the blog: https://weblogs.java.net/node/642849
     public static class OrchestratedTestSpecificationBuilderInit<Builder extends MorcBuilder<Builder>> extends MorcBuilder<Builder> {
 
@@ -147,6 +154,7 @@ public class OrchestratedTestSpecification {
         private EndpointNode currentTotalOrderLeafEndpoint;
         private int totalMockMessageCount = 0;
         private boolean expectsException = false;
+        private TestBean testBean = null;
 
         //final list of single processors and predicates
         private List<Processor> processors;
@@ -165,6 +173,11 @@ public class OrchestratedTestSpecification {
         public OrchestratedTestSpecificationBuilderInit(String description, String endpointUri) {
             super(endpointUri);
             this.description = description;
+        }
+
+        public OrchestratedTestSpecificationBuilderInit(String description, TestBean bean) {
+            this(description,"bean:"+bean.hashCode());
+            this.testBean = bean;
         }
 
         protected OrchestratedTestSpecificationBuilderInit(String description, String endpointUri,
@@ -425,6 +438,7 @@ public class OrchestratedTestSpecification {
         this.totalMockMessageCount = builder.totalMockMessageCount;
         this.mockFeedPreprocessor = builder.getMockFeedPreprocessor();
         this.executeDelay = builder.executeDelay;
+        this.testBean = builder.testBean;
     }
 
     /**

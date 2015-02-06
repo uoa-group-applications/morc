@@ -1,5 +1,6 @@
 package nz.ac.auckland.morc.specification;
 
+import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.HeadersProcessor;
 import nz.ac.auckland.morc.resource.TestResource;
@@ -30,6 +31,10 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
      */
     public AsyncOrchestratedTestBuilder(String description, String endpointUri) {
         super(description, endpointUri);
+    }
+
+    public AsyncOrchestratedTestBuilder(String description, TestBean bean) {
+        super(description,bean);
     }
 
     protected AsyncOrchestratedTestBuilder(String description, String endpointUri,

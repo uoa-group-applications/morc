@@ -1,5 +1,6 @@
 package nz.ac.auckland.morc.specification;
 
+import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.predicate.HeadersPredicate;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.HeadersProcessor;
@@ -40,6 +41,10 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
      */
     public SyncOrchestratedTestBuilder(String description, String endpointUri) {
         super(description, endpointUri);
+    }
+
+    public SyncOrchestratedTestBuilder(String description, TestBean bean) {
+        super(description,bean);
     }
 
     protected SyncOrchestratedTestBuilder(String description, String endpointUri,

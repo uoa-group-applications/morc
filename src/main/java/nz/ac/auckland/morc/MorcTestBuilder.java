@@ -84,6 +84,12 @@ public abstract class MorcTestBuilder extends MorcTest {
         return builder;
     }
 
+    protected SyncOrchestratedTestBuilder syncTest(String description, TestBean testBean) {
+        SyncOrchestratedTestBuilder builder = new SyncOrchestratedTestBuilder(description, testBean);
+        specificationBuilders.add(builder);
+        return builder;
+    }
+
     /**
      * @return A way of specifying that the next endpoint in the specification list should be synchronous
      */
