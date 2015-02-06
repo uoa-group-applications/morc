@@ -15,15 +15,14 @@
     <url>http://uoa-group-applications.github.io/morc/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <camel-version>2.13.2</camel-version>
-        <groovy-version>2.2.1</groovy-version>
-        <xmlunit-version>1.5</xmlunit-version>
-        <junit-version>4.11</junit-version>
+        <camel-version>2.14.1</camel-version>
+        <groovy-version>2.4.0</groovy-version>
+        <xmlunit-version>1.6</xmlunit-version>
+        <junit-version>4.12</junit-version>
         <commons-io-version>2.4</commons-io-version>
-        <commons-lang-version>3.1</commons-lang-version>
-        <cxf-version>2.7.7</cxf-version>
+        <commons-lang-version>3.3.2</commons-lang-version>
+        <cxf-version>3.0.3</cxf-version>
         <jackson-version>1.9.13</jackson-version>
-        <jacoco-version>0.6.3.201306030806</jacoco-version>
         <opencsv-version>2.3</opencsv-version>
         <github.global.server>github</github.global.server>
     </properties>
@@ -160,8 +159,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
