@@ -5,7 +5,6 @@ import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.predicate.HeadersPredicate;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
-import nz.ac.auckland.morc.specification.OrchestratedTestSpecification;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -213,10 +212,10 @@ public class SimpleSyncTest extends MorcTestBuilder {
                 .requestBody(xml(groovy("<foo>$baz</foo>", var("baz", "123"))))
                 .expectedResponseBody(json(groovy("{\"foo\":\"$x\"}", var("x", "baz"))));
 
-        syncTest("simple test bean test",new TestBean() {
+        syncTest("simple test bean test", new TestBean() {
             @Override
             public void run() throws Exception {
-                createCamelContext().createProducerTemplate().send("vm:foo",new Processor() {
+                createCamelContext().createProducerTemplate().send("vm:foo", new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.getIn().setBody("1");

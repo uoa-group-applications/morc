@@ -8,7 +8,6 @@ import nz.ac.auckland.morc.predicate.ExceptionPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +175,7 @@ public class OrchestratedTestSpecification {
         }
 
         public OrchestratedTestSpecificationBuilderInit(String description, TestBean bean) {
-            this(description,"bean:"+bean.hashCode());
+            this(description, "bean:" + bean.hashCode());
             this.testBean = bean;
         }
 
