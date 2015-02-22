@@ -3,7 +3,10 @@ package nz.ac.auckland.morc.tests.integration;
 import nz.ac.auckland.morc.MorcTestBuilder;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.impl.ProcessorEndpoint;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.junit.Assert;
 
 public class WebServiceProxyTest extends MorcTestBuilder {
 
@@ -13,8 +16,9 @@ public class WebServiceProxyTest extends MorcTestBuilder {
             @Override
             public void configure() throws Exception {
                 //a straight through proxy
-                from("jetty:http://localhost:8090/testWS")
-                        .to("jetty:http://localhost:8090/targetWS?bridgeEndpoint=true&throwExceptionOnFailure=false");
+                from("jetty:http://localhost:8090/testWS").bean()
+                        .to("jetty:http://localhost:8090/targetWS?bridgeEndpoint=true&throwExceptionOnFailure=false")
+                        ;
 
                 SoapFault fault = new SoapFault("Pretend SOAP Fault", SoapFault.FAULT_CODE_CLIENT);
 
@@ -35,6 +39,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
 
     @Override
     public void configure() {
+
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
@@ -131,6 +136,8 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(groovy("<foo>$x</foo>", var("x", "123"))))
                         .responseBody(xml(groovy("<baz>$y</baz>", var("y", "321")))));
+
+
     }
 
 }

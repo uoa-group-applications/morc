@@ -2,6 +2,7 @@ package nz.ac.auckland.morc.mock;
 
 import nz.ac.auckland.morc.MorcBuilder;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
+import nz.ac.auckland.morc.processor.SelectorProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A general class for declaring a mock definition for a consumer of the
@@ -42,7 +42,7 @@ public class MockDefinition {
     private int expectedMessageCount;
     private Processor mockFeedPreprocessor;
     private Predicate lenientSelector;
-    private LenientProcessor lenientProcessor;
+    private SelectorProcessor lenientProcessor;
     private long messageResultWaitTime;
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
     private long reassertionPeriod;
@@ -118,7 +118,7 @@ public class MockDefinition {
     /**
      * @return A processor that selects a processor to be used to generate a response for lenient/unvalidated messages
      */
-    public LenientProcessor getLenientProcessor() {
+    public SelectorProcessor getLenientProcessor() {
         return lenientProcessor;
     }
 
@@ -174,8 +174,8 @@ public class MockDefinition {
         private boolean isEndpointOrdered = true;
         private Predicate lenientSelector = null;
         private int expectedMessageCount = 0;
-        private Class<? extends LenientProcessor> lenientProcessorClass = LenientProcessor.class;
-        private LenientProcessor lenientProcessor;
+        private Class<? extends SelectorProcessor> lenientProcessorClass = SelectorProcessor.class;
+        private SelectorProcessor lenientProcessor;
         private long reassertionPeriod = 0;
 
         //these will be populated during the build
@@ -248,7 +248,7 @@ public class MockDefinition {
          * @param lenientProcessorClass A processor that selects a processor for lenient (unvalidated) exchange processing
          *                              - the default implementation takes a modulus approach
          */
-        public Builder lenientProcessor(Class<? extends LenientProcessor> lenientProcessorClass) {
+        public Builder lenientProcessor(Class<? extends SelectorProcessor> lenientProcessorClass) {
             this.lenientProcessorClass = lenientProcessorClass;
             return self();
         }
@@ -271,7 +271,7 @@ public class MockDefinition {
                         + getEndpointUri() + " must be at least 0");
 
             if (lenientSelector == null) {
-                if (!lenientProcessorClass.equals(LenientProcessor.class))
+                if (!lenientProcessorClass.equals(SelectorProcessor.class))
                     throw new IllegalArgumentException("The mock definition for endpoint " + getEndpointUri() +
                             " can only specify a lenient processor when a lenient selector is provided");
 
@@ -365,23 +365,6 @@ public class MockDefinition {
 
         protected OrderingType getOrderingType() {
             return this.orderingType;
-        }
-    }
-
-    //any processors added should be thread safe!
-    public static class LenientProcessor implements Processor {
-        private List<Processor> processors;
-        private AtomicInteger messageIndex = new AtomicInteger(0);
-
-        public LenientProcessor(List<Processor> processors) {
-            this.processors = processors;
-        }
-
-        public void process(Exchange exchange) throws Exception {
-            if (processors.size() == 0) return;
-
-            //the default implementation will cycle through the responses/partProcessors
-            processors.get(messageIndex.getAndIncrement() % processors.size()).process(exchange);
         }
     }
 

@@ -3,6 +3,7 @@ package nz.ac.auckland.morc.tests.mock;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.processor.BodyProcessor;
+import nz.ac.auckland.morc.processor.SelectorProcessor;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -40,7 +41,7 @@ public class MockDefinitionBuilderTest extends Assert {
         assertEquals(0, def.getPredicates().size());
         assertEquals(0, def.getProcessors().size());
         assertNotNull(def.getLenientSelector());
-        assertEquals(def.getLenientProcessor().getClass(), MockDefinition.LenientProcessor.class);
+        assertEquals(def.getLenientProcessor().getClass(), SelectorProcessor.class);
     }
 
     @Test
@@ -366,7 +367,7 @@ public class MockDefinitionBuilderTest extends Assert {
 
     }
 
-    public static class StubLenientProcessor extends MockDefinition.LenientProcessor {
+    public static class StubLenientProcessor extends SelectorProcessor {
         public StubLenientProcessor(List<Processor> processors) {
             super(processors);
         }
