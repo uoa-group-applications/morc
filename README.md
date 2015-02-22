@@ -33,14 +33,13 @@ While these tests conform with standard JUnit requirements, it requires a lot of
 ```java
 @Grab(group="nz.ac.auckland.morc",module="morc",version="1.8.0")
 import nz.ac.auckland.morc.MorcTestBuilder
-import nz.ac.auckland.morc.morc
 
-morc.run(new MorcTestBuilder() {
+new MorcTestBuilder() {
     public void configure() {
         syncTest("Simple Echo Test", "http://echo.jsontest.com/foo/baz")
                 .expectedResponseBody(json('{ "foo":"baz" }'))
     }
-})
+}.run()
 ```
 Refer to the example project link at the end of the page for further details on getting setup with Maven to manage tests and dependencies.
 
