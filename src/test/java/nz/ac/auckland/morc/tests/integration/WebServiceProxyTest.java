@@ -16,9 +16,8 @@ public class WebServiceProxyTest extends MorcTestBuilder {
             @Override
             public void configure() throws Exception {
                 //a straight through proxy
-                from("jetty:http://localhost:8090/testWS").bean()
-                        .to("jetty:http://localhost:8090/targetWS?bridgeEndpoint=true&throwExceptionOnFailure=false")
-                        ;
+                from("jetty:http://localhost:8090/testWS")
+                        .to("jetty:http://localhost:8090/targetWS?bridgeEndpoint=true&throwExceptionOnFailure=false");
 
                 SoapFault fault = new SoapFault("Pretend SOAP Fault", SoapFault.FAULT_CODE_CLIENT);
 
