@@ -4,6 +4,7 @@ import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.HeadersProcessor;
 import nz.ac.auckland.morc.resource.TestResource;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,14 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
     protected AsyncOrchestratedTestBuilder(String description, String endpointUri,
                                            OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
         super(description, endpointUri, previousPartBuilder);
+    }
+
+    /**
+     * @param processors A list of processors to apply to the exchange before the message is sent
+     */
+    public AsyncOrchestratedTestBuilder input(Processor... processors) {
+        this.addProcessors(processors);
+        return self();
     }
 
     /**

@@ -1,11 +1,9 @@
 package nz.ac.auckland.morc.tests;
 
-import nz.ac.auckland.morc.predicate.HttpErrorPredicate;
 import nz.ac.auckland.morc.resource.GroovyTemplateTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
@@ -27,49 +25,6 @@ public class MorcTestBuilderTest extends Assert {
         long finishTime = new Date().getTime();
 
         assertTrue(finishTime >= time + 5000l);
-    }
-
-    @Test
-    public void testHttpExceptionResponseCode() {
-        assertEquals(0, httpExceptionResponse().build().getStatusCode());
-        assertEquals(123, httpExceptionResponse(123).getStatusCode());
-    }
-
-    @Test
-    public void testHttpExceptionResponseCodePredicate() throws Exception {
-        Predicate p = new Predicate() {
-            @Override
-            public boolean matches(Exchange exchange) {
-                exchange.setProperty("foo", "baz");
-                return true;
-            }
-        };
-
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-
-        HttpErrorPredicate predicate = httpExceptionResponse(123, p);
-        assertEquals(123, predicate.getStatusCode());
-        assertTrue(predicate.getBodyPredicate().matches(e));
-        assertEquals("baz", e.getProperty("foo"));
-
-    }
-
-    @Test
-    public void testHttpExceptionPredicate() throws Exception {
-        Predicate p = new Predicate() {
-            @Override
-            public boolean matches(Exchange exchange) {
-                exchange.setProperty("foo", "baz");
-                return true;
-            }
-        };
-
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-
-        HttpErrorPredicate predicate = httpExceptionResponse(p);
-        assertEquals(0, predicate.getStatusCode());
-        assertTrue(predicate.getBodyPredicate().matches(e));
-        assertEquals("baz", e.getProperty("foo"));
     }
 
     @Test

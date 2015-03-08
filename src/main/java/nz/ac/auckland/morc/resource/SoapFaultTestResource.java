@@ -3,6 +3,7 @@ package nz.ac.auckland.morc.resource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import javax.xml.parsers.DocumentBuilder;
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
-public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate {
+public class SoapFaultTestResource implements Predicate, Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(SoapFaultTestResource.class);
 
@@ -50,7 +51,6 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate
         this.xmlUtilities = xmlUtilities;
     }
 
-    @Override
     public SoapFault getValue() throws Exception {
         SoapFault fault = new SoapFault(message, faultCode);
         if (xmlDetail != null) {
@@ -138,6 +138,13 @@ public class SoapFaultTestResource implements TestResource<SoapFault>, Predicate
                     exchange.getIn().getBody(QName.class) != null &&
                     exchange.getIn().getBody(QName.class).equals(expectedCode);
         }
+    }
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        logger.trace("Setting fault for exchange arriving from endpoint {}", exchange.getFromEndpoint().getEndpointUri());
+        exchange.getIn().setFault(true);
+        exchange.getIn().setBody(getValue());
     }
 
     @Override

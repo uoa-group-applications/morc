@@ -4,6 +4,7 @@ import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.HeadersProcessor;
 import nz.ac.auckland.morc.resource.TestResource;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,14 @@ public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBui
      */
     public SyncMockDefinitionBuilderInit(String endpointUri) {
         super(endpointUri);
+    }
+
+    /**
+     * @param processors A list of processors to apply to the response exchange
+     */
+    public final Builder response(Processor... processors) {
+        this.addProcessors(processors);
+        return self();
     }
 
     /**

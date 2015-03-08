@@ -53,6 +53,14 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     }
 
     /**
+     * @param processors A collection of processors that will be applied to an exchange before it is sent
+     */
+    public SyncOrchestratedTestBuilder request(Processor... processors) {
+        this.addProcessors(processors);
+        return self();
+    }
+
+    /**
      * @param resources A collection of test resources that can be used to send request bodies to a target endpoint -
      *                  each body will be placed together with the corresponding requestHeader if available
      */

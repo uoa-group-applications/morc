@@ -4,7 +4,6 @@ import nz.ac.auckland.morc.MorcBuilder;
 import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
 import nz.ac.auckland.morc.mock.MockDefinition;
-import nz.ac.auckland.morc.predicate.ExceptionPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -208,7 +207,24 @@ public class OrchestratedTestSpecification {
                     }
                 });
             else
-                addRepeatedPredicate(new ExceptionPredicate());
+                addRepeatedPredicate(new Predicate() {
+                    @Override
+                    public boolean matches(Exchange exchange) {
+                        Throwable t = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+
+                        if (t == null) {
+                            logger.warn("An exception was expected to be received on endpoint {}", exchange.getFromEndpoint().getEndpointUri());
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    @Override
+                    public String toString() {
+                        return "ExceptionExistencePredicate";
+                    }
+                });
 
             processors = getProcessors();
             if (processors.size() == 0) {
@@ -272,7 +288,6 @@ public class OrchestratedTestSpecification {
                 //this should be at the start!
                 noneStringBuilder.append(") ");
                 endpointOrderingStringBuilder = new StringBuilder(noneStringBuilder.toString() + endpointOrderingStringBuilder.toString());
-
             }
 
             //endpoints partially ordered to other endpoints will be added to the set after they are encountered

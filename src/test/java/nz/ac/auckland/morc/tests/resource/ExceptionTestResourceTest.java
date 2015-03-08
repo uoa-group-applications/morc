@@ -1,6 +1,6 @@
-package nz.ac.auckland.morc.tests.predicate;
+package nz.ac.auckland.morc.tests.resource;
 
-import nz.ac.auckland.morc.predicate.ExceptionPredicate;
+import nz.ac.auckland.morc.resource.ExceptionTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -12,11 +12,11 @@ import org.junit.Test;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 
-public class ExceptionPredicateTest extends Assert {
+public class ExceptionTestResourceTest extends Assert {
 
     @Test
     public void testMatchDefaultException() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate();
+        ExceptionTestResource predicate = new ExceptionTestResource();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -27,7 +27,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testMatchExceptionMessage() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(Exception.class, "foo");
+        ExceptionTestResource predicate = new ExceptionTestResource(new Exception("foo"));
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -38,7 +38,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testNoMatchExceptionMessage() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(Exception.class, "foo");
+        ExceptionTestResource predicate = new ExceptionTestResource(new Exception("foo"));
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -49,7 +49,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testNoMatchClassButMatchesMessage() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(IOException.class, "foo");
+        ExceptionTestResource predicate = new ExceptionTestResource(new IOException("foo"));
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -60,7 +60,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testNoMatchNullMessage() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(IOException.class);
+        ExceptionTestResource predicate = new ExceptionTestResource(new IOException());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -71,7 +71,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testNoException() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(IOException.class);
+        ExceptionTestResource predicate = new ExceptionTestResource(new IOException());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -80,13 +80,13 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testToStringNoMessage() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(IOException.class);
+        ExceptionTestResource predicate = new ExceptionTestResource(new IOException());
         assertTrue(predicate.toString().contains("IOException"));
     }
 
     @Test
     public void testToStringWithMessage() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(IOException.class, "foo");
+        ExceptionTestResource predicate = new ExceptionTestResource(new IOException("foo"));
         assertTrue(predicate.toString().contains("foo"));
     }
 
@@ -94,7 +94,7 @@ public class ExceptionPredicateTest extends Assert {
     public void testSubClassException() throws Exception {
         SoapFault fault = new SoapFault("", new QName(""));
 
-        ExceptionPredicate predicate = new ExceptionPredicate(Exception.class);
+        ExceptionTestResource predicate = new ExceptionTestResource(new Exception());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -105,13 +105,7 @@ public class ExceptionPredicateTest extends Assert {
 
     @Test
     public void testSuperClassException() throws Exception {
-        ExceptionPredicate predicate = new ExceptionPredicate(SoapFault.class);
-
-        Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
-        e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
-
-        assertFalse(predicate.matches(e));
+        //todo
     }
 
 }

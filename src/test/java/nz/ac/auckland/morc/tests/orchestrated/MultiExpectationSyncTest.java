@@ -268,17 +268,19 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
 
         syncTest("Test throw receive exceptions", "seda:throwsException?waitForTaskToComplete=Always")
                 .requestBody(times(5, text("1")))
-                .expectedResponseBody(exception(), exception(IOException.class), exception(IOException.class, "foo")
-                        , exception(FileNotFoundException.class), exception(FileNotFoundException.class, "baz"))
+                .expectedResponseBody(exception(), exception(new IOException()), exception(new IOException("foo"))
+                        , exception(new FileNotFoundException()), exception(new FileNotFoundException("baz")))
                 .expectsException()
-                .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
-                        .exception(new Exception()))
-                .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
-                        .exception(new IOException()))
-                .addExpectation(exceptionExpectation("seda:throwsException").expectedMessageCount(1)
-                        .exception(new IOException("foo")))
-                .addExpectation(exceptionExpectation("seda:throwsException", FileNotFoundException.class).expectedMessageCount(1))
-                .addExpectation(exceptionExpectation("seda:throwsException", FileNotFoundException.class, "baz").expectedMessageCount(1));
+                .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
+                        .response(exception()))
+                .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
+                        .response(exception(new IOException())))
+                .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
+                        .response(exception(new IOException("foo"))))
+                .addExpectation(syncExpectation("seda:throwsException").response(exception(new FileNotFoundException()))
+                        .expectedMessageCount(1))
+                .addExpectation(syncExpectation("seda:throwsException").response(exception(new FileNotFoundException("baz")))
+                        .expectedMessageCount(1));
     }
 
 }

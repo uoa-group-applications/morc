@@ -7,10 +7,10 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
 import nz.ac.auckland.morc.mock.MockDefinition;
-import nz.ac.auckland.morc.mock.builder.*;
-import nz.ac.auckland.morc.predicate.ExceptionPredicate;
+import nz.ac.auckland.morc.mock.builder.AsyncMockDefinitionBuilder;
+import nz.ac.auckland.morc.mock.builder.SyncMockDefinitionBuilder;
+import nz.ac.auckland.morc.mock.builder.UnreceivedMockDefinitionBuilder;
 import nz.ac.auckland.morc.predicate.HeadersPredicate;
-import nz.ac.auckland.morc.predicate.HttpErrorPredicate;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.HeadersProcessor;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
@@ -39,8 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 
@@ -333,27 +331,18 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
-     * @return A validator for ensuring an exception occurs
+     * @return A resource for ensuring an exception occurs, or return back to the client -- will simply use a standard Java Exception instance
      */
-    public static ExceptionPredicate exception() {
-        return new ExceptionPredicate();
+    public static ExceptionTestResource exception() {
+        return new ExceptionTestResource();
     }
 
     /**
-     * @param exception The exception we expect to validate against
+     * @param exception The exception we expect to validate against or return to caller
      * @return A validator for ensuring an exception occurs
      */
-    public static ExceptionPredicate exception(Class<? extends Exception> exception) {
-        return new ExceptionPredicate(exception);
-    }
-
-    /**
-     * @param exception The exception we expect to validate against
-     * @param message   The message in the exception we expect to validate against
-     * @return A validator for ensuring an exception occurs
-     */
-    public static ExceptionPredicate exception(Class<? extends Exception> exception, String message) {
-        return new ExceptionPredicate(exception, message);
+    public static ExceptionTestResource exception(Exception exception) {
+        return new ExceptionTestResource(exception);
     }
 
     /**
@@ -654,12 +643,7 @@ public abstract class MorcTestBuilder extends MorcTest {
             }
 
             //sort them alphabetically first
-            Collections.sort(resourceUrls, new Comparator<URL>() {
-                @Override
-                public int compare(URL o1, URL o2) {
-                    return o1.toString().compareTo(o2.toString());
-                }
-            });
+            Collections.sort(resourceUrls, (o1, o2) -> o1.toString().compareTo(o2.toString()));
 
             for (URL url : resourceUrls) {
                 resourceStreams.add(url.openStream());
@@ -716,64 +700,83 @@ public abstract class MorcTestBuilder extends MorcTest {
     }
 
     /**
+     * @return A resource for non-200 HTTP responses
+     */
+    public static HttpResponseTestResource httpResponse() {
+        return new HttpResponseTestResource();
+    }
+
+    /**
+     * @param statusCode the HTTP status code to use
+     * @return A resource for non-standard HTTP responses
+     */
+    public static HttpResponseTestResource httpResponse(int statusCode) {
+        return new HttpResponseTestResource(statusCode);
+    }
+
+    /**
+     * @param statusCode the HTTP status code to use
+     * @param body       the HTTP response body
+     * @return A resource for non-standard HTTP responses
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Predicate & TestResource> HttpResponseTestResource httpResponse(int statusCode, T body) {
+        return new HttpResponseTestResource(statusCode, body);
+    }
+
+    /**
+     * @param statusCode the HTTP status code to use
+     * @param body       the HTTP response body
+     * @param headers    HTTP response headers
+     * @return A resource for non-standard HTTP responses
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Predicate & TestResource> HttpResponseTestResource httpResponse(int statusCode, T body, HeadersTestResource headers) {
+        return new HttpResponseTestResource(statusCode, body, headers);
+    }
+
+    /**
+     * @return A resource for error HTTP response codes (this involves additional flags internally)
+     */
+    public static HttpErrorTestResource httpErrorResponse() {
+        return new HttpErrorTestResource();
+    }
+
+    /**
+     * @param statusCode the HTTP status code to use (usually 5**)
+     * @return A resource for error HTTP response codes (this involves additional flags internally)
+     */
+    public static HttpResponseTestResource httpErrorResponse(int statusCode) {
+        return new HttpErrorTestResource(statusCode);
+    }
+
+    /**
+     * @param statusCode the HTTP status code to use (usually 5**)
+     * @param body       The HTTP response body
+     * @return A resource for error HTTP response codes (this involves additional flags internally)
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Predicate & TestResource> HttpErrorTestResource httpErrorResponse(int statusCode, T body) {
+        return new HttpErrorTestResource(statusCode, body);
+    }
+
+    /**
+     * @param statusCode the HTTP status code to use (usually 5**)
+     * @param body       The HTTP response body
+     * @param headers    The HTTP response headers
+     * @return A resource for error HTTP response codes (this involves additional flags internally)
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Predicate & TestResource> HttpErrorTestResource httpErrorResponse(int statusCode, T body, HeadersTestResource headers) {
+        return new HttpErrorTestResource(statusCode, body, headers);
+    }
+
+    /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
     public static AsyncMockDefinitionBuilder asyncExpectation(String endpointUri) {
         return new AsyncMockDefinitionBuilder(endpointUri);
     }
-
-    /**
-     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
-     */
-    public static HttpErrorMockDefinitionBuilder httpErrorExpectation(String endpointUri) {
-        return new HttpErrorMockDefinitionBuilder(endpointUri);
-    }
-
-    /**
-     * @param endpointUri The endpoint URI that the mock should listen to; should follow the Apache Camel URI format
-     */
-    public static SoapFaultMockDefinitionBuilder soapFaultExpectation(String endpointUri) {
-        return new SoapFaultMockDefinitionBuilder(endpointUri);
-    }
-
-    /**
-     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
-     */
-    public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri) {
-        return new ExceptionMockDefinitionBuilder(endpointUri);
-    }
-
-    /**
-     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
-     * @param exception   The exception that should be instantiated and thrown as part of the expectation
-     */
-    public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri,
-                                                                      final Class<? extends Exception> exception) {
-        try {
-            Constructor<? extends Exception> constructor = exception.getConstructor();
-            return new ExceptionMockDefinitionBuilder(endpointUri).exception(constructor.newInstance());
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    /**
-     * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
-     * @param exception   The exception that should be instantiated and thrown as part of the expectation
-     * @param message
-     * @return
-     */
-    public static ExceptionMockDefinitionBuilder exceptionExpectation(String endpointUri,
-                                                                      final Class<? extends Exception> exception,
-                                                                      final String message) {
-        try {
-            Constructor<? extends Exception> constructor = exception.getConstructor(String.class);
-            return new ExceptionMockDefinitionBuilder(endpointUri).exception(constructor.newInstance(message));
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
@@ -797,35 +800,6 @@ public abstract class MorcTestBuilder extends MorcTest {
             this.header = header;
             this.value = value;
         }
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response body meets the expected response
-     */
-    public static HttpErrorPredicate httpExceptionResponse(Predicate predicate) {
-        return new HttpErrorPredicate.Builder().responseBody(predicate).build();
-    }
-
-    /**
-     * @return A validator that ensures that the HTTP response body meets the expected response
-     */
-    public static HttpErrorPredicate httpExceptionResponse(int statusCode, Predicate predicate) {
-        return new HttpErrorPredicate.Builder().responseBody(predicate).statusCode(statusCode).build();
-    }
-
-    /**
-     * @return A validation builder for setting http exception response values
-     */
-    public static HttpErrorPredicate.Builder httpExceptionResponse() {
-        return new HttpErrorPredicate.Builder();
-    }
-
-    /**
-     * @param statusCode The HTTP status code that is expected to be received back
-     * @return A validator that ensures that the HTTP response meets the expected XML response body
-     */
-    public static HttpErrorPredicate httpExceptionResponse(int statusCode) {
-        return new HttpErrorPredicate.Builder().statusCode(statusCode).build();
     }
 
     /**
@@ -865,11 +839,8 @@ public abstract class MorcTestBuilder extends MorcTest {
      *             replying to a system)
      */
     public static Processor delay(final long time) {
-        return new Processor() {
-            @Override
-            public void process(Exchange exchange) throws Exception {
-                Thread.sleep(time);
-            }
+        return exchange -> {
+            Thread.sleep(time);
         };
     }
 
