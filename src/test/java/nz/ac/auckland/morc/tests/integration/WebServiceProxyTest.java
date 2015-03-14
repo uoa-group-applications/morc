@@ -49,14 +49,14 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .expectedResponse(httpResponse(201))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpResponse(201,xml("<foo/>"))));
+                        .response(httpResponse(201, xml("<foo/>"))));
 
         syncTest("Simple non-200 WS proxy test check body", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponse(httpResponse(201, xml("<foo/>")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
                         .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpResponse(201,xml("<foo/>"))));
+                        .response(httpResponse(201, xml("<foo/>"))));
 
         syncTest("Simple WS proxy failure test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))

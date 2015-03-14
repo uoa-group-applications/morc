@@ -3,7 +3,6 @@ package nz.ac.auckland.morc.tests;
 import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.resource.GroovyTemplateTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
-import nz.ac.auckland.morc.resource.XmlTestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
