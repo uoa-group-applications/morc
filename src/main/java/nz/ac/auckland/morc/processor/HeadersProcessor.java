@@ -25,8 +25,9 @@ public class HeadersProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.trace("Setting headers of exchange from endpoint {} to {}", exchange.getFromEndpoint().getEndpointUri()
-                , responseHeaders.getValue());
+        logger.trace("Setting headers of exchange from endpoint {} to {}",
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"),
+                responseHeaders.getValue());
         exchange.getIn().setHeaders(responseHeaders.getValue());
     }
 }

@@ -259,12 +259,7 @@ public class MorcTest extends CamelSpringTestSupport {
             RouteDefinition publishRouteDefinition = new RouteDefinition();
 
             //ensure we have completed sending each exchange
-            sendingMockEndpoint.whenAnyExchangeReceived(new Processor() {
-                @Override
-                public void process(Exchange exchange) throws Exception {
-                    latch.countDown();
-                }
-            });
+            sendingMockEndpoint.whenAnyExchangeReceived(exchange -> latch.countDown());
 
             TryDefinition tryDefinition = publishRouteDefinition.from(dataSetEndpoint)
                     .routeId(MorcTest.class.getCanonicalName() + ".publish")

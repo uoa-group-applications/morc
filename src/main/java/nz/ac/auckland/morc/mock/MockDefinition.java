@@ -359,6 +359,7 @@ public class MockDefinition {
             return new MockDefinition(this);
         }
 
+        @SuppressWarnings("unchecked")
         protected Builder self() {
             return (Builder) this;
         }

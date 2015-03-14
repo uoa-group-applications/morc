@@ -52,11 +52,17 @@ public class HttpResponseTestResource<T extends Predicate & TestResource> implem
         return headers;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean matches(Exchange exchange) {
         if (exchange == null) return false;
 
         boolean validStatus = true, validBody = true, validHeaders = true;
+
+        if (exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE) == null) {
+            logger.warn("The HTTP response code does not exist");
+            return false;
+        }
 
         int receivedStatusCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class);
         if (statusCode != 0 && statusCode != receivedStatusCode) {
@@ -78,11 +84,13 @@ public class HttpResponseTestResource<T extends Predicate & TestResource> implem
         return validStatus && validBody && validHeaders;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.trace("Setting response code to {} for endpoint {}", statusCode, exchange.getFromEndpoint().getEndpointUri());
-        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
+        logger.trace("Setting response code to {} for endpoint {}", statusCode,
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
         if (body != null) new BodyProcessor(body).process(exchange);
         if (headers != null) new HeadersProcessor(headers).process(exchange);
+        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
     }
 }

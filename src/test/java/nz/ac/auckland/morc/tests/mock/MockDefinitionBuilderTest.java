@@ -1,5 +1,6 @@
 package nz.ac.auckland.morc.tests.mock;
 
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.processor.BodyProcessor;
@@ -17,9 +18,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.text;
-
-public class MockDefinitionBuilderTest extends Assert {
+public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testNegativeExpectedMessageCount() throws Exception {

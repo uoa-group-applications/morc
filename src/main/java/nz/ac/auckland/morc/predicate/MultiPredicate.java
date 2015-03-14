@@ -24,7 +24,7 @@ public class MultiPredicate implements Predicate {
     @Override
     public boolean matches(Exchange exchange) {
         logger.trace("Starting validation of exchange from endpoint {} against {} predicates",
-                exchange.getFromEndpoint().getEndpointUri(), predicates.size());
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"), predicates.size());
 
         boolean result = true;
 
@@ -38,7 +38,7 @@ public class MultiPredicate implements Predicate {
         }
 
         logger.trace("Validation of {} predicates was " + (result ? "successful" : "unsuccessful") + " for endpoint {}",
-                predicates.size(), exchange.getFromEndpoint().getEndpointUri());
+                predicates.size(), (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
 
         return result;
     }

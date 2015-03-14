@@ -26,6 +26,7 @@ public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinit
     private List<Predicate> expectedBodyPredicates = new ArrayList<>();
     private List<HeadersPredicate> expectedHeadersPredicates = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Builder self() {
         return (Builder) this;

@@ -44,6 +44,20 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .responseBody(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));
 
+        syncTest("Simple non-200 WS proxy test", "jetty:http://localhost:8090/testWS")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponse(httpResponse(201))
+                .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .response(httpResponse(201,xml("<foo/>"))));
+
+        syncTest("Simple non-200 WS proxy test check body", "jetty:http://localhost:8090/testWS")
+                .requestBody(xml(classpath("/data/pingRequest1.xml")))
+                .expectedResponse(httpResponse(201, xml("<foo/>")))
+                .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
+                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .response(httpResponse(201,xml("<foo/>"))));
+
         syncTest("Simple WS proxy failure test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))
                 .expectedResponse(httpErrorResponse(500))
@@ -78,22 +92,22 @@ public class WebServiceProxyTest extends MorcTestBuilder {
         syncTest("CXF WS Fault Test", "cxf:http://localhost:8092/testWSFault")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectsException()
-                .expectedResponse(soapFault(SOAPFAULT_CLIENT, "Pretend SOAP Fault"));
+                .expectedResponse(soapFault(soapFaultClient(), "Pretend SOAP Fault"));
 
         syncTest("CXF WS Fault Test with detail", "cxf:http://localhost:8092/testWSFaultDetail")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectsException()
-                .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Detailed SOAP Fault",
+                .expectedResponse(soapFault(soapFaultServer(), "Pretend Detailed SOAP Fault",
                         xml("<detail><foo/></detail>")));
 
         syncTest("Simple test to show SOAP Fault expectation", "cxf:http://localhost:8092/targetWS")
                 .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectsException()
-                .expectedResponse(soapFault(SOAPFAULT_SERVER, "Pretend Fault",
+                .expectedResponse(soapFault(soapFaultServer(), "Pretend Fault",
                         xml("<detail><foo/></detail>")))
                 .addExpectation(syncExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
                         .expectedMessageCount(1)
-                        .response(soapFault(SOAPFAULT_SERVER, "Pretend Fault", xml("<detail><foo/></detail>"))));
+                        .response(soapFault(soapFaultServer(), "Pretend Fault", xml("<detail><foo/></detail>"))));
 
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
                 .requestBody(xml(classpath("/data/pingRequest1.xml")))

@@ -24,7 +24,7 @@ public class MultiProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         logger.trace("Applying {} processors against exchange from endpoint {}", processors.size(),
-                exchange.getFromEndpoint().getEndpointUri());
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
         for (Processor processor : processors) {
             logger.trace("Applying processor");
             processor.process(exchange);

@@ -1,6 +1,8 @@
 package nz.ac.auckland.morc.tests.orchestrated;
 
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.MorcTest;
+import nz.ac.auckland.morc.MorcTestBuilder;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
 import nz.ac.auckland.morc.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.morc.specification.SyncOrchestratedTestBuilder;
@@ -16,9 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.*;
-
-public class SimpleSyncFailureTest extends CamelTestSupport {
+public class SimpleSyncFailureTest extends CamelTestSupport implements MorcMethods {
 
     Logger logger = LoggerFactory.getLogger(SimpleSyncFailureTest.class);
 
@@ -69,14 +69,25 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
         };
     }
 
+    public MorcTestBuilder createMorcTestBuilder() {
+        return new MorcTestBuilder() {
+            @Override
+            protected void configure() {
+
+            }
+        };
+    }
+
     @Test
     public void testDelayedDeliveryFails() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test delayed delivery fails",
                 "vm:syncInputAsyncOutputDelayed")
                 .expectedResponseBody(xml("<foo/>"))
                 .requestBody(xml("<baz/>"))
-                .addExpectation(unreceivedExpectation("vm:somethingToSeeHere"))
-                .addExpectation(asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
+                .addExpectation(morcMethods.unreceivedExpectation("vm:somethingToSeeHere"))
+                .addExpectation(morcMethods.asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
                 .build();
 
         AssertionError e = null;
@@ -93,6 +104,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testInvalidResponseFails() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid response", "vm:syncInputNoCallouts")
                 .requestBody(text("0"))
                 .expectedResponseBody(xml("<foo/>"))
@@ -112,9 +125,11 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationBodyInvalid() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation body", "vm:syncInputAsyncOutput")
                 .requestBody(xml("<foo/>"))
-                .addExpectation(asyncExpectation("vm:asyncTarget").expectedBody(xml("<baz/>")))
+                .addExpectation(morcMethods.asyncExpectation("vm:asyncTarget").expectedBody(xml("<baz/>")))
                 .build();
 
         AssertionError e = null;
@@ -132,9 +147,11 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExpectationHeadersInvalid() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on invalid expectation headers", "vm:syncInputAsyncOutput")
                 .requestHeaders(headers(new HeaderValue("foo", "baz")))
-                .addExpectation(asyncExpectation("vm:asyncTarget")
+                .addExpectation(morcMethods.asyncExpectation("vm:asyncTarget")
                         .expectedHeaders(headers(new HeaderValue("foo", "baz"), new HeaderValue("abc", "def"))))
                 .build();
 
@@ -153,10 +170,12 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testSendMoreExchangesThanExpectations() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test fails on more exchanges than expectations",
                 "vm:syncMultiTestPublisher")
                 .requestBody(xml("<foo/>"))
-                .addExpectation(asyncExpectation("vm:asyncTarget3")
+                .addExpectation(morcMethods.asyncExpectation("vm:asyncTarget3")
                         .expectedBody(xml("<moo/>")))
                 .build();
 
@@ -174,6 +193,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testResponseHeadersInvalid() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         Map<String, Object> headers = new HashMap<>();
         headers.put("abc", "123");
@@ -199,6 +219,8 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testExceptionFoundButUnexpectedWithNoValidator() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test Exception Found but not expected",
                 "vm:exceptionThrower")
                 .requestBody(text("foo"))
@@ -218,6 +240,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testNoSpecificationEntered() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         IllegalArgumentException e = null;
         try {
@@ -233,6 +256,7 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testNegativeSendIntervalError() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         IllegalArgumentException e = null;
 
@@ -251,13 +275,15 @@ public class SimpleSyncFailureTest extends CamelTestSupport {
 
     @Test
     public void testNoExpectedMessageCountSetForExpectation() throws Exception {
+        MorcTestBuilder morcMethods = createMorcTestBuilder();
+
         AssertionError e = null;
 
         try {
             OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test response with no expectation predicates",
                     "vm:syncInputSyncOutput")
                     .requestBody(times(3, xml("<baz/>")))
-                    .addExpectation(syncExpectation("vm:syncTarget")
+                    .addExpectation(morcMethods.syncExpectation("vm:syncTarget")
                             .responseBody(times(3, xml("<foo/>"))))
                     .sendInterval(3000)
                     .expectedResponseBody(times(3, xml("<foo/>"))).build();

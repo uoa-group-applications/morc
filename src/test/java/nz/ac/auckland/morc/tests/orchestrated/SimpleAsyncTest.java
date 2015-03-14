@@ -1,6 +1,7 @@
 package nz.ac.auckland.morc.tests.orchestrated;
 
 import nz.ac.auckland.morc.MorcTestBuilder;
+import nz.ac.auckland.morc.TestBean;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
@@ -72,6 +73,18 @@ public class SimpleAsyncTest extends MorcTestBuilder {
                 return exchange.getProperty("preprocessed", Boolean.class);
             }
         });
+
+        asyncTest("simple test bean test", new TestBean() {
+            @Override
+            public void run() throws Exception {
+                createCamelContext().createProducerTemplate().send("vm:foo", new Processor() {
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        exchange.getIn().setBody("1");
+                    }
+                });
+            }
+        }).addExpectation(asyncExpectation("vm:foo").expectedBody(text("1")));
 
 
     }

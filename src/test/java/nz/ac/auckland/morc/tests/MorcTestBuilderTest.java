@@ -1,7 +1,9 @@
 package nz.ac.auckland.morc.tests;
 
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.resource.GroovyTemplateTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
+import nz.ac.auckland.morc.resource.XmlTestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -14,9 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.*;
-
-public class MorcTestBuilderTest extends Assert {
+public class MorcTestBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testDelayProcessor() throws Exception {
@@ -65,13 +65,41 @@ public class MorcTestBuilderTest extends Assert {
     }
 
     @Test
-    public void testDirRetrieval() throws Exception {
+    public void testTextDirRetrieval() throws Exception {
         TestResource[] resources = text(dir("data/multidirtest/**/*.txt"));
         assertEquals(4, resources.length);
         assertEquals("a", resources[0].getValue());
         assertEquals("b", resources[1].getValue());
         assertEquals("c", resources[2].getValue());
         assertEquals("d", resources[3].getValue());
+    }
+
+    @Test
+    public void testXmlDirRetrieval() throws Exception {
+        TestResource[] resources = xml(dir("data/xmlmultidirtest/*.xml"));
+        assertEquals(2, resources.length);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody(resources[0].getValue());
+
+        assertTrue(xml("<foo/>").matches(e));
+
+        e.getIn().setBody(resources[1].getValue());
+        assertTrue(xml("<baz/>").matches(e));
+    }
+
+    @Test
+    public void testJsonDirRetrieval() throws Exception {
+        TestResource[] resources = json(dir("data/jsonmultidirtest/*.json"));
+        assertEquals(2, resources.length);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody(resources[0].getValue());
+
+        assertTrue(json("{ \"foo\":\"baz\" }").matches(e));
+
+        e.getIn().setBody(resources[1].getValue());
+        assertTrue(json("{ \"baz\":\"moo\" }").matches(e));
     }
 
     @Test

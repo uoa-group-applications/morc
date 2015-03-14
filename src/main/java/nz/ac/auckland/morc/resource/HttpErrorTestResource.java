@@ -1,6 +1,5 @@
 package nz.ac.auckland.morc.resource;
 
-import nz.ac.auckland.morc.predicate.HeadersPredicate;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.component.http.HttpOperationFailedException;
@@ -13,6 +12,8 @@ import java.util.Map;
 /**
  * A resource for returning non-200 error HTTP codes back to the client, or testing that such an response was received.
  * The default status code is 500.
+ * <p/>
+ * Setting the status code to 0 will mean it won't be validated against (but the body and headers will, if any).
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
@@ -38,6 +39,7 @@ public class HttpErrorTestResource<T extends Predicate & TestResource> extends H
         super(statusCode, body, headers);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean matches(Exchange exchange) {
         if (exchange == null) return false;
@@ -58,31 +60,15 @@ public class HttpErrorTestResource<T extends Predicate & TestResource> extends H
         Exchange validationExchange = new DefaultExchange(exchange);
         validationExchange.getIn().setBody(responseBody);
         validationExchange.getIn().setHeaders(responseHeaders);
+        validationExchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, httpException.getStatusCode());
 
-        boolean validStatus = true, validBody = true, validHeaders = true;
-
-        if (getStatusCode() != 0 && getStatusCode() != httpException.getStatusCode()) {
-            logger.warn("HTTP Status Code is not expected, received: {}, expected: {}", httpException.getStatusCode(),
-                    getStatusCode());
-            validStatus = false;
-        }
-
-        if (getBody() != null && !getBody().matches(validationExchange)) {
-            logger.warn("The HTTP exception response body is not as expected");
-            validBody = false;
-        }
-
-        if (getHeaders() != null && !new HeadersPredicate(getHeaders()).matches(validationExchange)) {
-            logger.warn("The HTTP exception response headers are not as expected");
-            validHeaders = false;
-        }
-
-        return validStatus && validBody && validHeaders;
+        return super.matches(validationExchange);
     }
 
     @Override
-    public void process(Exchange exchange) throws Exception {
-        super.process(exchange);
-        exchange.getIn().setFault(true);
+    public String toString() {
+        return "HttpErrorTestResource: Code:" + getStatusCode() + ", Body: " +
+                (getBody() != null ? getBody().toString() : ", Body: null");
     }
+
 }

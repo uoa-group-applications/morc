@@ -7,8 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A resource for using or validating Java exceptions where validation only checks that the message is the same,
- * and of the same type (or sub-type)
+ * A resource for testing that an exception is of the same type (or subclass)
  *
  * @author David MacDonald <d.macdonald@auckland.ac.nz>
  */
@@ -30,17 +29,19 @@ public class ExceptionTestResource implements Processor, Predicate {
         Throwable t = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
 
         if (t == null) {
-            logger.warn("An exception was expected to be received on endpoint {}", exchange.getFromEndpoint().getEndpointUri());
+            logger.warn("An exception was expected to be received on endpoint {}",
+                    (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
             return false;
         }
 
-        logger.debug("An execution exception was encountered on endpoint {}", exchange.getFromEndpoint().getEndpointUri(), t);
+        logger.debug("An execution exception was encountered on endpoint {}",
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"), t);
 
-        boolean matches = (t.getMessage().equals(exception.getMessage())) && exception.getClass().isAssignableFrom(t.getClass());
+        boolean matches = exception.getClass().isAssignableFrom(t.getClass());
 
-        if (!matches)
+        if (matches)
             logger.warn("The exception did not match the expected exception from endpoint {}",
-                    exchange.getFromEndpoint().getEndpointUri());
+                    (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
 
         return matches;
     }
@@ -48,5 +49,10 @@ public class ExceptionTestResource implements Processor, Predicate {
     @Override
     public void process(Exchange exchange) throws Exception {
         exchange.setException(exception);
+    }
+
+    @Override
+    public String toString() {
+        return "ExceptionTestResource: " + exception;
     }
 }

@@ -23,7 +23,9 @@ public class BodyProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.trace("Setting body of exchange from endpoint {} to {}", exchange.getFromEndpoint().getEndpointUri(), responseBody.getValue());
+        logger.trace("Setting body of exchange from endpoint {} to {}",
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"),
+                responseBody.getValue());
         exchange.getIn().setBody(responseBody.getValue());
     }
 }

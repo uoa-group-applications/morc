@@ -1,5 +1,7 @@
 package nz.ac.auckland.morc.tests.specification;
 
+import nz.ac.auckland.morc.MorcMethods;
+import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.morc.specification.OrchestratedTestSpecification;
 import org.apache.camel.Exchange;
@@ -9,9 +11,7 @@ import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.*;
-
-public class AsyncOrchestratedTestBuilderTest extends Assert {
+public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testEqualBodiesAndHeaders() throws Exception {
@@ -58,7 +58,7 @@ public class AsyncOrchestratedTestBuilderTest extends Assert {
 
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
-        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").inputMessage(text("foo"))
+        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").input(new BodyProcessor(text("foo")))
                 .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
 
         assertEquals(2, test.getProcessors().size());

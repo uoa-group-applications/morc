@@ -110,16 +110,3 @@ public class MorcParameterized extends Suite {
         }
     }
 }
-
-/*
-JUnit sigh...
- */
-class AnonymousMorc extends MorcTestBuilder {
-    public AnonymousMorc() {
-
-    }
-
-    public void configure() {
-
-    }
-}

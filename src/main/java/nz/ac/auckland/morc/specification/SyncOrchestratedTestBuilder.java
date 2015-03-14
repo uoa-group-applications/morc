@@ -6,7 +6,6 @@ import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.HeadersProcessor;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
-import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -136,11 +135,8 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
                 new Object[]{getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
                         responseBodyPredicates.size(), responseHeadersPredicates.size()});
 
-        addRepeatedProcessor(new Processor() {
-            @Override
-            public void process(Exchange exchange) throws Exception {
-                exchange.setPattern(ExchangePattern.InOut);
-            }
+        addRepeatedProcessor(exchange -> {
+            exchange.setPattern(ExchangePattern.InOut);
         });
 
         int messageCount = Math.max(inputRequestBodies.size(), inputRequestHeaders.size());

@@ -1,6 +1,6 @@
 package nz.ac.auckland.morc.tests.predicate;
 
-import nz.ac.auckland.morc.MorcTestBuilder;
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.resource.SoapFaultTestResource;
 import nz.ac.auckland.morc.resource.XmlTestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
@@ -17,7 +17,7 @@ import javax.xml.namespace.QName;
 import java.io.IOException;
 
 
-public class SOAPFaultPredicateTest extends Assert {
+public class SOAPFaultPredicateTest extends Assert implements MorcMethods {
 
     public SOAPFaultPredicateTest() {
         XMLUnit.setIgnoreWhitespace(true);
@@ -46,13 +46,13 @@ public class SOAPFaultPredicateTest extends Assert {
     @Test
     public void testFaultMessageValidator() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        SoapFault fault = new SoapFault("message", MorcTestBuilder.SOAPFAULT_SERVER);
+        SoapFault fault = new SoapFault("message", soapFaultServer());
         e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
-        Predicate predicate = new SoapFaultTestResource(MorcTestBuilder.SOAPFAULT_SERVER, "message");
+        Predicate predicate = new SoapFaultTestResource(soapFaultServer(), "message");
 
         assertTrue(predicate.matches(e));
-        fault = new SoapFault("message1", MorcTestBuilder.SOAPFAULT_SERVER);
+        fault = new SoapFault("message1", soapFaultServer());
         e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         assertFalse(predicate.matches(e));
@@ -62,13 +62,13 @@ public class SOAPFaultPredicateTest extends Assert {
     @Test
     public void testQNameFaultCodeValidation() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        SoapFault fault = new SoapFault("message", MorcTestBuilder.SOAPFAULT_SERVER);
+        SoapFault fault = new SoapFault("message", soapFaultServer());
         e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
-        Predicate predicate = new SoapFaultTestResource(MorcTestBuilder.SOAPFAULT_SERVER, "message");
+        Predicate predicate = new SoapFaultTestResource(soapFaultServer(), "message");
 
         assertTrue(predicate.matches(e));
-        fault = new SoapFault("message", MorcTestBuilder.SOAPFAULT_CLIENT);
+        fault = new SoapFault("message", soapFaultClient());
         e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         assertFalse(predicate.matches(e));

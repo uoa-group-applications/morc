@@ -71,7 +71,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      */
     public Builder addProcessors(int index, Processor... processors) {
         while (index >= this.processors.size()) {
-            this.processors.add(new ArrayList<Processor>());
+            this.processors.add(new ArrayList<>());
         }
         this.processors.get(index).addAll(new ArrayList<>(Arrays.asList(processors)));
         return self();
@@ -104,7 +104,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      */
     public Builder addPredicates(int index, Predicate... predicates) {
         while (index >= this.predicates.size()) {
-            this.predicates.add(new ArrayList<Predicate>());
+            this.predicates.add(new ArrayList<>());
         }
         this.predicates.get(index).addAll(new ArrayList<>(Arrays.asList(predicates)));
         return self();

@@ -1,13 +1,12 @@
 package nz.ac.auckland.morc.tests.mock;
 
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.builder.UnreceivedMockDefinitionBuilder;
 import nz.ac.auckland.morc.processor.BodyProcessor;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.text;
-
-public class UnreceivedMockDefinitionBuilderTest extends Assert {
+public class UnreceivedMockDefinitionBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testSpecifyPositiveReceived() throws Exception {

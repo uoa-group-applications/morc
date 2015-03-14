@@ -1,5 +1,6 @@
 package nz.ac.auckland.morc.tests.mock;
 
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.mock.builder.ContentMockDefinitionBuilder;
 import nz.ac.auckland.morc.predicate.HeadersPredicate;
@@ -10,10 +11,8 @@ import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.*;
 
-
-public class ContentMockDefinitionBuilderTest extends Assert {
+public class ContentMockDefinitionBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testBodiesAndHeadersMatchedCorrect() throws Exception {

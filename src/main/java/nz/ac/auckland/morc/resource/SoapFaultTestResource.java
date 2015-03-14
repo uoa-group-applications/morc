@@ -142,7 +142,8 @@ public class SoapFaultTestResource implements Predicate, Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        logger.trace("Setting fault for exchange arriving from endpoint {}", exchange.getFromEndpoint().getEndpointUri());
+        logger.trace("Setting fault for exchange arriving from endpoint {}",
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
         exchange.getIn().setFault(true);
         exchange.getIn().setBody(getValue());
     }

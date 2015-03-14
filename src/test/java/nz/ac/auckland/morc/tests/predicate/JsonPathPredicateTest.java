@@ -1,13 +1,13 @@
 package nz.ac.auckland.morc.tests.predicate;
 
-import nz.ac.auckland.morc.MorcTestBuilder;
+import nz.ac.auckland.morc.MorcMethods;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JsonPathPredicateTest extends Assert {
+public class JsonPathPredicateTest extends Assert implements MorcMethods {
 
     @Test
     public void testMatches() throws Exception {
@@ -16,7 +16,7 @@ public class JsonPathPredicateTest extends Assert {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody(message);
 
-        assertTrue(MorcTestBuilder.jsonpath(".foo.baz[?(@.size > 1)]").matches(e));
-        assertFalse(MorcTestBuilder.jsonpath(".foo.baz[?(@.size == 0)]").matches(e));
+        assertTrue(jsonpath(".foo.baz[?(@.size > 1)]").matches(e));
+        assertFalse(jsonpath(".foo.baz[?(@.size == 0)]").matches(e));
     }
 }

@@ -1,5 +1,6 @@
 package nz.ac.auckland.morc.tests.mock;
 
+import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.mock.builder.SyncMockDefinitionBuilder;
 import org.apache.camel.Exchange;
@@ -9,9 +10,7 @@ import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static nz.ac.auckland.morc.MorcTestBuilder.*;
-
-public class SyncMockDefinitionBuilderTest extends Assert {
+public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods {
 
     //to illustrate you must still specify the number of expected messages
     @Test

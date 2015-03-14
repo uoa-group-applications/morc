@@ -1,6 +1,6 @@
 morc
 ==================================================
-### Mock Orchestrated Testing of SOA Artifacts
+### Mock Orchestrated Testing of SOA and Micro Service Artifacts
 
 **[Javadoc](http://uoa-group-applications.github.io/morc/apidocs/)**
 
@@ -8,7 +8,7 @@ morc
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/nz.ac.auckland.morc/morc/badge.svg)](https://maven-badges.herokuapp.com/maven-central/nz.ac.auckland.morc/morc) [![Build Status](https://travis-ci.org/uoa-group-applications/morc.png)](http://travis-ci.org/uoa-group-applications/morc) [![Coverage Status](https://coveralls.io/repos/uoa-group-applications/morc/badge.png?branch=master)](https://coveralls.io/r/uoa-group-applications/morc?branch=master)
 
-morc provides a fluent Java Builder/DSL that allows developers and testers to construct specifications that dictate how an integration process/artifact under testing is expected to invoke a variety of different endpoints for a given input, where each endpoint has different ordering and message requirements. Given such a specification, the framework will first set up 'mock' endpoints as specified by the endpoint expectations that provide the canned responses before invoking the integration process/artifact to ensure all requirements are met. The requests/responses are compared semantically to the expectation based on the format required; for example, XML is compared using XMLUnit to allow for variations in XML request/response generation.
+morc provides a fluent Java Builder/DSL that allows developers and testers to construct specifications that dictate how an integration or Micro Service process/artifact under testing is expected to invoke a variety of different endpoints for a given input, where each endpoint has different ordering and message requirements. Given such a specification, the framework will first set up 'mock' endpoints as specified by the endpoint expectations that provide the canned responses before invoking the integration process/artifact to ensure all requirements are met. The requests/responses are compared semantically to the expectation based on the format required; for example, XML is compared using XMLUnit to allow for variations in XML request/response generation.
 
 This framework was borne out of frustration with setting up automated testing of integration artifacts produced by the mega vendors' integration stacks where we were unable to automatically set up (mock) endpoints to receive messages, ensure they are valid and provide a canned response to let the process continue on its way. This was especially problematic once we started introducing multi-step processes that were invoking other integration artifiacts using a variety of different transports. By using [Apache Camel](http://camel.apache.org/) under the hood we were effectively able to to support a [huge variety of technologies](http://camel.apache.org/components.html) for receiving and sending messages, although our major focus has been on JMS and (SOAP|REST|XML|JSON over HTTP)-style web-services. Our typical work-flow for testing (on a CI box) is to configure our integration stack to point to local host addresses/ports that morc (and Camel) will use to spin up a subscriber to receive a message, validate and return a canned response.
 
@@ -29,7 +29,7 @@ public class MorcTest extends MorcTestBuilder {
 }
 ```
 
-While these tests conform with standard JUnit requirements, it requires a lot of boiler plate configuration to get started. A simple way to create and run tests is with a Groovy script like:
+While these tests conform with standard JUnit requirements, it requires a lot of boiler plate configuration to get started. A simple way to create and run tests is with a Groovy (>=2.3) script like:
 ```java
 @Grab(group="nz.ac.auckland.morc",module="morc",version="1.8.0")
 import nz.ac.auckland.morc.MorcTestBuilder

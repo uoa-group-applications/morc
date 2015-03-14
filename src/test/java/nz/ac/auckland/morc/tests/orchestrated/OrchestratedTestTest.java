@@ -21,7 +21,7 @@ public class OrchestratedTestTest extends Assert {
 
     @Test
     public void testSpringContextPropertiesConstructor() throws Exception {
-        String[] inputs = new String[]{"foo.xml", "baz.xml"};
+        String[] inputs = new String[]{"1.xml", "baz.xml"};
         MorcTest test = new MorcTest(null, inputs, "foo.properties");
         assertArrayEquals(inputs, test.getSpringContextPaths());
         assertEquals("foo.properties", test.getPropertiesLocation());

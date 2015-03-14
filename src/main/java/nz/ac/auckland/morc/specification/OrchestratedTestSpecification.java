@@ -213,7 +213,8 @@ public class OrchestratedTestSpecification {
                         Throwable t = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
 
                         if (t == null) {
-                            logger.warn("An exception was expected to be received on endpoint {}", exchange.getFromEndpoint().getEndpointUri());
+                            logger.warn("An exception was expected to be received on endpoint {}",
+                                    (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
                             return false;
                         }
 
@@ -421,12 +422,7 @@ public class OrchestratedTestSpecification {
          * @param delay The time in milliseconds to delay the execution of *this* part of the specification
          */
         public Builder executeDelay(final long delay) {
-            this.executeDelay = new PartExecuteDelay() {
-                @Override
-                public long delay() {
-                    return delay;
-                }
-            };
+            this.executeDelay = () -> delay;
             return self();
         }
 
