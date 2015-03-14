@@ -16,13 +16,13 @@
     <url>http://uoa-group-applications.github.io/morc/</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <camel-version>2.14.1</camel-version>
-        <groovy-version>2.4.0</groovy-version>
+        <camel-version>2.15.0</camel-version>
+        <groovy-version>2.4.1</groovy-version>
         <xmlunit-version>1.6</xmlunit-version>
         <junit-version>4.12</junit-version>
         <commons-io-version>2.4</commons-io-version>
         <commons-lang-version>3.3.2</commons-lang-version>
-        <cxf-version>3.0.3</cxf-version>
+        <cxf-version>3.0.4</cxf-version>
         <jackson-version>1.9.13</jackson-version>
         <opencsv-version>2.3</opencsv-version>
         <github.global.server>github</github.global.server>
