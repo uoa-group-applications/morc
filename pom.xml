@@ -10,7 +10,7 @@
     <groupId>nz.ac.auckland.morc</groupId>
     <artifactId>morc</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0</version>
+    <version>1.9.1-SNAPSHOT</version>
     <name>morc</name>
     <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
     <url>http://uoa-group-applications.github.io/morc/</url>
@@ -101,12 +101,6 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring</artifactId>
             <version>${camel-version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
@@ -212,6 +206,6 @@
             scm:git:git@github.com:uoa-group-applications/morc.git
         </developerConnection>
         <url>git@github.com:uoa-group-applications/morc.git</url>
-        <tag>morc-2.0.0</tag>
+        <tag>morc-1.0.0</tag>
     </scm>
 </project>
