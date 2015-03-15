@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Provides a mechanism for validating headers for an expectation or response
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class HeadersPredicate implements Predicate {
 

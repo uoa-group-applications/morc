@@ -13,7 +13,7 @@ import java.util.Properties;
  * either as a mock response, or setting an expectation for the contents of a header.
  * Standard properties files are used if a File/URL is specified.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class HeadersTestResource extends StaticTestResource<Map<String, Object>> {
 

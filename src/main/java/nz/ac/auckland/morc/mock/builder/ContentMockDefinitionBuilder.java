@@ -3,7 +3,7 @@ package nz.ac.auckland.morc.mock.builder;
 /**
  * A concrete implementation of ContentMockDefinitionBuilderInit
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class ContentMockDefinitionBuilder extends ContentMockDefinitionBuilderInit<ContentMockDefinitionBuilder> {
 

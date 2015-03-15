@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * A processor for setting the headers of an exchange to the given set of values
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class HeadersProcessor implements Processor {
 

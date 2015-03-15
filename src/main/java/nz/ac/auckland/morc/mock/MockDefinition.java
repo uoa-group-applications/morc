@@ -18,7 +18,6 @@ import java.util.List;
 /**
  * A general class for declaring a mock definition for a consumer of the
  * given endpoint URI.
- * <p/>
  * By default messages are expected to be in strict order (they arrive in the
  * order that they are defined in the test). This can be relaxed by setting the
  * orderingType to something other than TOTAL; PARTIAL ordering will allow messages
@@ -28,7 +27,7 @@ import java.util.List;
  * - this may be useful when you just care about a message arriving, and not providing a
  * meaningful/ordered response.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class MockDefinition {
 

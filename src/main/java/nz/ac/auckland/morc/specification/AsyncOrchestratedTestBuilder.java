@@ -17,7 +17,7 @@ import java.util.Map;
  * A builder that generates a complete test specification including all expectations for asynchronously sending a message
  * to a target destination.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit<AsyncOrchestratedTestBuilder> {
 

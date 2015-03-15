@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A processor for setting the body of an exchange to a given value
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class BodyProcessor implements Processor {
 

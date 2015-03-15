@@ -21,10 +21,9 @@ import java.util.List;
  * assumes there's a public static void configure() method available
  * to configure a set of test specifications which will then be retrieved
  * using the getSpecifications method of MorcTest
- * <p/>
  * Any copyright for similar code will be under the EPL license for JUnit
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class MorcParameterized extends Suite {
 

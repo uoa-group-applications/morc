@@ -17,7 +17,7 @@ import javax.xml.parsers.DocumentBuilder;
 /**
  * A way to specify a SOAP Fault to return back to the application under testing, or validate a response SoapFault
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class SoapFaultTestResource implements Predicate, Processor {
 

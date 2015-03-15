@@ -6,7 +6,7 @@ import nz.ac.auckland.morc.mock.MockDefinition;
  * A builder to generate a mock definition that ensures no message is expected to be received at this point. This is useful
  * for setting up an endpoint to ensure no message is sent here.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class UnreceivedMockDefinitionBuilder extends MockDefinition.MockDefinitionBuilderInit<UnreceivedMockDefinitionBuilder> {
 

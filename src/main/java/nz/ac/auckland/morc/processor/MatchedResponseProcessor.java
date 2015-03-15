@@ -13,7 +13,7 @@ import java.util.HashSet;
 /**
  * An answer that will return a response back to the client based on the incoming exchange message
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class MatchedResponseProcessor implements Processor {
 
@@ -45,7 +45,7 @@ public class MatchedResponseProcessor implements Processor {
     }
 
     /**
-     * An approach class for making input->output pairs; these predicates and processors must be thread safe
+     * An approach class for making input to output pairs; these predicates and processors must be thread safe
      * as they can be called concurrently
      */
     public static class MatchedResponse {

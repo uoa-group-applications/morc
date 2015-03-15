@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * A builder to generate a mock definition that validates the bodies and headers for an incoming message
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class ContentMockDefinitionBuilderInit<Builder extends ContentMockDefinitionBuilderInit<Builder>>
         extends MockDefinition.MockDefinitionBuilderInit<Builder> {

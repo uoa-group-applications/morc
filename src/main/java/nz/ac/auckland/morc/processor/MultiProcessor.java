@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * A class for aggregating multiple processors to appear as one such that it's easier to use outside of the builder
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class MultiProcessor implements Processor {
 

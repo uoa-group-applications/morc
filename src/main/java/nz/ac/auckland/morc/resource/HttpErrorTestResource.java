@@ -12,10 +12,10 @@ import java.util.Map;
 /**
  * A resource for returning non-200 error HTTP codes back to the client, or testing that such an response was received.
  * The default status code is 500.
- * <p/>
+ *
  * Setting the status code to 0 will mean it won't be validated against (but the body and headers will, if any).
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class HttpErrorTestResource<T extends Predicate & TestResource> extends HttpResponseTestResource {
 

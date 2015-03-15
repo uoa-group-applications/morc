@@ -290,7 +290,7 @@ public interface MorcMethods {
     }
 
     /**
-     * A convenience method for specifying matched input->output answers for expectations
+     * A convenience method for specifying matched input to output answers for expectations
      */
     @SuppressWarnings("unchecked")
     default MatchedResponseProcessor matchedResponse(MatchedResponseProcessor.MatchedResponse... responses) {

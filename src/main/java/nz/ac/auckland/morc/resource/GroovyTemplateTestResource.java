@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * A test resource that has delayed evaluation of a groovy script with appropriate variables
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class GroovyTemplateTestResource implements TestResource<String>, Predicate {
     private TemplateEngine templateEngine;

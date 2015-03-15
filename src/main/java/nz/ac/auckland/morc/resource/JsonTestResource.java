@@ -17,7 +17,7 @@ import java.net.URL;
  * Provides a mechanism for retrieving JSON values from a file/URL/String and also
  * validating the response from a target service.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class JsonTestResource extends StaticTestResource<String> implements Predicate {
 

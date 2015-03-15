@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Generates an mock definition for ensuring asynchronous messages will be received at some point in the future.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class AsyncMockDefinitionBuilder extends ContentMockDefinitionBuilderInit<AsyncMockDefinitionBuilder> {
 

@@ -15,7 +15,7 @@ import java.net.URL;
  * A simple mechanism for sending and comparing plain text values
  * using the Java equals mechanism
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class PlainTextTestResource extends StaticTestResource<String> implements Predicate {
 

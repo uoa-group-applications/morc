@@ -27,10 +27,9 @@ import java.util.concurrent.CountDownLatch;
 /**
  * This carries out the actual testing of the orchestrated specification specification - ensuring
  * ordering of the received exchanges is as expected
- * <p/>
  * This will be extended for actual tests and will use JUnit Parameterized to add parameters at runtime.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 
 public class MorcTest extends CamelSpringTestSupport {

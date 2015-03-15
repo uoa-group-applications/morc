@@ -6,7 +6,12 @@ import org.apache.camel.Processor;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-//any processors added should be thread safe!
+/**
+ * Given a list of processors this class is used to select which should be used. The default implementation will cycle
+ * through the responses/partProcessors. Any processors added should be thread safe.
+ *
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
+ */
 public class SelectorProcessor implements Processor {
     private List<Processor> processors;
     private AtomicInteger messageIndex = new AtomicInteger(0);

@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * The root builder for specifying processors and predicates for message publishers and mock definitions
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 

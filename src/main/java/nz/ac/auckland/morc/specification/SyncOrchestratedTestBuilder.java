@@ -23,7 +23,7 @@ import java.util.Map;
  * which need to be satisfied. The response bodies from the target will also be validated against the expected
  * response bodies.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit<SyncOrchestratedTestBuilder> {
 

@@ -11,7 +11,7 @@ import java.util.List;
  * A class for aggregating multiple predicates to appear as one such that it's easier to use outside of the builder.
  * All predicates will be evaluated, even if one fails.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class MultiPredicate implements Predicate {
     private List<Predicate> predicates;

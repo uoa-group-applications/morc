@@ -4,7 +4,7 @@ package nz.ac.auckland.morc.resource;
  * An interface for providing test resources for expectations
  * or requests/inputs
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public interface TestResource<T> {
     /**

@@ -8,7 +8,7 @@ import org.apache.camel.component.cxf.DataFormat;
  * Overrides the default CXF endpoint dataFormat of POJO to PAYLOAD as we're not
  * interested in reading the data as a bean
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class CxfEndpointOverride implements EndpointOverride {
 

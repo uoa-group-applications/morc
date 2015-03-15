@@ -21,7 +21,7 @@ import java.io.StringWriter;
  * and the fact that performance isn't too much of a concern right now means
  * I'm leaving it as is.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class XmlUtilities {
 

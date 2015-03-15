@@ -7,7 +7,7 @@ import java.net.URL;
  * Used for retrieving static resources necessary for either sending values to an artifact under testing,
  * or validating an expectation
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public abstract class StaticTestResource<T> implements TestResource {
     private InputStream stream;

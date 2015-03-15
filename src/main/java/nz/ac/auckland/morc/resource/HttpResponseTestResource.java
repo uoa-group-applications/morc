@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A resource for returning non-200 HTTP codes back to the client, or testing that such an response was received
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class HttpResponseTestResource<T extends Predicate & TestResource> implements Processor, Predicate {
 

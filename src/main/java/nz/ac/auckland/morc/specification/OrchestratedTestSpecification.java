@@ -19,7 +19,7 @@ import java.util.*;
  * is deemed to be correct. A DSL builder is used to generate an instate of an orchestrated test specification
  * which is executed as part of a MorcTest
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class OrchestratedTestSpecification {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratedTestSpecification.class);

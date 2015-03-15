@@ -19,7 +19,7 @@ import java.net.URL;
  * Provides a mechanism for retrieving XML values from a file/URL/String and also
  * validating a response from a target service.
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class XmlTestResource extends StaticTestResource<Document> implements Predicate {
 

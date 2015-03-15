@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * A builder that generates a mock definition that will set the body or headers for a message response
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class SyncMockDefinitionBuilderInit<Builder extends SyncMockDefinitionBuilderInit<Builder, T>, T extends TestResource>
         extends ContentMockDefinitionBuilderInit<Builder> {

@@ -5,7 +5,7 @@ import nz.ac.auckland.morc.resource.TestResource;
 /**
  * A concrete implementation of SyncMockDefinitionBuilderInit
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class SyncMockDefinitionBuilder extends SyncMockDefinitionBuilderInit<SyncMockDefinitionBuilder, TestResource> {
     /**

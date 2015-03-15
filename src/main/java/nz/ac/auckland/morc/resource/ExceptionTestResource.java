@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A resource for testing that an exception is of the same type (or subclass)
  *
- * @author David MacDonald <d.macdonald@auckland.ac.nz>
+ * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class ExceptionTestResource implements Processor, Predicate {
 
