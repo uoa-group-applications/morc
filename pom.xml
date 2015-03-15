@@ -9,7 +9,7 @@
     <groupId>nz.ac.auckland.morc</groupId>
     <artifactId>morc</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <name>morc</name>
     <description>Orchestrated Testing of SOA Artifacts Using Apache Camel</description>
     <url>http://uoa-group-applications.github.io/morc/</url>
@@ -211,6 +211,6 @@
             scm:git:git@github.com:uoa-group-applications/morc.git
         </developerConnection>
         <url>git@github.com:uoa-group-applications/morc.git</url>
-        <tag>morc-2.0.0</tag>
+        <tag>morc-1.0.0</tag>
     </scm>
 </project>
