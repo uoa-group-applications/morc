@@ -1,8 +1,5 @@
 package nz.ac.auckland.morc.resource;
 
-import nz.ac.auckland.morc.predicate.HeadersPredicate;
-import nz.ac.auckland.morc.processor.BodyProcessor;
-import nz.ac.auckland.morc.processor.HeadersProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -14,7 +11,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class HttpResponseTestResource<T extends Predicate & TestResource> implements Processor, Predicate {
+public class HttpResponseTestResource<T extends Processor & Predicate> implements Processor, Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseTestResource.class);
     private int statusCode;
@@ -76,7 +73,7 @@ public class HttpResponseTestResource<T extends Predicate & TestResource> implem
             validBody = false;
         }
 
-        if (headers != null && !new HeadersPredicate(headers).matches(exchange)) {
+        if (headers != null && !headers.matches(exchange)) {
             logger.warn("The HTTP response headers are not as expected");
             validHeaders = false;
         }
@@ -89,8 +86,8 @@ public class HttpResponseTestResource<T extends Predicate & TestResource> implem
     public void process(Exchange exchange) throws Exception {
         logger.trace("Setting response code to {} for endpoint {}", statusCode,
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
-        if (body != null) new BodyProcessor(body).process(exchange);
-        if (headers != null) new HeadersProcessor(headers).process(exchange);
+        if (body != null) body.process(exchange);
+        if (headers != null) headers.process(exchange);
         exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, statusCode);
     }
 }

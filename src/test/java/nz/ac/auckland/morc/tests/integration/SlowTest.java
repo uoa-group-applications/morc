@@ -57,17 +57,17 @@ public class SlowTest extends MorcTestBuilder {
          */
         syncTest("Slow Consumer Test", "direct:syncConsumer")
                 .messageResultWaitTime(500)
-                .requestBody(times(10, text("foo")))
+                .requestMultiplier(10, text("foo"))
                         //.sendInterval(5000l)
-                .expectedResponse(times(10, text("baz")));
+                .expectationMultiplier(10, text("baz"));
 
         syncTest("Very Slow Consumer Test with limited timeframes", "direct:verySlowSyncConsumer")
-                .requestBody(text("foo"))
-                .expectedResponse(text("baz"));
+                .request(text("foo"))
+                .expectation(text("baz"));
 
 
         asyncTest("Very Slow Async Consumer Test with limited timeframes", "direct:verySlowAsyncConsumer")
-                .inputMessage(text("foo"));
+                .input(text("foo"));
     }
 
 }

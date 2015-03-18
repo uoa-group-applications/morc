@@ -1,6 +1,5 @@
 package nz.ac.auckland.morc.tests.resource;
 
-import nz.ac.auckland.morc.predicate.HeadersPredicate;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,8 +37,7 @@ public class HeadersTestResourceTest extends Assert {
 
     @Test
     public void testCompareInput() throws Exception {
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(inputUrl));
-        assertTrue(predicate.matches(EXPECTED_PROPERTIES));
+        assertTrue(new HeadersTestResource(inputUrl).matches(EXPECTED_PROPERTIES));
     }
 
     @Test
@@ -48,8 +46,7 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("baz", "foo");
         differentProperties.put("123", "abc");
 
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(inputUrl));
-        assertFalse(predicate.matches(differentProperties));
+        assertFalse(new HeadersTestResource(inputUrl).matches(differentProperties));
     }
 
     @Test
@@ -58,8 +55,7 @@ public class HeadersTestResourceTest extends Assert {
         differentProperties.put("foo", "foo");
         differentProperties.put("abc", "123");
 
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(inputUrl));
-        assertFalse(predicate.matches(differentProperties));
+        assertFalse(new HeadersTestResource(inputUrl).matches(differentProperties));
     }
 
     @Test
@@ -71,21 +67,18 @@ public class HeadersTestResourceTest extends Assert {
 
         HeadersTestResource receivedHeaders = new HeadersTestResource(inputUrl);
 
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(expectedHeaders));
-        assertFalse(predicate.matches(receivedHeaders.getValue()));
+        assertFalse(new HeadersTestResource(expectedHeaders).matches(receivedHeaders.getValue()));
     }
 
     @Test
     public void testNullProperties() throws Exception {
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(EXPECTED_PROPERTIES));
         Map<String, Object> nullMap = null;
-        assertFalse(predicate.matches(nullMap));
+        assertFalse(new HeadersTestResource(inputUrl).matches(nullMap));
     }
 
     @Test
     public void testEmptyPropertiesFile() throws Exception {
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(inputUrl2));
-        assertTrue(predicate.matches(new HashMap<String, Object>()));
+        assertTrue(new HeadersTestResource(inputUrl2).matches(new HashMap<>()));
     }
 
     @Test
@@ -98,8 +91,7 @@ public class HeadersTestResourceTest extends Assert {
         values2.put("foo", "baz");
         values2.put("abc", "123");
 
-        HeadersPredicate predicate = new HeadersPredicate(new HeadersTestResource(values1));
-        assertTrue(predicate.matches(values2));
+        assertTrue(new HeadersTestResource(values1).matches(values2));
     }
 
     @Test

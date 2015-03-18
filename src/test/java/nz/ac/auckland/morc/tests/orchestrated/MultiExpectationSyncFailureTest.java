@@ -134,7 +134,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test no exchange available fails", "vm:z")
-                .inputMessage(text("0"))
+                .input(text("0"))
                 .addExpectation(morcMethods.asyncExpectation("vm:b"))
                 .addExpectation(morcMethods.asyncExpectation("vm:c"))
                 .build();
@@ -147,10 +147,10 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new SyncOrchestratedTestBuilder("Test delayed delivery fails", "vm:syncInputAsyncOutputDelayed")
-                .expectedResponseBody(xml("<foo/>"))
-                .requestBody(xml("<baz/>"))
+                .expectation(xml("<foo/>"))
+                .request(xml("<baz/>"))
                 .addExpectation(morcMethods.unreceivedExpectation("vm:somethingToSeeHere").expectedMessageCount(0))
-                .addExpectation(morcMethods.asyncExpectation("vm:asyncTarget2").expectedBody(xml("<baz/>")))
+                .addExpectation(morcMethods.asyncExpectation("vm:asyncTarget2").expectation(xml("<baz/>")))
                 .build();
 
         runTest(spec);
@@ -161,7 +161,7 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test out of order expectations to different endpoints fails", "vm:outOfOrder")
-                .inputMessage(text("0"))
+                .input(text("0"))
                 .addExpectation(morcMethods.syncExpectation("vm:c"))
                 .addExpectation(morcMethods.syncExpectation("vm:b"))
                 .build();
@@ -174,10 +174,10 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test out of order expectations to different endpoints fails", "vm:endpointOutOfOrder")
-                .inputMessage(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectedBody(xml("<foo/>")))
-                .addExpectation(morcMethods.asyncExpectation("vm:b").expectedBody(xml("<baz/>")))
-                .addExpectation(morcMethods.asyncExpectation("vm:b").expectedBody(xml("<foo/>")))
+                .input(text("0"))
+                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(xml("<foo/>")))
+                .addExpectation(morcMethods.asyncExpectation("vm:b").expectation(xml("<baz/>")))
+                .addExpectation(morcMethods.asyncExpectation("vm:b").expectation(xml("<foo/>")))
                 .build();
 
         runTest(spec);
@@ -188,10 +188,10 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test out of order async expectations fail", "vm:asyncOutOfOrder")
-                .inputMessage(text("0"))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("1")))
+                .input(text("0"))
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("1")))
                 .addExpectation(morcMethods.asyncExpectation("vm:b"))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("2")))
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("2")))
                 .build();
 
         runTest(spec);
@@ -203,9 +203,9 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test out of order async expectations fail", "vm:asyncOutOfOrder")
-                .inputMessage(text("0"))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("1")))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("2")))
+                .input(text("0"))
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("1")))
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("2")))
                 .addExpectation(morcMethods.asyncExpectation("vm:b"))
                 .build();
 
@@ -218,11 +218,11 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test out of order async expectations fail with unordered endpoint", "vm:asyncIncorrectBodies")
-                .inputMessage(text("0"))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("1")).endpointNotOrdered())
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("2")).endpointNotOrdered())
+                .input(text("0"))
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("1")).endpointNotOrdered())
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("2")).endpointNotOrdered())
                 .addExpectation(morcMethods.asyncExpectation("vm:s"))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("3")).endpointNotOrdered())
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("3")).endpointNotOrdered())
                 .build();
 
         runTest(spec);
@@ -233,10 +233,10 @@ public class MultiExpectationSyncFailureTest extends CamelTestSupport implements
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Test none ordering handled first during order validation", "vm:noneOrdering")
-                .inputMessage(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectedBody(text("1")))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectedBody(text("1")))
-                .addExpectation(morcMethods.asyncExpectation("vm:n").expectedBody(times(3, text("1"))).ordering(morcMethods.noOrdering()))
+                .input(text("0"))
+                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
+                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("1")))
+                .addExpectation(morcMethods.asyncExpectation("vm:n").expectationMultiplier(3, text("1")).ordering(morcMethods.noOrdering()))
                 .build();
 
         runTest(spec);

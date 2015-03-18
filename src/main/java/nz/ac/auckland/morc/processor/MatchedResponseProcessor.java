@@ -6,9 +6,7 @@ import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * An answer that will return a response back to the client based on the incoming exchange message
@@ -35,7 +33,10 @@ public class MatchedResponseProcessor implements Processor {
                 logger.debug("Matched input for predicate {} at endpoint {}",
                         matchedResponse.inputPredicate,
                         (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
-                matchedResponse.responseProcessor.process(exchange);
+
+                for (Processor e : matchedResponse.responseProcessors)
+                    e.process(exchange);
+
                 return;
             }
         }
@@ -50,11 +51,11 @@ public class MatchedResponseProcessor implements Processor {
      */
     public static class MatchedResponse {
         private Predicate inputPredicate;
-        private Processor responseProcessor;
+        private List<Processor> responseProcessors;
 
-        public MatchedResponse(Predicate inputPredicate, Processor responseProcessor) {
+        public MatchedResponse(Predicate inputPredicate, Processor... responseProcessors) {
             this.inputPredicate = inputPredicate;
-            this.responseProcessor = responseProcessor;
+            this.responseProcessors = Collections.unmodifiableList(Arrays.asList(responseProcessors));
         }
     }
 }

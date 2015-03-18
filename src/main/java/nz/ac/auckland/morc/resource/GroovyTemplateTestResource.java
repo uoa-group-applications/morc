@@ -5,6 +5,9 @@ import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -13,7 +16,10 @@ import java.util.Map;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class GroovyTemplateTestResource implements TestResource<String>, Predicate {
+public class GroovyTemplateTestResource implements Predicate, Processor, TestResource<String> {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlainTextTestResource.class);
+
     private TemplateEngine templateEngine;
     private Map<String, String> variables;
     private TestResource<String> template;
@@ -40,7 +46,6 @@ public class GroovyTemplateTestResource implements TestResource<String>, Predica
         return textResource.matches(exchange);
     }
 
-    @Override
     public String getValue() throws Exception {
         Template groovyTemplate = templateEngine.createTemplate(template.getValue());
         return groovyTemplate.make(variables).toString();
@@ -55,5 +60,14 @@ public class GroovyTemplateTestResource implements TestResource<String>, Predica
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        String body = getValue();
+
+        logger.trace("Setting body of exchange from endpoint {} to {}",
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"), body);
+        exchange.getIn().setBody(body);
     }
 }

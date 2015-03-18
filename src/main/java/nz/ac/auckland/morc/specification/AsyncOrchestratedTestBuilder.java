@@ -1,17 +1,7 @@
 package nz.ac.auckland.morc.specification;
 
 import nz.ac.auckland.morc.TestBean;
-import nz.ac.auckland.morc.processor.BodyProcessor;
-import nz.ac.auckland.morc.processor.HeadersProcessor;
-import nz.ac.auckland.morc.resource.TestResource;
 import org.apache.camel.Processor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A builder that generates a complete test specification including all expectations for asynchronously sending a message
@@ -20,11 +10,6 @@ import java.util.Map;
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit<AsyncOrchestratedTestBuilder> {
-
-    private static final Logger logger = LoggerFactory.getLogger(AsyncOrchestratedTestBuilder.class);
-
-    private List<TestResource<Map<String, Object>>> inputMessageHeaders = new ArrayList<>();
-    private List<TestResource> inputMessageBodies = new ArrayList<>();
 
     /**
      * @param description The description that identifies what the test is supposed to do
@@ -47,52 +32,16 @@ public class AsyncOrchestratedTestBuilder extends OrchestratedTestSpecification.
      * @param processors A list of processors to apply to the exchange before the message is sent
      */
     public AsyncOrchestratedTestBuilder input(Processor... processors) {
-        this.addProcessors(processors);
-        return self();
+        return addProcessors(processors);
     }
 
     /**
-     * @param resources The set of resources that should be sent in the body to the target endpoint URI - these will
-     *                  match to the corresponding inputHeaders if available
+     * Replay the same request for the specified number of times
+     *
+     * @param count      The number of times to repeat these processors (separate requests)
+     * @param processors A collection of processors that will be applied to an exchange before it is sent
      */
-    public AsyncOrchestratedTestBuilder inputMessage(TestResource... resources) {
-        Collections.addAll(inputMessageBodies, resources);
-        return self();
+    public AsyncOrchestratedTestBuilder inputMultiplier(int count, Processor... processors) {
+        return processorMultiplier(count, processors);
     }
-
-    /**
-     * @param resources The set of resources that should be sent as headers to the target endpoint URI - these will
-     *                  match to the corresponding inputMessage if available
-     */
-    @SafeVarargs
-    public final AsyncOrchestratedTestBuilder inputHeaders(TestResource<Map<String, Object>>... resources) {
-        Collections.addAll(inputMessageHeaders, resources);
-        return self();
-    }
-
-    /**
-     * @throws IllegalArgumentException if no expectations are specified
-     */
-    public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
-        logger.debug("The endpoint {} will receive {} input message bodies and {} input message headers",
-                new Object[]{getEndpointUri(), inputMessageBodies.size(), inputMessageHeaders.size()});
-
-        int messageCount = Math.max(inputMessageBodies.size(), inputMessageHeaders.size());
-
-        for (int i = 0; i < messageCount; i++) {
-            if (i < inputMessageBodies.size()) {
-                try {
-                    addProcessors(i, new BodyProcessor(inputMessageBodies.get(i)));
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            if (i < inputMessageHeaders.size())
-                addProcessors(i, new HeadersProcessor(inputMessageHeaders.get(i)));
-        }
-
-        return super.build(partCount, nextPart);
-    }
-
 }

@@ -2,6 +2,7 @@ package nz.ac.auckland.morc.resource;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
 import org.apache.camel.component.http.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultExchange;
 import org.slf4j.Logger;
@@ -12,12 +13,12 @@ import java.util.Map;
 /**
  * A resource for returning non-200 error HTTP codes back to the client, or testing that such an response was received.
  * The default status code is 500.
- *
+ * <p/>
  * Setting the status code to 0 will mean it won't be validated against (but the body and headers will, if any).
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class HttpErrorTestResource<T extends Predicate & TestResource> extends HttpResponseTestResource {
+public class HttpErrorTestResource<T extends Processor & Predicate> extends HttpResponseTestResource {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpErrorTestResource.class);
 
@@ -59,7 +60,7 @@ public class HttpErrorTestResource<T extends Predicate & TestResource> extends H
         //this is a bit of a hack to use other validators
         Exchange validationExchange = new DefaultExchange(exchange);
         validationExchange.getIn().setBody(responseBody);
-        validationExchange.getIn().setHeaders(responseHeaders);
+        if (responseHeaders != null) validationExchange.getIn().setHeaders(responseHeaders);
         validationExchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, httpException.getStatusCode());
 
         return super.matches(validationExchange);

@@ -2,7 +2,7 @@
 
 #borrowed from ReadyTalk/swt-bling
 
-if [ "$TRAVIS_REPO_SLUG" == "uoa-group-applications/morc" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk7" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "uoa-group-applications/morc" ] && [ "$TRAVIS_JDK_VERSION" == "oraclejdk8" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
 
   mvn javadoc:javadoc
   cp -R target/site/apidocs $HOME/apidocs-latest

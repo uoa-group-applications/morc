@@ -1,7 +1,6 @@
 package nz.ac.auckland.morc.resource;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
 import org.apache.camel.TypeConversionException;
 import org.apache.cxf.helpers.IOUtils;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import java.net.URL;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class PlainTextTestResource extends StaticTestResource<String> implements Predicate {
+public class PlainTextTestResource extends StaticTestResource<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(PlainTextTestResource.class);
 

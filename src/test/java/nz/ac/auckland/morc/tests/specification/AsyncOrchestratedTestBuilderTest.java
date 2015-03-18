@@ -1,7 +1,6 @@
 package nz.ac.auckland.morc.tests.specification;
 
 import nz.ac.auckland.morc.MorcMethods;
-import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.morc.specification.OrchestratedTestSpecification;
 import org.apache.camel.Exchange;
@@ -16,8 +15,9 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
     @Test
     public void testEqualBodiesAndHeaders() throws Exception {
 
-        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").inputMessage(text("foo")).inputMessage(text("baz"))
-                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
+        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url")
+                .input(text("foo"),headers(header("1", "1"))).input(text("baz"),headers(header("2", "2")))
+                .build();
 
         assertEquals(2, test.getProcessors().size());
         assertEquals(2, test.getPredicates().size());
@@ -38,8 +38,8 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
         OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url")
-                .inputMessage(text("foo"), text("baz"))
-                .inputHeaders(headers(header("1", "1"))).build();
+                .input(text("foo"),headers(header("1", "1"))).input(text("baz"))
+                .build();
 
         assertEquals(2, test.getProcessors().size());
         assertEquals(2, test.getPredicates().size());
@@ -58,8 +58,8 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
 
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
-        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").input(new BodyProcessor(text("foo")))
-                .inputHeaders(headers(header("1", "1"))).inputHeaders(headers(header("2", "2"))).build();
+        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").input(text("foo"),headers(header("1", "1")))
+                .input(headers(header("2", "2"))).build();
 
         assertEquals(2, test.getProcessors().size());
         assertEquals(2, test.getPredicates().size());

@@ -78,10 +78,23 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * @param processor A processor that will be applied to every outgoing message
+     * @param processor A processor that will be applied to every outgoing message but won't create any exchanges
      */
     public Builder addRepeatedProcessor(Processor processor) {
         repeatedProcessors.add(processor);
+        return self();
+    }
+
+    /**
+     * Replay the same processor for the specified number of times (requests or inputs)
+     *
+     * @param count      The number of times to repeat these processors (separate requests)
+     * @param processors A collection of processors that will be applied to an exchange before it is sent
+     */
+    public Builder processorMultiplier(int count, Processor... processors) {
+        for (int i = 0; i < count; i++) {
+            addProcessors(processors);
+        }
         return self();
     }
 
@@ -111,10 +124,25 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
     }
 
     /**
-     * @param predicate A predicate that will be used to validate every exchange
+     * @param predicate A predicate that will be used to validate every exchange but won't create any expectations
+     *                  to start with
      */
     public Builder addRepeatedPredicate(Predicate predicate) {
         repeatedPredicates.add(predicate);
+        return self();
+    }
+
+    /**
+     * Expect a repeat of the same predicates multiple times
+     *
+     * @param count      The number of times to repeat these predicates (separate responses)
+     * @param predicates The set of response validators/predicates that will be used to validate consecutive responses
+     */
+    public Builder predicateMultiplier(int count, Predicate... predicates) {
+        for (int i = 0; i < count; i++) {
+            addPredicates(predicates);
+        }
+
         return self();
     }
 

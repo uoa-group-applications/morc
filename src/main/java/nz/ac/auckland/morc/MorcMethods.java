@@ -3,9 +3,6 @@ package nz.ac.auckland.morc;
 import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
-import nz.ac.auckland.morc.predicate.HeadersPredicate;
-import nz.ac.auckland.morc.processor.BodyProcessor;
-import nz.ac.auckland.morc.processor.HeadersProcessor;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
 import nz.ac.auckland.morc.resource.*;
 import nz.ac.auckland.morc.utility.XmlUtilities;
@@ -47,39 +44,28 @@ public interface MorcMethods {
      * @param data An XML string which will be used for seeding a message, or comparing a value
      */
     default XmlTestResource xml(String data) {
-        return new XmlTestResource(getXmlUtilities().getXmlAsDocument(data));
+        return new XmlTestResource(getXmlUtilities().getXmlAsDocument(data), getXmlUtilities());
     }
 
     /**
      * @param file A file containing an XML document
      */
     default XmlTestResource xml(File file) {
-        return new XmlTestResource(file);
+        return new XmlTestResource(file, getXmlUtilities());
     }
 
     /**
      * @param url A url pointing to an XML document
      */
     default XmlTestResource xml(URL url) {
-        return new XmlTestResource(url);
+        return new XmlTestResource(url, getXmlUtilities());
     }
 
-    default TestResource[] xml(final InputStream... inputs) {
-        TestResource[] resources = new TestResource[inputs.length];
+    default XmlTestResource[] xml(final InputStream... inputs) {
+        XmlTestResource[] resources = new XmlTestResource[inputs.length];
 
         for (int i = 0; i < inputs.length; i++) {
-            final int offset = i;
-            resources[i] = new TestResource() {
-                @Override
-                public Object getValue() throws Exception {
-                    return new XmlTestResource(inputs[offset]).getValue();
-                }
-
-                @Override
-                public String toString() {
-                    return "DynamicXMLTestResource";
-                }
-            };
+            resources[i] = new XmlTestResource(inputs[i], getXmlUtilities());
         }
 
         return resources;
@@ -106,22 +92,11 @@ public interface MorcMethods {
         return new JsonTestResource(url);
     }
 
-    default TestResource[] json(final InputStream... inputs) {
-        TestResource[] resources = new TestResource[inputs.length];
+    default JsonTestResource[] json(final InputStream... inputs) {
+        JsonTestResource[] resources = new JsonTestResource[inputs.length];
 
         for (int i = 0; i < inputs.length; i++) {
-            final int offset = i;
-            resources[i] = new TestResource() {
-                @Override
-                public Object getValue() throws Exception {
-                    return new JsonTestResource(inputs[offset]).getValue();
-                }
-
-                @Override
-                public String toString() {
-                    return "DynamicJSONTestResource";
-                }
-            };
+            resources[i] = new JsonTestResource(inputs[i]);
         }
 
         return resources;
@@ -151,39 +126,14 @@ public interface MorcMethods {
         return new PlainTextTestResource(url);
     }
 
-    default TestResource[] text(final InputStream... inputs) {
-        TestResource[] resources = new TestResource[inputs.length];
+    default PlainTextTestResource[] text(final InputStream... inputs) {
+        PlainTextTestResource[] resources = new PlainTextTestResource[inputs.length];
 
         for (int i = 0; i < inputs.length; i++) {
-            final int offset = i;
-            resources[i] = new TestResource() {
-                @Override
-                public String getValue() throws Exception {
-                    return new PlainTextTestResource(inputs[offset]).getValue();
-                }
-
-                @Override
-                public String toString() {
-                    return "DynamicPlainTextTestResource";
-                }
-            };
+            resources[i] = new PlainTextTestResource(inputs[i]);
         }
 
         return resources;
-    }
-
-    /**
-     * A simple way of repeating the same input multiple times - useful for sending or expecting the same message
-     * multiple times
-     */
-    @SuppressWarnings("unchecked")
-    default <T> T[] times(int count, T input) {
-        T[] typeArray = (T[]) java.lang.reflect.Array.newInstance(input.getClass(), count);
-        for (int i = 0; i < count; i++) {
-            typeArray[i] = input;
-        }
-
-        return typeArray;
     }
 
     /**
@@ -298,31 +248,15 @@ public interface MorcMethods {
     }
 
     /**
-     * A convenience method for specifying matched input validators to outputs
+     * A convenience method for specifying matched input validators to an output processor
      */
     @SuppressWarnings("unchecked")
-    default MatchedResponseProcessor.MatchedResponse answer(Predicate predicate, TestResource resource) {
+    default MatchedResponseProcessor.MatchedResponse answer(Predicate predicate, Processor... processors) {
         try {
-            return new MatchedResponseProcessor.MatchedResponse(predicate, new BodyProcessor(resource));
+            return new MatchedResponseProcessor.MatchedResponse(predicate, processors);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * A convenience method for specifying matched input header validators to output headers
-     */
-    default MatchedResponseProcessor.MatchedResponse headerAnswer(Predicate predicate, TestResource<Map<String, Object>> resource) {
-        try {
-            return new MatchedResponseProcessor.MatchedResponse(predicate, new HeadersProcessor(resource));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    default MatchedResponseProcessor.MatchedResponse headerAnswer(HeadersTestResource expectedHeaders, TestResource<Map<String, Object>> resource) {
-        return headerAnswer(new HeadersPredicate(expectedHeaders), resource);
     }
 
     /**
@@ -467,8 +401,7 @@ public interface MorcMethods {
         return resources;
     }
 
-    class XmlRuntimeTestResource implements TestResource<Document>, Predicate {
-
+    class XmlRuntimeTestResource implements Predicate, Processor, TestResource<Document> {
         private TestResource<String> resource;
         private XmlUtilities xmlUtilities;
 
@@ -483,14 +416,18 @@ public interface MorcMethods {
         }
 
         @Override
-        public Document getValue() throws Exception {
-            return getResource().getValue();
+        public void process(Exchange exchange) throws Exception {
+            getResource().process(exchange);
         }
 
         @Override
         public String toString() {
             return "XmlGroovyTemplateTestResource:" + getResource().toString();
+        }
 
+        @Override
+        public Document getValue() throws Exception {
+            return getResource().getValue();
         }
 
         private XmlTestResource getResource() {
@@ -517,8 +454,7 @@ public interface MorcMethods {
         return resources;
     }
 
-    class JsonRuntimeTestResource implements TestResource<String>, Predicate {
-
+    class JsonRuntimeTestResource implements Processor, Predicate, TestResource<String> {
         private TestResource<String> resource;
 
         public JsonRuntimeTestResource(TestResource<String> resource) {
@@ -531,13 +467,18 @@ public interface MorcMethods {
         }
 
         @Override
-        public String getValue() throws Exception {
-            return getResource().getValue();
+        public void process(Exchange exchange) throws Exception {
+            getResource().process(exchange);
         }
 
         @Override
         public String toString() {
             return "JsonGroovyTemplateTestResource:" + getResource().toString();
+        }
+
+        @Override
+        public String getValue() throws Exception {
+            return getResource().getValue();
         }
 
         private JsonTestResource getResource() {
@@ -629,7 +570,7 @@ public interface MorcMethods {
     }
 
     /**
-     * @return A resource for non-200 HTTP responses
+     * @return A resource for HTTP responses, by default this will return HTTP Status 200
      */
     default HttpResponseTestResource httpResponse() {
         return new HttpResponseTestResource();
@@ -649,7 +590,7 @@ public interface MorcMethods {
      * @return A resource for non-standard HTTP responses
      */
     @SuppressWarnings("unchecked")
-    default <T extends Predicate & TestResource> HttpResponseTestResource httpResponse(int statusCode, T body) {
+    default <T extends Predicate & Processor> HttpResponseTestResource httpResponse(int statusCode, T body) {
         return new HttpResponseTestResource(statusCode, body);
     }
 
@@ -660,7 +601,7 @@ public interface MorcMethods {
      * @return A resource for non-standard HTTP responses
      */
     @SuppressWarnings("unchecked")
-    default <T extends Predicate & TestResource> HttpResponseTestResource httpResponse(int statusCode, T body, HeadersTestResource headers) {
+    default <T extends Processor & Predicate> HttpResponseTestResource httpResponse(int statusCode, T body, HeadersTestResource headers) {
         return new HttpResponseTestResource(statusCode, body, headers);
     }
 
@@ -685,7 +626,7 @@ public interface MorcMethods {
      * @return A resource for error HTTP response codes (this involves additional flags internally)
      */
     @SuppressWarnings("unchecked")
-    default <T extends Predicate & TestResource> HttpErrorTestResource httpErrorResponse(int statusCode, T body) {
+    default <T extends Processor & Predicate> HttpErrorTestResource httpErrorResponse(int statusCode, T body) {
         return new HttpErrorTestResource(statusCode, body);
     }
 
@@ -696,7 +637,7 @@ public interface MorcMethods {
      * @return A resource for error HTTP response codes (this involves additional flags internally)
      */
     @SuppressWarnings("unchecked")
-    default <T extends Predicate & TestResource> HttpErrorTestResource httpErrorResponse(int statusCode, T body, HeadersTestResource headers) {
+    default <T extends Processor & Predicate> HttpErrorTestResource httpErrorResponse(int statusCode, T body, HeadersTestResource headers) {
         return new HttpErrorTestResource(statusCode, body, headers);
     }
 

@@ -37,114 +37,116 @@ public class WebServiceProxyTest extends MorcTestBuilder {
     public void configure() {
 
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
+                        .response(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));
 
         syncTest("Simple non-200 WS proxy test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponse(httpResponse(201))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(httpResponse(201))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpResponse(201, xml("<foo/>"))));
 
         syncTest("Simple non-200 WS proxy test check body", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponse(httpResponse(201, xml("<foo/>")))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(httpResponse(201, xml("<foo/>")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpResponse(201, xml("<foo/>"))));
 
         syncTest("Simple WS proxy failure test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponse(httpErrorResponse(500))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(httpErrorResponse(500))
                 .expectsException()
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpErrorResponse(500, xml(classpath("/data/pingSoapFault.xml")))));
 
         syncTest("Simple WS proxy failure test with body", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponse(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml"))))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml"))))
                 .expectsException()
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml")))));
 
         syncTest("Simple WS test using CXF", "cxf:http://localhost:8091/targetWS")
-                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
+                .request(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectation(xml(classpath("/data/pingResponseCxf1.xml")))
                 .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
-                        .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))));
+                        .expectation(xml(classpath("/data/pingRequestCxf1.xml")))
+                        .response(xml(classpath("/data/pingResponseCxf1.xml"))));
 
         //Testing work around for https://issues.apache.org/jira/browse/CXF-2775
         syncTest("Duplicated WS test using CXF for CXF-2775 Work around", "cxf:http://localhost:8091/targetWS")
-                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                .expectedResponseBody(xml(classpath("/data/pingResponseCxf1.xml")))
+                .request(xml(classpath("/data/pingRequestCxf1.xml")))
+                .expectation(xml(classpath("/data/pingResponseCxf1.xml")))
                 .addExpectation(syncExpectation("cxf:http://localhost:8091/targetWS?wsdlURL=data/PingService.wsdl")
-                        .expectedBody(xml(classpath("/data/pingRequestCxf1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponseCxf1.xml"))));
+                        .expectation(xml(classpath("/data/pingRequestCxf1.xml")))
+                        .response(xml(classpath("/data/pingResponseCxf1.xml"))));
 
         syncTest("CXF WS Fault Test", "cxf:http://localhost:8092/testWSFault")
-                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .request(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectsException()
-                .expectedResponse(soapFault(soapFaultClient(), "Pretend SOAP Fault"));
+                .expectation(soapFault(soapFaultClient(), "Pretend SOAP Fault"));
 
         syncTest("CXF WS Fault Test with detail", "cxf:http://localhost:8092/testWSFaultDetail")
-                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .request(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectsException()
-                .expectedResponse(soapFault(soapFaultServer(), "Pretend Detailed SOAP Fault",
+                .expectation(soapFault(soapFaultServer(), "Pretend Detailed SOAP Fault",
                         xml("<detail><foo/></detail>")));
 
         syncTest("Simple test to show SOAP Fault expectation", "cxf:http://localhost:8092/targetWS")
-                .requestBody(xml(classpath("/data/pingRequestCxf1.xml")))
+                .request(xml(classpath("/data/pingRequestCxf1.xml")))
                 .expectsException()
-                .expectedResponse(soapFault(soapFaultServer(), "Pretend Fault",
+                .expectation(soapFault(soapFaultServer(), "Pretend Fault",
                         xml("<detail><foo/></detail>")))
                 .addExpectation(syncExpectation("cxf:http://localhost:8092/targetWS?wsdlURL=data/PingService.wsdl")
                         .expectedMessageCount(1)
                         .response(soapFault(soapFaultServer(), "Pretend Fault", xml("<detail><foo/></detail>"))));
 
         syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
+                        .response(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()))
                 .addEndpoint("jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                        .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                        .expectation(xml(classpath("/data/pingRequest1.xml")))
+                        .response(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));
 
         syncTest("Simple multiple request WS proxy test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(classpath("/data/pingRequest1.xml")), xml(classpath("/data/pingRequest1.xml")), xml(classpath("/data/pingRequest1.xml")))
-                .expectedResponseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .request(xml(classpath("/data/pingRequest1.xml")))
+                .expectationMultiplier(3, xml(classpath("/data/pingResponse1.xml")))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(times(3, xml(classpath("/data/pingRequest1.xml"))))
-                        .responseBody(times(3, xml(classpath("/data/pingResponse1.xml"))))
+                        .expectationMultiplier(3, xml(classpath("/data/pingRequest1.xml")))
+                        .responseMultiplier(3, xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));
 
         syncTest("Simple JSON PING", "http://localhost:8093/jsonPingService")
-                .requestBody(json("{\"request\":\"PING\"}"))
-                .expectedResponseBody(json("{\"response\":\"PONG\"}"));
+                .request(json("{\"request\":\"PING\"}"))
+                .expectation(json("{\"response\":\"PONG\"}"));
 
         syncTest("Simple JSON PING no message", "http://localhost:8093/jsonPingService")
-                .expectedResponseBody(json("{\"response\":\"PONG\"}"));
+                .expectation(json("{\"response\":\"PONG\"}"));
 
         syncTest("Simple XML Groovy Test", "jetty:http://localhost:8090/testWS")
-                .requestBody(xml(groovy("<foo>$baz</foo>", var("baz", "123"))))
-                .expectedResponseBody(xml(groovy("<baz>$foo</baz>", var("foo", "321"))))
+                .request(xml(groovy("<foo>$baz</foo>", var("baz", "123"))))
+                .expectation(xml(groovy("<baz>$foo</baz>", var("foo", "321"))))
                 .addExpectation(syncExpectation("jetty:http://localhost:8090/targetWS")
-                        .expectedBody(xml(groovy("<foo>$x</foo>", var("x", "123"))))
-                        .responseBody(xml(groovy("<baz>$y</baz>", var("y", "321")))));
+                        .expectation(xml(groovy("<foo>$x</foo>", var("x", "123"))))
+                        .response(xml(groovy("<baz>$y</baz>", var("y", "321")))));
 
 
     }

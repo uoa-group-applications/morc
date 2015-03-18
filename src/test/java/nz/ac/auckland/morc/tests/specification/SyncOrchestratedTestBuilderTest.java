@@ -1,7 +1,6 @@
 package nz.ac.auckland.morc.tests.specification;
 
 import nz.ac.auckland.morc.MorcMethods;
-import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.morc.specification.SyncOrchestratedTestBuilder;
 import org.apache.camel.Exchange;
@@ -16,10 +15,10 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
     @Test
     public void testEqualBodiesAndHeaders() throws Exception {
 
-        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url").requestBody(text("foo")).requestBody(text("baz"))
-                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
-                .expectedResponseBody(text("1")).expectedResponseBody(text("2"))
-                .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo"))).build();
+        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url").request(text("foo"),headers(header("1", "1")))
+                .request(text("baz"),headers(header("2", "2")))
+                .expectation(text("1"),headers(header("foo", "baz"))).addPredicates(1,text("2"),headers(header("baz", "foo")))
+                .build();
 
         assertEquals(2, test.getProcessors().size());
         assertEquals(2, test.getPredicates().size());
@@ -49,10 +48,10 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
         OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url")
-                .requestBody(text("foo"), text("baz"))
-                .requestHeaders(headers(header("1", "1")))
-                .expectedResponseBody(text("1")).expectedResponseBody(text("2"))
-                .expectedResponseHeaders(headers(header("foo", "baz"))).build();
+                .request(text("foo"),headers(header("1", "1"))).request(text("baz"))
+                .expectation(text("1"),headers(header("foo", "baz")))
+                .expectation(text("2"))
+                .build();
 
         assertEquals(2, test.getProcessors().size());
         assertEquals(2, test.getPredicates().size());
@@ -79,10 +78,10 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
         OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url")
-                .request(new BodyProcessor(text("foo")))
-                .requestHeaders(headers(header("1", "1"))).requestHeaders(headers(header("2", "2")))
-                .expectedResponseBody(text("1"))
-                .expectedResponseHeaders(headers(header("foo", "baz"))).expectedResponseHeaders(headers(header("baz", "foo"))).build();
+                .request(text("foo"),headers(header("1", "1")))
+                .request(headers(header("2", "2")))
+                .expectation(text("1"),headers(header("foo", "baz")))
+                .expectation(headers(header("baz", "foo"))).build();
 
         assertEquals(2, test.getProcessors().size());
         assertEquals(2, test.getPredicates().size());

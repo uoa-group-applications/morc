@@ -2,7 +2,6 @@ package nz.ac.auckland.morc.tests.mock;
 
 import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.builder.UnreceivedMockDefinitionBuilder;
-import nz.ac.auckland.morc.processor.BodyProcessor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,7 +37,7 @@ public class UnreceivedMockDefinitionBuilderTest extends Assert implements MorcM
         IllegalArgumentException e = null;
         try {
             new UnreceivedMockDefinitionBuilder("")
-                    .addProcessors(new BodyProcessor(text("1"))).build(null);
+                    .addProcessors(text("1")).build(null);
         } catch (IllegalArgumentException ex) {
             e = ex;
         }

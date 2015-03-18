@@ -2,7 +2,6 @@ package nz.ac.auckland.morc.resource;
 
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
 import org.apache.camel.TypeConversionException;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
@@ -21,7 +20,7 @@ import java.net.URL;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class XmlTestResource extends StaticTestResource<Document> implements Predicate {
+public class XmlTestResource extends StaticTestResource<Document> {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlTestResource.class);
     private XmlUtilities xmlUtilities = new XmlUtilities();
@@ -30,16 +29,36 @@ public class XmlTestResource extends StaticTestResource<Document> implements Pre
         super(value);
     }
 
+    public XmlTestResource(Document value, XmlUtilities xmlUtilities) {
+        super(value);
+        this.xmlUtilities = xmlUtilities;
+    }
+
     public XmlTestResource(File file) {
         super(file);
+    }
+
+    public XmlTestResource(File file, XmlUtilities xmlUtilities) {
+        super(file);
+        this.xmlUtilities = xmlUtilities;
     }
 
     public XmlTestResource(URL url) {
         super(url);
     }
 
+    public XmlTestResource(URL url, XmlUtilities xmlUtilities) {
+        super(url);
+        this.xmlUtilities = xmlUtilities;
+    }
+
     public XmlTestResource(InputStream stream) {
         super(stream);
+    }
+
+    public XmlTestResource(InputStream stream, XmlUtilities xmlUtilities) {
+        super(stream);
+        this.xmlUtilities = xmlUtilities;
     }
 
     public XmlUtilities getXmlUtilities() {

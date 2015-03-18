@@ -1,21 +1,9 @@
 package nz.ac.auckland.morc.specification;
 
 import nz.ac.auckland.morc.TestBean;
-import nz.ac.auckland.morc.predicate.HeadersPredicate;
-import nz.ac.auckland.morc.processor.BodyProcessor;
-import nz.ac.auckland.morc.processor.HeadersProcessor;
-import nz.ac.auckland.morc.resource.HeadersTestResource;
-import nz.ac.auckland.morc.resource.TestResource;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A builder that generates a synchronous orchestrated test specification that will call a target endpoint
@@ -26,13 +14,6 @@ import java.util.Map;
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit<SyncOrchestratedTestBuilder> {
-
-    private static final Logger logger = LoggerFactory.getLogger(SyncOrchestratedTestBuilder.class);
-
-    private List<TestResource> inputRequestBodies = new ArrayList<>();
-    private List<TestResource<Map<String, Object>>> inputRequestHeaders = new ArrayList<>();
-    private List<Predicate> responseBodyPredicates = new ArrayList<>();
-    private List<HeadersPredicate> responseHeadersPredicates = new ArrayList<>();
 
     /**
      * @param description The description that identifies what the test is supposed to do
@@ -55,114 +36,40 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
      * @param processors A collection of processors that will be applied to an exchange before it is sent
      */
     public SyncOrchestratedTestBuilder request(Processor... processors) {
-        this.addProcessors(processors);
-        return self();
+        return addProcessors(processors);
     }
 
     /**
-     * @param resources A collection of test resources that can be used to send request bodies to a target endpoint -
-     *                  each body will be placed together with the corresponding requestHeader if available
+     * Replay the same request for the specified number of times
+     *
+     * @param count      The number of times to repeat these processors (separate requests)
+     * @param processors A collection of processors that will be applied to an exchange before it is sent
      */
-    public SyncOrchestratedTestBuilder requestBody(TestResource... resources) {
-        Collections.addAll(inputRequestBodies, resources);
-        return self();
-    }
-
-    /**
-     * @param resources A collection of test header resources that can be used to send request headers to a target endpoint -
-     *                  headers will be placed together with the corresponding requestBody if available
-     */
-    @SafeVarargs
-    public final SyncOrchestratedTestBuilder requestHeaders(TestResource<Map<String, Object>>... resources) {
-        Collections.addAll(inputRequestHeaders, resources);
-        return self();
+    public SyncOrchestratedTestBuilder requestMultiplier(int count, Processor... processors) {
+        return processorMultiplier(count, processors);
     }
 
     /**
      * @param predicates The set of response validators/predicates that will be used to validate consecutive responses
      */
-    public SyncOrchestratedTestBuilder expectedResponse(Predicate... predicates) {
-        return this.expectedResponseBody(predicates);
+    public SyncOrchestratedTestBuilder expectation(Predicate... predicates) {
+        return addPredicates(predicates);
     }
 
     /**
-     * @param predicates The set of response body predicates that will be used to validate consecutive responses - these
-     *                   will be paired with the corresponding header predicate
+     * Expect a repeat of the same predicates multiple times
+     *
+     * @param count      The number of times to repeat these predicates (separate responses)
+     * @param predicates The set of response validators/predicates that will be used to validate consecutive responses
      */
-    public SyncOrchestratedTestBuilder expectedResponseBody(Predicate... predicates) {
-        Collections.addAll(this.responseBodyPredicates, predicates);
-        return self();
+    public SyncOrchestratedTestBuilder expectationMultiplier(int count, Predicate predicates) {
+        return predicateMultiplier(count, predicates);
     }
-
-    /**
-     * @param responseHeadersPredicates The set of response header predicates that will be used to validate consecutive
-     *                                  responses - these will be paired with the corresponding body predicate
-     */
-    public SyncOrchestratedTestBuilder expectedResponseHeaders(HeadersPredicate... responseHeadersPredicates) {
-        Collections.addAll(this.responseHeadersPredicates, responseHeadersPredicates);
-        return self();
-    }
-
-    /**
-     * @param resources The set of response header test resources that will be used to validate consecutive
-     *                  responses - these will be paired with the corresponding body predicate
-     */
-    @SafeVarargs
-    public final SyncOrchestratedTestBuilder expectedResponseHeaders(TestResource<Map<String, Object>>... resources) {
-        for (TestResource<Map<String, Object>> resource : resources) {
-            this.responseHeadersPredicates.add(new HeadersPredicate(resource));
-        }
-        return self();
-    }
-
-    /**
-     * @param headers The set of response header maps that will be used to validate consecutive
-     *                responses - these will be paired with the corresponding body predicate
-     */
-    @SafeVarargs
-    public final SyncOrchestratedTestBuilder expectedResponseHeaders(Map<String, Object>... headers) {
-        for (Map<String, Object> header : headers) {
-            expectedResponseHeaders(new HeadersTestResource(header));
-        }
-        return self();
-    }
-
 
     @Override
-    public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
-        logger.debug("The endpoint {} will receive {} request message bodies, {} request message headers, " +
-                "{} expected response body predicates, and {} expected response headers predicate",
-                new Object[]{getEndpointUri(), inputRequestBodies.size(), inputRequestHeaders.size(),
-                        responseBodyPredicates.size(), responseHeadersPredicates.size()});
+     public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
+         addRepeatedProcessor(exchange -> exchange.setPattern(ExchangePattern.InOut));
 
-        addRepeatedProcessor(exchange -> {
-            exchange.setPattern(ExchangePattern.InOut);
-        });
-
-        int messageCount = Math.max(inputRequestBodies.size(), inputRequestHeaders.size());
-        for (int i = 0; i < messageCount; i++) {
-            if (i < inputRequestBodies.size()) {
-                try {
-                    addProcessors(i, new BodyProcessor(inputRequestBodies.get(i)));
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            if (i < inputRequestHeaders.size())
-                addProcessors(i, new HeadersProcessor(inputRequestHeaders.get(i)));
-        }
-
-        int responseCount = Math.max(responseBodyPredicates.size(), responseHeadersPredicates.size());
-        for (int i = 0; i < responseCount; i++) {
-            if (i < responseBodyPredicates.size())
-                addPredicates(i, responseBodyPredicates.get(i));
-
-            if (i < responseHeadersPredicates.size())
-                addPredicates(i, responseHeadersPredicates.get(i));
-        }
-
-        return super.build(partCount, nextPart);
+         return super.build(partCount, nextPart);
     }
-
 }

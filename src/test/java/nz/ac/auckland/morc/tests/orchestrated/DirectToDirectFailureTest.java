@@ -12,9 +12,9 @@ public class DirectToDirectFailureTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Test direct to direct expectation where Camel doesn't set fromEndpoint properly", "direct:direct2direct")
-                .requestBody(xml("<foo/>"))
+                .request(xml("<foo/>"))
                 .addExpectation(asyncExpectation("direct:directExpectation")
-                        .expectedBody(xml("<foo/>")));
+                        .expectation(xml("<foo/>")));
     }
 
     @Override

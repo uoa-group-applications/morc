@@ -15,10 +15,10 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     //to illustrate you must still specify the number of expected messages
     @Test
     public void testMatchedBodyAndHeadersNoExpectatations() throws Exception {
-
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1"), text("2"), text("3"))
-                .responseHeaders(headers(header("1", "1")), headers(header("2", "2")), headers(header("3", "3"))).build(null);
+                .response(text("1"),headers(header("1", "1")))
+                .response(text("2"), headers(header("2", "2")))
+                .response(text("3"), headers(header("3", "3"))).build(null);
 
         assertEquals(0, def.getExpectedMessageCount());
         assertEquals(0, def.getProcessors().size());
@@ -29,8 +29,11 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     public void testMatchedBodyAndHeaders() throws Exception {
 
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1")).responseBody(text("2"), text("3")).expectedMessageCount(4)
-                .responseHeaders(headers(header("1", "1")), headers(header("2", "2")), headers(header("3", "3"))).build(null);
+                .response(text("1"), headers(header("1", "1")))
+                .response(text("2"), headers(header("2", "2")))
+                .response(text("3"), headers(header("3", "3")))
+                .expectedMessageCount(4)
+                .build(null);
 
         assertEquals(4, def.getExpectedMessageCount());
         assertEquals(4, def.getPredicates().size());
@@ -64,7 +67,7 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     @Test
     public void testMoreBodiesThanExpectedMessages() throws Exception {
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1"), text("2"), text("3"))
+                .response(text("1")).response(text("2")).response(text("3"))
                 .expectedMessageCount(1).build(null);
 
         assertEquals(1, def.getExpectedMessageCount());
@@ -82,8 +85,10 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1"), text("2"), text("3")).expectedMessageCount(3)
-                .responseHeaders(headers(header("1", "1"))).build(null);
+                .response(text("1"),headers(header("1", "1")))
+                .response(text("2"))
+                .response(text("3")).expectedMessageCount(3)
+                .build(null);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -110,8 +115,9 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .responseBody(text("1")).expectedMessageCount(3)
-                .responseHeaders(headers(header("1", "1")), headers(header("2", "2")), headers(header("3", "3"))).build(null);
+                .response(text("1"), headers(header("1", "1"))).expectedMessageCount(3)
+                .response(headers(header("2", "2")))
+                .response(headers(header("3", "3"))).build(null);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));

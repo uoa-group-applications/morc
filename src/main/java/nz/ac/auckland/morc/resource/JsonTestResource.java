@@ -1,7 +1,6 @@
 package nz.ac.auckland.morc.resource;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.Predicate;
 import org.apache.camel.TypeConversionException;
 import org.apache.cxf.helpers.IOUtils;
 import org.codehaus.jackson.JsonNode;
@@ -19,7 +18,7 @@ import java.net.URL;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class JsonTestResource extends StaticTestResource<String> implements Predicate {
+public class JsonTestResource extends StaticTestResource<String> {
 
     private static final Logger logger = LoggerFactory.getLogger(JsonTestResource.class);
 

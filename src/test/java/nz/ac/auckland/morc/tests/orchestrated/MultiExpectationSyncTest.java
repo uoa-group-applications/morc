@@ -4,7 +4,6 @@ import nz.ac.auckland.morc.MorcTestBuilder;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
-import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -148,46 +147,46 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
-                .expectedResponseBody(xml("<foo/>"))
-                .requestBody(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
-                .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
-                        responseBody(xml("<foo/>")));
+                .expectation(xml("<foo/>"))
+                .request(xml("<baz/>"))
+                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")))
+                .addExpectation(syncExpectation("seda:syncTarget").expectation(xml("<baz/>")).
+                        response(xml("<foo/>")));
 
         syncTest("Simple send body to two destinations with swapped order", "direct:syncInput")
-                .expectedResponseBody(xml("<foo/>"))
-                .requestBody(xml("<baz/>"))
+                .expectation(xml("<foo/>"))
+                .request(xml("<baz/>"))
                 .addExpectation(syncExpectation("seda:syncTarget")
-                        .expectedBody(xml("<baz/>"))
-                        .responseBody(xml("<foo/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
+                        .expectation(xml("<baz/>"))
+                        .response(xml("<foo/>")))
+                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")));
 
         syncTest("Sync and multiple Async - ensuring total order", "direct:syncInputMultiAsync")
-                .expectedResponseBody(xml("<foo/>"))
-                .requestBody(xml("<baz/>"))
+                .expectation(xml("<foo/>"))
+                .request(xml("<baz/>"))
                         //this expectation will come in last
-                .addExpectation(asyncExpectation("seda:asyncTarget1").expectedBody(xml("<async/>")))
+                .addExpectation(asyncExpectation("seda:asyncTarget1").expectation(xml("<async/>")))
                         //this expectation will come in first
-                .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
-                        responseBody(xml("<foo/>")))
+                .addExpectation(syncExpectation("seda:syncTarget").expectation(xml("<baz/>")).
+                        response(xml("<foo/>")))
                         //this expectation will come in second to last
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")));
+                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")));
 
         /*
             Note we expect to see an exception at the end of this as the last asyncExpectation("seda:asyncTarget1") has
             no expected messages and the delay will mean the message never arrives on time.
          */
         syncTest("Sync and multiple Async to same dest - ensuring total order", "direct:syncInputMultiAsyncToSameDest")
-                .expectedResponseBody(xml("<foo/>"))
-                .requestBody(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget1").expectedBody(xml("<async/>")))
-                .addExpectation(syncExpectation("seda:syncTarget").expectedBody(xml("<baz/>")).
-                        responseBody(xml("<foo/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectedBody(xml("<async/>")))
+                .expectation(xml("<foo/>"))
+                .request(xml("<baz/>"))
+                .addExpectation(asyncExpectation("seda:asyncTarget1").expectation(xml("<async/>")))
+                .addExpectation(syncExpectation("seda:syncTarget").expectation(xml("<baz/>")).
+                        response(xml("<foo/>")))
+                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")))
                 .addExpectation(asyncExpectation("seda:asyncTarget1"));
 
         syncTest("Send to two sync destinations without total ordering", "direct:multiSend")
-                .requestBody(xml("<foo/>"))
+                .request(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
                         //this will receive the message last
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").expectedMessageCount(1)
@@ -197,79 +196,80 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                         .ordering(MockDefinition.OrderingType.PARTIAL));
 
         syncTest("Send unordered messages to same sync endpoint without endpoint ordering", "direct:multiSend1")
-                .requestBody(xml("<foo/>"))
+                .request(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
                         //we will receive this last
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered()
-                        .expectedBody(xml("<second/>")))
+                        .expectation(xml("<second/>")))
                         //we will receive this first
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered()
-                        .expectedBody(xml("<first/>")));
+                        .expectation(xml("<first/>")));
 
         syncTest("Send unordered messages to two different sync destinations without total ordering or endpoint ordering", "direct:multiSend2")
-                .requestBody(xml("<foo/>"))
+                .request(xml("<foo/>"))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
-                        .expectedBody(xml("<fourth/>")))
+                        .expectation(xml("<fourth/>")))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
-                        .expectedBody(xml("<third/>")))
+                        .expectation(xml("<third/>")))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
-                        .expectedBody(xml("<second/>")))
+                        .expectation(xml("<second/>")))
                 .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
-                        .expectedBody(xml("<first/>")));
+                        .expectation(xml("<first/>")));
 
         syncTest("Send async messages out of order such that sync arrives first", "direct:syncAtEnd")
-                .requestBody(text("0"))
-                .addExpectation(asyncExpectation("seda:a").expectedBody(text("2")).endpointNotOrdered().expectedMessageCount(1))
-                .addExpectation(asyncExpectation("seda:a").expectedBody(text("1")).endpointNotOrdered().expectedMessageCount(1))
+                .request(text("0"))
+                .addExpectation(asyncExpectation("seda:a").expectation(text("2")).endpointNotOrdered().expectedMessageCount(1))
+                .addExpectation(asyncExpectation("seda:a").expectation(text("1")).endpointNotOrdered().expectedMessageCount(1))
                 .addExpectation(syncExpectation(("seda:b")).expectedMessageCount(1));
 
         asyncTest("send mis-ordered", "direct:endpointWithSyncOrdering")
-                .inputMessage(text("0"))
+                .input(text("0"))
                 .addExpectation(asyncExpectation("seda:a").expectedMessageCount(1))
                 .addExpectation(asyncExpectation("seda:b").expectedMessageCount(1))
                 .addExpectation(syncExpectation("seda:s").expectedMessageCount(1));
 
         syncTest("Test Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
-                .requestBody(text("1"), text("2"), text("3"), text("4"))
-                .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-1"))
-                .addExpectation(syncExpectation("seda:lenient").lenient().responseBody(text("-1"), text("-2"), text("-3")));
+                .request(text("1")).request(text("2")).request(text("3")).request(text("4"))
+                .expectation(text("-1")).expectation(text("-2")).expectation(text("-3")).expectation(text("-1"))
+                .addExpectation(syncExpectation("seda:lenient").lenient()
+                        .response(text("-1")).response(text("-2")).response(text("-3")));
 
         syncTest("Match response Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
-                .requestBody(text("1"), text("2"), text("3"), text("4"))
-                .requestHeaders(headers(header("5", "5")), headers(header("6", "6")), headers(header("7", "7")), headers(header("8", "8")))
-                .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-4"))
-                .expectedResponseHeaders(headers(header("-5", "-5")), headers(header("-6", "-6")), headers(header("-7", "-7")), headers(header("-8", "-8")))
-                .addExpectation(syncExpectation("seda:lenient").lenient().addProcessors(0, matchedResponse(answer(text("4"), text("-4")),
-                        answer(text("3"), text("-3")), answer(text("2"), text("-2")), answer(text("1"), text("-1"))))
-                        .addProcessors(0, matchedResponse(headerAnswer(headers(header("8", "8")), headers(header("-8", "-8"))),
-                                headerAnswer(headers(header("7", "7")), headers(header("-7", "-7"))),
-                                headerAnswer(headers(header("6", "6")), headers(header("-6", "-6"))),
-                                headerAnswer(headers(header("5", "5")), headers(header("-5", "-5"))))));
+                .request(text("1"), headers(header("5", "5")))
+                .request(text("2"), headers(header("6", "6")))
+                .request(text("3"), headers(header("7", "7")))
+                .request(text("4"), headers(header("8", "8")))
+                .expectation(text("-1"), headers(header("-5", "-5")))
+                .expectation(text("-2"), headers(header("-6", "-6")))
+                .expectation(text("-3"), headers(header("-7", "-7")))
+                .expectation(text("-4"), headers(header("-8", "-8")))
+                .addExpectation(syncExpectation("seda:lenient").lenient()
+                        .addProcessors(0, matchedResponse(answer(text("4"), text("-4"), headers(header("-8", "-8"))),
+                        answer(text("3"), text("-3"), headers(header("-7", "-7")))
+                                , answer(text("2"), text("-2"), headers(header("-6", "-6")))
+                                , answer(text("1"), text("-1"), headers(header("-5", "-5"))))));
 
         syncTest("Test Partial Lenient Processor", "seda:partialLenient?waitForTaskToComplete=Always")
-                .requestBody(text("1"), text("2"), text("3"), text("4"))
-                .expectedResponseBody(text("-1"), text("-2"), text("-3"), text("-4"))
-                .addExpectation(syncExpectation("seda:partialLenient").lenient(new Predicate() {
-                    @Override
-                    public boolean matches(Exchange exchange) {
-                        return Integer.parseInt(exchange.getIn().getBody(String.class)) % 2 == 0;
-                    }
-                }).responseBody(text("-2"), text("-4")))
+                .request(text("1")).request(text("2")).request(text("3")).request(text("4"))
+                .expectation(text("-1")).expectation(text("-2")).expectation(text("-3")).expectation(text("-4"))
+                .addExpectation(syncExpectation("seda:partialLenient").lenient(
+                        exchange ->
+                                Integer.parseInt(exchange.getIn().getBody(String.class)) % 2 == 0)
+                        .response(text("-2")).response(text("-4")))
                 .addExpectation(syncExpectation("seda:partialLenient")
-                        .addRepeatedPredicate(new Predicate() {
-                            @Override
-                            public boolean matches(Exchange exchange) {
-                                return exchange.getPattern().equals(ExchangePattern.InOut);
-                            }
-                        })
-                        .expectedBody(text("1"), text("3"))
-                        .responseBody(text("-1"), text("-3")));
+                        .addRepeatedPredicate(exchange ->
+                                exchange.getPattern().equals(ExchangePattern.InOut))
+                        .expectation(text("1")).expectation(text("3"))
+                        .response(text("-1")).response(text("-3")));
 
         syncTest("Test throw receive exceptions", "seda:throwsException?waitForTaskToComplete=Always")
-                .requestBody(times(5, text("1")))
-                .expectedResponseBody(exception(), exception(new IOException()), exception(new IOException("foo"))
-                        , exception(new FileNotFoundException()), exception(new FileNotFoundException("baz")))
+                .requestMultiplier(5, text("1"))
+                .expectation(exception())
+                .expectation(exception(new IOException()))
+                .expectation(exception(new IOException("foo")))
+                .expectation(exception(new FileNotFoundException()))
+                .expectation(exception(new FileNotFoundException("baz")))
                 .expectsException()
                 .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
                         .response(exception()))

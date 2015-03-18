@@ -15,6 +15,7 @@ import org.apache.camel.model.TryDefinition;
 import org.apache.camel.model.language.ConstantExpression;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import java.util.concurrent.CountDownLatch;
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
 
+@Ignore
 public class MorcTest extends CamelSpringTestSupport {
 
     private String[] springContextPaths = new String[]{};

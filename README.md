@@ -19,10 +19,10 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple WS PING test","cxf:http://localhost:8090/services/pingService")
-            .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+            .request(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                 "<request>PING</request>" +
                              "</ns:pingRequest>"))
-            .expectedResponseBody(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+            .expectation(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                     "<response>PONG</response>" +
                     "</ns:pingResponse>"));
     }
@@ -31,13 +31,13 @@ public class MorcTest extends MorcTestBuilder {
 
 While these tests conform with standard JUnit requirements, it requires a lot of boiler plate configuration to get started. A simple way to create and run tests is with a Groovy (>=2.3) script like:
 ```java
-@Grab(group="nz.ac.auckland.morc",module="morc",version="1.8.0")
+@Grab(group="nz.ac.auckland.morc",module="morc",version="3.0.0")
 import nz.ac.auckland.morc.MorcTestBuilder
 
 new MorcTestBuilder() {
     public void configure() {
         syncTest("Simple Echo Test", "http://echo.jsontest.com/foo/baz")
-                .expectedResponseBody(json('{ "foo":"baz" }'))
+                .expectation(json('{ "foo":"baz" }'))
     }
 }.run()
 ```
@@ -54,10 +54,10 @@ public class MorcTest extends MorcTestBuilder {
             "wsdlURL=SecurePingService.wsdl&" +
             "properties.ws-security.username=user&" +
             "properties.ws-security.password=pass")
-            .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+            .request(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                 "<request>PING</request>" +
                              "</ns:pingRequest>"))
-            .expectedResponseBody(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+            .expectation(xml("<ns:pingResponse xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                     "<response>PONG</response>" +
                     "</ns:pingResponse>"));
     }
@@ -72,14 +72,14 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Simple WS PING test with local resources","cxf:http://localhost:8090/services/pingService")
-            .requestBody(xml(classpath("/data/pingRequest1.xml")))
-            .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")));
+            .request(xml(classpath("/data/pingRequest1.xml")))
+            .expectation(xml(classpath("/data/pingResponse1.xml")));
 
         //If there's a JSON service we can also ensure this is acting appropriately
         //(JSON comparisons are made using the Jackson library to unmarshal and compare each value)
         syncTest("Simple JSON PING","http://localhost:8091/jsonPingService")
-            .requestBody(json("{\"request\":\"PING\"}"))
-            .expectedResponseBody(json("{\"response\":\"PONG\"}"));
+            .request(json("{\"request\":\"PING\"}"))
+            .expectation(json("{\"response\":\"PONG\"}"));
     }
 }
 ```
@@ -92,11 +92,11 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("WS PING test with mock service expectation","cxf:http://localhost:8090/services/pingServiceProxy")
-            .requestBody(xml(classpath("/data/pingRequest1.xml")))
-            .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+            .request(xml(classpath("/data/pingRequest1.xml")))
+            .expectation(xml(classpath("/data/pingResponse1.xml")))
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml"))));
+                    .expectation(xml(classpath("/data/pingRequest1.xml")))
+                    .response(xml(classpath("/data/pingResponse1.xml"))));
     }
 }
 ```
@@ -109,15 +109,15 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("WS PING test with multiple mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxy")
-            .requestBody(xml(classpath("/data/pingRequest1.xml")))
-            .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+            .request(xml(classpath("/data/pingRequest1.xml")))
+            .expectation(xml(classpath("/data/pingResponse1.xml")))
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml"))))
+                    .expectation(xml(classpath("/data/pingRequest1.xml")))
+                    .response(xml(classpath("/data/pingResponse1.xml"))))
             .addExpectation(syncExpectation
                     ("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml"))));
+                    .expectation(xml(classpath("/data/pingRequest1.xml")))
+                    .response(xml(classpath("/data/pingResponse1.xml"))));
     }
 }
 ```
@@ -128,15 +128,15 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("WS PING test with multiple unordered mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered")
-            .requestBody(xml(classpath("/data/pingRequest1.xml")))
-            .expectedResponseBody(xml(classpath("/data/pingResponse1.xml")))
+            .request(xml(classpath("/data/pingRequest1.xml")))
+            .expectation(xml(classpath("/data/pingResponse1.xml")))
             .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                    .expectation(xml(classpath("/data/pingRequest1.xml")))
+                    .response(xml(classpath("/data/pingResponse1.xml")))
                     .ordering(partialOrdering()))
             .addExpectation(syncExpectation("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
-                    .expectedBody(xml(classpath("/data/pingRequest1.xml")))
-                    .responseBody(xml(classpath("/data/pingResponse1.xml")))
+                    .expectation(xml(classpath("/data/pingRequest1.xml")))
+                    .response(xml(classpath("/data/pingResponse1.xml")))
                     .ordering(partialOrdering()));
     }
 }
@@ -149,9 +149,9 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         asyncTest("Simple Asynchronous Canonicalizer Comparison","vm:test.input")
-            .inputMessage(xml("<SystemField>foo</SystemField>"))
+            .input(xml("<SystemField>foo</SystemField>"))
             .addExpectation(asyncExpectation("vm:test.output")
-                    .expectedBody(xml("<CanonicalField>foo</CanonicalField>")));
+                    .expectation(xml("<CanonicalField>foo</CanonicalField>")));
     }
 }
 ```
@@ -164,11 +164,11 @@ public class MorcTest extends MorcTestBuilder {
     @Override
     public void configure() {
         syncTest("Test invalid message doesn't arrive at the endpoint and returns exception","cxf:http://localhost:8090/services/pingServiceProxy")
-            .requestBody(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
+            .request(xml("<ns:pingRequest xmlns:ns=\"urn:com:acme:integration:wsdl:pingservice\">" +
                                                 "<request>PONG</request>" +
                                              "</ns:pingRequest>"))
             .expectsException()
-            .addExpectation(unreceivedExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"));
+            .expectation(unreceivedExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"));
     }
 }
 ```

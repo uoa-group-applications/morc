@@ -3,7 +3,6 @@ package nz.ac.auckland.morc.tests.mock;
 import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.endpointoverride.EndpointOverride;
 import nz.ac.auckland.morc.mock.MockDefinition;
-import nz.ac.auckland.morc.processor.BodyProcessor;
 import nz.ac.auckland.morc.processor.SelectorProcessor;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
@@ -34,8 +33,10 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testLenientSelectorWithExpectedMessages() throws Exception {
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
-                new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient().build(null);
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(text("foo"))
+                .addProcessors(text("baz"))
+                .addPredicates(text("foo"))
+                .addPredicates(text("baz")).lenient().build(null);
 
         assertEquals(0, def.getPredicates().size());
         assertEquals(0, def.getProcessors().size());
@@ -52,8 +53,9 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
             }
         };
 
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
-                new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient(predicate)
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(text("foo"))
+                .addProcessors(text("baz"))
+                .addPredicates(text("foo"), text("baz")).lenient(predicate)
                 .lenientProcessor(StubLenientProcessor.class).build(null);
 
         assertEquals(0, def.getPredicates().size());
@@ -124,8 +126,8 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
         IllegalArgumentException e = null;
 
         try {
-            MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(new BodyProcessor(text("foo")),
-                    new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz"))
+            MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(text("foo"),text("baz"))
+            .addPredicates(text("foo"), text("baz"))
                     .lenientProcessor(StubLenientProcessor.class).build(null);
         } catch (IllegalArgumentException ex) {
             e = ex;
@@ -138,12 +140,12 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
     public void testMergeLenientSelectorFail() throws Exception {
         IllegalArgumentException e = null;
 
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")),
-                new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient().build(null);
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"),text("baz"))
+                .addPredicates(text("foo"), text("baz")).lenient().build(null);
 
         try {
-            MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")),
-                    new BodyProcessor(text("baz"))).addPredicates(text("foo"), text("baz")).lenient().build(def);
+            MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"),text("baz"))
+                .addPredicates(text("foo"), text("baz")).lenient().build(def);
         } catch (IllegalArgumentException ex) {
             e = ex;
         }
@@ -161,11 +163,11 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
 
     @Test
     public void testMergeLenientSelector() throws Exception {
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
-                .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz")).build(null);
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"))
+                .addProcessors(text("baz")).addPredicates(text("foo")).addPredicates(text("baz")).build(null);
 
-        MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
-                .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz")).lenient().build(def);
+        MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"))
+                .addProcessors(text("baz")).addPredicates(text("foo")).addPredicates(text("baz")).lenient().build(def);
 
         assertEquals(2, def1.getExpectedMessageCount());
         assertEquals(2, def1.getProcessors().size());
@@ -187,15 +189,15 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
             }
         };
 
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
-                .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz"))
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"))
+                .addProcessors(text("baz")).addPredicates(text("foo")).addPredicates(text("baz"))
                 .endpointNotOrdered()
                 .ordering(MockDefinition.OrderingType.NONE)
                 .messageResultWaitTime(1234).minimalResultWaitTime(5678).reassertionPeriod(314)
                 .mockFeedPreprocessor(pre).build(null);
 
-        MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("a")))
-                .addProcessors(new BodyProcessor(text("b"))).addPredicates(text("a")).addPredicates(text("b")).lenient()
+        MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("a"))
+                .addProcessors(text("b")).addPredicates(text("a")).addPredicates(text("b")).lenient()
                 .addEndpointOverride(new EndpointOverride() {
                     @Override
                     public void overrideEndpoint(Endpoint endpoint) {
@@ -203,9 +205,9 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
                     }
                 }).build(def);
 
-        MockDefinition def2 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("moo")))
+        MockDefinition def2 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("moo"))
                 .endpointNotOrdered().ordering(MockDefinition.OrderingType.NONE)
-                .addProcessors(new BodyProcessor(text("cow"))).addPredicates(text("moo")).addPredicates(text("cow")).build(def1);
+                .addProcessors(text("cow")).addPredicates(text("moo")).addPredicates(text("cow")).build(def1);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.setFromEndpoint(new CxfEndpoint(""));
@@ -268,20 +270,20 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
             }
         };
 
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("foo")))
-                .addProcessors(new BodyProcessor(text("baz"))).addPredicates(text("foo")).addPredicates(text("baz"))
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"))
+                .addProcessors(text("baz")).addPredicates(text("foo")).addPredicates(text("baz"))
                 .endpointNotOrdered()
                 .ordering(MockDefinition.OrderingType.NONE)
                 .mockFeedPreprocessor(pre).build(null);
 
-        MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("moo")))
+        MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("moo"))
                 .endpointNotOrdered().ordering(MockDefinition.OrderingType.NONE)
                         //these should be ignored
                 .messageResultWaitTime(1234).minimalResultWaitTime(5678).reassertionPeriod(314)
-                .addProcessors(new BodyProcessor(text("cow"))).addPredicates(text("moo")).addPredicates(text("cow")).build(def);
+                .addProcessors(text("cow")).addPredicates(text("moo")).addPredicates(text("cow")).build(def);
 
-        MockDefinition def2 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(new BodyProcessor(text("a")))
-                .addProcessors(new BodyProcessor(text("b"))).addPredicates(text("a")).addPredicates(text("b")).lenient()
+        MockDefinition def2 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("a"))
+                .addProcessors(text("b")).addPredicates(text("a")).addPredicates(text("b")).lenient()
                 .addEndpointOverride(new EndpointOverride() {
                     @Override
                     public void overrideEndpoint(Endpoint endpoint) {

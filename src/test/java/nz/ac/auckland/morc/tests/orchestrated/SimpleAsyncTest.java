@@ -37,29 +37,29 @@ public class SimpleAsyncTest extends MorcTestBuilder {
     @Override
     public void configure() {
         asyncTest("test async send body", "seda:asyncTestInput")
-                .inputMessage(xml("<test/>"))
-                .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedBody(xml("<foo/>")));
+                .input(xml("<test/>"))
+                .addExpectation(asyncExpectation("seda:asyncTestOutput").expectation(xml("<foo/>")));
 
         asyncTest("test async send headers", "seda:asyncTestInput")
-                .inputHeaders(headers(header("foo", "baz"), header("abc", "def")))
+                .input(headers(header("foo", "baz"), header("abc", "def")))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
-                        .expectedHeaders(headers(header("abc", "def"), header("foo", "baz"))));
+                        .expectation(headers(header("abc", "def"), header("foo", "baz"))));
 
         Map<String, Object> headers = new HashMap<>();
         headers.put("foo", "baz");
         headers.put("abc", "def");
 
         asyncTest("test async send headers from map", "seda:asyncTestInput")
-                .inputHeaders(new HeadersTestResource(headers))
+                .input(new HeadersTestResource(headers))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput")
-                        .expectedHeaders(headers));
+                        .expectation(new HeadersTestResource(headers)));
 
         asyncTest("test async delayed", "seda:asyncTestInputDelayed")
-                .inputMessage(text("0"))
+                .input(text("0"))
                 .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedMessageCount(1));
 
         asyncTest("Test sender preprocessor applied", "seda:preprocessorSender")
-                .inputMessage(text("1"))
+                .input(text("1"))
                 .mockFeedPreprocessor(new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
@@ -84,7 +84,7 @@ public class SimpleAsyncTest extends MorcTestBuilder {
                     }
                 });
             }
-        }).addExpectation(asyncExpectation("vm:foo").expectedBody(text("1")));
+        }).addExpectation(asyncExpectation("vm:foo").expectation(text("1")));
 
 
     }

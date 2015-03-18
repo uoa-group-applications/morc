@@ -1,5 +1,11 @@
 package nz.ac.auckland.morc.resource;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.URL;
 
@@ -9,7 +15,10 @@ import java.net.URL;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public abstract class StaticTestResource<T> implements TestResource {
+public abstract class StaticTestResource<T> implements Predicate, Processor, TestResource<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(StaticTestResource.class);
+
     private InputStream stream;
     private T value;
 
@@ -63,5 +72,15 @@ public abstract class StaticTestResource<T> implements TestResource {
         value = getResource(stream);
         stream.close();
         return value;
+    }
+
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        T body = getValue();
+
+        logger.trace("Setting body of exchange from endpoint {} to {}",
+                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"),
+                body);
+        exchange.getIn().setBody(body);
     }
 }
