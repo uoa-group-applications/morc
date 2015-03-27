@@ -254,7 +254,7 @@ public class OrchestratedTestSpecification {
         /**
          * @param mockDefinitionBuilder The expectation builder used to seed the expectation
          */
-        public Builder addExpectation(MockDefinition.MockDefinitionBuilderInit mockDefinitionBuilder) {
+        public Builder addMock(MockDefinition.MockDefinitionBuilderInit mockDefinitionBuilder) {
 
             //we need to merge the expectations
             MockDefinition endpointExpectation = mockExpectations.get(mockDefinitionBuilder.getEndpointUri());
@@ -338,9 +338,9 @@ public class OrchestratedTestSpecification {
         /**
          * A convenience method for adding multiple expectations at the same time
          */
-        public Builder addExpectations(MockDefinition.MockDefinitionBuilderInit... expectationBuilders) {
+        public Builder addMocks(MockDefinition.MockDefinitionBuilderInit... expectationBuilders) {
             for (MockDefinition.MockDefinitionBuilderInit expectationBuilder : expectationBuilders) {
-                addExpectation(expectationBuilder);
+                addMock(expectationBuilder);
             }
 
             return self();

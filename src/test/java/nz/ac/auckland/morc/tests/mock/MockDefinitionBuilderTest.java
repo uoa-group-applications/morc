@@ -126,8 +126,8 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
         IllegalArgumentException e = null;
 
         try {
-            MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(text("foo"),text("baz"))
-            .addPredicates(text("foo"), text("baz"))
+            MockDefinition def = new MockDefinition.MockDefinitionBuilder("").addProcessors(text("foo"), text("baz"))
+                    .addPredicates(text("foo"), text("baz"))
                     .lenientProcessor(StubLenientProcessor.class).build(null);
         } catch (IllegalArgumentException ex) {
             e = ex;
@@ -140,12 +140,12 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
     public void testMergeLenientSelectorFail() throws Exception {
         IllegalArgumentException e = null;
 
-        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"),text("baz"))
+        MockDefinition def = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"), text("baz"))
                 .addPredicates(text("foo"), text("baz")).lenient().build(null);
 
         try {
-            MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"),text("baz"))
-                .addPredicates(text("foo"), text("baz")).lenient().build(def);
+            MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("foo"), text("baz"))
+                    .addPredicates(text("foo"), text("baz")).lenient().build(def);
         } catch (IllegalArgumentException ex) {
             e = ex;
         }

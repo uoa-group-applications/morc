@@ -17,7 +17,7 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
     @Test
     public void testBodiesAndHeadersMatchedCorrect() throws Exception {
 
-        MockDefinition def = new ContentMockDefinitionBuilder("").expectation(text("foo"),headers(header("foo", "1")))
+        MockDefinition def = new ContentMockDefinitionBuilder("").expectation(text("foo"), headers(header("foo", "1")))
                 .expectation(text("baz"), headers(header("foo", "2")))
                 .expectation(text("moo"), headers(header("foo", "3")))
                 .addRepeatedPredicate(headers(header("aaa", "bbb"))).build(null);
@@ -44,7 +44,7 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
 
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
-        MockDefinition def = new ContentMockDefinitionBuilder("").expectation(text("foo"),headers(header("foo", "1")))
+        MockDefinition def = new ContentMockDefinitionBuilder("").expectation(text("foo"), headers(header("foo", "1")))
                 .expectation(text("baz"))
                 .expectation(text("moo"))
                 .addRepeatedPredicate(headers(header("aaa", "bbb"))).build(null);
@@ -70,7 +70,7 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
         MockDefinition def = new ContentMockDefinitionBuilder("")
-                .expectation(text("foo"),headers(header("foo", "1")))
+                .expectation(text("foo"), headers(header("foo", "1")))
                 .expectation(headers(header("foo", "2")))
                 .expectation(headers(header("foo", "3")))
                 .addRepeatedPredicate(headers(header("aaa", "bbb"))).build(null);
@@ -96,7 +96,7 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
 
     @Test
     public void testBodiesAndHeadersLargeExpectedMessageCount() throws Exception {
-        MockDefinition def = new ContentMockDefinitionBuilder("").expectation(text("foo"),headers(header("foo", "1")))
+        MockDefinition def = new ContentMockDefinitionBuilder("").expectation(text("foo"), headers(header("foo", "1")))
                 .expectedMessageCount(3)
                 .addRepeatedPredicate(headers(header("aaa", "bbb"))).build(null);
 

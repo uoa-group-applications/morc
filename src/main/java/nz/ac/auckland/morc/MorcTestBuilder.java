@@ -73,21 +73,21 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public AsyncMockDefinitionBuilder asyncExpectation(String endpointUri) {
+    public AsyncMockDefinitionBuilder asyncMock(String endpointUri) {
         return new AsyncMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public SyncMockDefinitionBuilder syncExpectation(String endpointUri) {
+    public SyncMockDefinitionBuilder syncMock(String endpointUri) {
         return new SyncMockDefinitionBuilder(endpointUri);
     }
 
     /**
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
-    public UnreceivedMockDefinitionBuilder unreceivedExpectation(String endpointUri) {
+    public UnreceivedMockDefinitionBuilder unreceivedMock(String endpointUri) {
         return new UnreceivedMockDefinitionBuilder(endpointUri);
     }
 

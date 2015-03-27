@@ -15,9 +15,9 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
     @Test
     public void testEqualBodiesAndHeaders() throws Exception {
 
-        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url").request(text("foo"),headers(header("1", "1")))
-                .request(text("baz"),headers(header("2", "2")))
-                .expectation(text("1"),headers(header("foo", "baz"))).addPredicates(1,text("2"),headers(header("baz", "foo")))
+        OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url").request(text("foo"), headers(header("1", "1")))
+                .request(text("baz"), headers(header("2", "2")))
+                .expectation(text("1"), headers(header("foo", "baz"))).addPredicates(1, text("2"), headers(header("baz", "foo")))
                 .build();
 
         assertEquals(2, test.getProcessors().size());
@@ -48,8 +48,8 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
         OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url")
-                .request(text("foo"),headers(header("1", "1"))).request(text("baz"))
-                .expectation(text("1"),headers(header("foo", "baz")))
+                .request(text("foo"), headers(header("1", "1"))).request(text("baz"))
+                .expectation(text("1"), headers(header("foo", "baz")))
                 .expectation(text("2"))
                 .build();
 
@@ -78,9 +78,9 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
         OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url")
-                .request(text("foo"),headers(header("1", "1")))
+                .request(text("foo"), headers(header("1", "1")))
                 .request(headers(header("2", "2")))
-                .expectation(text("1"),headers(header("foo", "baz")))
+                .expectation(text("1"), headers(header("foo", "baz")))
                 .expectation(headers(header("baz", "foo"))).build();
 
         assertEquals(2, test.getProcessors().size());

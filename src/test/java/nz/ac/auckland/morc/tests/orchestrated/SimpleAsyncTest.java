@@ -38,11 +38,11 @@ public class SimpleAsyncTest extends MorcTestBuilder {
     public void configure() {
         asyncTest("test async send body", "seda:asyncTestInput")
                 .input(xml("<test/>"))
-                .addExpectation(asyncExpectation("seda:asyncTestOutput").expectation(xml("<foo/>")));
+                .addMock(asyncMock("seda:asyncTestOutput").expectation(xml("<foo/>")));
 
         asyncTest("test async send headers", "seda:asyncTestInput")
                 .input(headers(header("foo", "baz"), header("abc", "def")))
-                .addExpectation(asyncExpectation("seda:asyncTestOutput")
+                .addMock(asyncMock("seda:asyncTestOutput")
                         .expectation(headers(header("abc", "def"), header("foo", "baz"))));
 
         Map<String, Object> headers = new HashMap<>();
@@ -51,12 +51,12 @@ public class SimpleAsyncTest extends MorcTestBuilder {
 
         asyncTest("test async send headers from map", "seda:asyncTestInput")
                 .input(new HeadersTestResource(headers))
-                .addExpectation(asyncExpectation("seda:asyncTestOutput")
+                .addMock(asyncMock("seda:asyncTestOutput")
                         .expectation(new HeadersTestResource(headers)));
 
         asyncTest("test async delayed", "seda:asyncTestInputDelayed")
                 .input(text("0"))
-                .addExpectation(asyncExpectation("seda:asyncTestOutput").expectedMessageCount(1));
+                .addMock(asyncMock("seda:asyncTestOutput").expectedMessageCount(1));
 
         asyncTest("Test sender preprocessor applied", "seda:preprocessorSender")
                 .input(text("1"))
@@ -66,7 +66,7 @@ public class SimpleAsyncTest extends MorcTestBuilder {
                         exchange.setProperty("preprocessed", true);
                     }
                 })
-                .addExpectation(syncExpectation("seda:preprocessorSender").expectedMessageCount(1)
+                .addMock(syncMock("seda:preprocessorSender").expectedMessageCount(1)
                 ).addPredicates(new Predicate() {
             @Override
             public boolean matches(Exchange exchange) {
@@ -84,7 +84,7 @@ public class SimpleAsyncTest extends MorcTestBuilder {
                     }
                 });
             }
-        }).addExpectation(asyncExpectation("vm:foo").expectation(text("1")));
+        }).addMock(asyncMock("vm:foo").expectation(text("1")));
 
 
     }

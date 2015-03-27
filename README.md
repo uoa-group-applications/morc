@@ -94,7 +94,7 @@ public class MorcTest extends MorcTestBuilder {
         syncTest("WS PING test with mock service expectation","cxf:http://localhost:8090/services/pingServiceProxy")
             .request(xml(classpath("/data/pingRequest1.xml")))
             .expectation(xml(classpath("/data/pingResponse1.xml")))
-            .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
+            .addMock(syncMock("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
                     .expectation(xml(classpath("/data/pingRequest1.xml")))
                     .response(xml(classpath("/data/pingResponse1.xml"))));
     }
@@ -111,10 +111,10 @@ public class MorcTest extends MorcTestBuilder {
         syncTest("WS PING test with multiple mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxy")
             .request(xml(classpath("/data/pingRequest1.xml")))
             .expectation(xml(classpath("/data/pingResponse1.xml")))
-            .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
+            .addMock(syncMock("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
                     .expectation(xml(classpath("/data/pingRequest1.xml")))
                     .response(xml(classpath("/data/pingResponse1.xml"))))
-            .addExpectation(syncExpectation
+            .addMock(syncMock
                     ("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
                     .expectation(xml(classpath("/data/pingRequest1.xml")))
                     .response(xml(classpath("/data/pingResponse1.xml"))));
@@ -130,11 +130,11 @@ public class MorcTest extends MorcTestBuilder {
         syncTest("WS PING test with multiple unordered mock service expectations","cxf:http://localhost:8090/services/pingServiceMultiProxyUnordered")
             .request(xml(classpath("/data/pingRequest1.xml")))
             .expectation(xml(classpath("/data/pingResponse1.xml")))
-            .addExpectation(syncExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
+            .addMock(syncMock("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl")
                     .expectation(xml(classpath("/data/pingRequest1.xml")))
                     .response(xml(classpath("/data/pingResponse1.xml")))
                     .ordering(partialOrdering()))
-            .addExpectation(syncExpectation("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
+            .addMock(syncMock("cxf:http://localhost:9091/services/anotherTargetWS?wsdlURL=PingService.wsdl")
                     .expectation(xml(classpath("/data/pingRequest1.xml")))
                     .response(xml(classpath("/data/pingResponse1.xml")))
                     .ordering(partialOrdering()));
@@ -150,7 +150,7 @@ public class MorcTest extends MorcTestBuilder {
     public void configure() {
         asyncTest("Simple Asynchronous Canonicalizer Comparison","vm:test.input")
             .input(xml("<SystemField>foo</SystemField>"))
-            .addExpectation(asyncExpectation("vm:test.output")
+            .addMock(asyncMock("vm:test.output")
                     .expectation(xml("<CanonicalField>foo</CanonicalField>")));
     }
 }
@@ -168,7 +168,7 @@ public class MorcTest extends MorcTestBuilder {
                                                 "<request>PONG</request>" +
                                              "</ns:pingRequest>"))
             .expectsException()
-            .expectation(unreceivedExpectation("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"));
+            .addMock(unreceivedMock("cxf:http://localhost:9090/services/targetWS?wsdlURL=PingService.wsdl"));
     }
 }
 ```

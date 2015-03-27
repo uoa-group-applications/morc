@@ -67,9 +67,9 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     }
 
     @Override
-     public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
-         addRepeatedProcessor(exchange -> exchange.setPattern(ExchangePattern.InOut));
+    public OrchestratedTestSpecification build(int partCount, OrchestratedTestSpecification nextPart) {
+        addRepeatedProcessor(exchange -> exchange.setPattern(ExchangePattern.InOut));
 
-         return super.build(partCount, nextPart);
+        return super.build(partCount, nextPart);
     }
 }

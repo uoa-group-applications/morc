@@ -149,90 +149,90 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
         syncTest("Simple send body to two destinations and get correct response", "direct:syncInput")
                 .expectation(xml("<foo/>"))
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")))
-                .addExpectation(syncExpectation("seda:syncTarget").expectation(xml("<baz/>")).
+                .addMock(asyncMock("seda:asyncTarget").expectation(xml("<async/>")))
+                .addMock(syncMock("seda:syncTarget").expectation(xml("<baz/>")).
                         response(xml("<foo/>")));
 
         syncTest("Simple send body to two destinations with swapped order", "direct:syncInput")
                 .expectation(xml("<foo/>"))
                 .request(xml("<baz/>"))
-                .addExpectation(syncExpectation("seda:syncTarget")
+                .addMock(syncMock("seda:syncTarget")
                         .expectation(xml("<baz/>"))
                         .response(xml("<foo/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")));
+                .addMock(asyncMock("seda:asyncTarget").expectation(xml("<async/>")));
 
         syncTest("Sync and multiple Async - ensuring total order", "direct:syncInputMultiAsync")
                 .expectation(xml("<foo/>"))
                 .request(xml("<baz/>"))
                         //this expectation will come in last
-                .addExpectation(asyncExpectation("seda:asyncTarget1").expectation(xml("<async/>")))
+                .addMock(asyncMock("seda:asyncTarget1").expectation(xml("<async/>")))
                         //this expectation will come in first
-                .addExpectation(syncExpectation("seda:syncTarget").expectation(xml("<baz/>")).
+                .addMock(syncMock("seda:syncTarget").expectation(xml("<baz/>")).
                         response(xml("<foo/>")))
                         //this expectation will come in second to last
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")));
+                .addMock(asyncMock("seda:asyncTarget").expectation(xml("<async/>")));
 
         /*
-            Note we expect to see an exception at the end of this as the last asyncExpectation("seda:asyncTarget1") has
+            Note we expect to see an exception at the end of this as the last asyncMock("seda:asyncTarget1") has
             no expected messages and the delay will mean the message never arrives on time.
          */
         syncTest("Sync and multiple Async to same dest - ensuring total order", "direct:syncInputMultiAsyncToSameDest")
                 .expectation(xml("<foo/>"))
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget1").expectation(xml("<async/>")))
-                .addExpectation(syncExpectation("seda:syncTarget").expectation(xml("<baz/>")).
+                .addMock(asyncMock("seda:asyncTarget1").expectation(xml("<async/>")))
+                .addMock(syncMock("seda:syncTarget").expectation(xml("<baz/>")).
                         response(xml("<foo/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<async/>")))
-                .addExpectation(asyncExpectation("seda:asyncTarget1"));
+                .addMock(asyncMock("seda:asyncTarget").expectation(xml("<async/>")))
+                .addMock(asyncMock("seda:asyncTarget1"));
 
         syncTest("Send to two sync destinations without total ordering", "direct:multiSend")
                 .request(xml("<foo/>"))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
+                .addMock(syncMock("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
                         //this will receive the message last
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").expectedMessageCount(1)
+                .addMock(syncMock("seda:syncMultiSendEndpoint1").expectedMessageCount(1)
                         .ordering(MockDefinition.OrderingType.PARTIAL))
                         //this will receive the message first
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").expectedMessageCount(1)
+                .addMock(syncMock("seda:syncMultiSendEndpoint2").expectedMessageCount(1)
                         .ordering(MockDefinition.OrderingType.PARTIAL));
 
         syncTest("Send unordered messages to same sync endpoint without endpoint ordering", "direct:multiSend1")
                 .request(xml("<foo/>"))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
+                .addMock(syncMock("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
                         //we will receive this last
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered()
+                .addMock(syncMock("seda:syncMultiSendEndpoint1").endpointNotOrdered()
                         .expectation(xml("<second/>")))
                         //we will receive this first
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered()
+                .addMock(syncMock("seda:syncMultiSendEndpoint1").endpointNotOrdered()
                         .expectation(xml("<first/>")));
 
         syncTest("Send unordered messages to two different sync destinations without total ordering or endpoint ordering", "direct:multiSend2")
                 .request(xml("<foo/>"))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
+                .addMock(syncMock("seda:syncMultiSendEndpoint0").expectedMessageCount(1))
+                .addMock(syncMock("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
                         .expectation(xml("<fourth/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
+                .addMock(syncMock("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
                         .expectation(xml("<third/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
+                .addMock(syncMock("seda:syncMultiSendEndpoint1").endpointNotOrdered().ordering(partialOrdering())
                         .expectation(xml("<second/>")))
-                .addExpectation(syncExpectation("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
+                .addMock(syncMock("seda:syncMultiSendEndpoint2").endpointNotOrdered().ordering(partialOrdering())
                         .expectation(xml("<first/>")));
 
         syncTest("Send async messages out of order such that sync arrives first", "direct:syncAtEnd")
                 .request(text("0"))
-                .addExpectation(asyncExpectation("seda:a").expectation(text("2")).endpointNotOrdered().expectedMessageCount(1))
-                .addExpectation(asyncExpectation("seda:a").expectation(text("1")).endpointNotOrdered().expectedMessageCount(1))
-                .addExpectation(syncExpectation(("seda:b")).expectedMessageCount(1));
+                .addMock(asyncMock("seda:a").expectation(text("2")).endpointNotOrdered().expectedMessageCount(1))
+                .addMock(asyncMock("seda:a").expectation(text("1")).endpointNotOrdered().expectedMessageCount(1))
+                .addMock(syncMock(("seda:b")).expectedMessageCount(1));
 
         asyncTest("send mis-ordered", "direct:endpointWithSyncOrdering")
                 .input(text("0"))
-                .addExpectation(asyncExpectation("seda:a").expectedMessageCount(1))
-                .addExpectation(asyncExpectation("seda:b").expectedMessageCount(1))
-                .addExpectation(syncExpectation("seda:s").expectedMessageCount(1));
+                .addMock(asyncMock("seda:a").expectedMessageCount(1))
+                .addMock(asyncMock("seda:b").expectedMessageCount(1))
+                .addMock(syncMock("seda:s").expectedMessageCount(1));
 
         syncTest("Test Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
                 .request(text("1")).request(text("2")).request(text("3")).request(text("4"))
                 .expectation(text("-1")).expectation(text("-2")).expectation(text("-3")).expectation(text("-1"))
-                .addExpectation(syncExpectation("seda:lenient").lenient()
+                .addMock(syncMock("seda:lenient").lenient()
                         .response(text("-1")).response(text("-2")).response(text("-3")));
 
         syncTest("Match response Lenient Processor", "seda:lenient?waitForTaskToComplete=Always")
@@ -244,20 +244,20 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .expectation(text("-2"), headers(header("-6", "-6")))
                 .expectation(text("-3"), headers(header("-7", "-7")))
                 .expectation(text("-4"), headers(header("-8", "-8")))
-                .addExpectation(syncExpectation("seda:lenient").lenient()
+                .addMock(syncMock("seda:lenient").lenient()
                         .addProcessors(0, matchedResponse(answer(text("4"), text("-4"), headers(header("-8", "-8"))),
-                        answer(text("3"), text("-3"), headers(header("-7", "-7")))
+                                answer(text("3"), text("-3"), headers(header("-7", "-7")))
                                 , answer(text("2"), text("-2"), headers(header("-6", "-6")))
                                 , answer(text("1"), text("-1"), headers(header("-5", "-5"))))));
 
         syncTest("Test Partial Lenient Processor", "seda:partialLenient?waitForTaskToComplete=Always")
                 .request(text("1")).request(text("2")).request(text("3")).request(text("4"))
                 .expectation(text("-1")).expectation(text("-2")).expectation(text("-3")).expectation(text("-4"))
-                .addExpectation(syncExpectation("seda:partialLenient").lenient(
+                .addMock(syncMock("seda:partialLenient").lenient(
                         exchange ->
                                 Integer.parseInt(exchange.getIn().getBody(String.class)) % 2 == 0)
                         .response(text("-2")).response(text("-4")))
-                .addExpectation(syncExpectation("seda:partialLenient")
+                .addMock(syncMock("seda:partialLenient")
                         .addRepeatedPredicate(exchange ->
                                 exchange.getPattern().equals(ExchangePattern.InOut))
                         .expectation(text("1")).expectation(text("3"))
@@ -271,15 +271,15 @@ public class MultiExpectationSyncTest extends MorcTestBuilder {
                 .expectation(exception(new FileNotFoundException()))
                 .expectation(exception(new FileNotFoundException("baz")))
                 .expectsException()
-                .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
+                .addMock(syncMock("seda:throwsException").expectedMessageCount(1)
                         .response(exception()))
-                .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
+                .addMock(syncMock("seda:throwsException").expectedMessageCount(1)
                         .response(exception(new IOException())))
-                .addExpectation(syncExpectation("seda:throwsException").expectedMessageCount(1)
+                .addMock(syncMock("seda:throwsException").expectedMessageCount(1)
                         .response(exception(new IOException("foo"))))
-                .addExpectation(syncExpectation("seda:throwsException").response(exception(new FileNotFoundException()))
+                .addMock(syncMock("seda:throwsException").response(exception(new FileNotFoundException()))
                         .expectedMessageCount(1))
-                .addExpectation(syncExpectation("seda:throwsException").response(exception(new FileNotFoundException("baz")))
+                .addMock(syncMock("seda:throwsException").response(exception(new FileNotFoundException("baz")))
                         .expectedMessageCount(1));
     }
 

@@ -202,9 +202,9 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Total Order Ordered Endpoint", "vm:totalOrderOrderedEndpoint")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("3")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("3")))
                 .build();
 
         runTest(spec);
@@ -217,10 +217,10 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Total Order Unordered Endpoint", "vm:totalOrderUnorderedEndpoint")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("1")).endpointNotOrdered())
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("2")).endpointNotOrdered())
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("1")).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("2")).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
                 .build();
 
         runTest(spec);
@@ -233,10 +233,10 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Partial Order Ordered Endpoint", "vm:partialOrderOrderedEndpoint")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
-                .addExpectation(morcMethods.asyncExpectation("vm:a").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.asyncMock("vm:a").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
+                .addMock(morcMethods.asyncMock("vm:a").expectation(text("2")))
                 .build();
 
         runTest(spec);
@@ -249,10 +249,10 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Partial Order Unordered Endpoint", "vm:partialOrderUnorderedEndpoint")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("1")).endpointNotOrdered())
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("2")).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("1")).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("2")).endpointNotOrdered())
                 .build();
 
         runTest(spec);
@@ -265,8 +265,8 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Partial Order Unordered Endpoint 2", "vm:partialOrderUnorderedEndpoint2")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("1")).endpointNotOrdered())
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("2")).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("1")).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("2")).endpointNotOrdered())
                 .build();
 
         runTest(spec);
@@ -279,12 +279,12 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("Partial Order Unordered Endpoint 3", "vm:partialOrderUnorderedEndpoint3")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("1")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("2")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("3")))
-                .addExpectation(morcMethods.syncExpectation("vm:a").expectation(text("3")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("1")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("2")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("3")))
+                .addMock(morcMethods.syncMock("vm:a").expectation(text("3")).endpointNotOrdered().ordering(MockDefinition.OrderingType.PARTIAL))
                 .build();
 
         runTest(spec);
@@ -297,8 +297,8 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("No Order Ordered Endpoint", "vm:testNoOrderOrderedEndpoint")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE))
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE))
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
                 .build();
 
         runTest(spec);
@@ -311,10 +311,10 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("No Order Ordered Endpoint 2", "vm:testNoOrderOrderedEndpoint2")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
                 .build();
 
         runTest(spec);
@@ -327,10 +327,10 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("No Order Unordered Endpoint", "vm:testNoOrderUnorderedEndpoint")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("1")))
-                .addExpectation(morcMethods.syncExpectation("vm:s").expectation(text("2")))
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("1")))
+                .addMock(morcMethods.syncMock("vm:s").expectation(text("2")))
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
                 .build();
 
         runTest(spec);
@@ -343,8 +343,8 @@ public class EachCaseMultiExpectationSyncFailureTest extends CamelTestSupport im
 
         OrchestratedTestSpecification spec = new AsyncOrchestratedTestBuilder("No Order Unordered Endpoint 2", "vm:testNoOrderUnorderedEndpoint2")
                 .input(text("0"))
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
-                .addExpectation(morcMethods.syncExpectation("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("1")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
+                .addMock(morcMethods.syncMock("vm:x").expectation(text("2")).ordering(MockDefinition.OrderingType.NONE).endpointNotOrdered())
                 .build();
 
         runTest(spec);

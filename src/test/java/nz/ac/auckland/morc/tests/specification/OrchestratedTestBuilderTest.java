@@ -68,14 +68,14 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
     @Test
     public void testAddEndpointSameClass() throws Exception {
         OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url")
-                .request(text("foo"),headers(header("1", "1")))
-                .request(text("baz"),headers(header("2", "2")))
-                .expectation(text("1"),headers(header("foo", "baz")))
-                .expectation(text("2"),headers(header("baz", "foo")))
+                .request(text("foo"), headers(header("1", "1")))
+                .request(text("baz"), headers(header("2", "2")))
+                .expectation(text("1"), headers(header("foo", "baz")))
+                .expectation(text("2"), headers(header("baz", "foo")))
                 .addEndpoint("2")
-                .request(text("foo"),headers(header("1", "1")))
+                .request(text("foo"), headers(header("1", "1")))
                 .request(headers(header("2", "2")))
-                .expectation(text("1"),headers(header("foo", "baz")))
+                .expectation(text("1"), headers(header("foo", "baz")))
                 .expectation(headers(header("baz", "foo"))).build();
 
         assertEquals(2, test.getPartCount());
@@ -131,12 +131,12 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
     @Test
     public void testAddEndpointDifferentClass() throws Exception {
         OrchestratedTestSpecification test = new SyncOrchestratedTestBuilder("foo", "url")
-                .request(text("foo"),headers(header("1", "1")))
-                .request(text("baz"),headers(header("2", "2")))
-                .expectation(text("1"),headers(header("foo", "baz")))
-                .expectation(text("2"),headers(header("baz", "foo")))
-                .addEndpoint("2", AsyncOrchestratedTestBuilder.class).input(text("foo"),headers(header("1", "1")))
-                .input(text("baz"),headers(header("2", "2")))
+                .request(text("foo"), headers(header("1", "1")))
+                .request(text("baz"), headers(header("2", "2")))
+                .expectation(text("1"), headers(header("foo", "baz")))
+                .expectation(text("2"), headers(header("baz", "foo")))
+                .addEndpoint("2", AsyncOrchestratedTestBuilder.class).input(text("foo"), headers(header("1", "1")))
+                .input(text("baz"), headers(header("2", "2")))
                 .build();
 
         assertEquals(2, test.getPartCount());
@@ -189,12 +189,12 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         SyncOrchestratedTestBuilder test = new SyncOrchestratedTestBuilder("foo", "url");
         MorcTestBuilder morcMethods = createMorcTestBuilder();
 
-        test.request(text("foo"),headers(header("1", "1"))).request(text("baz"),headers(header("2", "2")))
-                .expectation(text("1"),headers(header("foo", "baz"))).expectation(text("2"),headers(header("baz", "foo")))
-                .addEndpoint("2", morcMethods.asyncTest()).input(text("foo"),headers(header("1", "1")))
-                .input(text("baz"),headers(header("2", "2")))
-                .addEndpoint("3", morcMethods.syncTest()).request(text("foo"),headers(header("1", "1")))
-                .request(text("baz"),headers(header("2", "2")))
+        test.request(text("foo"), headers(header("1", "1"))).request(text("baz"), headers(header("2", "2")))
+                .expectation(text("1"), headers(header("foo", "baz"))).expectation(text("2"), headers(header("baz", "foo")))
+                .addEndpoint("2", morcMethods.asyncTest()).input(text("foo"), headers(header("1", "1")))
+                .input(text("baz"), headers(header("2", "2")))
+                .addEndpoint("3", morcMethods.syncTest()).request(text("foo"), headers(header("1", "1")))
+                .request(text("baz"), headers(header("2", "2")))
                 .build();
 
         OrchestratedTestSpecification spec = test.build();
@@ -240,13 +240,13 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
 
         OrchestratedTestSpecification test = new OrchestratedTestSpecification.OrchestratedTestSpecificationBuilder("foo", "baz")
                 .addProcessors(text("foo"))
-                .addExpectation(morcMethods.asyncExpectation("baz").expectation(text("1")).expectation(text("2")))
-                .addExpectation(morcMethods.syncExpectation("foo").expectation(text("1")).expectation(text("2")))
-                .addExpectation(morcMethods.asyncExpectation("moo").expectation(text("1")).expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
-                .addExpectation(morcMethods.asyncExpectation("baz").expectation(text("3")).expectation(text("4")))
-                .addExpectation(morcMethods.syncExpectation("foo").expectation(text("3")).expectation(text("4")))
-                .addExpectation(morcMethods.asyncExpectation("baz").expectation(text("4")).expectation(text("5")))
-                .addExpectation(morcMethods.asyncExpectation("cow").expectation(text("1")).expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
+                .addMock(morcMethods.asyncMock("baz").expectation(text("1")).expectation(text("2")))
+                .addMock(morcMethods.syncMock("foo").expectation(text("1")).expectation(text("2")))
+                .addMock(morcMethods.asyncMock("moo").expectation(text("1")).expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
+                .addMock(morcMethods.asyncMock("baz").expectation(text("3")).expectation(text("4")))
+                .addMock(morcMethods.syncMock("foo").expectation(text("3")).expectation(text("4")))
+                .addMock(morcMethods.asyncMock("baz").expectation(text("4")).expectation(text("5")))
+                .addMock(morcMethods.asyncMock("cow").expectation(text("1")).expectation(text("2")).ordering(MockDefinition.OrderingType.NONE))
                 .build();
 
         assertEquals(7, test.getEndpointNodesOrdering().size());

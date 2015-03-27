@@ -16,7 +16,7 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
     public void testEqualBodiesAndHeaders() throws Exception {
 
         OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url")
-                .input(text("foo"),headers(header("1", "1"))).input(text("baz"),headers(header("2", "2")))
+                .input(text("foo"), headers(header("1", "1"))).input(text("baz"), headers(header("2", "2")))
                 .build();
 
         assertEquals(2, test.getProcessors().size());
@@ -38,7 +38,7 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
         OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url")
-                .input(text("foo"),headers(header("1", "1"))).input(text("baz"))
+                .input(text("foo"), headers(header("1", "1"))).input(text("baz"))
                 .build();
 
         assertEquals(2, test.getProcessors().size());
@@ -58,7 +58,7 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
 
     @Test
     public void testMoreHeadersThanBodies() throws Exception {
-        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").input(text("foo"),headers(header("1", "1")))
+        OrchestratedTestSpecification test = new AsyncOrchestratedTestBuilder("foo", "url").input(text("foo"), headers(header("1", "1")))
                 .input(headers(header("2", "2"))).build();
 
         assertEquals(2, test.getProcessors().size());

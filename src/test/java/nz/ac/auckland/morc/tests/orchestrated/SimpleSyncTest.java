@@ -75,18 +75,18 @@ public class SimpleSyncTest extends MorcTestBuilder {
     public void configure() {
         /*syncTest("Simple send body to async output with valid response", "direct:syncInputAsyncOutput")
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget").expectation(xml("<baz/>")))
+                .addMock(asyncMock("seda:asyncTarget").expectation(xml("<baz/>")))
                 .expectation(xml("<foo/>"));
 
         syncTest("Ensure unresolved message count is zero and still valid", "direct:syncInputAsyncOutput")
                 .expectation(xml("<foo/>"))
                 .request(xml("<baz/>"))
-                .addExpectation(unreceivedExpectation("seda:nothingToSeeHere"));
+                .addMock(unreceivedMock("seda:nothingToSeeHere"));
 
         syncTest("Multiple messages received by expectation", "direct:syncMultiTestPublisher")
                 .expectation(xml("<foo/>"))
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget")
+                .addMock(asyncMock("seda:asyncTarget")
                         .expectedMessageCount(3)
                         .expectation(xml("<moo/>")));
 
@@ -96,28 +96,28 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
         syncTest("Test total ordering response the same", "direct:syncMultiTestPublisher")
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget")
+                .addMock(asyncMock("seda:asyncTarget")
                         .expectedMessageCount(3).ordering(MockDefinition.OrderingType.PARTIAL));
 
         syncTest("Test endpoint ordering response the same", "direct:syncMultiTestPublisher")
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget")
+                .addMock(asyncMock("seda:asyncTarget")
                         .expectedMessageCount(3).ordering(MockDefinition.OrderingType.PARTIAL));
 
         syncTest("Test no ordering response the same", "direct:syncMultiTestPublisher")
                 .request(xml("<baz/>"))
-                .addExpectation(asyncExpectation("seda:asyncTarget")
+                .addMock(asyncMock("seda:asyncTarget")
                         .expectedMessageCount(3).ordering(MockDefinition.OrderingType.PARTIAL).endpointNotOrdered());
 
         syncTest("Test headers are handled appropriately", "direct:syncInputAsyncOutput")
                 .request(xml("<baz/>"), headers(header("foo", "baz"), header("abc", "def")))
-                .addExpectation(asyncExpectation("seda:asyncTarget")
+                .addMock(asyncMock("seda:asyncTarget")
                         .expectation(headers(header("abc", "def"), header("foo", "baz"))));
         */
 
         syncTest("Test sync response", "direct:syncInputSyncOutput")
                 .requestMultiplier(3, xml("<baz/>"))
-                .addExpectation(syncExpectation("seda:syncTarget")
+                .addMock(syncMock("seda:syncTarget")
                         .expectationMultiplier(3, xml("<baz/>"))
                         .responseMultiplier(3, xml("<foo/>")).ordering(totalOrdering()))
                 .sendInterval(3000)
@@ -142,16 +142,16 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
         syncTest("Test JSON Expectation", "seda:jsonRequest")
                 .request(json("{\"foo\":\"baz\"}"))
-                .addExpectation(syncExpectation("seda:jsonExpectation")
+                .addMock(syncMock("seda:jsonExpectation")
                         .expectation(json("{\"foo\":\"baz\"}")));
 
-        MockDefinition.MockDefinitionBuilderInit expectation1 = syncExpectation("seda:jsonExpectation")
+        MockDefinition.MockDefinitionBuilderInit expectation1 = syncMock("seda:jsonExpectation")
                 .expectation(json("{\"foo\":\"baz\"}"));
-        MockDefinition.MockDefinitionBuilderInit expectation2 = unreceivedExpectation("seda:nothingToSeeHere");
+        MockDefinition.MockDefinitionBuilderInit expectation2 = unreceivedMock("seda:nothingToSeeHere");
 
         syncTest("addExpectationsTest", "seda:jsonRequest")
                 .request(json("{\"foo\":\"baz\"}"))
-                .addExpectations(expectation1, expectation2);
+                .addMocks(expectation1, expectation2);
 
         Map<String, Object> headers = new HashMap<>();
         headers.put("foo", "baz");
@@ -163,21 +163,21 @@ public class SimpleSyncTest extends MorcTestBuilder {
 
         syncTest("Test Response Headers from Map Validated", "seda:headersFromMap")
                 .request(text("1"), new HeadersTestResource(headers))
-                .addExpectation(syncExpectation("seda:headersFromMap")
+                .addMock(syncMock("seda:headersFromMap")
                         .expectation(new HeadersTestResource(headers))
                         .response(new HeadersTestResource(headers1)))
                 .expectation(new HeadersTestResource(headers1), text("1"));
 
         syncTest("Test Response Headers from Map Validated 2", "seda:headersFromMap")
                 .request(text("1"), new HeadersTestResource(headers))
-                .addExpectation(syncExpectation("seda:headersFromMap")
+                .addMock(syncMock("seda:headersFromMap")
                         .expectation(new HeadersTestResource(headers))
                         .response(new HeadersTestResource(headers1)))
                 .expectation(text("1"), new HeadersTestResource(headers1));
 
         syncTest("Test response with no expectation predicates", "direct:syncInputSyncOutput")
                 .requestMultiplier(3, xml("<baz/>"))
-                .addExpectation(syncExpectation("seda:syncTarget").expectedMessageCount(3)
+                .addMock(syncMock("seda:syncTarget").expectedMessageCount(3)
                         .responseMultiplier(3, xml("<foo/>")))
                 .sendInterval(3000)
                 .expectationMultiplier(3, xml("<foo/>"));
@@ -185,7 +185,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
         //we don't normally expect the preprocessor to be applied in this way
         syncTest("Test Mock preprocessor applied", "seda:preprocessorMock")
                 .request(text("1"))
-                .addExpectation(syncExpectation("seda:preprocessorMock").expectedMessageCount(1)
+                .addMock(syncMock("seda:preprocessorMock").expectedMessageCount(1)
                         .mockFeedPreprocessor(new Processor() {
                             @Override
                             public void process(Exchange exchange) throws Exception {
@@ -212,7 +212,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
                     }
                 });
             }
-        }).addExpectation(asyncExpectation("vm:foo").expectation(text("1")));
+        }).addMock(asyncMock("vm:foo").expectation(text("1")));
 
     }
 

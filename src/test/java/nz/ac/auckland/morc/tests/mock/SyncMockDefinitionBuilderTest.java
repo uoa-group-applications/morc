@@ -16,7 +16,7 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     @Test
     public void testMatchedBodyAndHeadersNoExpectatations() throws Exception {
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .response(text("1"),headers(header("1", "1")))
+                .response(text("1"), headers(header("1", "1")))
                 .response(text("2"), headers(header("2", "2")))
                 .response(text("3"), headers(header("3", "3"))).build(null);
 
@@ -85,7 +85,7 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
     @Test
     public void testMoreBodiesThanHeaders() throws Exception {
         MockDefinition def = new SyncMockDefinitionBuilder("")
-                .response(text("1"),headers(header("1", "1")))
+                .response(text("1"), headers(header("1", "1")))
                 .response(text("2"))
                 .response(text("3")).expectedMessageCount(3)
                 .build(null);
