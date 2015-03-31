@@ -3,7 +3,6 @@ package nz.ac.auckland.morc.tests.mock;
 import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.mock.builder.ContentMockDefinitionBuilder;
-import nz.ac.auckland.morc.resource.HeadersTestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
