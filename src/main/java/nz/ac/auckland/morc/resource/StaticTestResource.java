@@ -21,11 +21,17 @@ public abstract class StaticTestResource<T> implements Predicate, Processor, Tes
 
     private InputStream stream;
     private T value;
+    private ContentTypeTestResource contentTypeTestResource;
+
+    private StaticTestResource() {
+        contentTypeTestResource = new ContentTypeTestResource(getContentType());
+    }
 
     /**
      * @param value set the value directly for this test resource
      */
     public StaticTestResource(T value) {
+        this();
         this.value = value;
     }
 
@@ -33,6 +39,7 @@ public abstract class StaticTestResource<T> implements Predicate, Processor, Tes
      * @param file A reference to a file containing a resource of the specified type T
      */
     public StaticTestResource(File file) {
+        this();
         try {
             this.stream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
@@ -44,6 +51,7 @@ public abstract class StaticTestResource<T> implements Predicate, Processor, Tes
      * @param url A reference to a resource of the specified type T
      */
     public StaticTestResource(URL url) {
+        this();
         try {
             this.stream = url.openStream();
         } catch (IOException e) {
@@ -52,6 +60,7 @@ public abstract class StaticTestResource<T> implements Predicate, Processor, Tes
     }
 
     public StaticTestResource(InputStream inputStream) {
+        this();
         this.stream = inputStream;
     }
 
@@ -82,5 +91,7 @@ public abstract class StaticTestResource<T> implements Predicate, Processor, Tes
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"),
                 body);
         exchange.getIn().setBody(body);
+
+        contentTypeTestResource.process(exchange);
     }
 }

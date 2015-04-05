@@ -85,4 +85,11 @@ public class PlainTextTestResourceTest extends Assert {
         assertEquals(100, new PlainTextTestResource("testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest").toString().length());
     }
 
+    @Test
+    public void testContentType() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        new PlainTextTestResource("foo").process(e);
+        assertEquals("text/plain", e.getIn().getHeader(Exchange.CONTENT_TYPE));
+    }
+
 }

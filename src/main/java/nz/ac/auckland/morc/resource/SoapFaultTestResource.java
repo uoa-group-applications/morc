@@ -146,6 +146,7 @@ public class SoapFaultTestResource implements Predicate, Processor {
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
         exchange.getIn().setFault(true);
         exchange.getIn().setBody(getValue());
+        new ContentTypeTestResource("application/xml").process(exchange);
     }
 
     @Override

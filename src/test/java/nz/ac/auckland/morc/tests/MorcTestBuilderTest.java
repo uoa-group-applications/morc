@@ -1,6 +1,8 @@
 package nz.ac.auckland.morc.tests;
 
 import nz.ac.auckland.morc.MorcMethods;
+import nz.ac.auckland.morc.mock.MockDefinition;
+import nz.ac.auckland.morc.mock.builder.SyncMockDefinitionBuilder;
 import nz.ac.auckland.morc.resource.GroovyTemplateTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
@@ -9,7 +11,6 @@ import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 import java.util.Date;
 import java.util.List;
@@ -115,21 +116,31 @@ public class MorcTestBuilderTest extends Assert implements MorcMethods {
     @Test
     public void testXmlGroovyTemplateCompleted() throws Exception {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
-        TestResource[] resources = xml(groovy("<result><input>${foo}</input><output>${baz}</output></result>", csv));
+        XmlRuntimeTestResource[] resources = xml(groovy("<result><input>${foo}</input><output>${baz}</output></result>", csv));
 
-        assertTrue(xml("<result><input>1</input><output>2</output></result>").validate((Document) resources[0].getValue()));
-        assertTrue(xml("<result><input>3</input><output>4</output></result>").validate((Document) resources[1].getValue()));
-        assertTrue(xml("<result><input>5</input><output>6</output></result>").validate((Document) resources[2].getValue()));
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+
+        resources[0].process(e);
+        assertTrue(xml("<result><input>1</input><output>2</output></result>").matches(e));
+        resources[1].process(e);
+        assertTrue(xml("<result><input>3</input><output>4</output></result>").matches(e));
+        resources[2].process(e);
+        assertTrue(xml("<result><input>5</input><output>6</output></result>").matches(e));
     }
 
     @Test
     public void testJsonGroovyTemplateCompleted() throws Exception {
         List<Map<String, String>> csv = csv(text("foo,baz\n1,2\n3,4\n5,6"));
-        TestResource[] resources = json(groovy("{ \"${foo}\":\"${baz}\" }", csv));
+        JsonRuntimeTestResource[] resources = json(groovy("{ \"${foo}\":\"${baz}\" }", csv));
 
-        assertTrue(json("{ \"1\":\"2\" }").validate((String) resources[0].getValue()));
-        assertTrue(json("{ \"3\":\"4\" }").validate((String) resources[1].getValue()));
-        assertTrue(json("{ \"5\":\"6\" }").validate((String) resources[2].getValue()));
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+
+        resources[0].process(e);
+        assertTrue(json("{ \"1\":\"2\" }").matches(e));
+        resources[1].process(e);
+        assertTrue(json("{ \"3\":\"4\" }").matches(e));
+        resources[2].process(e);
+        assertTrue(json("{ \"5\":\"6\" }").matches(e));
     }
 
     @Test
@@ -215,10 +226,10 @@ public class MorcTestBuilderTest extends Assert implements MorcMethods {
         e.getIn().setBody(new XmlUtilities().getXmlAsDocument("<foo>abc</foo>"));
         assertTrue(resources[1].matches(e));
 
-        e.getIn().setBody(resources[0].getValue());
+        resources[0].process(e);
         assertTrue(xml("<foo>baz</foo>").matches(e));
 
-        e.getIn().setBody(resources[1].getValue());
+        resources[1].process(e);
         assertTrue(xml("<foo>abc</foo>").matches(e));
     }
 
@@ -237,10 +248,10 @@ public class MorcTestBuilderTest extends Assert implements MorcMethods {
         e.getIn().setBody("{ \"foo\": \"abc\" }");
         assertTrue(resources[1].matches(e));
 
-        e.getIn().setBody(resources[0].getValue());
+        resources[0].process(e);
         assertTrue(json("{ \"foo\": \"baz\" }").matches(e));
 
-        e.getIn().setBody(resources[1].getValue());
+        resources[1].process(e);
         assertTrue(json("{ \"foo\": \"abc\" }").matches(e));
     }
 
@@ -251,5 +262,29 @@ public class MorcTestBuilderTest extends Assert implements MorcMethods {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody("baz foo");
         assertTrue(resources[0].matches(e));
+    }
+
+    @Test
+    public void testRandomGenerator() throws Exception {
+        MockDefinition mock = new SyncMockDefinitionBuilder("foo").lenientProcessor(randomSelector())
+                .lenient(exchange -> true)
+                .response(text("foo")).response(text("baz")).response(text("moo")).build(null);
+
+        int foo = 0, baz = 0, moo = 0;
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+
+        for (int i = 0; i < 1000; i++) {
+            mock.getLenientProcessor().process(e);
+            String body = e.getIn().getBody(String.class);
+            if (body.equals("foo")) foo++;
+            else if (body.equals("baz")) baz++;
+            else if (body.equals("moo")) moo++;
+            else throw new Exception("Body not expected!");
+        }
+
+        assertTrue(foo > 0);
+        assertTrue(baz > 0);
+        assertTrue(moo > 0);
     }
 }

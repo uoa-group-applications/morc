@@ -3,6 +3,7 @@ package nz.ac.auckland.morc.processor;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,6 +19,10 @@ public class SelectorProcessor implements Processor {
 
     public SelectorProcessor(List<Processor> processors) {
         this.processors = processors;
+    }
+
+    protected List<Processor> getProcessors() {
+        return Collections.unmodifiableList(processors);
     }
 
     public void process(Exchange exchange) throws Exception {

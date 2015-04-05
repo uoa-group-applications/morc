@@ -36,17 +36,17 @@ public class WebServiceProxyTest extends MorcTestBuilder {
     @Override
     public void configure() {
 
-        syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
+        syncTest("Simple WS proxy test", "http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
-                .expectation(xml(classpath("/data/pingResponse1.xml")))
-                .addMock(syncMock("jetty:http://localhost:8090/targetWS")
-                        .expectation(xml(classpath("/data/pingRequest1.xml")))
+                .expectation(xml(classpath("/data/pingResponse1.xml")), contentType("application/xml"))
+                .addMock(syncMock("http://localhost:8090/targetWS")
+                        .expectation(xml(classpath("/data/pingRequest1.xml")), contentType("application/xml"))
                         .response(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));
 
         syncTest("Simple non-200 WS proxy test", "jetty:http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
-                .expectation(httpResponse(201))
+                .expectation(httpResponse(201), contentType("application/xml"))
                 .addMock(syncMock("jetty:http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpResponse(201, xml("<foo/>"))));
@@ -58,19 +58,19 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpResponse(201, xml("<foo/>"))));
 
-        syncTest("Simple WS proxy failure test", "jetty:http://localhost:8090/testWS")
+        syncTest("Simple WS proxy failure test", "http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
                 .expectation(httpErrorResponse(500))
                 .expectsException()
-                .addMock(syncMock("jetty:http://localhost:8090/targetWS")
+                .addMock(syncMock("http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpErrorResponse(500, xml(classpath("/data/pingSoapFault.xml")))));
 
-        syncTest("Simple WS proxy failure test with body", "jetty:http://localhost:8090/testWS")
+        syncTest("Simple WS proxy failure test with body", "http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
                 .expectation(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml"))))
                 .expectsException()
-                .addMock(syncMock("jetty:http://localhost:8090/targetWS")
+                .addMock(syncMock("http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml")))));
 
@@ -109,17 +109,17 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .expectedMessageCount(1)
                         .response(soapFault(soapFaultServer(), "Pretend Fault", xml("<detail><foo/></detail>"))));
 
-        syncTest("Simple WS proxy test", "jetty:http://localhost:8090/testWS")
+        syncTest("Simple WS proxy test", "http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
                 .expectation(xml(classpath("/data/pingResponse1.xml")))
-                .addMock(syncMock("jetty:http://localhost:8090/targetWS")
+                .addMock(syncMock("http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()))
-                .addEndpoint("jetty:http://localhost:8090/testWS")
+                .addEndpoint("http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
                 .expectation(xml(classpath("/data/pingResponse1.xml")))
-                .addMock(syncMock("jetty:http://localhost:8090/targetWS")
+                .addMock(syncMock("http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
                         .response(xml(classpath("/data/pingResponse1.xml")))
                         .ordering(partialOrdering()));

@@ -4,10 +4,12 @@ import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.apache.cxf.helpers.IOUtils;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -38,6 +40,27 @@ public class JsonTestResource extends StaticTestResource<String> {
         super(stream);
     }
 
+    public String getValue() throws Exception {
+        if (!validJson())
+            throw new RuntimeException("Invalid JSON: " + super.getValue());
+
+        return super.getValue();
+    }
+
+    private boolean validJson() throws Exception {
+        String input = super.getValue();
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.readTree(input);
+        } catch (JsonProcessingException | EOFException e) {
+            logger.warn("Invalid JSON: {}", input);
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * @param stream an input stream we can read the file from (this will close it for you)
      */
@@ -61,8 +84,9 @@ public class JsonTestResource extends StaticTestResource<String> {
     }
 
     public boolean validate(String value) {
-        if (value == null) return false;
         try {
+            if (value == null || !validJson()) return false;
+
             String expectedInput = getValue();
 
             logger.debug("Expected JSON Input: {},\nActual JSON Input: {}", expectedInput,
@@ -90,5 +114,9 @@ public class JsonTestResource extends StaticTestResource<String> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public String getContentType() {
+        return "application/json";
     }
 }

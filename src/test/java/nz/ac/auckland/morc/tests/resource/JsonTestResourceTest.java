@@ -70,7 +70,7 @@ public class JsonTestResourceTest extends Assert {
     @Test
     public void testEmptyFile() throws Exception {
         JsonTestResource validator = new JsonTestResource(inputUrl2);
-        assertTrue(validator.validate(""));
+        assertFalse(validator.validate(""));
     }
 
     @Test
@@ -108,5 +108,26 @@ public class JsonTestResourceTest extends Assert {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         e.getIn().setBody("");
         assertFalse(new JsonTestResource("{\"foo\":\"baz\"}").matches(e));
+    }
+
+    @Test
+    public void testInvalidJson() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+
+        boolean exception = false;
+        try {
+            new JsonTestResource("{\"foo\":\"baz\" ").process(e);
+        } catch (RuntimeException ex) {
+            exception = true;
+        }
+
+        assertTrue("Exception not found", exception);
+    }
+
+    @Test
+    public void testContentType() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        new JsonTestResource("{\"foo\":\"baz\" }").process(e);
+        assertEquals("application/json", e.getIn().getHeader(Exchange.CONTENT_TYPE));
     }
 }

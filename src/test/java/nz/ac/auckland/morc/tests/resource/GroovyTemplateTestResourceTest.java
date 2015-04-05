@@ -3,7 +3,6 @@ package nz.ac.auckland.morc.tests.resource;
 import groovy.text.SimpleTemplateEngine;
 import nz.ac.auckland.morc.resource.GroovyTemplateTestResource;
 import nz.ac.auckland.morc.resource.PlainTextTestResource;
-import nz.ac.auckland.morc.resource.TestResource;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
@@ -26,9 +25,14 @@ public class GroovyTemplateTestResourceTest extends Assert {
         variables.put("baz", "2");
         variables.put("moo", "3");
 
-        TestResource testResource = new GroovyTemplateTestResource(resource, variables);
+        GroovyTemplateTestResource testResource = new GroovyTemplateTestResource(resource, variables);
         assertTrue(testResource.toString().endsWith(templateValue));
         assertEquals("1 2 3", testResource.getValue());
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        testResource.process(e);
+        assertEquals("1 2 3", e.getIn().getBody(String.class));
+        assertEquals("text/plain", e.getIn().getHeader(Exchange.CONTENT_TYPE));
     }
 
     @Test
@@ -82,4 +86,5 @@ public class GroovyTemplateTestResourceTest extends Assert {
         long nextEndTime = Long.parseLong(testResource.getValue());
         assertTrue(nextEndTime - 2000 >= endTime);
     }
+
 }

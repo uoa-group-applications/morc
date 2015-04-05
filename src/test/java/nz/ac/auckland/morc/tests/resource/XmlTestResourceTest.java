@@ -149,5 +149,12 @@ public class XmlTestResourceTest extends Assert {
         assertTrue(resource.matches(e));
     }
 
+    @Test
+    public void testContentType() throws Exception {
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        new XmlTestResource(xmlUtilities.getXmlAsDocument("<ns1:foo xmlns:ns1=\"foo.com\">foo</ns1:foo>")).process(e);
+        assertEquals("application/xml", e.getIn().getHeader(Exchange.CONTENT_TYPE));
+    }
+
 }
 

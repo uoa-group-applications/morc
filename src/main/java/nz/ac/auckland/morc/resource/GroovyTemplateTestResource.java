@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class GroovyTemplateTestResource implements Predicate, Processor, TestResource<String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlainTextTestResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(GroovyTemplateTestResource.class);
 
     private TemplateEngine templateEngine;
     private Map<String, String> variables;
@@ -64,10 +64,6 @@ public class GroovyTemplateTestResource implements Predicate, Processor, TestRes
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        String body = getValue();
-
-        logger.trace("Setting body of exchange from endpoint {} to {}",
-                (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"), body);
-        exchange.getIn().setBody(body);
+        new PlainTextTestResource(getValue()).process(exchange);
     }
 }

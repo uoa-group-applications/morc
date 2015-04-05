@@ -148,4 +148,8 @@ public class XmlTestResource extends StaticTestResource<Document> {
             throw new RuntimeException(e);
         }
     }
+
+    public String getContentType() {
+        return "application/xml";
+    }
 }

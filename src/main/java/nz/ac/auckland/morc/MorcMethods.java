@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
+import nz.ac.auckland.morc.processor.SelectorProcessor;
 import nz.ac.auckland.morc.resource.*;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
@@ -14,7 +15,6 @@ import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.camel.jsonpath.JsonPathExpression;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
 import java.io.File;
@@ -134,6 +134,10 @@ public interface MorcMethods {
         }
 
         return resources;
+    }
+
+    default ContentTypeTestResource contentType(String contentType) {
+        return new ContentTypeTestResource(contentType);
     }
 
     /**
@@ -401,7 +405,7 @@ public interface MorcMethods {
         return resources;
     }
 
-    class XmlRuntimeTestResource implements Predicate, Processor, TestResource<Document> {
+    class XmlRuntimeTestResource implements Predicate, Processor {
         private TestResource<String> resource;
         private XmlUtilities xmlUtilities;
 
@@ -423,11 +427,6 @@ public interface MorcMethods {
         @Override
         public String toString() {
             return "XmlGroovyTemplateTestResource:" + getResource().toString();
-        }
-
-        @Override
-        public Document getValue() throws Exception {
-            return getResource().getValue();
         }
 
         private XmlTestResource getResource() {
@@ -454,7 +453,7 @@ public interface MorcMethods {
         return resources;
     }
 
-    class JsonRuntimeTestResource implements Processor, Predicate, TestResource<String> {
+    class JsonRuntimeTestResource implements Processor, Predicate {
         private TestResource<String> resource;
 
         public JsonRuntimeTestResource(TestResource<String> resource) {
@@ -474,11 +473,6 @@ public interface MorcMethods {
         @Override
         public String toString() {
             return "JsonGroovyTemplateTestResource:" + getResource().toString();
-        }
-
-        @Override
-        public String getValue() throws Exception {
-            return getResource().getValue();
         }
 
         private JsonTestResource getResource() {
@@ -718,5 +712,23 @@ public interface MorcMethods {
      */
     default Predicate regex(String expression) {
         return new SimpleBuilder("${body} regex '" + expression + "'");
+    }
+
+    default Class<? extends SelectorProcessor> randomSelector() {
+        return RandomSelector.class;
+    }
+
+    class RandomSelector extends SelectorProcessor {
+        public RandomSelector(List<Processor> processors) {
+            super(processors);
+        }
+
+        public void process(Exchange exchange) throws Exception {
+            List<Processor> processors = getProcessors();
+
+            if (processors.size() == 0) return;
+
+            processors.get(new Random().nextInt(processors.size())).process(exchange);
+        }
     }
 }

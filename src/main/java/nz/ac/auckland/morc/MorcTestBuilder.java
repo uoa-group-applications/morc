@@ -32,6 +32,7 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
      * @return An asynchronous test specification builder with the endpoint uri and description configured
      */
     protected AsyncOrchestratedTestBuilder asyncTest(String description, String endpointUri) {
+        if (endpointUri.startsWith("http")) endpointUri = "jetty:" + endpointUri;
         AsyncOrchestratedTestBuilder builder = new AsyncOrchestratedTestBuilder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
@@ -54,6 +55,7 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
      * @return A synchronous test specification builder with the endpoint uri and description configured
      */
     protected SyncOrchestratedTestBuilder syncTest(String description, String endpointUri) {
+        if (endpointUri.startsWith("http")) endpointUri = "jetty:" + endpointUri;
         SyncOrchestratedTestBuilder builder = new SyncOrchestratedTestBuilder(description, endpointUri);
         specificationBuilders.add(builder);
         return builder;
@@ -74,6 +76,7 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
     public AsyncMockDefinitionBuilder asyncMock(String endpointUri) {
+        if (endpointUri.startsWith("http")) endpointUri = "jetty:" + endpointUri;
         return new AsyncMockDefinitionBuilder(endpointUri);
     }
 
@@ -81,6 +84,7 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
     public SyncMockDefinitionBuilder syncMock(String endpointUri) {
+        if (endpointUri.startsWith("http")) endpointUri = "jetty:" + endpointUri;
         return new SyncMockDefinitionBuilder(endpointUri);
     }
 
@@ -88,6 +92,7 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
      * @param endpointUri The endpoint URI that a mock should listen to; should follow the Apache Camel URI format
      */
     public UnreceivedMockDefinitionBuilder unreceivedMock(String endpointUri) {
+        if (endpointUri.startsWith("http")) endpointUri = "jetty:" + endpointUri;
         return new UnreceivedMockDefinitionBuilder(endpointUri);
     }
 

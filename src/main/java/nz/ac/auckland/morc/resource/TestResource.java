@@ -13,4 +13,8 @@ public interface TestResource<T> {
      */
     public T getValue() throws Exception;
 
+    public default String getContentType() {
+        return "text/plain";
+    }
+
 }
