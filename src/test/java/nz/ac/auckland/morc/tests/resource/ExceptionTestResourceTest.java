@@ -19,7 +19,6 @@ public class ExceptionTestResourceTest extends Assert {
         ExceptionTestResource predicate = new ExceptionTestResource();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
 
         assertTrue(predicate.matches(e));
@@ -30,7 +29,6 @@ public class ExceptionTestResourceTest extends Assert {
         ExceptionTestResource predicate = new ExceptionTestResource(new IOException());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         assertFalse(predicate.matches(e));
     }
 
@@ -47,7 +45,6 @@ public class ExceptionTestResourceTest extends Assert {
         ExceptionTestResource predicate = new ExceptionTestResource(new Exception());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.setProperty(Exchange.EXCEPTION_CAUGHT, fault);
 
         assertTrue(predicate.matches(e));
@@ -58,7 +55,6 @@ public class ExceptionTestResourceTest extends Assert {
         ExceptionTestResource predicate = new ExceptionTestResource(new SoapFault("", new QName("")));
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.setProperty(Exchange.EXCEPTION_CAUGHT, new Exception());
 
         assertFalse(predicate.matches(e));

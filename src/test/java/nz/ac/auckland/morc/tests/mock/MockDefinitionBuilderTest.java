@@ -210,7 +210,6 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
                 .addProcessors(text("cow")).addPredicates(text("moo")).addPredicates(text("cow")).build(def1);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         assertEquals(4, def2.getExpectedMessageCount());
         assertEquals(4, def2.getPredicates().size());
@@ -292,7 +291,6 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
                 }).build(def1);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         assertEquals(4, def2.getExpectedMessageCount());
         assertEquals(4, def2.getPredicates().size());
@@ -348,7 +346,6 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
         assertNotNull(def.getLenientSelector());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         //ensure we can handle the case when no processors are available
         e.getIn().setBody("foo");

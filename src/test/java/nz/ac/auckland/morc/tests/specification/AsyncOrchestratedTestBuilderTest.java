@@ -24,7 +24,6 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         test.getProcessors().get(0).process(e);
         assertEquals("foo", e.getIn().getBody(String.class));
@@ -46,7 +45,6 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         test.getProcessors().get(0).process(e);
         assertEquals("foo", e.getIn().getBody(String.class));
@@ -66,7 +64,6 @@ public class AsyncOrchestratedTestBuilderTest extends Assert implements MorcMeth
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         test.getProcessors().get(0).process(e);
         assertEquals("foo", e.getIn().getBody(String.class));

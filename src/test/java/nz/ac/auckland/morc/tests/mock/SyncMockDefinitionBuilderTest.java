@@ -40,7 +40,6 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
         assertEquals(4, def.getProcessors().size());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("");
         e.getIn().setHeader("1", "1");
 
@@ -75,7 +74,6 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
         assertEquals(1, def.getPredicates().size());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("");
 
         def.getProcessors().get(0).process(e);
@@ -91,7 +89,6 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
                 .build(null);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("");
 
         def.getProcessors().get(0).process(e);
@@ -120,7 +117,6 @@ public class SyncMockDefinitionBuilderTest extends Assert implements MorcMethods
                 .response(headers(header("3", "3"))).build(null);
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("");
 
         def.getProcessors().get(0).process(e);

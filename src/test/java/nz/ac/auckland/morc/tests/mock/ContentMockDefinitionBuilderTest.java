@@ -23,7 +23,6 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
 
         assertEquals(3, def.getPredicates().size());
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         e.getIn().setHeader("aaa", "bbb");
         e.getIn().setBody("foo");
@@ -50,7 +49,6 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
 
         assertEquals(3, def.getPredicates().size());
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         e.getIn().setHeader("foo", "1");
         e.getIn().setHeader("aaa", "bbb");
@@ -76,7 +74,6 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
 
         assertEquals(3, def.getPredicates().size());
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         e.getIn().setHeader("aaa", "bbb");
         e.getIn().setBody("foo");
@@ -101,7 +98,6 @@ public class ContentMockDefinitionBuilderTest extends Assert implements MorcMeth
 
         assertEquals(3, def.getPredicates().size());
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         e.getIn().setHeader("aaa", "bbb");
         e.getIn().setBody("foo");

@@ -25,7 +25,6 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
         e.getIn().setHeader("foo", "baz");
@@ -58,7 +57,6 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
         e.getIn().setHeader("foo", "baz");
@@ -88,7 +86,6 @@ public class SyncOrchestratedTestBuilderTest extends Assert implements MorcMetho
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
         e.getIn().setHeader("foo", "baz");

@@ -31,7 +31,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         assertEquals(0, test.getTotalMockMessageCount());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("baz");
 
         assertTrue(test.getPredicates().get(0).matches(e));
@@ -54,7 +53,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         assertEquals(2, test.getPredicates().size());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("baz");
 
         assertFalse(test.getPredicates().get(0).matches(e));
@@ -85,7 +83,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
         e.getIn().setHeader("foo", "baz");
@@ -111,7 +108,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         assertEquals(2, test.getPredicates().size());
 
         e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
         e.getIn().setHeader("foo", "baz");
@@ -146,7 +142,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         assertEquals("url", test.getEndpointUri());
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
         assertFalse(test.getPredicates().get(0).matches(e));
         e.getIn().setHeader("foo", "baz");
@@ -172,7 +167,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
         assertEquals("2", test.getEndpointUri());
 
         e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
 
         test.getProcessors().get(0).process(e);
         assertEquals("foo", e.getIn().getBody(String.class));
@@ -211,7 +205,6 @@ public class OrchestratedTestBuilderTest extends Assert implements MorcMethods {
                 .addPredicates(text("1")).addPredicates(text("2")).build();
 
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setFromEndpoint(new CxfEndpoint(""));
         e.getIn().setBody("1");
 
         assertTrue(test.getPredicates().get(0).matches(e));
