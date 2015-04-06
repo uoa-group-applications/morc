@@ -255,12 +255,23 @@ public interface MorcMethods {
      * A convenience method for specifying matched input validators to an output processor
      */
     @SuppressWarnings("unchecked")
-    default MatchedResponseProcessor.MatchedResponse answer(Predicate predicate, Processor... processors) {
-        try {
-            return new MatchedResponseProcessor.MatchedResponse(predicate, processors);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    default MatchedResponseProcessor.MatchedResponse answer(Predicate predicate, Processor processor, Processor... processors) {
+        return new MatchedResponseProcessor.MatchedResponse(predicate, processor, processors);
+    }
+
+    /**
+     * A convenience method for specifying matched input validators to an output processor
+     */
+    default MatchedResponseProcessor.MatchedResponse response(Predicate predicate, Processor processor, Processor... processors) {
+        return answer(predicate, processor, processors);
+    }
+
+    /**
+     * @param processors The set of processors for the default response if no predicate match can be found
+     * @return
+     */
+    default MatchedResponseProcessor.DefaultMatchedResponse defaultResponse(Processor... processors) {
+        return new MatchedResponseProcessor.DefaultMatchedResponse(processors);
     }
 
     /**
@@ -714,6 +725,9 @@ public interface MorcMethods {
         return new SimpleBuilder("${body} regex '" + expression + "'");
     }
 
+    /**
+     * @return randomly choose processors for handling a response
+     */
     default Class<? extends SelectorProcessor> randomSelector() {
         return RandomSelector.class;
     }
