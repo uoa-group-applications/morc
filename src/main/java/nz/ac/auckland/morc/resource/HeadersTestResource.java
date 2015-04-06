@@ -138,7 +138,8 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
         logger.trace("Setting headers of exchange from endpoint {} to {}",
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"),
                 headers);
-        exchange.getIn().setHeaders(headers);
-    }
 
+        Map<String,Object> currentHeaders = exchange.getIn().getHeaders();
+        currentHeaders.putAll(headers);
+    }
 }

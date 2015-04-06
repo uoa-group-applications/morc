@@ -1,11 +1,18 @@
 package nz.ac.auckland.morc.tests.resource;
 
+import nz.ac.auckland.morc.processor.MultiProcessor;
 import nz.ac.auckland.morc.resource.HeadersTestResource;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HeadersTestResourceTest extends Assert {
@@ -108,5 +115,30 @@ public class HeadersTestResourceTest extends Assert {
         assertTrue(HeadersTestResource.formatHeaders(values).contains("null"));
     }
 
+    @Test
+    public void testSetMultipleHeaders() throws Exception {
+        HashMap<String, Object> values = new HashMap<>();
+        values.put("foo", "baz");
+        values.put("abc", "123");
+
+        HeadersTestResource headers = new HeadersTestResource(values);
+
+        HashMap<String, Object> values1 = new HashMap<>();
+        values.put("123","456");
+
+        HeadersTestResource headers1 = new HeadersTestResource(values1);
+
+        List<Processor> processors = new ArrayList<>();
+        processors.add(headers);
+        processors.add(headers1);
+
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+
+        new MultiProcessor(processors).process(e);
+
+        assertEquals("baz",e.getIn().getHeader("foo"));
+        assertEquals("123",e.getIn().getHeader("abc"));
+        assertEquals("456",e.getIn().getHeader("123"));
+    }
 
 }
