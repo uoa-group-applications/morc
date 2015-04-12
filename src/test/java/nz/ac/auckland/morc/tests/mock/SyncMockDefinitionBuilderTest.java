@@ -4,7 +4,6 @@ import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.mock.builder.SyncMockDefinitionBuilder;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;

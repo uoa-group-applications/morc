@@ -37,7 +37,7 @@ public class MatchedResponseProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         for (MatchedResponse matchedResponse : responses) {
             if (matchedResponse.inputPredicate.matches(exchange)) {
-                logger.debug("Matched input for predicate {} at endpoint {}",matchedResponse.inputPredicate,
+                logger.debug("Matched input for predicate {} at endpoint {}", matchedResponse.inputPredicate,
                         (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
 
                 for (Processor e : matchedResponse.responseProcessors)
@@ -71,7 +71,7 @@ public class MatchedResponseProcessor implements Processor {
         public MatchedResponse(Predicate inputPredicate, Processor processor, Processor... responseProcessors) {
             this.inputPredicate = inputPredicate;
             ArrayList<Processor> processors = new ArrayList<>(Arrays.asList(responseProcessors));
-            processors.add(0,processor);
+            processors.add(0, processor);
             this.responseProcessors = Collections.unmodifiableList(processors);
         }
     }

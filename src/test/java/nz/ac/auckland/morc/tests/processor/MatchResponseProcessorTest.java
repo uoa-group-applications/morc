@@ -3,7 +3,6 @@ package nz.ac.auckland.morc.tests.processor;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
 import nz.ac.auckland.morc.resource.PlainTextTestResource;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;

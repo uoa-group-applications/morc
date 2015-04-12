@@ -124,7 +124,7 @@ public class HeadersTestResourceTest extends Assert {
         HeadersTestResource headers = new HeadersTestResource(values);
 
         HashMap<String, Object> values1 = new HashMap<>();
-        values.put("123","456");
+        values.put("123", "456");
 
         HeadersTestResource headers1 = new HeadersTestResource(values1);
 
@@ -136,9 +136,9 @@ public class HeadersTestResourceTest extends Assert {
 
         new MultiProcessor(processors).process(e);
 
-        assertEquals("baz",e.getIn().getHeader("foo"));
-        assertEquals("123",e.getIn().getHeader("abc"));
-        assertEquals("456",e.getIn().getHeader("123"));
+        assertEquals("baz", e.getIn().getHeader("foo"));
+        assertEquals("123", e.getIn().getHeader("abc"));
+        assertEquals("456", e.getIn().getHeader("123"));
     }
 
 }

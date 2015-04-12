@@ -2,7 +2,6 @@ package nz.ac.auckland.morc.tests.resource;
 
 import nz.ac.auckland.morc.resource.ExceptionTestResource;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.cxf.binding.soap.SoapFault;

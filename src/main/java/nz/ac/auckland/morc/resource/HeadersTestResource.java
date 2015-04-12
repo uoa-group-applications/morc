@@ -139,7 +139,7 @@ public class HeadersTestResource extends StaticTestResource<Map<String, Object>>
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"),
                 headers);
 
-        Map<String,Object> currentHeaders = exchange.getIn().getHeaders();
+        Map<String, Object> currentHeaders = exchange.getIn().getHeaders();
         currentHeaders.putAll(headers);
     }
 }

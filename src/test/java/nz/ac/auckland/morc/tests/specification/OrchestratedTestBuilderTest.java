@@ -7,7 +7,6 @@ import nz.ac.auckland.morc.specification.AsyncOrchestratedTestBuilder;
 import nz.ac.auckland.morc.specification.OrchestratedTestSpecification;
 import nz.ac.auckland.morc.specification.SyncOrchestratedTestBuilder;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.cxf.CxfEndpoint;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
