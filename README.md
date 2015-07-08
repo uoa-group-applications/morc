@@ -31,7 +31,7 @@ public class MorcTest extends MorcTestBuilder {
 
 While these tests conform with standard JUnit requirements, it requires a lot of boiler plate configuration to get started. A simple way to create and run tests is with a Groovy (>=2.3) script like:
 ```java
-@Grab(group="nz.ac.auckland.morc",module="morc",version="3.0.0")
+@Grab(group="nz.ac.auckland.morc",module="morc",version="3.3.0")
 import nz.ac.auckland.morc.MorcTestBuilder
 
 new MorcTestBuilder() {
