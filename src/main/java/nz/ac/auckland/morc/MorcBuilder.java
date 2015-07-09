@@ -33,7 +33,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
 
     private long messageResultWaitTime = 1000l;
     private long minimalResultWaitTime = 10000l;
-    private Processor mockFeedPreprocessor;
+    private List<Processor> mockFeedPreprocessors;
 
     private Collection<EndpointOverride> endpointOverrides = new ArrayList<>();
 
@@ -292,14 +292,15 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      * @return A processor that will be applied before the exchange is sent through to the mock endpoint
      */
     public Processor getMockFeedPreprocessor() {
-        return mockFeedPreprocessor;
+        return new MultiProcessor(mockFeedPreprocessors);
     }
 
     /**
-     * @param mockFeedPreprocessor A processor that will be applied before the exchange is sent through to the mock endpoint
+     * @param mockFeedPreprocessors A list processor that will be applied before the exchange is sent through to the
+     *                              mock endpoint
      */
-    public Builder mockFeedPreprocessor(Processor mockFeedPreprocessor) {
-        this.mockFeedPreprocessor = mockFeedPreprocessor;
+    public Builder addMockFeedPreprocessor(Processor... mockFeedPreprocessors) {
+        this.mockFeedPreprocessors.addAll(new ArrayList<>(Arrays.asList(mockFeedPreprocessors)));
         return self();
     }
 

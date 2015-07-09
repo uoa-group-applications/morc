@@ -60,7 +60,7 @@ public class SimpleAsyncTest extends MorcTestBuilder {
 
         asyncTest("Test sender preprocessor applied", "seda:preprocessorSender")
                 .input(text("1"))
-                .mockFeedPreprocessor(new Processor() {
+                .addMockFeedPreprocessor(new Processor() {
                     @Override
                     public void process(Exchange exchange) throws Exception {
                         exchange.setProperty("preprocessed", true);

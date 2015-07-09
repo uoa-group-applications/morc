@@ -1,6 +1,7 @@
 package nz.ac.auckland.morc.specification;
 
 import nz.ac.auckland.morc.TestBean;
+import nz.ac.auckland.morc.processor.HttpExceptionResponseProcessor;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
@@ -30,6 +31,9 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
     protected SyncOrchestratedTestBuilder(String description, String endpointUri,
                                           OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
         super(description, endpointUri, previousPartBuilder);
+        //In the case of HTTP responses we need to rip out the body and headers and put it in the message for proper
+        //validation
+        addMockFeedPreprocessor(new HttpExceptionResponseProcessor());
     }
 
     /**

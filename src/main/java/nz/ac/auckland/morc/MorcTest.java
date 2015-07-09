@@ -268,8 +268,6 @@ public class MorcTest extends CamelSpringTestSupport {
                     .handleFault()
                     .doTry(); //for some reason onException().continued(true) doesn't work
 
-            if (spec.getMockFeedPreprocessor() != null) tryDefinition.process(spec.getMockFeedPreprocessor());
-
             if (spec.getTestBean() == null) tryDefinition.to(targetEndpoint);
             else tryDefinition.process(spec.getTestBean());
 
@@ -282,8 +280,11 @@ public class MorcTest extends CamelSpringTestSupport {
                     .otherwise()
                     .log(LoggingLevel.DEBUG, "Received response from endpoint " + spec.getEndpointUri()
                             + " body: ${body}, headers: ${headers}")
-                    .end()
-                    .to(sendingMockEndpoint);
+                    .end();
+
+            if (spec.getMockFeedPreprocessor() != null) tryDefinition.process(spec.getMockFeedPreprocessor());
+
+            tryDefinition.to(sendingMockEndpoint);
 
             context.addRouteDefinition(publishRouteDefinition);
 

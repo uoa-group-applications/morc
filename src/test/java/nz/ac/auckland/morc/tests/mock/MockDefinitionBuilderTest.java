@@ -193,7 +193,7 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
                 .endpointNotOrdered()
                 .ordering(MockDefinition.OrderingType.NONE)
                 .messageResultWaitTime(1234).minimalResultWaitTime(5678).reassertionPeriod(314)
-                .mockFeedPreprocessor(pre).build(null);
+                .addMockFeedPreprocessor(pre).build(null);
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("a"))
                 .addProcessors(text("b")).addPredicates(text("a")).addPredicates(text("b")).lenient()
@@ -272,7 +272,7 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
                 .addProcessors(text("baz")).addPredicates(text("foo")).addPredicates(text("baz"))
                 .endpointNotOrdered()
                 .ordering(MockDefinition.OrderingType.NONE)
-                .mockFeedPreprocessor(pre).build(null);
+                .addMockFeedPreprocessor(pre).build(null);
 
         MockDefinition def1 = new MockDefinition.MockDefinitionBuilder("foo").addProcessors(text("moo"))
                 .endpointNotOrdered().ordering(MockDefinition.OrderingType.NONE)

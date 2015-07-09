@@ -46,33 +46,33 @@ public class WebServiceProxyTest extends MorcTestBuilder {
 
         syncTest("Simple non-200 WS proxy test", "jetty:http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
-                .expectation(httpResponse(201), contentType("application/xml"))
+                .expectation(httpStatusCode(201), contentType("application/xml"))
                 .addMock(syncMock("jetty:http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpResponse(201, xml("<foo/>"))));
+                        .response(httpStatusCode(201),xml("<foo/>")));
 
         syncTest("Simple non-200 WS proxy test check body", "jetty:http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
-                .expectation(httpResponse(201, xml("<foo/>")))
+                .expectation(httpStatusCode(201), xml("<foo/>"))
                 .addMock(syncMock("jetty:http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpResponse(201, xml("<foo/>"))));
+                        .response(httpStatusCode(201), xml("<foo/>")));
 
         syncTest("Simple WS proxy failure test", "http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
-                .expectation(httpErrorResponse(500))
+                .expectation(httpStatusCode(500))
                 .expectsException()
                 .addMock(syncMock("http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpErrorResponse(500, xml(classpath("/data/pingSoapFault.xml")))));
+                        .response(httpStatusCode(500), xml(classpath("/data/pingSoapFault.xml"))));
 
         syncTest("Simple WS proxy failure test with body", "http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))
-                .expectation(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml"))))
+                .expectation(httpStatusCode(501), xml(classpath("/data/pingSoapFault.xml")))
                 .expectsException()
                 .addMock(syncMock("http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpErrorResponse(501, xml(classpath("/data/pingSoapFault.xml")))));
+                        .response(httpStatusCode(501), xml(classpath("/data/pingSoapFault.xml"))));
 
         syncTest("Simple WS test using CXF", "cxf:http://localhost:8091/targetWS")
                 .request(xml(classpath("/data/pingRequestCxf1.xml")))

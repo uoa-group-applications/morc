@@ -3,6 +3,7 @@ package nz.ac.auckland.morc;
 import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
+import nz.ac.auckland.morc.predicate.HttpPathPredicate;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
 import nz.ac.auckland.morc.processor.SelectorProcessor;
 import nz.ac.auckland.morc.resource.*;
@@ -575,75 +576,51 @@ public interface MorcMethods {
     }
 
     /**
-     * @return A resource for HTTP responses, by default this will return HTTP Status 200
+     * @param statusCode the HTTP status code to use or validate
+     * @return A resource for non-200 HTTP responses
      */
-    default HttpResponseTestResource httpResponse() {
-        return new HttpResponseTestResource();
+    default HttpStatusCodeTestResource httpStatusCode(int statusCode) {
+        return new HttpStatusCodeTestResource(statusCode);
     }
 
     /**
-     * @param statusCode the HTTP status code to use
-     * @return A resource for non-standard HTTP responses
+     * @param method the HTTP method to use or validate
+     * @return A resource for non-GET HTTP responses
      */
-    default HttpResponseTestResource httpResponse(int statusCode) {
-        return new HttpResponseTestResource(statusCode);
+    default HttpMethodTestResource httpMethod(HttpMethodTestResource.HttpMethod method) {
+        return new HttpMethodTestResource(method);
     }
 
-    /**
-     * @param statusCode the HTTP status code to use
-     * @param body       the HTTP response body
-     * @return A resource for non-standard HTTP responses
-     */
-    @SuppressWarnings("unchecked")
-    default <T extends Predicate & Processor> HttpResponseTestResource httpResponse(int statusCode, T body) {
-        return new HttpResponseTestResource(statusCode, body);
+    default HttpMethodTestResource.HttpMethod POST() {
+        return HttpMethodTestResource.HttpMethod.POST;
     }
 
-    /**
-     * @param statusCode the HTTP status code to use
-     * @param body       the HTTP response body
-     * @param headers    HTTP response headers
-     * @return A resource for non-standard HTTP responses
-     */
-    @SuppressWarnings("unchecked")
-    default <T extends Processor & Predicate> HttpResponseTestResource httpResponse(int statusCode, T body, HeadersTestResource headers) {
-        return new HttpResponseTestResource(statusCode, body, headers);
+    default HttpMethodTestResource.HttpMethod GET() {
+        return HttpMethodTestResource.HttpMethod.GET;
     }
 
-    /**
-     * @return A resource for error HTTP response codes (this involves additional flags internally)
-     */
-    default HttpErrorTestResource httpErrorResponse() {
-        return new HttpErrorTestResource();
+    default HttpMethodTestResource.HttpMethod DELETE() {
+        return HttpMethodTestResource.HttpMethod.DELETE;
     }
 
-    /**
-     * @param statusCode the HTTP status code to use (usually 5**)
-     * @return A resource for error HTTP response codes (this involves additional flags internally)
-     */
-    default HttpResponseTestResource httpErrorResponse(int statusCode) {
-        return new HttpErrorTestResource(statusCode);
+    default HttpMethodTestResource.HttpMethod HEAD() {
+        return HttpMethodTestResource.HttpMethod.HEAD;
     }
 
-    /**
-     * @param statusCode the HTTP status code to use (usually 5**)
-     * @param body       The HTTP response body
-     * @return A resource for error HTTP response codes (this involves additional flags internally)
-     */
-    @SuppressWarnings("unchecked")
-    default <T extends Processor & Predicate> HttpErrorTestResource httpErrorResponse(int statusCode, T body) {
-        return new HttpErrorTestResource(statusCode, body);
+    default HttpMethodTestResource.HttpMethod OPTIONS() {
+        return HttpMethodTestResource.HttpMethod.OPTIONS;
     }
 
-    /**
-     * @param statusCode the HTTP status code to use (usually 5**)
-     * @param body       The HTTP response body
-     * @param headers    The HTTP response headers
-     * @return A resource for error HTTP response codes (this involves additional flags internally)
-     */
-    @SuppressWarnings("unchecked")
-    default <T extends Processor & Predicate> HttpErrorTestResource httpErrorResponse(int statusCode, T body, HeadersTestResource headers) {
-        return new HttpErrorTestResource(statusCode, body, headers);
+    default HttpMethodTestResource.HttpMethod PUT() {
+        return HttpMethodTestResource.HttpMethod.PUT;
+    }
+
+    default HttpMethodTestResource.HttpMethod TRACE() {
+        return HttpMethodTestResource.HttpMethod.TRACE;
+    }
+
+    default HttpPathPredicate httpPath(String path) {
+        return new HttpPathPredicate(path);
     }
 
     class HeaderValue {

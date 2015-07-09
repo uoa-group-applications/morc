@@ -349,7 +349,7 @@ public class MockDefinition {
                 minimalResultWaitTime(previousDefinitionPart.minimalResultWaitTime);
                 messageResultWaitTime(previousDefinitionPart.getMessageResultWaitTime());
                 this.expectedMessageCount += previousDefinitionPart.getExpectedMessageCount();
-                mockFeedPreprocessor(previousDefinitionPart.getMockFeedPreprocessor());
+                addMockFeedPreprocessor(previousDefinitionPart.getMockFeedPreprocessor());
                 for (EndpointOverride endpointOverride : previousDefinitionPart.getEndpointOverrides()) {
                     this.addEndpointOverride(endpointOverride);
                 }

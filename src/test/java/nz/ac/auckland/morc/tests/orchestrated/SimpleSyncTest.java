@@ -186,7 +186,7 @@ public class SimpleSyncTest extends MorcTestBuilder {
         syncTest("Test Mock preprocessor applied", "seda:preprocessorMock")
                 .request(text("1"))
                 .addMock(syncMock("seda:preprocessorMock").expectedMessageCount(1)
-                        .mockFeedPreprocessor(new Processor() {
+                        .addMockFeedPreprocessor(new Processor() {
                             @Override
                             public void process(Exchange exchange) throws Exception {
                                 exchange.setProperty("preprocessed", true);
