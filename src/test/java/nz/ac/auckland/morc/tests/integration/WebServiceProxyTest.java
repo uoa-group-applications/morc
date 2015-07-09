@@ -49,7 +49,7 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                 .expectation(httpStatusCode(201), contentType("application/xml"))
                 .addMock(syncMock("jetty:http://localhost:8090/targetWS")
                         .expectation(xml(classpath("/data/pingRequest1.xml")))
-                        .response(httpStatusCode(201),xml("<foo/>")));
+                        .response(httpStatusCode(201), xml("<foo/>")));
 
         syncTest("Simple non-200 WS proxy test check body", "jetty:http://localhost:8090/testWS")
                 .request(xml(classpath("/data/pingRequest1.xml")))

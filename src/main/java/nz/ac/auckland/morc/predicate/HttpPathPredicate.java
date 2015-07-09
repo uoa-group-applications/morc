@@ -28,7 +28,7 @@ public class HttpPathPredicate implements Predicate {
             return false;
         }
 
-        String receivedHttpPath = exchange.getIn().getHeader(Exchange.HTTP_PATH,String.class);
+        String receivedHttpPath = exchange.getIn().getHeader(Exchange.HTTP_PATH, String.class);
         if (!receivedHttpPath.equals(path)) {
             logger.warn("HTTP Path is not expected, received: {}, expected: {}", receivedHttpPath,
                     this.path);

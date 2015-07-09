@@ -20,7 +20,7 @@ public class HttpExceptionResponseProcessor implements Processor {
         HttpOperationFailedException httpException = (HttpOperationFailedException) t;
 
         String responseBody = httpException.getResponseBody();
-        Map<String,String> responseHeaders = httpException.getResponseHeaders();
+        Map<String, String> responseHeaders = httpException.getResponseHeaders();
 
         exchange.getIn().setBody(responseBody);
         exchange.getIn().getHeaders().putAll(responseHeaders);
@@ -33,7 +33,7 @@ public class HttpExceptionResponseProcessor implements Processor {
         }
 
         logger.debug("Received error response from endpoint: {}, body: {}, headers: {}",
-                new String[] {(exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() :
+                new String[]{(exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() :
                         "unknown"), responseBody, builder.toString()});
     }
 }

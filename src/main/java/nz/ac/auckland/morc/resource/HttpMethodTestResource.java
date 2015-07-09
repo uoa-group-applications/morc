@@ -29,7 +29,7 @@ public class HttpMethodTestResource<T extends Processor & Predicate> implements 
             return false;
         }
 
-        String receivedMethod = exchange.getIn().getHeader(Exchange.HTTP_METHOD,String.class);
+        String receivedMethod = exchange.getIn().getHeader(Exchange.HTTP_METHOD, String.class);
         if (!httpMethod.name().equals(receivedMethod)) {
             logger.warn("HTTP Method is not expected, received {}, expected: {}", receivedMethod, httpMethod.name());
             return false;
@@ -42,11 +42,11 @@ public class HttpMethodTestResource<T extends Processor & Predicate> implements 
     public void process(Exchange exchange) throws Exception {
         logger.trace("Setting response method to {} for endpoint {}", httpMethod.name(),
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
-        exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod.name());
+        exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod.name());
     }
 
     public enum HttpMethod {
-        GET, POST , PUT, DELETE, HEAD, OPTIONS, TRACE
+        GET, POST, PUT, DELETE, HEAD, OPTIONS, TRACE
     }
 
     @Override
