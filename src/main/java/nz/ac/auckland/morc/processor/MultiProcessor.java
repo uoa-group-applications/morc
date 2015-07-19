@@ -27,7 +27,7 @@ public class MultiProcessor implements Processor {
                 (exchange.getFromEndpoint() != null ? exchange.getFromEndpoint().getEndpointUri() : "unknown"));
         for (Processor processor : processors) {
             logger.trace("Applying processor");
-            processor.process(exchange);
+            if (processor != null) processor.process(exchange);
         }
     }
 }

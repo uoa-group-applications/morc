@@ -282,11 +282,9 @@ public class MorcTest extends CamelSpringTestSupport {
                             + " body: ${body}, headers: ${headers}")
                     .end();
 
-            if (spec.getMockFeedPreprocessor() != null) tryDefinition.process(spec.getMockFeedPreprocessor());
+            if (spec.getMockFeedPreprocessor() != null) publishRouteDefinition.process(spec.getMockFeedPreprocessor());
 
-            tryDefinition.to(sendingMockEndpoint);
-
-            context.addRouteDefinition(publishRouteDefinition);
+            context.addRouteDefinition(publishRouteDefinition.to(sendingMockEndpoint));
 
             createdRoutes.add(publishRouteDefinition);
 

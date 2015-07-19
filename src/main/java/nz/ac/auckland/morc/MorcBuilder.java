@@ -292,7 +292,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      * @return A processor that will be applied before the exchange is sent through to the mock endpoint
      */
     public Processor getMockFeedPreprocessor() {
-        return new MultiProcessor(mockFeedPreprocessors);
+        return (mockFeedPreprocessors == null ? null : new MultiProcessor(mockFeedPreprocessors));
     }
 
     /**
@@ -300,6 +300,7 @@ public class MorcBuilder<Builder extends MorcBuilder<Builder>> {
      *                              mock endpoint
      */
     public Builder addMockFeedPreprocessor(Processor... mockFeedPreprocessors) {
+        if (this.mockFeedPreprocessors == null) this.mockFeedPreprocessors = new ArrayList<>();
         this.mockFeedPreprocessors.addAll(new ArrayList<>(Arrays.asList(mockFeedPreprocessors)));
         return self();
     }

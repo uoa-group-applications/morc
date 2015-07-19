@@ -22,17 +22,23 @@ public class SyncOrchestratedTestBuilder extends OrchestratedTestSpecification.O
      */
     public SyncOrchestratedTestBuilder(String description, String endpointUri) {
         super(description, endpointUri);
+        //In the case of HTTP responses we need to rip out the body and headers and put it in the message for proper
+        //validation
+        addRequiredMockPreprocessors();
     }
 
     public SyncOrchestratedTestBuilder(String description, TestBean bean) {
         super(description, bean);
+        addRequiredMockPreprocessors();
     }
 
     protected SyncOrchestratedTestBuilder(String description, String endpointUri,
                                           OrchestratedTestSpecification.OrchestratedTestSpecificationBuilderInit previousPartBuilder) {
         super(description, endpointUri, previousPartBuilder);
-        //In the case of HTTP responses we need to rip out the body and headers and put it in the message for proper
-        //validation
+        addRequiredMockPreprocessors();
+    }
+
+    private void addRequiredMockPreprocessors() {
         addMockFeedPreprocessor(new HttpExceptionResponseProcessor());
     }
 

@@ -148,6 +148,13 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .expectation(xml(groovy("<foo>$x</foo>", var("x", "123"))))
                         .response(xml(groovy("<baz>$y</baz>", var("y", "321")))));
 
+        syncTest("Simple HTTP Fail Test", "jetty:http://localhost:8090/testWS")
+                        .request(text("test"))
+                        .expectation(httpStatusCode(501),text("fail"))
+                        .expectsException()
+                        .addMock(syncMock("jetty:http://localhost:8090/targetWS")
+                                .expectation(text("test"))
+                                .response(text("fail"),httpStatusCode(501)));
 
     }
 
