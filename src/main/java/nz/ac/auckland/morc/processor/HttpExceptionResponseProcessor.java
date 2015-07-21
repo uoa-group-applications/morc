@@ -24,7 +24,7 @@ public class HttpExceptionResponseProcessor implements Processor {
 
         exchange.getIn().setBody(responseBody);
         exchange.getIn().getHeaders().putAll(responseHeaders);
-        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE,httpException.getStatusCode());
+        exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, httpException.getStatusCode());
 
         StringBuilder builder = new StringBuilder();
         for (String key : responseHeaders.keySet()) {

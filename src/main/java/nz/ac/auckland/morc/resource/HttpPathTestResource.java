@@ -1,7 +1,8 @@
-package nz.ac.auckland.morc.predicate;
+package nz.ac.auckland.morc.resource;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
+import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +11,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class HttpPathPredicate implements Predicate {
+public class HttpPathTestResource implements Predicate, Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpPathPredicate.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpPathTestResource.class);
     private String path;
 
-    public HttpPathPredicate(String path) {
+    public HttpPathTestResource(String path) {
         this.path = path;
     }
 
@@ -39,7 +40,15 @@ public class HttpPathPredicate implements Predicate {
     }
 
     @Override
+    public void process(Exchange exchange) {
+        if (exchange == null) return;
+
+        exchange.getIn().setHeader(Exchange.HTTP_PATH, path);
+        logger.debug("Setting HTTP path to {}", path);
+    }
+
+    @Override
     public String toString() {
-        return "HttpPathPredicate: Path:" + path;
+        return "HttpPathTestResource: Path:" + path;
     }
 }

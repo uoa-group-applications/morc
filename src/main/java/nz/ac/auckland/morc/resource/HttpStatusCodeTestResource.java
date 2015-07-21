@@ -65,26 +65,3 @@ public class HttpStatusCodeTestResource<T extends Processor & Predicate> impleme
         return "HttpStatusCodeTestResource: Status:" + statusCode;
     }
 }
-
-/*
-        Throwable t = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
-        if (!(t instanceof HttpOperationFailedException)) {
-            logger.error("An unexpected error occurred during exception validation", t);
-            return false;
-        }
-
-
-        logger.debug("Validating exception {} on endpoint {}", httpException, (exchange.getFromEndpoint() != null ?
-                exchange.getFromEndpoint().getEndpointUri() : "null"));
-
-        String responseBody = httpException.getResponseBody();
-        Map responseHeaders = httpException.getResponseHeaders();
-
-        //this is a bit of a hack to use other validators
-        Exchange validationExchange = new DefaultExchange(exchange);
-        validationExchange.getIn().setBody(responseBody);
-        if (responseHeaders != null) validationExchange.getIn().setHeaders(responseHeaders);
-        validationExchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, httpException.getStatusCode());
-
-        return super.matches(validationExchange);
- */

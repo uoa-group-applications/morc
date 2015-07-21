@@ -3,7 +3,6 @@ package nz.ac.auckland.morc;
 import au.com.bytecode.opencsv.CSVReader;
 import groovy.text.GStringTemplateEngine;
 import groovy.text.TemplateEngine;
-import nz.ac.auckland.morc.predicate.HttpPathPredicate;
 import nz.ac.auckland.morc.processor.MatchedResponseProcessor;
 import nz.ac.auckland.morc.processor.SelectorProcessor;
 import nz.ac.auckland.morc.resource.*;
@@ -619,8 +618,8 @@ public interface MorcMethods {
         return HttpMethodTestResource.HttpMethod.TRACE;
     }
 
-    default HttpPathPredicate httpPath(String path) {
-        return new HttpPathPredicate(path);
+    default HttpPathTestResource httpPath(String path) {
+        return new HttpPathTestResource(path);
     }
 
     class HeaderValue {
