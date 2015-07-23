@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class HttpStatusCodeTestResource<T extends Processor & Predicate> implements Processor, Predicate {
+public class HttpStatusCodeTestResource implements Processor, Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpStatusCodeTestResource.class);
     private int statusCode;
@@ -31,7 +31,7 @@ public class HttpStatusCodeTestResource<T extends Processor & Predicate> impleme
         }
 
         int receivedStatusCode = exchange.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE, Integer.class);
-        if (statusCode != 0 && statusCode != receivedStatusCode) {
+        if (statusCode != receivedStatusCode) {
             logger.warn("HTTP Status Code is not expected, received: {}, expected: {}", receivedStatusCode,
                     this.statusCode);
             return false;

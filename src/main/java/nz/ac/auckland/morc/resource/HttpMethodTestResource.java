@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author David MacDonald - d.macdonald@auckland.ac.nz
  */
-public class HttpMethodTestResource<T extends Processor & Predicate> implements Processor, Predicate {
+public class HttpMethodTestResource implements Processor, Predicate {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpMethodTestResource.class);
     private HttpMethod httpMethod;

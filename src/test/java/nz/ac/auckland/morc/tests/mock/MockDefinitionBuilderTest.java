@@ -216,7 +216,7 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
         assertEquals(5678 + (4 * 1234), def2.getResultWaitTime());
         assertEquals(314, def2.getReassertionPeriod());
         def2.getMockFeedPreprocessor().process(e);
-        assertEquals("PreprocessorCalled", e.getProperty("PreprocessorCalled",Boolean.class));
+        assertEquals(true, e.getProperty("PreprocessorCalled",Boolean.class));
         assertEquals(MockDefinition.OrderingType.NONE, def2.getOrderingType());
         assertFalse(def2.isEndpointOrdered());
         assertNotNull(def2.getLenientSelector());
@@ -298,7 +298,7 @@ public class MockDefinitionBuilderTest extends Assert implements MorcMethods {
         assertEquals(10000 + (4 * 1000), def2.getResultWaitTime());
         assertEquals(0, def2.getReassertionPeriod());
         def2.getMockFeedPreprocessor().process(e);
-        assertEquals("PreprocessorCalled", e.getProperty("PreprocessorCalled",Boolean.class));
+        assertEquals(true, e.getProperty("PreprocessorCalled",Boolean.class));
         assertEquals(MockDefinition.OrderingType.NONE, def2.getOrderingType());
         assertFalse(def2.isEndpointOrdered());
         assertNotNull(def2.getLenientSelector());
