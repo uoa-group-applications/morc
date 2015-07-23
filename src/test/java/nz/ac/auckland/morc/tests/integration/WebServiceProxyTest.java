@@ -149,23 +149,23 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .response(xml(groovy("<baz>$y</baz>", var("y", "321")))));
 
         syncTest("Simple HTTP Fail Test", "jetty:http://localhost:8090/testWS")
-                        .request(text("test"),httpMethod(POST()))
-                        .expectation(httpStatusCode(501),text("fail"))
-                        .expectsException()
-                        .addMock(syncMock("jetty:http://localhost:8090/targetWS")
-                                .expectation(text("test"),httpMethod(POST()))
-                                .response(text("fail"),httpStatusCode(501)));
+                .request(text("test"), httpMethod(POST()))
+                .expectation(httpStatusCode(501), text("fail"))
+                .expectsException()
+                .addMock(syncMock("jetty:http://localhost:8090/targetWS")
+                        .expectation(text("test"), httpMethod(POST()))
+                        .response(text("fail"), httpStatusCode(501)));
 
         syncTest("Simple HTTP REST Test", "http://localhost:8094/testWS")
-            .request(httpPath("/foo"),text("1"),httpMethod(POST())).expectation(httpStatusCode(203),text("2"))
-            .request(httpPath("/baz"),text("3"),httpMethod(PUT())).expectation(httpStatusCode(203),text("4"))
-            .request(httpPath("/moo"),text("5"),httpMethod(DELETE())).expectation(httpStatusCode(203),text("6"))
-            .request(httpPath("/abc"),headers(header("foo","baz")),httpMethod(GET())).expectation(httpStatusCode(203),text("7"))
-            .addMock(restMock("http://localhost:8094/testWS")
-                    .expectation(httpPath("/foo"),text("1"),httpMethod(POST())).response(text("2"),httpStatusCode(203))
-                    .expectation(httpPath("/baz"),text("3"),httpMethod(PUT())).response(text("4"),httpStatusCode(203))
-                    .expectation(httpPath("/moo"),text("5"),httpMethod(DELETE())).response(text("6"),httpStatusCode(203))
-                    .expectation(httpPath("/abc"),headers(header("foo","baz")),httpMethod(GET())).response(text("7"),httpStatusCode(203)));
+                .request(httpPath("/foo"), text("1"), httpMethod(POST())).expectation(httpStatusCode(203), text("2"))
+                .request(httpPath("/baz"), text("3"), httpMethod(PUT())).expectation(httpStatusCode(203), text("4"))
+                .request(httpPath("/moo"), text("5"), httpMethod(DELETE())).expectation(httpStatusCode(203), text("6"))
+                .request(httpPath("/abc"), headers(header("foo", "baz")), httpMethod(GET())).expectation(httpStatusCode(203), text("7"))
+                .addMock(restMock("http://localhost:8094/testWS")
+                        .expectation(httpPath("/foo"), text("1"), httpMethod(POST())).response(text("2"), httpStatusCode(203))
+                        .expectation(httpPath("/baz"), text("3"), httpMethod(PUT())).response(text("4"), httpStatusCode(203))
+                        .expectation(httpPath("/moo"), text("5"), httpMethod(DELETE())).response(text("6"), httpStatusCode(203))
+                        .expectation(httpPath("/abc"), headers(header("foo", "baz")), httpMethod(GET())).response(text("7"), httpStatusCode(203)));
 
     }
 

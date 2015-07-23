@@ -14,7 +14,7 @@ public class HttpPathTestResourceTest extends Assert {
         HttpPathTestResource resource = new HttpPathTestResource("/foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         resource.process(e);
-        assertEquals("/foo",e.getIn().getHeader(Exchange.HTTP_PATH));
+        assertEquals("/foo", e.getIn().getHeader(Exchange.HTTP_PATH));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class HttpPathTestResourceTest extends Assert {
     public void testPathMatches() throws Exception {
         HttpPathTestResource resource = new HttpPathTestResource("/foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setHeader(Exchange.HTTP_PATH,"/foo");
+        e.getIn().setHeader(Exchange.HTTP_PATH, "/foo");
         assertTrue(resource.matches(e));
     }
 
@@ -42,7 +42,7 @@ public class HttpPathTestResourceTest extends Assert {
     public void testPathMismatch() throws Exception {
         HttpPathTestResource resource = new HttpPathTestResource("/foo");
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setHeader(Exchange.HTTP_PATH,"/baz");
+        e.getIn().setHeader(Exchange.HTTP_PATH, "/baz");
         assertFalse(resource.matches(e));
     }
 }

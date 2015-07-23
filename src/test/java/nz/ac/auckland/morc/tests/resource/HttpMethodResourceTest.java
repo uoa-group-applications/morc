@@ -27,7 +27,7 @@ public class HttpMethodResourceTest extends Assert {
     public void testMethodMatch() throws Exception {
         HttpMethodTestResource resource = new HttpMethodTestResource(HttpMethodTestResource.HttpMethod.POST);
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setHeader(Exchange.HTTP_METHOD,"POST");
+        e.getIn().setHeader(Exchange.HTTP_METHOD, "POST");
         assertTrue(resource.matches(e));
     }
 
@@ -35,7 +35,7 @@ public class HttpMethodResourceTest extends Assert {
     public void testMethodMisMatch() throws Exception {
         HttpMethodTestResource resource = new HttpMethodTestResource(HttpMethodTestResource.HttpMethod.POST);
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.getIn().setHeader(Exchange.HTTP_METHOD,"GET");
+        e.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
         assertFalse(resource.matches(e));
     }
 
@@ -44,7 +44,7 @@ public class HttpMethodResourceTest extends Assert {
         HttpMethodTestResource resource = new HttpMethodTestResource(HttpMethodTestResource.HttpMethod.POST);
         Exchange e = new DefaultExchange(new DefaultCamelContext());
         resource.process(e);
-        assertEquals("POST",e.getIn().getHeader(Exchange.HTTP_METHOD));
+        assertEquals("POST", e.getIn().getHeader(Exchange.HTTP_METHOD));
     }
 
 }

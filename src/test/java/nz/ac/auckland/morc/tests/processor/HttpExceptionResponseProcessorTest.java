@@ -26,7 +26,7 @@ public class HttpExceptionResponseProcessorTest extends Assert {
     @Test
     public void testWrongException() throws Exception {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
-        e.setProperty(Exchange.EXCEPTION_CAUGHT,new IOException());
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, new IOException());
         HttpExceptionResponseProcessor processor = new HttpExceptionResponseProcessor();
         processor.process(e);
         assertNull(e.getIn().getBody());
@@ -38,23 +38,23 @@ public class HttpExceptionResponseProcessorTest extends Assert {
         Exchange e = new DefaultExchange(new DefaultCamelContext());
 
         //check headers are appended
-        e.getIn().setHeader("foo","baz");
+        e.getIn().setHeader("foo", "baz");
 
         HttpExceptionResponseProcessor processor = new HttpExceptionResponseProcessor();
-        Map<String,String> headers = new HashMap<>();
-        headers.put("a","b");
-        headers.put("c","d");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("a", "b");
+        headers.put("c", "d");
 
-        Exception ex = new HttpOperationFailedException("foo",505,"failbot","somewhere",headers,"responsebody");
-        e.setProperty(Exchange.EXCEPTION_CAUGHT,ex);
+        Exception ex = new HttpOperationFailedException("foo", 505, "failbot", "somewhere", headers, "responsebody");
+        e.setProperty(Exchange.EXCEPTION_CAUGHT, ex);
 
         processor.process(e);
 
-        assertEquals("responsebody",e.getIn().getBody(String.class));
-        assertEquals(505,e.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE));
-        assertEquals("b",e.getIn().getHeader("a"));
-        assertEquals("d",e.getIn().getHeader("c"));
-        assertEquals("baz",e.getIn().getHeader("foo"));
+        assertEquals("responsebody", e.getIn().getBody(String.class));
+        assertEquals(505, e.getIn().getHeader(Exchange.HTTP_RESPONSE_CODE));
+        assertEquals("b", e.getIn().getHeader("a"));
+        assertEquals("d", e.getIn().getHeader("c"));
+        assertEquals("baz", e.getIn().getHeader("foo"));
     }
 
 }

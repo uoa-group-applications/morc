@@ -97,9 +97,9 @@ public abstract class MorcTestBuilder extends MorcTest implements MorcMethods {
     public SyncMockDefinitionBuilder restMock(String endpointUri) {
         try {
             if (!URISupport.parseParameters(new URI(endpointUri)).containsKey("matchOnUriPrefix")) {
-                Map<String,Object> params = new HashMap<>();
-                params.put("matchOnUriPrefix","true");
-                endpointUri = URISupport.appendParametersToURI(endpointUri,params);
+                Map<String, Object> params = new HashMap<>();
+                params.put("matchOnUriPrefix", "true");
+                endpointUri = URISupport.appendParametersToURI(endpointUri, params);
             }
         } catch (URISyntaxException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
