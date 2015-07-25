@@ -167,6 +167,17 @@ public class WebServiceProxyTest extends MorcTestBuilder {
                         .expectation(httpPath("/moo"), text("5"), httpMethod(DELETE())).response(text("6"), httpStatusCode(203))
                         .expectation(httpPath("/abc"), headers(header("foo", "baz")), httpMethod(GET())).response(text("7"), httpStatusCode(203)));
 
+        //without any path on the uri
+        syncTest("Simple HTTP REST Test", "http://localhost:8094")
+                .request(httpPath("/foo"), text("1"), httpMethod(POST())).expectation(httpStatusCode(203), text("2"))
+                .request(httpPath("/baz"), text("3"), httpMethod(PUT())).expectation(httpStatusCode(203), text("4"))
+                .request(httpPath("/moo"), text("5"), httpMethod(DELETE())).expectation(httpStatusCode(203), text("6"))
+                .request(httpPath("/abc"), headers(header("foo", "baz")), httpMethod(GET())).expectation(httpStatusCode(203), text("7"))
+                .addMock(restMock("http://localhost:8094")
+                        .expectation(httpPath("/foo"), text("1"), httpMethod(POST())).response(text("2"), httpStatusCode(203))
+                        .expectation(httpPath("/baz"), text("3"), httpMethod(PUT())).response(text("4"), httpStatusCode(203))
+                        .expectation(httpPath("/moo"), text("5"), httpMethod(DELETE())).response(text("6"), httpStatusCode(203))
+                        .expectation(httpPath("/abc"), headers(header("foo", "baz")), httpMethod(GET())).response(text("7"), httpStatusCode(203)));
     }
 
 }

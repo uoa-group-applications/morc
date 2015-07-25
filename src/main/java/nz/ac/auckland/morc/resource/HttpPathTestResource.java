@@ -30,6 +30,7 @@ public class HttpPathTestResource implements Predicate, Processor {
         }
 
         String receivedHttpPath = exchange.getIn().getHeader(Exchange.HTTP_PATH, String.class);
+        if (!receivedHttpPath.startsWith("/")) receivedHttpPath = "/" + receivedHttpPath;
         if (!receivedHttpPath.equals(path)) {
             logger.warn("HTTP Path is not expected, received: {}, expected: {}", receivedHttpPath,
                     this.path);
