@@ -3,16 +3,19 @@ package nz.ac.auckland.morc.tests;
 import nz.ac.auckland.morc.MorcMethods;
 import nz.ac.auckland.morc.mock.MockDefinition;
 import nz.ac.auckland.morc.mock.builder.SyncMockDefinitionBuilder;
+import nz.ac.auckland.morc.predicate.MultiPredicate;
 import nz.ac.auckland.morc.resource.GroovyTemplateTestResource;
 import nz.ac.auckland.morc.resource.TestResource;
 import nz.ac.auckland.morc.utility.XmlUtilities;
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +28,19 @@ public class MorcTestBuilderTest extends Assert implements MorcMethods {
         long finishTime = new Date().getTime();
 
         assertTrue(finishTime >= time + 5000l);
+    }
+
+    @Test
+    public void testMultiPredicate() throws Exception {
+        Predicate predicate = multiPredicate(text("a"), headers(header("a", "b"), header("c", "d")));
+        Exchange e = new DefaultExchange(new DefaultCamelContext());
+        e.getIn().setBody("a");
+        Map<String,Object> headers = new HashMap<>();
+        headers.put("a","b");
+        headers.put("c","d");
+        e.getIn().setHeaders(headers);
+        assertTrue(predicate.matches(e));
+        assertTrue(multiPredicate(headers(header("a", "b"), header("c", "d"))).matches(e));
     }
 
     @Test
